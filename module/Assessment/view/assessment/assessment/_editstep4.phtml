@@ -1,0 +1,285 @@
+<?php
+
+// within a view script
+$form = $this->form;
+$form->prepare();
+
+// Assuming the "contact/process" route exists...
+$form->setAttribute('action', '/assessment/edit');
+
+// Set the method attribute for the form
+$form->setAttribute('method', 'post');
+
+// Render the opening tag
+?>
+
+<style>
+    .labelBold label {
+        font-weight: 700;
+    }
+    #step1 {
+        margin-top: 30px;
+    }
+</style>
+
+<div class="page-title">
+    <h1 class="fleft">
+        <?php if ($this->aId): ?>
+            Assessment for <?php echo $this->aObj->_client_name; ?>
+        <?php endif; ?>
+    </h1>
+
+    <div class="cboth"></div>
+</div>
+    <?php if (!$this->isClosed): ?>
+        <form action="/assessment/edit/<?php echo $this->aId ?>/step/4" method="post" name="assessment" id="assessment" enctype="multipart/form-data">
+    <?php endif; ?>
+        <h2>Step 4 of 5 - Business Associates</h2>
+
+        <input type="hidden" name="locationHidden" value="<?php echo $this->location ?>" />
+        <input id="setStep" type="hidden" name="setStep" value="" />
+        <input id="isNew" type="hidden" name="isNew" value="0" />
+
+        <?php $locationName = ''; ?>
+        <p>
+            <label style="font-weight: 700;">Select Location</label>
+            <select name="abal_adr_id" id="selectLocation">
+                <option value="">Select Location</option>
+                <?php foreach ($this->addresses as $address): ?>
+                    <?php if ($this->location == $address->adr_id) $locationName = $address->adr_name; ?>
+                    <option <?php echo $this->location == $address->adr_id ? ' SELECTED ' : '' ?> value="<?php echo $address->adr_id ?>"><?php echo $address->adr_name ?></option>
+                <?php endforeach; ?>
+            </select>
+        </p>
+        <p></p>
+
+        <?php
+            $fn = $form->get('a_id');
+            echo $this->formHidden($fn);
+        ?>
+
+        <div class="cboth"></div>
+
+        <?php if ($this->location): ?>
+            <h3><?php echo $locationName ?> Business Associates</h3>
+
+            <?php $reportFile = isset($this->reportsFiles[5]) ? $this->reportsFiles[5] : null; ?>
+            <div class="cboth"></div>
+
+            <table cellpadding="0" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th colspan="2"></th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <?php $counterAbal = 1;
+                    foreach ($this->abals as $abal): ?>
+                        <tr>
+                            <td><?php echo $counterAbal ?>.</td>
+                            <td>
+                                <select name="abal_ba_id_exists[<?php echo $abal->abal_id ?>]" id="" class="baSelect w350">
+                                    <option value="">Select Business Associate</option>
+                                    <option SELECTED value="0">N/A</option>
+                                    <?php foreach ($this->bas as $baId => $baName): ?>
+                                        <option <?php if ($abal->abal_ba_id == $baId) echo ' SELECTED '; ?> value="<?php echo $baId ?>"><?php echo $baName ?></option>
+                                    <?php endforeach; ?>
+                                    <option value="addNewBaSelect" value="">&rarr; Add New Business Associate</option>
+
+                                </select>
+                            </td>
+                            <td>&nbsp;</td>
+
+                            <td class="aright">
+                                <a title="Delete" class="i-delete" href="/assessment/deleteabal/<?php echo $abal->abal_a_id ?>/adrId/<?php echo $abal->abal_adr_id ?>/abalId/<?php echo $abal->abal_id ?>"><i class="fa fa-trash-o"></i></a>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                            </td>
+                        </tr>
+                    <?php $counterAbal++; endforeach ?>
+
+                    <tr>
+                        <td><?php echo $counterAbal ?>.</td>
+                        <td>
+                            <select name="abal_ba_id" id="" class="baSelect w350">
+                                <option value="">Select Business Associate</option>
+                                <option value="0">N/A</option>
+                                <?php foreach ($this->bas as $baId => $baName): ?>
+                                    <option value="<?php echo $baId ?>"><?php echo $baName ?></option>
+                                <?php endforeach; ?>
+                                <option value="addNewBaSelect" value="">&rarr; Add New Business Associate</option>
+                            </select>
+                        </td>
+                        <td>&nbsp;</td>
+                        <td class="aright">
+                            <?php if (!$this->isClosed): ?>
+                                <a href="javascript:" rel="" class="button fright buttonAdd"><i class="fa fa-plus-circle"></i> Add</a>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <?php if (!$this->isClosed): ?>
+                <a id="addNewBaLink" style="display: none" href="/assessment/addnewba/<?php echo $this->aId ?>/step/4/location/<?php echo $this->location ?>/companyId/<?php echo $this->aObj->a_c_id; ?>" class="fancybox" title="Edit"><i class="fa fa-pencil"></i></a>
+            <?php endif; ?>
+
+            <h5 style="padding-top: 22px;">Report files</h5>
+            <?php if (!$this->isClosed): ?>
+                <p>
+                    <a id="browseReportFile" href="javascript:" class="button"><i class="fa fa-plus-circle"></i> Upload report...</a>
+                </p>
+            <?php endif; ?>
+
+            <div class="cboth"></div>
+            <div id="filesReportsToUploadBox">
+
+            </div>
+
+            <div class="cboth"></div>
+
+            <?php if ($this->aId && $this->location && is_object($this->reportFiles) && ($this->reportFiles->count())): ?>
+                <?php foreach ($reportFiles as $_file): ?>
+                    <?php
+                    $_fileName = $_file->_filename;
+                    $_fileId = $_file->ailr_f_id;
+                    ?>
+                    <span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/report/<?php echo $_file->ailr_a_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+
+                <?php endforeach; ?>
+            <?php endif; ?>
+
+            <div class="cboth"></div>
+
+            <h5 style="padding-top: 22px;">Notes</h5>
+            <input type="hidden" name="note_item_type" value="7" />
+            <input type="hidden" name="note_item_id" value="<?php echo $this->aId ?>" />
+            <input type="hidden" name="note_subitem_id" value="<?php echo $this->location ?>" />
+            <p>
+                <textarea name="note_text" id="" style="width: 524px;"></textarea>
+            </p>
+            <div class="cboth"></div>
+
+            <h5 style="padding-top: 22px;">Attachments</h5>
+            <?php if (!$this->isClosed): ?>
+                <p>
+                    <a id="browseFile" href="javascript:" class="button"><i class="fa fa-plus-circle"></i> Browse Files...</a>
+                </p>
+            <?php endif; ?>
+
+            <div class="cboth"></div>
+            <div id="filesToUploadBox">
+
+            </div>
+
+            <div class="cboth"></div>
+
+            <?php if ($this->aId && $this->location && is_object($notes) && ($notes->count())): ?>
+                <?php foreach ($notes as $note): ?>
+                    <div class="note">
+                        <strong><?php echo $note->_username ?></strong> <small> on <?php echo $note->_note_create_date_format ?></small><br />
+                        <p>
+                            <?php echo $note->note_text ?><br />
+                            <?php if ($note->_files != ''): ?>
+                                <?php
+                                $_files = explode(',', $note->_files);
+                                ?>
+                                <strong>Attachments:</strong><br />
+                                <?php foreach ($_files as $_file): ?>
+                                    <?php
+                                    $_file = explode('::', $_file);
+                                    $_fileName = $_file[0];
+                                    $_fileId = $_file[1];
+                                    ?>
+                                    <span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </p>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+
+            <div class="cboth"></div>
+
+            <div class="form-buttons">
+                <?php if (!$this->isClosed): ?>
+                    <input id="saveAndContinue" type="button" value="Save and Continue" class="form-button" />
+                    <input type="submit" value="Save" class="form-button" />
+                    <div class="fleft">or</div>
+                <?php endif; ?>
+
+                <a href="/assessment/list" class="cancel">Cancel</a>
+            </div>
+
+        <?php endif; ?>
+
+    <?php echo $this->form()->closeTag() ?>
+
+
+<div class="cboth"><br /></div>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+
+        $('#saveAndContinue').click(function() {
+            $('#setStep').val(5);
+            $('#assessment').submit();
+        });
+
+        $('#selectLocation').change(function() {
+            var location = $(this).val();
+
+            if (location) {
+                window.location.href = '/assessment/edit/<?php echo $this->aId ?>/step/<?php echo $this->step ?>/location/' + location;
+            }
+        });
+
+        var browseFilesCounter = 0;
+        $('#browseFile').click(function() {
+            $('#filesToUploadBox').append('<input type="file" name="notesFiles[]" id="file' + browseFilesCounter + '" /><div class="cboth"></div>');
+
+            $('#file' + browseFilesCounter).click();
+            browseFilesCounter++;
+        });
+
+        var browseReportsFilesCounter = 0;
+        $('#browseReportFile').click(function() {
+            $('#filesReportsToUploadBox').append('<input type="file" name="report[5][]" id="fileReport' + browseReportsFilesCounter + '" /><div class="cboth"></div>');
+
+            $('#fileReport' + browseReportsFilesCounter).click();
+            browseReportsFilesCounter++;
+        });
+
+
+
+        $('.buttonAdd').click(function() {
+            $('#isNew').val(1);
+
+            $('#assessment').submit();
+        });
+
+        $('.baSelect').change(function() {
+            var valueContact = $(this).val();
+            if (valueContact == 'addNewBaSelect') {
+                $('#addNewBaLink').click();
+            }
+        });
+    });
+
+    function uploadReport()
+    {
+        $('#report5').click();
+    }
+
+    $('.fileReport').change(function() {
+        var rf = $(this).attr('rel');
+        $('#reportFilename' + rf).html($(this).val());
+    });
+
+
+</script>
+
+

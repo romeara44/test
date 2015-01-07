@@ -1,0 +1,106 @@
+<?php
+$urlOrder = $order == 'ASC' ? 'DESC' : 'ASC';
+$authService = new \Zend\Authentication\AuthenticationService();
+$authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+$identity = $authService->getIdentity();
+?>
+
+<div class="page-title">
+    <h1 class="fleft">Business Associates</h1>
+    <a href="/businessassociate/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Business Associate</a>
+    <div class="cboth"></div>
+</div>
+
+
+<p></p>
+
+<table cellpadding="0" cellspacing="0">
+    <thead>
+        <tr>
+            <?php $classSort = ($order_by == 'id') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('businessassociate', array('action' => 'list', 'page' => $page, 'order_by' => 'id', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    ID <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'name') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('businessassociate', array('action' => 'list', 'page' => $page, 'order_by' => 'name', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Name <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'uid') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('businessassociate', array('action' => 'list', 'page' => $page, 'order_by' => 'uid', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Contact Name <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'client') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('businessassociate', array('action' => 'list', 'page' => $page, 'order_by' => 'client', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Client Name <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'agreement') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('businessassociate', array('action' => 'list', 'page' => $page, 'order_by' => 'agreement', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Agreement <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+
+            <?php $classSort = ($order_by == 'email') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('businessassociate', array('action' => 'list', 'page' => $page, 'order_by' => 'email', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Email <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <th>Phone</th>
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->paginator as $ba): ?>
+            <tr>
+                <td><?php echo $ba->ba_id ?></td>
+                <td><a href="/businessassociate/edit/<?php echo $ba->ba_id ?>"><?php echo $ba->ba_name ?></a></td>
+                <td><?php echo $ba->_contact_name ?></td>
+                <td><?php echo $ba->_client_name ?></td>
+                <td>
+                    <?php if (!is_numeric($ba->ba_agreement_status)): ?>
+                        Not Assessed
+                    <?php else: ?>
+                        <?php echo $ba->ba_agreement_status ? 'Required' : 'Not Required' ?>
+                    <?php endif; ?>
+                </td>
+                <td><a href="mailto:<?php echo $ba->ba_email ?>"><?php echo $ba->ba_email ?></a></td>
+                <td style="white-space: nowrap;"><?php echo $ba->ba_office_phone ?></td>
+                <td style="white-space: nowrap;" class="aright">
+                    <a href="/businessassociate/edit/<?php echo $ba->ba_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+                    <?php if ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
+                        <a href="/businessassociate/unarchive/<?php echo $ba->ba_id ?>" class="">Unarchive</a>
+                    <?php else: ?>
+                        <?php $deleteUrl = '/businessassociate/delete/' . $ba->ba_id; ?>
+                        <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
+                    <?php endif; ?>
+                </td>
+            </tr>
+
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+<?php echo $this->paginationControl(
+    $this->paginator,
+    'sliding',
+    array('partial/paginator.phtml', 'Businessassociate'),
+    array('route' => 'list', 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'roleFilter' => $roleFilter, 'role' => 1, 'controller' => 'businessassociate', 'action' => 'list')
+);
+?>
+
+<div class="cboth"><br /></div>

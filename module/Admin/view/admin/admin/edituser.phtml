@@ -1,0 +1,510 @@
+<?php
+
+// within a view script
+$form = $this->form;
+$form->prepare();
+
+// Assuming the "contact/process" route exists...
+$form->setAttribute('action', '/admin/edituser');
+
+// Set the method attribute for the form
+$form->setAttribute('method', 'post');
+
+$_options = array(0 => 'Current Month', 1 => 'Last Month', 2 => 'Last 3 Months', 3 => 'Q1', 4 => 'Q2', 5 => 'Q3', 6 => 'Q4', 7 => 'This Year', 8 => 'Last Year');
+
+?>
+
+<div id="canvas">
+
+    <div class="page-title">
+        <h1 class="fleft"><?php if (!$uId): ?>Add New User<?php else: ?>User Details<?php endif; ?></h1>
+        <?php if (in_array($this->roleId, array(2, 3))): ?>
+            <ul id="tabs-nav">
+                <li><a href="#tab1">Details</a></li>
+                <li><a id="tab2Link" href="#tab2">Statistics</a></li>
+            </ul>
+        <?php endif; ?>
+        <div class="cboth"></div>
+    </div>
+
+    <p></p>
+
+    <div id="tab1">
+        <div class="col-left">
+
+            <form action="/admin/edituser/<?php echo $this->uId ?>" method="post" name="user" id="user">
+                <?php
+                    $fn = $form->get('u_id');
+                    echo $this->formHidden($fn);
+                ?>
+
+                <p>
+                    <?php $fn = $form->get('u_role_id');
+                    echo $this->formLabel($fn);
+                    $attrs = array('id'=>'accountType', 'class'=>'form-control required');
+                    if ($this->uId):
+                        $attrs['disabled'] = 'disabled';
+                    endif;
+                    echo $this->formSelect($fn->setAttributes($attrs));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+
+                <p id="seniorConsult">
+                    <?php $fn = $form->get('u_senior_consultant_u_id');
+                    echo $this->formLabel($fn);
+                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+
+                <h2>User Details</h2>
+
+                <p>
+                    <?php
+                    $fn = $form->get('u_firstname');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    $fn = $form->get('u_lastname');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    $fn = $form->get('u_title');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    $fn = $form->get('u_company');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    $fn = $form->get('u_office_phone');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+
+                    <?php
+                    $fn = $form->get('u_office_phone_inner');
+                    echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    $fn = $form->get('u_direct_phone');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                    <?php
+                    $fn = $form->get('u_direct_phone_inner');
+                    echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    $fn = $form->get('u_cell_phone');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    $fn = $form->get('u_other_phone');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                    <?php
+                    $fn = $form->get('u_other_phone_inner');
+                    echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    $fn = $form->get('u_fax');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    $fn = $form->get('u_email');
+                    $attrs = array('class'=>'form-control required email');
+                    if ($this->uId):
+                        $attrs['disabled'] = 'disabled';
+                    endif;
+
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes($attrs));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+
+                <h2>Address</h2>
+
+                <p>
+                    <?php
+                    $fn = $form->get('u_address1');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    $fn = $form->get('u_address2');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    $fn = $form->get('u_city');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php $fn = $form->get('u_state_id');
+                    echo $this->formLabel($fn);
+                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    $fn = $form->get('u_zip');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+
+                <div class="cboth"></div>
+                <div class="form-buttons">
+                    <input type="submit" value="Save" class="form-button" />
+                    <?php if ($this->isActive == 0): ?>
+                        <input onclick="window.location.href='/admin/unarchiveuser/<?php echo $this->uId ?>'" type="button" value="Unarchive user" class="form-button" />
+                    <?php elseif ($this->isActive == 1): ?>
+                        <input onclick="window.location.href='/admin/deleteuser/<?php echo $this->uId ?>'" type="button" value="Archive user" class="form-button" />
+                    <?php endif; ?>
+
+                    <div class="fleft">or</div>
+                    <a href="/admin/users" class="cancel">Cancel</a>
+                </div>
+
+            <?php echo $this->form()->closeTag() ?>
+
+        </div>
+    </div>
+
+    <?php if (in_array($this->roleId, array(2, 3))): ?>
+        <div id="tab2">
+
+            <div class="col2">
+
+                <table cellpadding="0" cellspacing="0">
+                    <thead>
+                    <tr>
+                        <th><h3 style="padding: 2px 0;">Consultant's Statistics</h3></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="acenter">
+                            <h4>Breach Logs</h4>
+                            <form action="" name="" id="" class="chart" method="POST">
+                                <select class="cSelect" rel="1" id="c1Select">
+                                    <?php foreach ($_options as $_key => $_option): ?>
+                                        <option <?php echo $_key == $this->c1Param ? ' SELECTED' : ''  ?> value="<?php echo $_key ?>"><?php echo $_option ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </form>
+                            Reportable: <?php echo $this->blReportReportable ?> &nbsp; | &nbsp; Un-Reportable: <?php echo $this->blReportUnReportable ?><br />
+
+                            <canvas id="chart1" class="chart"></canvas>
+
+                            <script type="text/javascript">
+
+                                // pie chart data
+                                var pieData = [
+                                    {
+                                        value: <?php echo $this->blReportReportable ?>,
+                                        color: "#2e9f9f",
+                                        highlight: "#ababab",
+                                        label: "Reportable"
+                                    },
+                                    {
+                                        value: <?php echo $this->blReportUnReportable ?>,
+                                        color: "#0a2a47",
+                                        highlight: "#ababab",
+                                        label: "Un-Reportable"
+                                    }
+                                ];
+
+                                // pie chart options
+                                var pieOptions = {
+                                    segmentShowStroke : true,
+                                    segmentStrokeColor : "#fff",
+                                    segmentStrokeWidth : 4,
+                                    animateRotate : false,
+                                    animateScale : false
+                                }
+
+                                // get pie chart canvas
+                                var countries = document.getElementById("chart1").getContext("2d");
+
+                                // draw pie chart
+                                new Chart(countries).Doughnut(pieData, pieOptions);
+
+                            </script>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="acenter">
+                            <h4>Breach Remediation Plans</h4>
+                            <form action="" name="" id="" class="chart" method="POST">
+                                <select class="cSelect" rel="3" id="c3Select">
+                                    <?php foreach ($_options as $_key => $_option): ?>
+                                        <option <?php echo $_key == $this->c3Param ? ' SELECTED' : ''  ?> value="<?php echo $_key ?>"><?php echo $_option ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </form>
+                            In Progress: <?php echo $this->brpReportInProgress ?> &nbsp; | &nbsp; Completed: <?php echo $this->brpReportCompleted ?><br />
+
+                            <canvas id="chart2" class="chart"></canvas>
+
+                            <script type="text/javascript">
+
+                                // pie chart data
+                                var pieData = [
+                                    {
+                                        value: <?php echo $this->brpReportInProgress ?>,
+                                        color: "#2e9f9f",
+                                        highlight: "#ababab",
+                                        label: "In Progress"
+                                    },
+                                    {
+                                        value: <?php echo $this->brpReportCompleted ?>,
+                                        color: "#0a2a47",
+                                        highlight: "#ababab",
+                                        label: "Completed"
+                                    }
+                                ];
+
+                                // pie chart options
+                                var pieOptions = {
+                                    segmentShowStroke : true,
+                                    segmentStrokeColor : "#fff",
+                                    segmentStrokeWidth : 4,
+                                    animateRotate : false,
+                                    animateScale : false
+                                }
+
+                                // get pie chart canvas
+                                var countries = document.getElementById("chart2").getContext("2d");
+
+                                // draw pie chart
+                                new Chart(countries).Doughnut(pieData, pieOptions);
+
+                            </script>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+
+            <div class="col2 last">
+
+                <table cellpadding="0" cellspacing="0">
+                    <thead>
+                    <tr>
+                        <th><h3 style="padding: 2px 0;">Consultant's Statistics</h3></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="acenter">
+                            <h4>Assessments</h4>
+                            <form action="" name="" id="" class="chart" method="POST">
+                                <select class="cSelect" rel="2" id="c2Select">
+                                    <?php foreach ($_options as $_key => $_option): ?>
+                                        <option <?php echo $_key == $this->c2Param ? ' SELECTED' : ''  ?> value="<?php echo $_key ?>"><?php echo $_option ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </form>
+                            In Progress: <?php echo $this->aReportInProgress ?> &nbsp; | &nbsp; Completed: <?php echo $this->aReportCompleted ?><br />
+
+                            <canvas id="chart3" class="chart"></canvas>
+
+                            <script type="text/javascript">
+
+                                // pie chart data
+                                var pieData = [
+                                    {
+                                        value: <?php echo $this->aReportInProgress ?>,
+                                        color: "#2e9f9f",
+                                        highlight: "#ababab",
+                                        label: "In Progress"
+                                    },
+                                    {
+                                        value: <?php echo $this->aReportCompleted ?>,
+                                        color: "#0a2a47",
+                                        highlight: "#ababab",
+                                        label: "Completed"
+                                    }
+                                ];
+
+                                // pie chart options
+                                var pieOptions = {
+                                    segmentShowStroke : true,
+                                    segmentStrokeColor : "#fff",
+                                    segmentStrokeWidth : 4,
+                                    animateRotate : false,
+                                    animateScale : false
+                                }
+
+                                // get pie chart canvas
+                                var countries = document.getElementById("chart3").getContext("2d");
+
+                                // draw pie chart
+                                new Chart(countries).Doughnut(pieData, pieOptions);
+
+                            </script>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="acenter">
+                            <h4>Remediation Plans</h4>
+                            <form action="" name="" id="" class="chart" method="POST">
+                                <select class="cSelect" rel="4" id="c4Select">
+                                    <?php foreach ($_options as $_key => $_option): ?>
+                                        <option <?php echo $_key == $this->c4Param ? ' SELECTED' : ''  ?> value="<?php echo $_key ?>"><?php echo $_option ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </form>
+                            In Progress: <?php echo $this->rpReportInProgress ?> &nbsp; | &nbsp; Completed: <?php echo $this->rpReportCompleted ?><br />
+
+                            <canvas id="chart4" class="chart"></canvas>
+
+                            <script type="text/javascript">
+
+                                // pie chart data
+                                var pieData = [
+                                    {
+                                        value: <?php echo $this->rpReportInProgress ?>,
+                                        color: "#2e9f9f",
+                                        highlight: "#ababab",
+                                        label: "In Progress"
+                                    },
+                                    {
+                                        value: <?php echo $this->rpReportCompleted ?>,
+                                        color: "#0a2a47",
+                                        highlight: "#ababab",
+                                        label: "Completed"
+                                    }
+                                ];
+
+                                // pie chart options
+                                var pieOptions = {
+                                    segmentShowStroke : true,
+                                    segmentStrokeColor : "#fff",
+                                    segmentStrokeWidth : 4,
+                                    animateRotate : false,
+                                    animateScale : false
+                                }
+
+                                // get pie chart canvas
+                                var countries = document.getElementById("chart4").getContext("2d");
+
+                                // draw pie chart
+                                new Chart(countries).Doughnut(pieData, pieOptions);
+
+                            </script>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <div class="cboth"><br /></div>
+
+</div>
+
+<script>
+    jQuery(document).ready(function(){
+
+        //Conditional logic for account types
+        $('#user').submit(function() {
+            $('#user select, #user input').removeAttr('disabled');
+        });
+
+        jQuery('#seniorConsult').hide();
+        jQuery('#accountType').change(function() {
+            jQuery('#seniorConsult').hide();
+            if (jQuery(this).val() == 3) {
+                jQuery('#seniorConsult').show();
+            }
+        });
+        jQuery('#accountType').change();
+    });
+
+</script>
+
+<script type="text/javascript">
+    jQuery(function() {
+        $('#user').validate();
+        $("input[name=u_cell_phone], input[name=u_office_phone], input[name=u_direct_phone], input[name=u_other_phone], input[name=u_fax]").mask("(999) 999-9999");
+        $('input[name="u_zip"]').mask("99999");
+    });
+</script>
+
+
+<script>
+    $(document).ready(function() {
+        $('.cSelect').change(function() {
+            var num = $(this).attr('rel');
+
+            var c1Value = $('#c1Select').val();
+            var c2Value = $('#c2Select').val();
+            var c3Value = $('#c3Select').val();
+            var c4Value = $('#c4Select').val();
+
+            window.location.href = '/admin/edituser/40/c1/' + c1Value + '/c2/' + c2Value + '/c3/' + c3Value + '/c4/' + c4Value + '/st/1';
+        });
+
+
+        if (<?php echo $this->stParam ?>) {
+            $('#tab2Link').click();
+        }
+    });
+
+</script>

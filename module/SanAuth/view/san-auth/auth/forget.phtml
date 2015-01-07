@@ -1,0 +1,32 @@
+<?php
+
+$form = $this->form;
+$form->setAttribute('action', $this->url('auth', array('action' => 'forget')));
+$form->prepare();
+
+?>
+
+
+<div class="col-md-8 col-md-offset-2">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h1>Nie pamiętam hasła</h1>
+    </div>
+    <div class="panel-body">
+      <div class="col-md-6 col-md-offset-3">
+    <?php echo $this->form()->openTag($form); ?>
+			<label>Wpisz email użyty do rejestracji / logowania na który zostanie wysłana instrukcja zmiany hasła.</label>
+        <?php $fn = $form->get('u_email'); ?>
+        <?php
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control input-lg', 'placeholder' => 'Email', 'autofocus' => "true", "required"=>"true", "type"=>"email")));
+            echo $this->formElementErrors($fn);
+        ?>
+		<br />
+        <button class="btn btn-block btn-success btn-lg" type="submit">Wyślij instrukcję zmiany hasła</button>
+        <hr>
+    	<?php echo $this->form()->closeTag() ?>
+      </div>
+    </div>
+    <div class="panel-footer"></div>
+  </div>
+</div>

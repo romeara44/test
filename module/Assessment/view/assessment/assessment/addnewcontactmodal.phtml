@@ -1,0 +1,265 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head profile="http://gmpg.org/xfn/11">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <title>HIPAA Compliance - Application Wireframes v2.0</title>
+
+    <script type="text/javascript" src="//use.typekit.net/znb8skn.js"></script>
+    <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+    <link rel="stylesheet" href="/css/modals.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/css/font-awesome.css" type="text/css" media="screen" />
+    <!--<link rel="stylesheet" href="css/responsive.css" type="text/css" media="screen" />-->
+
+    <!--<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;" />-->
+
+    <!--<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.10.0/jquery.validate.min.js"></script>-->
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.fancybox.pack.js"></script>
+    <script type="text/javascript" src="/js/jquery.maskedinput.min.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+
+            /*jQuery('#click5-newsletter').validate({
+             errorPlacement: function(error, element) {}
+             });*/
+
+        });
+    </script>
+
+</head>
+
+<style type="text/css">
+    #statuses label { width: auto; }
+</style>
+
+<body>
+
+<?php if ($this->added): ?>
+    <script type="text/javascript">
+        window.parent.location.href = '/assessment/edit/<?php echo $this->aId ?>/step/2/location/<?php echo $this->location ?>';
+        parent.jQuery.fancybox.close();
+    </script>
+<?php endif; ?>
+
+<div id="modal">
+
+    <h1>Add New Contact</h1>
+
+    <div id="wrap">
+
+        <form action="/assessment/addnewcontact/<?php echo $this->aId ?>/step/2/location/<?php echo $this->location ?>/companyId/<?php echo $this->companyId; ?>" method="post" name="user" id="user">
+            <?php
+            $fn = $form->get('u_id');
+            echo $this->formHidden($fn);
+            ?>
+
+            <p>
+                <?php
+                $fn = $form->get('u_firstname');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_lastname');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_title');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+
+            <p style="padding: 2px 0 12px 0; line-height: 14px; border-top: 0;">
+                <label>&nbsp;</label>
+                <input type="checkbox" name="is_primary_contact" id="primaryContact" class="checkbox" value="1" />
+                <label for="primaryContact" class="checkbox">Primary Contact</label>
+            </p>
+
+            <p>
+                <?php
+                $fn = $form->get('u_office_phone');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                echo $this->formElementErrors($fn);
+                ?>
+
+                <?php
+                $fn = $form->get('u_office_phone_inner');
+                echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                echo $this->formElementErrors($fn);
+                ?>
+
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_direct_phone');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                echo $this->formElementErrors($fn);
+                ?>
+                <?php
+                $fn = $form->get('u_direct_phone_inner');
+                echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                echo $this->formElementErrors($fn);
+                ?>
+
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_cell_phone');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_other_phone');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                echo $this->formElementErrors($fn);
+                ?>
+                <?php
+                $fn = $form->get('u_other_phone_inner');
+                echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                echo $this->formElementErrors($fn);
+                ?>
+
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_fax');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_email');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+
+            <h2>Address</h2>
+
+            <p style="padding: 12px 0 12px 0; line-height: 14px;">
+                <label>&nbsp;</label>
+                <input type="checkbox" name="companyAddress" id="companyAddress" class="checkbox" value="" /> <label for="companyAddress" class="checkbox">Same as Company Address</label>
+            </p>
+
+            <p>
+                <?php
+                $fn = $form->get('u_address1');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id' => 'u_address1')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_address2');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id' => 'u_address2')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_city');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id' => 'u_city')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php $fn = $form->get('u_state_id');
+                echo $this->formLabel($fn);
+                echo $this->formSelect($fn->setAttributes(array('class'=>'form-control', 'id' => 'u_state_id')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_zip');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id' => 'u_zip')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+
+            <div class="cboth"></div>
+            <div class="form-buttons">
+                <input type="submit" value="Save" class="form-button" />
+                <div class="fleft">or</div>
+                <a href="javascript:void(0);" onclick="parent.jQuery.fancybox.close();" class="cancel">Cancel</a>
+            </div>
+
+            <?php echo $this->form()->closeTag() ?>
+
+        <div class="cboth"></div>
+
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    var primaryAddress1 = '';
+    var primaryAddress2 = '';
+    var primaryCity = '';
+    var primaryState = '';
+    var primaryZip = '';
+
+    <?php if (is_object($primaryAddressObj)): ?>
+        primaryAddress1 = '<?php echo $primaryAddressObj->adr_address1 ?>';
+        primaryAddress2 = '<?php echo $primaryAddressObj->adr_address2 ?>';
+        primaryCity = '<?php echo $primaryAddressObj->adr_city ?>';
+        primaryState = '<?php echo $primaryAddressObj->adr_state_id ?>';
+        primaryZip = '<?php echo $primaryAddressObj->adr_zip ?>';
+    <?php endif; ?>
+
+    var browseFilesCounter = 0;
+    $(document).ready(function() {
+        $('input[name=u_cell_phone], input[name="u_office_phone"], input[name="u_direct_phone"], input[name="u_other_phone"], input[name="u_fax"]').mask("(999) 999-9999");
+
+        $('#browseFileTask').click(function() {
+            $('#filesToUploadBoxTask').append('<input type="file" name="notesFiles[]" id="file' + browseFilesCounter + '" />');
+
+            $('#file' + browseFilesCounter).click();
+            browseFilesCounter++;
+        });
+
+        $('#companyAddress').click(function() {
+            var ca = $(this);
+            if ($(ca).is(':checked')) {
+                $('#u_address1').val(primaryAddress1);
+                $('#u_address2').val(primaryAddress2);
+                $('#u_city').val(primaryCity);
+                $('#u_state_id option[value=' + primaryState + ']').attr('selected','selected');
+                $('#u_zip').val(primaryZip);
+            }
+        });
+    });
+
+
+</script>
+
+</body>
+</html>

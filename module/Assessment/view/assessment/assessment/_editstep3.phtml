@@ -1,0 +1,253 @@
+<?php
+
+// within a view script
+$form = $this->form;
+$form->prepare();
+
+// Assuming the "contact/process" route exists...
+$form->setAttribute('action', '/assessment/edit');
+
+// Set the method attribute for the form
+$form->setAttribute('method', 'post');
+
+// Render the opening tag
+?>
+
+<style>
+    .labelBold label {
+        font-weight: 700;
+    }
+    #step1 {
+        margin-top: 30px;
+    }
+</style>
+
+<div class="page-title">
+    <h1 class="fleft">
+        <?php if ($this->aId): ?>
+            Assessment for <?php echo $this->aObj->_client_name; ?>
+        <?php endif; ?>
+    </h1>
+
+    <div class="cboth"></div>
+</div>
+    <?php if (!$this->isClosed): ?>
+        <form action="/assessment/edit/<?php echo $this->aId ?>/step/3" method="post" name="assessment" id="assessment" enctype="multipart/form-data">
+    <?php endif; ?>
+        <h2>Step 3 of 5 - Inventory Assets</h2>
+
+        <input type="hidden" name="locationHidden" value="<?php echo $this->location ?>" />
+        <input id="setStep" type="hidden" name="setStep" value="" />
+        <input id="aiId" type="hidden" name="aili_ai_id" value="" />
+        <input id="isNew" type="hidden" name="isNew" value="0" />
+
+        <?php $locationName = ''; ?>
+        <p>
+            <label style="font-weight: 700;">Select Location</label>
+            <select name="aili_adr_id" id="selectLocation">
+                <option value="">Select Location</option>
+                <option value="">---</option>
+                <?php foreach ($this->addresses as $address): ?>
+                    <?php if ($this->location == $address->adr_id) $locationName = $address->adr_name; ?>
+                    <option <?php echo $this->location == $address->adr_id ? ' SELECTED ' : '' ?> value="<?php echo $address->adr_id ?>"><?php echo $address->adr_name ?></option>
+                <?php endforeach; ?>
+            </select>
+        </p>
+        <p></p>
+
+        <?php
+            $fn = $form->get('a_id');
+            echo $this->formHidden($fn);
+        ?>
+
+        <div class="cboth"></div>
+
+        <?php if ($this->location): ?>
+            <h3><?php echo $locationName ?> Inventory</h3>
+
+            <div class="cboth"></div>
+
+            <?php $counterInv = 0; $last = ''; ?>
+            <?php foreach ($this->assessmentsInv as $ai): ?>
+
+                <?php if ($ai->ai_id < 3): ?>
+                    <h5 style="padding-top: 14px;"><?php echo $ai->ai_name ?></h5>
+                    <div class="cboth"></div>
+                <?php endif; ?>
+
+                <table cellpadding="0" cellspacing="0">
+                    <?php $wh = true; ?>
+                    <?php $counterAili = 1;
+                    if (isset($this->ailiItems[$ai->ai_id])):
+                        foreach ($this->ailiItems[$ai->ai_id] as $aili): ?>
+                            <?php echo $this->partial('assessment/assessment/_step3/_inventory' . $ai->ai_id . '.phtml', array('isClosed' => $this->isClosed, 'aId' => $this->aId, 'aiId' => $ai->ai_id, 'empty' => false, 'withHeader' => $wh, 'counterAili' => $counterAili, 'aili' => $aili, 'reportFile' => isset($this->reportsFiles[$ai->ai_id]) ? $this->reportsFiles[$ai->ai_id] : null)); ?>
+                            <?php $wh = false; ?>
+                        <?php $counterAili++; endforeach; ?>
+                    <?php endif; ?>
+
+                    <?php echo $this->partial('assessment/assessment/_step3/_inventory' . $ai->ai_id . '.phtml', array('isClosed' => $this->isClosed, 'aId' => $this->aId, 'aiId' => $ai->ai_id, 'empty' => true, 'withHeader' => $wh, 'counterAili' => $counterAili, 'reportFile' => isset($this->reportsFiles[$ai->ai_id]) ? $this->reportsFiles[$ai->ai_id] : null)); ?>
+                </table>
+
+                <h5 style="padding-top: 2px; padding-bottom: 15px;">Report files</h5>
+                <?php if (!$this->isClosed): ?>
+                    <p>
+                        <a rel="<?php echo $ai->ai_id ?>" href="javascript:" class="browseFile button" href="javascript:"><i class="fa fa-plus-circle"></i> Upload report...</a>
+                    </p>
+                <?php endif; ?>
+
+                <div class="cboth"></div>
+                <div id="filesReportsToUploadBox<?php echo $ai->ai_id ?>">
+
+                </div>
+
+                <div class="cboth"></div>
+
+                <?php if ($this->aId && $this->location && isset($this->reportFiles[$ai->ai_id])): ?>
+                    <div style="margin-bottom: 20px;">
+                        <?php foreach ($this->reportFiles[$ai->ai_id] as $_file): ?>
+                            <?php
+                            $_fileName = $_file->_filename;
+                            $_fileId = $_file->ailr_f_id;
+                            ?>
+                            <span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/report/<?php echo $_file->ailr_a_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+
+                <div class="cboth"></div>
+
+                <?php $counterInv++; endforeach; ?>
+
+            <div class="cboth"></div>
+
+            <h5 style="padding-top: 22px;">Notes</h5>
+            <input type="hidden" name="note_item_type" value="6" />
+            <input type="hidden" name="note_item_id" value="<?php echo $this->aId ?>" />
+            <input type="hidden" name="note_subitem_id" value="<?php echo $this->location ?>" />
+            <p>
+                <textarea name="note_text" id="" style="width: 524px;"></textarea>
+            </p>
+            <div class="cboth"></div>
+
+            <h5 style="padding-top: 22px;">Attachments</h5>
+            <?php if (!$this->isClosed): ?>
+                <p>
+                    <a id="browseFile" href="javascript:" class="button"><i class="fa fa-plus-circle"></i> Browse Files...</a>
+                </p>
+            <?php endif; ?>
+
+            <div class="cboth"></div>
+            <div id="filesToUploadBox">
+
+            </div>
+
+            <div class="cboth"></div>
+
+            <?php if ($this->aId && $this->location && is_object($notes) && ($notes->count())): ?>
+                <?php foreach ($notes as $note): ?>
+                    <div class="note">
+                        <strong><?php echo $note->_username ?></strong> <small> on <?php echo $note->_note_create_date_format ?></small><br />
+                        <p>
+                            <?php echo $note->note_text ?><br />
+                            <?php if ($note->_files != ''): ?>
+                                <?php
+                                $_files = explode(',', $note->_files);
+                                ?>
+                                <strong>Attachments:</strong><br />
+                                <?php foreach ($_files as $_file): ?>
+                                    <?php
+                                    $_file = explode('::', $_file);
+                                    $_fileName = $_file[0];
+                                    $_fileId = $_file[1];
+                                    ?>
+                                    <span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </p>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+
+            <div class="cboth"></div>
+
+            <div class="form-buttons">
+                <?php if (!$this->isClosed): ?>
+                    <input id="saveAndContinue" type="button" value="Save and Continue" class="form-button" />
+                    <input type="submit" value="Save" class="form-button" />
+                    <div class="fleft">or</div>
+                <?php endif; ?>
+
+                <a href="/assessment/list" class="cancel">Cancel</a>
+            </div>
+
+        <?php endif; ?>
+
+    <?php echo $this->form()->closeTag() ?>
+
+
+<div class="cboth"><br /></div>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+
+        $('#saveAndContinue').click(function() {
+            $('#setStep').val(4);
+            $('#assessment').submit();
+        });
+
+        $('#selectLocation').change(function() {
+            var location = $(this).val();
+
+            if (location) {
+                window.location.href = '/assessment/edit/<?php echo $this->aId ?>/step/<?php echo $this->step ?>/location/' + location;
+            }
+        });
+
+        var browseFilesCounter = 0;
+        $('#browseFile').click(function() {
+            $('#filesToUploadBox').append('<input type="file" name="notesFiles[]" id="file' + browseFilesCounter + '" /><div class="cboth"></div>');
+
+            $('#file' + browseFilesCounter).click();
+            browseFilesCounter++;
+        });
+
+        $('.buttonAdd').click(function() {
+            $('#aiId').val($(this).attr('rel'));
+            $('#isNew').val(1);
+
+            $('#assessment').submit();
+        });
+
+        var browseFilesCounter = new Object();
+        $(document).ready(function() {
+            $('.browseFile').click(function() {
+                var baqId = $(this).attr('rel');
+
+                if (browseFilesCounter[baqId] == undefined) {
+                    browseFilesCounter[baqId] = 1;
+                } else {
+                    browseFilesCounter[baqId]++;
+                }
+                $('#filesReportsToUploadBox' + baqId).append('<input type="file" name="report[' + baqId + '][]" id="file' + baqId + '_' + browseFilesCounter[baqId] + '" /><div class="cboth"></div>');
+
+                $('#file' + baqId + '_' + browseFilesCounter[baqId]).click();
+            });
+        });
+
+    });
+
+    function uploadReport(type)
+    {
+        $('#report' + type).click();
+    }
+
+    $('.fileReport').change(function() {
+        var rf = $(this).attr('rel');
+        $('#reportFilename' + rf).html($(this).val());
+    });
+
+</script>
+
+

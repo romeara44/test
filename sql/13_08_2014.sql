@@ -1,0 +1,1 @@
+update `assessments_questions` set aq_title = 'Are there policies and procedures describing how to protect ePHI from inappropriate alteration or destruction' WHERE aq_id = 197;

@@ -1,0 +1,257 @@
+<?php
+    $_options = array(0 => 'Current Month', 1 => 'Last Month', 2 => 'Last 3 Months', 3 => 'Q1', 4 => 'Q2', 5 => 'Q3', 6 => 'Q4', 7 => 'This Year', 8 => 'Last Year');
+?>
+
+<div class="page-title">
+    <h1 class="fleft">Dashboard</h1>
+    <a href="/admin/edituser" class="button"><i class="fa fa-plus-circle"></i> Add New User</a>
+    <div class="cboth"></div>
+</div>
+
+<p></p>
+
+<div class="col2">
+
+    <table cellpadding="0" cellspacing="0">
+        <thead>
+        <tr>
+            <th><h3 style="padding: 2px 0;">Summary Reports</h3></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td class="acenter">
+                <h4>Breach Logs</h4>
+                <form action="" name="" id="" class="chart" method="POST">
+                    <select class="cSelect" rel="1" id="c1Select">
+                        <?php foreach ($_options as $_key => $_option): ?>
+                            <option <?php echo $_key == $this->c1Param ? ' SELECTED' : ''  ?> value="<?php echo $_key ?>"><?php echo $_option ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </form>
+                Reportable: <?php echo $this->blReportReportable ?> &nbsp; | &nbsp; Un-Reportable: <?php echo $this->blReportUnReportable ?><br />
+
+                <canvas id="chart1" class="chart"></canvas>
+
+                <script type="text/javascript">
+
+                    // pie chart data
+                    var pieData = [
+                        {
+                            value: <?php echo $this->blReportReportable ?>,
+                            color: "#2e9f9f",
+                            highlight: "#ababab",
+                            label: "Reportable"
+                        },
+                        {
+                            value: <?php echo $this->blReportUnReportable ?>,
+                            color: "#0a2a47",
+                            highlight: "#ababab",
+                            label: "Un-Reportable"
+                        }
+                    ];
+
+                    // pie chart options
+                    var pieOptions = {
+                        segmentShowStroke : true,
+                        segmentStrokeColor : "#fff",
+                        segmentStrokeWidth : 4,
+                        animateRotate : false,
+                        animateScale : false
+                    }
+
+                    // get pie chart canvas
+                    var countries = document.getElementById("chart1").getContext("2d");
+
+                    // draw pie chart
+                    new Chart(countries).Doughnut(pieData, pieOptions);
+
+                </script>
+            </td>
+        </tr>
+        <tr>
+            <td class="acenter">
+                <h4>Breach Remediation Plans</h4>
+                <form action="" name="" id="" class="chart" method="POST">
+                    <select class="cSelect" rel="3" id="c3Select">
+                        <?php foreach ($_options as $_key => $_option): ?>
+                            <option <?php echo $_key == $this->c3Param ? ' SELECTED' : ''  ?> value="<?php echo $_key ?>"><?php echo $_option ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </form>
+                In Progress: <?php echo $this->brpReportInProgress ?> &nbsp; | &nbsp; Completed: <?php echo $this->brpReportCompleted ?><br />
+
+                <canvas id="chart2" class="chart"></canvas>
+
+                <script type="text/javascript">
+
+                    // pie chart data
+                    var pieData = [
+                        {
+                            value: <?php echo $this->brpReportInProgress ?>,
+                            color: "#2e9f9f",
+                            highlight: "#ababab",
+                            label: "In Progress"
+                        },
+                        {
+                            value: <?php echo $this->brpReportCompleted ?>,
+                            color: "#0a2a47",
+                            highlight: "#ababab",
+                            label: "Completed"
+                        }
+                    ];
+
+                    // pie chart options
+                    var pieOptions = {
+                        segmentShowStroke : true,
+                        segmentStrokeColor : "#fff",
+                        segmentStrokeWidth : 4,
+                        animateRotate : false,
+                        animateScale : false
+                    }
+
+                    // get pie chart canvas
+                    var countries = document.getElementById("chart2").getContext("2d");
+
+                    // draw pie chart
+                    new Chart(countries).Doughnut(pieData, pieOptions);
+
+                </script>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<div class="col2 last">
+
+    <table cellpadding="0" cellspacing="0">
+        <thead>
+        <tr>
+            <th><h3 style="padding: 2px 0;">Summary Reports</h3></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td class="acenter">
+                <h4>Assessments</h4>
+                <form action="" name="" id="" class="chart" method="POST">
+                    <select class="cSelect" rel="2" id="c2Select">
+                        <?php foreach ($_options as $_key => $_option): ?>
+                            <option <?php echo $_key == $this->c2Param ? ' SELECTED' : ''  ?> value="<?php echo $_key ?>"><?php echo $_option ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </form>
+                In Progress: <?php echo $this->aReportInProgress ?> &nbsp; | &nbsp; Completed: <?php echo $this->aReportCompleted ?><br />
+
+                <canvas id="chart3" class="chart"></canvas>
+
+                <script type="text/javascript">
+
+                    // pie chart data
+                    var pieData = [
+                        {
+                            value: <?php echo $this->aReportInProgress ?>,
+                            color: "#2e9f9f",
+                            highlight: "#ababab",
+                            label: "In Progress"
+                        },
+                        {
+                            value: <?php echo $this->aReportCompleted ?>,
+                            color: "#0a2a47",
+                            highlight: "#ababab",
+                            label: "Completed"
+                        }
+                    ];
+
+                    // pie chart options
+                    var pieOptions = {
+                        segmentShowStroke : true,
+                        segmentStrokeColor : "#fff",
+                        segmentStrokeWidth : 4,
+                        animateRotate : false,
+                        animateScale : false
+                    }
+
+                    // get pie chart canvas
+                    var countries = document.getElementById("chart3").getContext("2d");
+
+                    // draw pie chart
+                    new Chart(countries).Doughnut(pieData, pieOptions);
+
+                </script>
+            </td>
+        </tr>
+        <tr>
+            <td class="acenter">
+                <h4>Remediation Plans</h4>
+                <form action="" name="" id="" class="chart" method="POST">
+                    <select class="cSelect" rel="4" id="c4Select">
+                        <?php foreach ($_options as $_key => $_option): ?>
+                            <option <?php echo $_key == $this->c4Param ? ' SELECTED' : ''  ?> value="<?php echo $_key ?>"><?php echo $_option ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </form>
+                In Progress: <?php echo $this->rpReportInProgress ?> &nbsp; | &nbsp; Completed: <?php echo $this->rpReportCompleted ?><br />
+
+                <canvas id="chart4" class="chart"></canvas>
+
+                <script type="text/javascript">
+
+                    // pie chart data
+                    var pieData = [
+                        {
+                            value: <?php echo $this->rpReportInProgress ?>,
+                            color: "#2e9f9f",
+                            highlight: "#ababab",
+                            label: "In Progress"
+                        },
+                        {
+                            value: <?php echo $this->rpReportCompleted ?>,
+                            color: "#0a2a47",
+                            highlight: "#ababab",
+                            label: "Completed"
+                        }
+                    ];
+
+                    // pie chart options
+                    var pieOptions = {
+                        segmentShowStroke : true,
+                        segmentStrokeColor : "#fff",
+                        segmentStrokeWidth : 4,
+                        animateRotate : false,
+                        animateScale : false
+                    }
+
+                    // get pie chart canvas
+                    var countries = document.getElementById("chart4").getContext("2d");
+
+                    // draw pie chart
+                    new Chart(countries).Doughnut(pieData, pieOptions);
+
+                </script>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+<div class="cboth"><br /></div>
+
+
+<script>
+    $(document).ready(function() {
+        $('.cSelect').change(function() {
+            var num = $(this).attr('rel');
+
+            var c1Value = $('#c1Select').val();
+            var c2Value = $('#c2Select').val();
+            var c3Value = $('#c3Select').val();
+            var c4Value = $('#c4Select').val();
+
+            window.location.href = '/dashboard/admin/c1/' + c1Value + '/c2/' + c2Value + '/c3/' + c3Value + '/c4/' + c4Value;
+        });
+    });
+
+</script>

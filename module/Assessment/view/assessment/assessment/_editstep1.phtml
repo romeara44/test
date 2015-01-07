@@ -1,0 +1,419 @@
+<?php
+
+// within a view script
+$form = $this->form;
+$form->prepare();
+
+// Assuming the "contact/process" route exists...
+$form->setAttribute('action', '/assessment/edit');
+
+// Set the method attribute for the form
+$form->setAttribute('method', 'post');
+
+// Render the opening tag
+?>
+
+<style>
+    .labelBold label {
+        font-weight: 700;
+    }
+    #step1 {
+        margin-top: 30px;
+    }
+</style>
+
+<div class="page-title">
+    <h1 class="fleft">
+        <?php if ($this->aId): ?>
+            Assessment for <?php echo $this->aObj->_client_name; ?>
+        <?php else: ?>
+            New Assessment
+        <?php endif; ?>
+    </h1>
+
+    <div class="cboth"></div>
+</div>
+
+
+<div class="col-left">
+    <?php if (!$this->isClosed): ?>
+        <form action="/assessment/edit/<?php echo $this->aId ?>/step/1<?php if ($this->companyId): ?>/companyId/<?php echo $this->companyId ?><?php endif; ?>" method="post" name="assessment" id="assessment">
+    <?php endif; ?>
+        <input id="setStep" type="hidden" name="setStep" value="" />
+        <?php
+            $fn = $form->get('a_id');
+            echo $this->formHidden($fn);
+        ?>
+
+        <?php if (!$this->aId): ?>
+            <h2 style="padding-top: 0">Select Client</h2>
+
+            <p class="labelBold">
+                <?php $fn = $form->get('a_c_id');
+                $fn->setValue($this->companyId);
+                echo $this->formLabel($fn);
+                echo $this->formSelect($fn->setAttributes(array('class'=>'form-control', 'id' => 'a_c_id')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <ul style="display: none" id="s1"><li>Value is required and can't be empty</li></ul>
+
+            <h2>Select Assessment Type</h2>
+
+            <p class="labelBold">
+                <?php $fn = $form->get('a_type');
+                echo $this->formLabel($fn);
+                echo $this->formSelect($fn->setAttributes(array('class'=>'form-control', 'id' => 'assessmentType')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <ul style="display: none" id="sa1"><li>Value is required and can't be empty</li></ul>
+
+            <p id="inviteClientLinkP">
+                <label>&nbsp;</label>
+                <a id="inviteClientLink" href="/assessment/invitetoassessment/0" onclick="" class="fancybox form-button"><i class="fa fa-envelope"></i> Invite Client to Assessment</a>
+            </p>
+
+        <?php endif; ?>
+
+        <div class="cboth"></div>
+
+        <div id="step1">
+
+            <h2>Step 1 of 5 - Enter Locations</h2>
+
+            <div class="col-left">
+
+                <?php if ($this->aId): ?>
+                    <?php $counter = 1;
+
+                    foreach ($this->addresses as $address): ?>
+                        <h2>
+                            <?php if ($counter == 1): ?>
+                            <?php else: ?>
+                                Location #<?php echo $counter ?> <a class="i-delete" href="/assessment/deleteaddress/<?php echo $this->aId ?>/adrId/<?php echo $address->adr_id ?>"><i class="fa fa-trash-o"></i></a>
+                            <?php endif; ?>
+                        </h2>
+                        <div id="<?php echo ($counter == 1) ? 'location' : '' ?>">
+                            <p>
+                                <label for="exists_adr_name[<?php echo $address->adr_id ?>]">Location Name</label>
+                                <input id="adr1<?php echo $counter ?>" type="text" value="<?php echo $address->adr_name ?>" class="form-control" name="exists_adr_name[<?php echo $address->adr_id ?>]">
+                            </p>
+
+                            <p>
+                                <label for="exists_adr_address1[<?php echo $address->adr_id ?>]">Address 1</label>
+                                <input type="text" value="<?php echo $address->adr_address1 ?>" class="form-control" name="exists_adr_address1[<?php echo $address->adr_id ?>]">
+                            </p>
+
+                            <p>
+                                <label for="exists_adr_address2[<?php echo $address->adr_id ?>]">Address 2</label>
+                                <input type="text" value="<?php echo $address->adr_address2 ?>" class="form-control" name="exists_adr_address2[<?php echo $address->adr_id ?>]">
+                            </p>
+
+                            <p>
+                                <label for="exists_adr_city[<?php echo $address->adr_id ?>]">City</label>
+                                <input type="text" value="<?php echo $address->adr_city ?>" class="form-control" name="exists_adr_city[<?php echo $address->adr_id ?>]">
+                            </p>
+
+                            <p>
+                                <?php $fn = $form->get('adr_state_id[]');
+                                $fn->setValue($address->adr_state_id);
+                                $fn->setName('exists_adr_state_id[' . $address->adr_id .']');
+                                echo $this->formLabel($fn);
+                                echo $this->formSelect($fn->setAttributes(array('class'=>'form-control'))); ?>
+                            </p>
+
+                            <p>
+                                <label for="exists_adr_zip[<?php echo $address->adr_id ?>]">ZIP Code</label>
+                                <input type="text" value="<?php echo $address->adr_zip ?>" class="form-control" name="exists_adr_zip[<?php echo $address->adr_id ?>]">
+                            </p>
+
+                            <p>
+                                <label for="exists_adr_phone[<?php echo $address->adr_id ?>]">Phone</label>
+                                <input type="text" value="<?php echo $address->adr_phone ?>" class="phone" name="exists_adr_phone[<?php echo $address->adr_id ?>]">
+                                <input type="text" value="<?php echo $address->adr_phone_inner ?>" class="ext" name="exists_adr_phone_inner[<?php echo $address->adr_id ?>]">
+                            </p>
+
+                            <p>
+                                <label for="exists_adr_other_phone[<?php echo $address->adr_id ?>]">Other Phone</label>
+                                <input type="text" value="<?php echo $address->adr_other_phone ?>" class="phone" name="exists_adr_other_phone[<?php echo $address->adr_id ?>]">
+                                <input type="text" value="<?php echo $address->adr_other_phone_inner ?>" class="ext" name="exists_adr_other_phone_inner[<?php echo $address->adr_id ?>]">
+                            </p>
+
+                            <p>
+                                <label for="exists_adr_fax[<?php echo $address->adr_id ?>]">Fax</label>
+                                <input type="text" value="<?php echo $address->adr_fax ?>" class="form-control" name="exists_adr_fax[<?php echo $address->adr_id ?>]">
+                            </p>
+
+                            <p>
+                                <label for="exists_adr_email[<?php echo $address->adr_id ?>]">Email</label>
+                                <input type="text" value="<?php echo $address->adr_email ?>" class="form-control" name="exists_adr_email[<?php echo $address->adr_id ?>]">
+                            </p>
+                        </div>
+                        <?php $counter++; endforeach; ?>
+                <?php endif; ?>
+
+                <?php if (!$this->aId || !count($this->addresses)): ?>
+                    <div id="location">
+                        <p>
+                            <?php
+                            $fn = $form->get('adr_name[]');
+                            echo $this->formLabel($fn);
+                            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+                            echo $this->formElementErrors($fn);
+                            ?>
+                        </p>
+                        <ul style="display: none" id="adr11"><li>Value is required and can't be empty</li></ul>
+                        <p>
+                            <?php
+                            $fn = $form->get('adr_address1[]');
+                            echo $this->formLabel($fn);
+                            echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                            echo $this->formElementErrors($fn);
+                            ?>
+                        </p>
+                        <ul style="display: none" id="adr12"><li>Value is required and can't be empty</li></ul>
+                        <p>
+                            <?php
+                            $fn = $form->get('adr_address2[]');
+                            echo $this->formLabel($fn);
+                            echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                            echo $this->formElementErrors($fn);
+                            ?>
+                        </p>
+                        <p>
+                            <?php
+                            $fn = $form->get('adr_city[]');
+                            echo $this->formLabel($fn);
+                            echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                            echo $this->formElementErrors($fn);
+                            ?>
+                        </p>
+                        <ul style="display: none" id="adr13"><li>Value is required and can't be empty</li></ul>
+                        <p>
+                            <?php $fn = $form->get('adr_state_id[]');
+                            echo $this->formLabel($fn);
+                            echo $this->formSelect($fn->setAttributes(array('id' => 'adr14Select', 'class'=>'form-control')));
+                            echo $this->formElementErrors($fn);
+                            ?>
+                        </p>
+                        <ul style="display: none" id="adr14"><li>Value is required and can't be empty</li></ul>
+                        <p>
+                            <?php
+                            $fn = $form->get('adr_zip[]');
+                            echo $this->formLabel($fn);
+                            echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                            echo $this->formElementErrors($fn);
+                            ?>
+                        </p>
+                        <ul style="display: none" id="adr15"><li>Value is required and can't be empty</li></ul>
+                        <p>
+                            <?php
+                            $fn = $form->get('adr_phone[]');
+                            echo $this->formLabel($fn);
+                            echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                            echo $this->formElementErrors($fn);
+                            ?>
+                            <?php
+                            $fn = $form->get('adr_phone_inner[]');
+                            echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                            echo $this->formElementErrors($fn);
+                            ?>
+                        </p>
+
+                        <p>
+                            <?php
+                            $fn = $form->get('adr_other_phone[]');
+                            echo $this->formLabel($fn);
+                            echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                            echo $this->formElementErrors($fn);
+                            ?>
+                            <?php
+                            $fn = $form->get('adr_other_phone_inner[]');
+                            echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                            echo $this->formElementErrors($fn);
+                            ?>
+                        </p>
+
+                        <p>
+                            <?php
+                            $fn = $form->get('adr_fax[]');
+                            echo $this->formLabel($fn);
+                            echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                            echo $this->formElementErrors($fn);
+                            ?>
+                        </p>
+
+                        <p>
+                            <?php
+                            $fn = $form->get('adr_email[]');
+                            echo $this->formLabel($fn);
+                            echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                            echo $this->formElementErrors($fn);
+                            ?>
+                        </p>
+                        <p>
+                        </p>
+                        <div class="cboth"></div>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (!$this->isClosed): ?>
+                    <p style="border-top: 0">
+                        <a id="addLocationButton" href="javascript:" onclick="return addLocation()" class="button"><i class="fa fa-plus-circle"></i> Add Additional Location</a>
+                    </p>
+                <?php endif; ?>
+            </div>
+
+        </div>
+
+        <div class="cboth"></div>
+        <div class="form-buttons">
+            <?php if (!$this->isClosed): ?>
+                <input id="saveAndContinue" type="button" value="Save and Continue" class="form-button" />
+                <input id="save" type="button" value="Save" class="form-button" />
+                <div class="fleft">or</div>
+            <?php endif; ?>
+            <a href="/assessment/list" class="cancel">Cancel</a>
+        </div>
+
+    <?php echo $this->form()->closeTag() ?>
+</div>
+
+<div class="cboth"><br /></div>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        $('#location input[name="adr_phone[]"]').mask("(999) 999-9999");
+        $('#location input[name="adr_other_phone[]"]').mask("(999) 999-9999");
+        $('#location input[name="adr_fax[]"]').mask("(999) 999-9999");
+        $('#location input[name="adr_zip[]"]').mask("99999");
+
+        $('#saveAndContinue').click(function() {
+            <?php if (!$this->aId): ?>
+            if ((($('#assessmentType').val() == 1) && (($('#location input[name="adr_name[]"]').val() != '') && ($('#location input[name="adr_address1[]"]').val() != '') && ($('#location input[name="adr_city[]"]').val() != '') && ($('#location #adr14Select').val() >= 1) && ($('#location input[name="adr_zip[]"]').val() != '') && ($('#a_c_id').val() >= 1) && ($('#assessmentType').val() >= 1))) || ($('#assessmentType').val() == 2)) {
+                $('#setStep').val(2);
+                $('#assessment').submit();
+            } else {
+                $('#a_c_id').val() < 1 ? $('#s1').show() : $('#s1').hide();
+                $('#assessmentType').val() < 1 ? $('#sa1').show() : $('#sa1').hide();
+                $('#location input[name="adr_name[]"]').val() == '' ? $('#adr11').show() : $('#adr11').hide();
+                $('#location input[name="adr_address1[]"]').val() == '' ? $('#adr12').show() : $('#adr12').hide();
+                $('#location input[name="adr_city[]"]').val() == '' ? $('#adr13').show() : $('#adr13').hide();
+                $('#location #adr14Select').val() < 1 ? $('#adr14').show() : $('#adr14').hide();
+                $('#location input[name="adr_zip[]"]').val() == '' ? $('#adr15').show() : $('#adr15').hide();
+            }
+            <?php else: ?>
+                $('#setStep').val(2);
+                $('#assessment').submit();
+            <?php endif; ?>
+        });
+
+        $('#save').click(function() {
+            <?php if (!$this->aId): ?>
+            if ((($('#assessmentType').val() == 1) && (($('#location input[name="adr_name[]"]').val() != '') && ($('#location input[name="adr_address1[]"]').val() != '') && ($('#location input[name="adr_city[]"]').val() != '') && ($('#location #adr14Select').val() >= 1) && ($('#location input[name="adr_zip[]"]').val() != '') && ($('#a_c_id').val() >= 1) && ($('#assessmentType').val() >= 1))) || ($('#assessmentType').val() == 2)) {
+                    $('#assessment').submit();
+                } else {
+                    $('#a_c_id').val() < 1 ? $('#s1').show() : $('#s1').hide();
+                    $('#assessmentType').val() < 1 ? $('#sa1').show() : $('#sa1').hide();
+                    $('#location input[name="adr_name[]"]').val() == '' ? $('#adr11').show() : $('#adr11').hide();
+                    $('#location input[name="adr_address1[]"]').val() == '' ? $('#adr12').show() : $('#adr12').hide();
+                    $('#location input[name="adr_city[]"]').val() == '' ? $('#adr13').show() : $('#adr13').hide();
+                    $('#location #adr14Select').val() < 1 ? $('#adr14').show() : $('#adr14').hide();
+                    $('#location input[name="adr_zip[]"]').val() == '' ? $('#adr15').show() : $('#adr15').hide();
+            }
+            <?php else: ?>
+                $('#assessment').submit();
+            <?php endif; ?>
+
+        });
+
+        //Conditional logic for assesment type
+        jQuery('#assessmentType').change(function(){
+            if(jQuery(this).val() == 2) {
+                jQuery('#step1').hide();
+                $('#inviteClientLinkP').hide();
+            } else {
+                jQuery('#step1').show();
+                $('#inviteClientLinkP').show();
+            }
+        });
+
+        jQuery('#assessmentType').change();
+
+        jQuery('#a_c_id').change(function() {
+            window.location.href='/assessment/edit/0/step/1/companyId/' + $(this).val();
+
+            /*if (jQuery('#a_c_id').val() > 0) {
+                jQuery('#inviteClientLink').attr('href', '/assessment/invitetoassessment/' + jQuery(this).val());
+            } else {
+                jQuery('#inviteClientLink').attr('href', '/assessment/invitetoassessment/0');
+            }*/
+        });
+
+        if (jQuery('#a_c_id').val() > 0) {
+            jQuery('#inviteClientLink').attr('href', '/assessment/invitetoassessment/' + jQuery('#a_c_id').val());
+        } else {
+            jQuery('#inviteClientLink').attr('href', '/assessment/invitetoassessment/0');
+        }
+
+        <?php $counterAdr = 1;
+        foreach ($this->companyAddresses as $address): ?>
+            <?php if ($counterAdr == 1):
+                $locationId = 'location';
+            ?>
+            $('#<?php echo $locationId ?> input[name="adr_phone[]"]').val('<?php echo $this->company->c_phone ?>');
+            $('#<?php echo $locationId ?> input[name="adr_other_phone[]"]').val('<?php echo $this->company->c_other_phone ?>');
+            $('#<?php echo $locationId ?> input[name="adr_other_phone_inner[]"]').val('<?php echo $this->company->c_other_phone_inner ?>');
+            $('#<?php echo $locationId ?> input[name="adr_fax[]"]').val('<?php echo $this->company->c_fax ?>');
+            $('#<?php echo $locationId ?> input[name="adr_email[]"]').val('<?php echo $this->company->c_email ?>');
+            <?php else: ?>
+                addLocation();
+                <?php $locationId = 'location' . $counterAdr;
+            endif; ?>
+
+            $('#<?php echo $locationId ?> input[name="adr_address1[]"]').val('<?php echo $address->adr_address1 ?>');
+            $('#<?php echo $locationId ?> input[name="adr_address2[]"]').val('<?php echo $address->adr_address2 ?>');
+            $('#<?php echo $locationId ?> input[name="adr_city[]"]').val('<?php echo $address->adr_city ?>');
+            $('#<?php echo $locationId ?> input[name="adr_zip[]"]').val('<?php echo $address->adr_zip ?>');
+            $('#<?php echo $locationId ?> select[name="adr_state_id[]"] option[value="<?php echo $address->adr_state_id ?>"]').attr('selected', 'selected');
+            $('#<?php echo $locationId ?> input[name="adr_zip[]"]').val('<?php echo $address->adr_zip ?>');
+
+
+        <?php $counterAdr++; endforeach; ?>
+    });
+
+    var counterLocation = <?php if ($this->aId): ?><?php echo $this->addresses->count() + 1 ?><?php else: ?>2<?php endif;?>;
+    var locationAddress = $('#location').html();
+
+    locationAddress = locationAddress.replace(/exists_/g, '');
+
+    function addLocation()
+    {
+        var locationHtml = '<div id="location' + counterLocation + '" class="additionalLocation"><h2>Location #' + counterLocation + ' <a onclick="$(this).parent().parent().remove()" class="i-delete" href="javascript:"><i class="fa fa-trash-o"></i></a></h2>' + locationAddress + '</div>';
+        $('#addLocationButton').before(locationHtml);
+        $('#location' + counterLocation).find('input').val('');
+        $('#location' + counterLocation).find('select').val('');
+
+        $('#location' + counterLocation + ' input, #location' + counterLocation + ' select').each(function() {
+            var name = $(this).attr('name');
+            var n = name.indexOf("[");
+            var newName = name.substr(0, n) + '[]';
+            $(this).attr('name', newName);
+        });
+
+        //$("'#location' + counterLocation + ' input[name=ba_office_phone], input[name=ba_direct_phone], input[name=ba_other_phone], input[name=c_fax]").mask("(999) 999-9999");
+        $('#location input[name="adr_phone[]"]').mask("(999) 999-9999");
+        $('#location input[name="adr_other_phone[]"]').mask("(999) 999-9999");
+        $('#location input[name="adr_fax[]"]').mask("(999) 999-9999");
+        $('#location input[name="adr_zip[]"]').mask("99999");
+
+        $('#location' + counterLocation + ' input[name="adr_phone[]"]').mask("(999) 999-9999");
+        $('#location' + counterLocation + ' input[name="adr_other_phone[]"]').mask("(999) 999-9999");
+        $('#location' + counterLocation + ' input[name="adr_fax[]"]').mask("(999) 999-9999");
+        $('#location' + counterLocation + ' input[name="adr_zip[]"]').mask("99999");
+
+        counterLocation++;
+    }
+</script>

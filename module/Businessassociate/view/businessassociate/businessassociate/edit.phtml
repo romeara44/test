@@ -1,0 +1,573 @@
+<?php
+
+// within a view script
+$form = $this->form;
+$form->prepare();
+
+// Assuming the "contact/process" route exists...
+$form->setAttribute('action', '/businessassociate/edit');
+
+// Set the method attribute for the form
+$form->setAttribute('method', 'post');
+
+// Render the opening tag
+?>
+
+<style>
+    h4 label {
+        width: auto;
+    }
+    input[type="radio"] {
+        float: none;
+    }
+    #questionsForm input[type="radio"] {
+        float: left;
+    }
+
+</style>
+
+<div id="canvas">
+    <div class="page-title">
+        <h1 class="fleft"><?php if (!$this->baId): ?>Add New Business Associate<?php else: ?>Business Associate Details<?php endif; ?></h1>
+        <?php if ($this->baId): ?>
+            <ul id="tabs-nav">
+                <li><a href="#tab1">Details</a></li>
+                <li><a href="#tab2">Assessment</a></li>
+                <li><a href="#tab3">Notes</a></li>
+            </ul>
+        <?php endif; ?>
+        <div class="cboth"></div>
+    </div>
+
+    <p></p>
+
+    <div id="tab1">
+        <form action="/businessassociate/edit/<?php echo $this->baId ?>" method="post" name="businessassociate" id="businessassociate">
+            <div class="col-left">
+                <?php
+                    $fn = $form->get('ba_id');
+                    echo $this->formHidden($fn);
+                ?>
+
+                <?php
+                    $authService = new \Zend\Authentication\AuthenticationService();
+                    $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+                    $identity = $authService->getIdentity();
+                ?>
+
+                <p>
+                    <?php $fn = $form->get('ba_c_id');
+                    echo $this->formLabel($fn);
+                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control required')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+
+                <p>
+                    <?php
+                    $fn = $form->get('ba_name');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+
+                <p>
+                    <?php
+                    $fn = $form->get('ba_office_phone');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                    <?php
+                    $fn = $form->get('ba_office_phone_inner');
+                    echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+
+                <p>
+                    <?php
+                    $fn = $form->get('ba_direct_phone');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                    <?php
+                    $fn = $form->get('ba_direct_phone_inner');
+                    echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+
+                <p>
+                    <?php
+                    $fn = $form->get('ba_other_phone');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                    <?php
+                    $fn = $form->get('ba_other_phone_inner');
+                    echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+
+                <p>
+                    <?php
+                    $fn = $form->get('ba_fax');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+
+                </p>
+
+                <p>
+                    <?php
+                    $fn = $form->get('ba_email');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+
+                <p>
+                    <?php
+                    $fn = $form->get('ba_website');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+
+                <p>
+                    <?php
+                    $fn = $form->get('ba_address1');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+
+                <p>
+                    <?php
+                    $fn = $form->get('ba_address2');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+
+                <p>
+                    <?php
+                    $fn = $form->get('ba_city');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+
+                <p>
+                <?php $fn = $form->get('ba_state_id');
+                echo $this->formLabel($fn);
+                echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+                </p>
+
+                <p>
+                    <?php
+                    $fn = $form->get('ba_zip');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+
+                <h2>Contact Person</h2>
+
+                <?php
+                $fn = $form->get('u_id');
+                echo $this->formHidden($fn);
+                ?>
+
+                <p>
+                    <?php
+                    $fn = $form->get('u_firstname');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    $fn = $form->get('u_lastname');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    $fn = $form->get('u_title');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    $fn = $form->get('u_office_phone');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+
+                    <?php
+                    $fn = $form->get('u_office_phone_inner');
+                    echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    $fn = $form->get('u_direct_phone');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                    <?php
+                    $fn = $form->get('u_direct_phone_inner');
+                    echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    $fn = $form->get('u_cell_phone');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    $fn = $form->get('u_other_phone');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                    <?php
+                    $fn = $form->get('u_other_phone_inner');
+                    echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    $fn = $form->get('u_fax');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    $fn = $form->get('u_email');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control required email')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+
+                <div class="cboth"></div>
+                <div class="form-buttons" style="width: 900px">
+                    <input type="submit" value="Save" class="form-button" />
+
+                    <?php if ($this->baId): ?>
+                        <a href="/businessassociate/getschedulecall/<?php echo $this->baId ?>" class="fancybox form-button"><i class="fa fa-envelope"></i> Schedule Call</a>
+                        <a href="/businessassociate/invitetoassessment/<?php echo $this->baId ?>" class="fancybox form-button"><i class="fa fa-envelope"></i> Invite to Assessment</a>
+                    <?php endif; ?>
+
+                    <div class="fleft">or</div>
+                    <a href="/businessassociate/list" class="cancel">Cancel</a>
+                </div>
+            </div>
+
+
+            <?php if ($this->baId): ?>
+                <div class="col-right">
+                    <h4>
+                        Phone Call Status
+                    </h4>
+                    <?php
+                    $fn = $form->get('ba_phone_call_invited_status');
+                    ?>
+                    <?php echo $this->formCheckbox($fn->setAttributes(array('class'=>'checkbox', 'id' => 'ba_phone_call_invited_status'))); ?>
+                    <label for="ba_phone_call_invited_status" class="checkbox">Invited</label>
+
+                    <?php
+                    $fn = $form->get('ba_phone_call_status');
+                    ?>
+                    <?php echo $this->formCheckbox($fn->setAttributes(array('class'=>'checkbox', 'style' => 'margin-left: 73px;', 'id' => 'ba_phone_call_status'))); ?>
+                    <label for="ba_phone_call_status" class="checkbox">Completed</label>
+
+                    <br /><br />
+
+                    <?php
+                    $fn = $form->get('ba_agreement_status');
+                    ?>
+                    <h4>Agreement Status</h4>
+                    <?php echo $this->formRadio($fn->setAttributes(array('class'=>'radio'))); ?>
+
+                    <br /><br />
+
+                    <div id="agreementRequired">
+                        <h4>Assessment Status</h4>
+
+                        <?php
+                        $fn = $form->get('ba_assessment_invited_status');
+                        ?>
+                        <?php echo $this->formCheckbox($fn->setAttributes(array('class'=>'checkbox', 'id' => 'ba_assessment_invited_status'))); ?>
+                        <label for="ba_assessment_invited_status" class="checkbox">Invited</label>
+
+                        <?php
+                        $fn = $form->get('ba_assessment_completed_status');
+                        ?>
+                        <?php echo $this->formCheckbox($fn->setAttributes(array('class'=>'checkbox', 'style' => 'margin-left: 73px;', 'id' => 'ba_assessment_completed_status'))); ?>
+                        <label for="ba_assessment_completed_status" class="checkbox">Completed</label>
+
+                        <br /><br />
+
+                        <?php
+                        $fn = $form->get('ba_hipaa_compliant_status');
+                        ?>
+                        <h4>HIPAA Compliant</h4>
+                        <?php echo $this->formRadio($fn->setAttributes(array('class'=>'radio'))); ?>
+
+                    </div>
+
+                </div>
+            <?php endif; ?>
+        <?php echo $this->form()->closeTag() ?>
+    </div>
+
+    <?php if ($this->baId): ?>
+        <div id="tab2">
+            <div class="col-left">
+                <?php if (count($this->questions)): ?>
+                    <style>
+                        #questionsForm label.error {
+                            position: absolute;
+                            left: 10px;
+                            top: 35px;
+                        }
+                    </style>
+
+                    <div>
+                        <?php if (($this->signoff == 1) && ($this->signoffDate != '')): ?>
+                            <div class="cboth"></div>
+                            Assessment has been completed on <?php echo $this->formatDateA($this->signoffDate, true, false, true) ?>
+                        <?php elseif (($this->invitedStatus == 1) && ($this->invitedDate != '')): ?>
+                            Business Associate has been invited to Assessment on <?php echo $this->formatDateA($this->invitedDate, true, false, true) ?>
+                        <?php else: ?>
+                            Business Associate has not been invited to Assessment yet.
+                        <?php endif; ?>
+
+                    </div>
+
+                    <h3>Assessment questions</h3>
+                    <form id="questionsForm" action="/businessassociate/questionsform" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" value="<?php echo $this->baId ?>" name="baId" />
+                        <?php foreach ($this->questions as $question): ?>
+                            <h4><?php echo $question->baq_title ?></h4>
+
+                            <?php echo $question->baq_text ?>
+
+                            <p style="position: relative; padding: 22px 0 32px 0; border: 0;">
+                                <input <?php echo ($this->signoff == 1) ? 'DISABLED' : '' ?> <?php echo isset($this->answers[$question->baq_id]) && ($this->answers[$question->baq_id]->baa_value == 2) ? 'CHECKED' : '' ?> type="radio" name="questions[<?php echo $question->baq_id ?>]" id="q<?php echo $question->baq_id ?>2" class="required radio" value="2" /> <label for="q<?php echo $question->baq_id ?>2" class="checkbox fleft"><strong>Yes &nbsp; &nbsp; &nbsp; </strong></label>
+                                <input <?php echo ($this->signoff == 1) ? 'DISABLED' : '' ?> <?php echo isset($this->answers[$question->baq_id]) && ($this->answers[$question->baq_id]->baa_value == 1) ? 'CHECKED' : '' ?> type="radio" name="questions[<?php echo $question->baq_id ?>]" id="q<?php echo $question->baq_id ?>1" class="required radio" value="1" /> <label for="q<?php echo $question->baq_id ?>1" class="checkbox fleft"><strong>No &nbsp; &nbsp; &nbsp; </strong></label>
+                                <input <?php echo ($this->signoff == 1) ? 'DISABLED' : '' ?> <?php echo isset($this->answers[$question->baq_id]) && ($this->answers[$question->baq_id]->baa_value == 0) ? 'CHECKED' : '' ?> type="radio" name="questions[<?php echo $question->baq_id ?>]" id="q<?php echo $question->baq_id ?>0" class="required radio" value="0" /> <label for="q<?php echo $question->baq_id ?>0" class="checkbox fleft"><strong>N/A</strong></label>
+                            </p>
+
+                            <p style="border: 0;">
+                                <strong style="line-height: 30px;">Notes</strong><br />
+                                <textarea name="notes[<?php echo $question->baq_id ?>]" id="" style="width: 570px;"></textarea>
+                            </p>
+                            <p style="border: 0;">
+                                <strong style="line-height: 30px;">Attachments</strong><br />
+                                <?php if ($this->signoff == 0): ?>
+                                    <a rel="<?php echo $question->baq_id ?>" href="javascript:" class="browseFile button"><i class="fa fa-plus-circle"></i> Browse Files...</a>
+                                <?php endif; ?>
+                            </p>
+
+                            <div class="cboth"></div>
+                            <div id="filesToUploadBox<?php echo $question->baq_id ?>">
+
+                            </div>
+
+                            <div class="cboth"></div>
+                            <?php if (isset($this->answers[$question->baq_id])): ?>
+                                <?php echo ($this->answers[$question->baq_id]->_note_text != '') ? 'Note: ' . $this->answers[$question->baq_id]->_note_text : '' ?><br />
+
+                                <?php if ($this->answers[$question->baq_id]->_files != ''): ?>
+                                    <?php
+                                    $_files = explode(',', $this->answers[$question->baq_id]->_files);
+                                    ?>
+                                    Attachments:<br />
+                                    <?php foreach ($_files as $_file): ?>
+                                        <?php
+                                        $_file = explode('::', $_file);
+                                        $_fileName = $_file[0];
+                                        $_fileId = $_file[1];
+                                        ?>
+                                        <span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/note/<?php echo $this->answers[$question->baq_id]->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+
+                        <div class="cboth"></div>
+                        <?php if ($this->signoff == 0): ?>
+                            <div class="form-buttons">
+                                <input type="submit" class="form-button" value="Save" />
+                                <?php if (($this->baId) && ($this->checkIfUserAnswered)): ?>
+                                    <a href="/businessassociate/signoff/<?php echo $this->baId ?>" class="form-button">Sign-Off and Close</a>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
+                    </form>
+                <?php endif; ?>
+
+                <div class="cboth"></div>
+            </div>
+
+            <div class="col-right">
+                <br />
+            </div>
+
+        </div>
+
+        <div id="tab3">
+            <h3>Add a note about this Business Associate</h3>
+
+            <form action="/businessassociate/edit/<?php echo $this->baId ?>" name="" id="" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="noteform" value="1" />
+
+                <?php
+                $fn = $formNote->get('note_id');
+                echo $this->formHidden($fn);
+                ?>
+
+                <?php
+                $fn = $formNote->get('note_item_type');
+                $fn->setValue(2);
+                echo $this->formHidden($fn);
+                ?>
+
+                <?php
+                $fn = $formNote->get('note_item_id');
+                $fn->setValue($this->baId);
+                echo $this->formHidden($fn);
+                ?>
+
+                <p>
+                    <?php
+                    $fn = $formNote->get('note_text');
+                    echo $this->formTextarea($fn->setAttributes(array('class' => 'double')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+
+                <p style="border: 0;">
+                    <strong style="line-height: 30px;">Attachments</strong><br />
+                    <a id="browseFile" href="javascript:" class="button"><i class="fa fa-plus-circle"></i> Browse Files...</a>
+                </p>
+
+                <div class="cboth"></div>
+                <div id="filesToUploadBox">
+
+                </div>
+
+                <div class="cboth"></div>
+                <div class="form-buttons">
+                    <input type="submit" value="Save" class="form-button" />
+
+                    <div class="fleft">or</div>
+                    <a href="/company/list" class="cancel">Cancel</a>
+                </div>
+                <div class="cboth"><br /></div>
+
+            </form>
+
+            <?php if ($this->baId && is_object($notes) && ($notes->count())): ?>
+                <?php foreach ($notes as $note): ?>
+                    <div class="note">
+                        <strong><?php echo $note->_username ?></strong> <small> on <?php echo $note->_note_create_date_format ?></small><br />
+                        <p>
+                            <?php echo $note->note_text ?><br />
+                            <?php if ($note->_files != ''): ?>
+                                <?php
+                                    $_files = explode(',', $note->_files);
+                                ?>
+                                <strong>Attachments:</strong><br />
+                                <?php foreach ($_files as $_file): ?>
+                                    <?php
+                                        $_file = explode('::', $_file);
+                                        $_fileName = $_file[0];
+                                        $_fileId = $_file[1];
+                                    ?>
+                                    <span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </p>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+
+    </div>
+    <div class="cboth"><br /></div>
+
+</div>
+
+<script type="text/javascript">
+
+    var browseFilesCounter = 0;
+    var browseFilesCounterObj = new Object();
+    $(document).ready(function() {
+        $('#browseFile').click(function() {
+            $('#filesToUploadBox').append('<div><input type="file" name="notesFiles[]" id="file' + browseFilesCounter + '" /><div class="cboth"></div></div>');
+
+            $('#file' + browseFilesCounter).click();
+            browseFilesCounter++;
+        });
+
+        $('#businessassociate').validate();
+        $('#questionsForm').validate();
+
+        $("input[name=ba_office_phone], input[name=ba_direct_phone], input[name=ba_other_phone], input[name=c_fax]").mask("(999) 999-9999");
+        $('input[name=u_cell_phone], input[name="u_office_phone"], input[name="u_direct_phone"], input[name="u_other_phone"], input[name="u_fax"]').mask("(999) 999-9999");
+        $('input[name="ba_zip"]').mask("99999");
+
+        $('.browseFile').click(function() {
+            var baqId = $(this).attr('rel');
+
+            if (browseFilesCounterObj[baqId] == undefined) {
+                browseFilesCounterObj[baqId] = 1;
+            } else {
+                browseFilesCounterObj[baqId]++;
+            }
+            $('#filesToUploadBox' + baqId).append('<input type="file" name="notesFiles[' + baqId + '][]" id="file' + baqId + '_' + browseFilesCounterObj[baqId] + '" />');
+
+            $('#file' + baqId + '_' + browseFilesCounterObj[baqId]).click();
+        });
+    });
+
+
+</script>

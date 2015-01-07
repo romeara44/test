@@ -1,0 +1,22 @@
+delete from addresses;
+delete from addresses_items;
+delete from assessments;
+delete from assessments_business_associates_locations;
+delete from assessments_inventory_locations_items;
+delete from assessments_inventory_locations_reports;
+delete from assessments_roles_locations_contacts;
+delete from breach_logs;
+delete from breach_logs_answers;
+delete from breach_remediation_plans;
+delete from breach_remediation_plans_actions;
+delete from business_associates;
+delete from business_associates_answers;
+delete from business_associates_questions;
+delete from companies;
+delete from files;
+delete from notes;
+delete from notes_files;
+delete from users_agencies;
+delete from agencies;
+-- SHARED
+delete from agencies;

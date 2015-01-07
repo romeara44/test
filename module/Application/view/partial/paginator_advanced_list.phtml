@@ -1,0 +1,50 @@
+<?php if ($this->pageCount): ?>
+
+    <div class="center">
+        <ul class="pagination">
+            <!-- Previous page link -->
+            <?php if (isset($this->previous)): ?>
+                <li>
+                    <a href="/<?php echo $this->controller . '/' . $this->action . '/page/' . $this->previous . '/order_by/' . $order_by . '/' . $order . $searchValue ?>">
+                        <<
+                    </a>
+                </li>
+            <?php else: ?>
+                <li class="disabled">
+                    <a href="#">
+                        <<
+                    </a>
+                </li>
+            <?php endif; ?>
+            <!-- Numbered page links -->
+            <?php foreach ($this->pagesInRange as $page): ?>
+                <?php if ($page != $this->current): ?>
+                    <li>
+                        <a href="/<?php echo $this->controller . '/' . $this->action . '/page/' . $page . '/order_by/' . $order_by . '/' . $order . $searchValue ?>">
+                            <?php echo $page; ?>
+                        </a>
+                    </li>
+                <?php else: ?>
+                    <li class="active">
+                        <a href="#"><?php echo $page; ?></a>
+                    </li>
+                <?php endif; ?>
+            <?php endforeach; ?>
+
+            <!-- Next page link -->
+            <?php if (isset($this->next)): ?>
+                <li>
+                    <a href="/<?php echo $this->controller . '/' . $this->action . '/page/' . $this->next . '/order_by/' . $order_by . '/' . $order . $searchValue ?>">
+                        >>
+                    </a>
+                </li>
+            <?php else: ?>
+                <li class="disabled">
+                    <a href="#">
+                        >>
+                    </a>
+                </li>
+            <?php endif; ?>
+        </ul>
+    </div>
+<?php endif; ?>

@@ -1,0 +1,402 @@
+
+
+<div class="page-title">
+    <h1 class="fleft">Breach Remediation Plan for <?php echo (!$this->isPdf) ? '<br/>' : '' ?><?php echo $this->brpObj->_client_name ?></h1>
+    <?php if (!$this->isPdf): ?>
+        <a href="/breachremediationplan/edit/<?php echo $brpObj->brp_id ?>/type/pdf" class="button" title="Download as PDF"><i class="fa fa-download"></i> PDF</a>
+        <a href="/breachremediationplan/edit/<?php echo $brpObj->brp_id ?>/type/csv" class="button" title="Download as CSV"><i class="fa fa-download"></i> CSV</a>
+    <?php endif; ?>
+    <div class="cboth"></div>
+</div>
+
+<p></p>
+<div class="cboth"></div>
+
+<div class="col6" style="float: left;">
+    <p><strong>STATUS:</strong><br /><span class="label selected"><?php echo \Breachlog\Model\Breachremediationplan::$statusesNames[$brpObj->brp_status]  ?></span></p>
+</div>
+<div class="col5"  style="float: left;">
+    <p>
+        <strong>PERFORMED BY:</strong><br />
+        <?php if ($this->writable): ?>
+            <span id="toggle-edit-show-1">
+                <?php echo $this->brpObj->_performed_name ?> &nbsp;<a href="" title="Edit"><i class="fa fa-pencil"></i></a>
+            </span>
+            <span id="toggle-edit-1">
+                <select id="brp_performed_u_id" id="" class="w175">
+                    <option value="">Please Select</option>
+                    <option value="">---</option>
+                    <?php foreach ($this->contacts as $uId => $contact): ?>
+                        <option <?php echo ($uId == $this->brpObj->brp_performed_u_id) ? ' SELECTED ' : '' ?> value="<?php echo $uId ?>"><?php echo $contact ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </span>
+        <?php else: ?>
+            <?php echo $this->brpObj->_performed_name ?>
+        <?php endif; ?>
+    </p>
+</div>
+<div class="col5"  style="float: left;">
+    <p>
+        <strong>APPROVED BY:</strong><br />
+        <?php if ($this->writable): ?>
+            <span id="toggle-edit-show-4">
+                <?php echo $this->brpObj->_approver_name ?> &nbsp;<a href="" title="Edit"><i class="fa fa-pencil"></i></a>
+            </span>
+            <span id="toggle-edit-4">
+                <select id="brp_approver_u_id" id="" class="w175">
+                    <option value="">Please Select</option>
+                    <option value="">---</option>
+                    <?php foreach ($this->contactsApr as $uId => $contact): ?>
+                        <option <?php echo ($uId == $this->brpObj->brp_approver_u_id) ? ' SELECTED ' : '' ?> value="<?php echo $uId ?>"><?php echo $contact ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </span>
+        <?php else: ?>
+            <?php echo $this->brpObj->_approver_name ?>
+        <?php endif; ?>
+    </p>
+</div>
+<div class="col5"  style="float: left;">
+    <p><strong>BREACH INCIDENT DATE:</strong><br />
+        <?php if ($this->writable): ?>
+            <span id="toggle-edit-show-2">
+                <?php echo ($this->brpObj->brp_incident_date != '0000-00-00') ? $this->brpObj->_brp_incident_date_formatted : '' ?> &nbsp;<a href="" title="Edit"><i class="fa fa-pencil"></i></a>
+            </span>
+            <span id="toggle-edit-2">
+                <input type="text" id="brp_incident_date" class="w175" value="<?php echo ($this->brpObj->brp_incident_date != '0000-00-00') ? $this->brpObj->_brp_incident_date_formatted : '' ?>" />
+            </span>
+        <?php else: ?>
+            <?php echo ($this->brpObj->brp_incident_date != '0000-00-00') ? $this->brpObj->_brp_incident_date_formatted : '' ?>
+        <?php endif; ?>
+    </p>
+</div>
+<div class="col4 last" style="float: left;">
+    <p><strong>REMEDIATION PLAN DATE:</strong><br />
+    <?php if ($this->writable): ?>
+        <span id="toggle-edit-show-3">
+            <?php echo ($this->brpObj->brp_remediation_date != '0000-00-00') ? $this->brpObj->_brp_remediation_date_formatted : '' ?> &nbsp;<a href="" title="Edit"><i class="fa fa-pencil"></i></a>
+        </span>
+        <span id="toggle-edit-3">
+            <input type="text" id="brp_remediation_date" class="w175" value="<?php echo ($this->brpObj->brp_remediation_date != '0000-00-00') ? $this->brpObj->_brp_remediation_date_formatted : '' ?>" />
+        </span>
+    <?php else: ?>
+        <?php echo ($this->brpObj->brp_remediation_date != '0000-00-00') ? $this->brpObj->_brp_remediation_date_formatted : '' ?>
+    <?php endif; ?>
+</div>
+<div class="cboth"></div>
+
+<p></p>
+
+<table cellpadding="0" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Task</th>
+            <th>Status <i class="fa fa-unsorted"></i></th>
+            <th>Assignee <i class="fa fa-unsorted"></i></th>
+            <th>Approver <i class="fa fa-unsorted"></i></th>
+            <th>Target Date <i class="fa fa-unsorted"></i></th>
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($this->actions as $brpa): ?>
+        <tr>
+            <td class="tdSmall"><?php echo $brpa->brpa_task ?></td>
+            <td class="acenter"><?php echo \Breachlog\Model\Breachremediationplanaction::$statusesNames[$brpa->brpa_status] ?></td>
+            <td><?php echo $brpa->_contact_name ?></td>
+            <td><?php echo $brpa->_approver_name ?></td>
+            <td><?php echo ($brpa->brpa_target_date != '0000-00-00') ? $brpa->_brpa_target_date_formatted : '' ?></td>
+            <td class="aright nowrap">
+                <a href="/breachremediationplan/edittask/<?php echo $brpa->brpa_id ?>/brpId/<?php echo $brpObj->brp_id ?>" class="fancybox" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+                <?php /* <a href="/breachremediationplan/breachplanemail/<?php echo $brpa->brpa_id ?>/brpId/<?php echo $brpObj->brp_id ?>" class="fancybox" title="Email Assignee"><i class="fa fa-envelope"></i></a> &nbsp; */ ?>
+                <?php if ($this->writable): ?>
+                    <a href="/breachremediationplan/deletetask/<?php echo $brpa->brpa_id ?>/brpId/<?php echo $brpObj->brp_id ?>" class="i-delete" title="Delete"><i class="fa fa-trash-o"></i></a>
+                <?php endif; ?>
+                <?php  if (!$this->writable): ?>
+                    <a href="" class="attachments" rel="<?php echo $brpa->brpa_id ?>" title="View Attachments"><i class="fa fa-paperclip"></i></a>
+                <?php endif; ?>
+            </td>
+        </tr>
+
+        <?php if (!$this->writable): ?>
+            <?php $notesTask = $this->noteTable->getNotes($brpa->brpa_id, \Note\Model\Note::NOTE_BRPA); ?>
+            <tr class="expandable" id="attachments<?php echo $brpa->brpa_id ?>">
+                <td>&nbsp;</td>
+                <td class="aright"><strong>Attachments:<br /><br /><br /></strong></td>
+                <td colspan="5">
+                    <?php if (is_object($notesTask) && ($notesTask->count())): ?>
+                        <?php foreach ($notesTask as $note): ?>
+                                <?php if ($note->_files != ''): ?>
+                                    <?php
+                                    $_files = explode(',', $note->_files);
+                                    ?>
+                                    <?php foreach ($_files as $_file): ?>
+                                        <?php
+                                        $_file = explode('::', $_file);
+                                        $_fileName = $_file[0];
+                                        $_fileId = $_file[1];
+                                        ?>
+                                        <span style="float: left; margin-right: 5px;" class="<?php echo (!$this->isPdf) ? $this->renderPictoIcon($_fileName) : ''; ?>"></span><a href="http://<?php echo $_SERVER['HTTP_HOST'] ?>/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                    <?php if (!$this->isPdf): ?>
+                        <br />
+                        <a class="browseFileTask button" rel="<?php echo $brpa->brpa_id ?>" href="javascript:"><i class="fa fa-plus-circle"></i> Browse Files...</a>
+                        <div class="cboth"></div>
+                        <form action="/breachremediationplan/savefiles/<?php echo $brpa->brpa_id ?>/brpId/<?php echo $brpObj->brp_id ?>" method="POST" enctype="multipart/form-data">
+                            <div id="filesToUploadBox<?php echo $brpa->brpa_id ?>">
+
+                            </div>
+                            <input type="submit" value="Save" class="form-button" />
+                        </form>
+                    <?php endif; ?>
+                </td>
+            </tr>
+        <?php endif; ?>
+    <?php endforeach; ?>
+    </tbody>
+</table>
+
+<?php if ($this->writable && !$this->isPdf): ?>
+    <p><a href="/breachremediationplan/edittask/0/brpId/<?php echo $brpObj->brp_id ?>" class="fancybox button fright"><i class="fa fa-plus-circle"></i> Add</a></p>
+<?php endif; ?>
+
+<form action="/breachremediationplan/edit/<?php echo $this->id ?>" name="" style="width: 600px;" id="formNote" method="POST" enctype="multipart/form-data" class="col2" >
+    <input id="brp_performed_u_id_hidden" name="brp_performed_u_id" type="hidden" value="<?php echo $this->brpObj->brp_performed_u_id ?>" />
+    <input id="brp_approver_u_id_hidden" name="brp_approver_u_id" type="hidden" value="<?php echo $this->brpObj->brp_approver_u_id ?>" />
+    <input id="brp_incident_date_hidden" name="brp_incident_date" type="hidden" value="<?php echo ($this->brpObj->brp_incident_date != '0000-00-00') ? $this->brpObj->_brp_incident_date_formatted : '' ?>" />
+    <input id="brp_remediation_date_hidden" name="brp_remediation_date" type="hidden" value="<?php echo ($this->brpObj->brp_remediation_date != '0000-00-00') ? $this->brpObj->_brp_remediation_date_formatted : '' ?>" />
+
+    <?php if ($this->writable && !$this->isPdf): ?>
+        <input id="signedoff" type="hidden" name="signedoff" value="0" />
+        <input id="requestreview" type="hidden" name="requestreview" value="0" />
+        <input type="hidden" name="noteform" value="1" />
+        <?php
+        $fn = $formNote->get('note_id');
+        echo $this->formHidden($fn);
+        ?>
+        <?php
+        $fn = $formNote->get('note_item_type');
+        $fn->setValue(4);
+        echo $this->formHidden($fn);
+        ?>
+        <?php
+        $fn = $formNote->get('note_item_id');
+        $fn->setValue($this->id);
+        echo $this->formHidden($fn);
+        ?>
+
+        <p style="border: 0;">
+            <strong style="line-height: 30px;">Notes</strong><br />
+            <?php
+            $fn = $formNote->get('note_text');
+            echo $this->formTextarea($fn->setAttributes(array('style' => 'width: 570px;')));
+            echo $this->formElementErrors($fn);
+            ?>
+
+        </p>
+        <?php if (!$this->isPdf): ?>
+            <p style="border: 0;">
+                <strong style="line-height: 30px;">Additional Attachments</strong><br />
+                <a id="browseFile" href="javascript:" class="button"><i class="fa fa-plus-circle"></i> Browse Files...</a>
+                <br /><br /><br />
+            </p>
+        <?php endif; ?>
+
+        <div class="cboth"></div>
+        <div id="filesToUploadBox">
+
+        </div>
+    <?php endif; ?>
+
+    <?php if ($this->id && is_object($notes) && ($notes->count())): ?>
+        <?php foreach ($notes as $note): ?>
+            <div class="note">
+                <strong><?php echo $note->_username ?></strong> <small> on <?php echo $note->_note_create_date_format ?></small><br />
+                <p>
+                    <?php echo $note->note_text ?><br />
+                    <?php if ($note->_files != ''): ?>
+                        <?php
+                        $_files = explode(',', $note->_files);
+                        ?>
+                        <strong>Attachments:</strong><br />
+                        <?php foreach ($_files as $_file): ?>
+                            <?php
+                            $_file = explode('::', $_file);
+                            $_fileName = $_file[0];
+                            $_fileId = $_file[1];
+                            ?>
+                            <span style="float: left; margin-right: 5px;" class="<?php echo !$this->isPdf ? $this->renderPictoIcon($_fileName) : ''; ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </p>
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+
+    <div class="cboth"></div>
+
+    <p style="border: 0;"><strong>Reviewed and approved by <?php echo $this->brpObj->_approver_name ?><!-- on March 10th, 2014 --></strong></p>
+    <?php if ($this->writable): ?>
+        <p style="border: 0;">
+            <label>Initials</label>
+            <input type="text" name="brp_initials_approver" id="brp_initials_approver" value="<?php echo $this->brpObj->brp_initials_approver ?>" />
+            <ul style="display: none" id="brp_initials_approver_val"><li>Value is required and can't be empty</li></ul>
+        </p>
+    <?php else: ?>
+        <p style="border: 0;">
+            <label>Initials: <?php echo $this->brpObj->brp_initials_approver ?></label>
+        </p>
+    <?php endif; ?>
+
+    <div class="cboth"></div>
+
+    <p style="border: 0;"><strong>Agreed to and accepted by <?php echo $this->brpObj->_client_name ?><!-- on March 10th, 2014 --></strong></p>
+    <?php if ($this->writable): ?>
+        <p style="border: 0;">
+            <label>Initials</label>
+            <input type="text" name="brp_initials" id="" value="<?php echo $this->brpObj->brp_initials ?>" />
+        </p>
+    <?php else: ?>
+        <p style="border: 0;">
+            <label>Initials: <?php echo $this->brpObj->brp_initials ?></label>
+        </p>
+    <?php endif; ?>
+
+    <div class="cboth"></div>
+
+    <div class="form-buttons">
+        <?php if ($this->writable && !$this->isPdf): ?>
+            <input type="submit" value="Save" class="form-button" />
+            <?php if ($brpObj->brp_approver_u_id): ?>
+                <input type="button" onclick="$('#requestreview').val(1); $('#formNote').submit()" value="Request Review" class="form-button" />
+            <?php endif; ?>
+            <input type="button" onclick="if ($('#brp_initials_approver').val() == '') $('#brp_initials_approver_val').show(); else {  $('#signedoff').val(1); $('#formNote').submit() }" value="Sign-off and Close" class="form-button" />
+            <div class="fleft">or</div>
+            <a href="/breachremediationplan/list" class="cancel">Cancel</a>
+        <?php else: ?>
+            <?php if (!$this->isPdf): ?>
+                <div class="cboth"></div>
+                <?php if (!$this->isAdmin): ?>
+                    <a href="/breachremediationplan/list" class="form-button">Back</a>
+                <?php endif; ?>
+            <?php endif; ?>
+        <?php endif; ?>
+
+        <?php if ($this->isAdmin): ?>
+            <?php $deleteUrl = '/breachremediationplan/reopen/' . $brpObj->brp_id; ?>
+            <a href="#confirmation-box-modal" onclick="$('#confirmation-box-modal h3').html('Are you sure you want to re-open this plan ?'); $('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="form-button confirmation-modal">Re-Open Plan</a>
+            <div class="fleft">or</div>
+            <a href="/breachremediationplan/list" class="cancel">Cancel</a>
+        <?php endif; ?>
+    </div>
+
+</form>
+
+
+<div class="cboth"><br /></div>
+
+<script type="text/javascript">
+
+    var browseFilesCounter = 0;
+    $(document).ready(function() {
+        $('#browseFile').click(function() {
+            $('#filesToUploadBox').append('<input type="file" name="notesFiles[]" id="file' + browseFilesCounter + '" />');
+
+            $('#file' + browseFilesCounter).click();
+            browseFilesCounter++;
+        });
+
+        $('.browseFileTask').click(function() {
+            var noteId = $(this).attr('rel');
+            $('#filesToUploadBox' + noteId).append('<input type="file" name="notesFiles[]" id="file' + noteId + browseFilesCounter + '" /><div class="cboth"></div>');
+
+            $('#file' + noteId + browseFilesCounter).click();
+            browseFilesCounter++;
+        });
+
+    });
+
+
+</script>
+
+<script type="text/javascript">
+
+    jQuery(document).ready(function() {
+        $('#brp_performed_u_id').change(function() {
+            $('#brp_performed_u_id_hidden').val($(this).val());
+        });
+
+        $('#brp_approver_u_id').change(function() {
+            $('#brp_approver_u_id_hidden').val($(this).val());
+        });
+
+        $('#brp_incident_date').change(function() {
+            $('#brp_incident_date_hidden').val($(this).val());
+        });
+
+        $('#brp_remediation_date').change(function() {
+            $('#brp_remediation_date_hidden').val($(this).val());
+        });
+        //form disclaimer slide out
+        jQuery('.expandable').hide();
+        jQuery('.attachments').toggle(
+            function() {
+                var idA = $(this).attr('rel');
+                jQuery('#attachments' + idA).slideDown();
+            }, function() {
+                var idA = $(this).attr('rel');
+                jQuery('#attachments' + idA).slideUp();
+            }
+        );
+
+    });
+
+</script>
+
+
+<script type="text/javascript">
+    jQuery(function(){
+        jQuery("#brp_incident_date").mask("99/99/9999");
+        jQuery("#brp_remediation_date").mask("99/99/9999");
+
+        jQuery("#toggle-edit-1").hide();
+        jQuery("#toggle-edit-show-1").toggle(function() {
+            jQuery("#toggle-edit-1").show();
+            jQuery("#toggle-edit-show-1").hide();
+        }, function() {
+            jQuery("#toggle-edit-show-1").show();
+            jQuery("#toggle-edit-1").hide();
+        });
+
+        jQuery("#toggle-edit-4").hide();
+        jQuery("#toggle-edit-show-4").toggle(function() {
+            jQuery("#toggle-edit-4").show();
+            jQuery("#toggle-edit-show-4").hide();
+        }, function() {
+            jQuery("#toggle-edit-show-4").show();
+            jQuery("#toggle-edit-4").hide();
+        });
+
+        jQuery("#toggle-edit-2").hide();
+        jQuery("#toggle-edit-show-2").toggle(function() {
+            jQuery("#toggle-edit-2").show();
+            jQuery("#toggle-edit-show-2").hide();
+        }, function() {
+            jQuery("#toggle-edit-show-2").show();
+            jQuery("#toggle-edit-2").hide();
+        });
+        jQuery("#toggle-edit-3").hide();
+        jQuery("#toggle-edit-show-3").toggle(function() {
+            jQuery("#toggle-edit-3").show();
+            jQuery("#toggle-edit-show-3").hide();
+        }, function() {
+            jQuery("#toggle-edit-show-3").show();
+            jQuery("#toggle-edit-3").hide();
+        });
+    });
+</script>

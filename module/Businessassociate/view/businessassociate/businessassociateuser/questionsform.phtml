@@ -1,0 +1,96 @@
+<div class="page-title">
+    <h1 class="fleft">Business Associate Assessment</h1>
+    <div class="cboth"></div>
+</div>
+
+<p>In order to demonstrate your compliance under the current HIPAA regulations, please answer the following questions.<br /><br /></p>
+
+<div class="col-left" style="float: none !important; margin: 0 auto;">
+    <style>
+        #questionsForm label.error {
+            position: absolute;
+            left: 10px;
+            top: 35px;
+        }
+    </style>
+    <form id="questionsForm" action="/businessassociateuser/questionsform" method="POST" enctype="multipart/form-data">
+        <input type="hidden" value="<?php echo $this->baId ?>" name="baId" />
+        <?php foreach ($this->questions as $question): ?>
+            <h4><?php echo $question->baq_title ?></h4>
+
+            <?php echo $question->baq_text ?>
+
+            <p style="position: relative; padding: 22px 0 32px 0; border: 0;">
+                <input <?php echo ($this->signoff == 1) ? 'DISABLED' : '' ?> <?php echo isset($this->answers[$question->baq_id]) && ($this->answers[$question->baq_id]->baa_value == 2) ? 'CHECKED' : '' ?> type="radio" name="questions[<?php echo $question->baq_id ?>]" id="q<?php echo $question->baq_id ?>2" class="required radio" value="2" /> <label for="q<?php echo $question->baq_id ?>2" class="checkbox fleft"><strong>Yes &nbsp; &nbsp; &nbsp; </strong></label>
+                <input <?php echo ($this->signoff == 1) ? 'DISABLED' : '' ?> <?php echo isset($this->answers[$question->baq_id]) && ($this->answers[$question->baq_id]->baa_value == 1) ? 'CHECKED' : '' ?> type="radio" name="questions[<?php echo $question->baq_id ?>]" id="q<?php echo $question->baq_id ?>1" class="required radio" value="1" /> <label for="q<?php echo $question->baq_id ?>1" class="checkbox fleft"><strong>No &nbsp; &nbsp; &nbsp; </strong></label>
+                <input <?php echo ($this->signoff == 1) ? 'DISABLED' : '' ?> <?php echo isset($this->answers[$question->baq_id]) && ($this->answers[$question->baq_id]->baa_value == 0) ? 'CHECKED' : '' ?> type="radio" name="questions[<?php echo $question->baq_id ?>]" id="q<?php echo $question->baq_id ?>0" class="required radio" value="0" /> <label for="q<?php echo $question->baq_id ?>0" class="checkbox fleft"><strong>N/A</strong></label>
+            </p>
+
+            <p style="border: 0;">
+                <strong style="line-height: 30px;">Notes</strong><br />
+                <textarea name="notes[<?php echo $question->baq_id ?>]" id="" style="width: 570px;"></textarea>
+            </p>
+            <p style="border: 0;">
+                <strong style="line-height: 30px;">Attachments</strong><br />
+                <?php if ($this->signoff == 0): ?>
+                    <a rel="<?php echo $question->baq_id ?>" href="javascript:" class="browseFile button"><i class="fa fa-plus-circle"></i> Browse Files...</a>
+                <?php endif; ?>
+            </p>
+
+            <div class="cboth"></div>
+            <div id="filesToUploadBox<?php echo $question->baq_id ?>">
+
+            </div>
+            <div class="cboth"></div>
+            <?php if (isset($this->answers[$question->baq_id])): ?>
+                <?php echo ($this->answers[$question->baq_id]->_note_text != '') ? 'Note: ' . $this->answers[$question->baq_id]->_note_text : '' ?><br />
+
+                <?php if ($this->answers[$question->baq_id]->_files != ''): ?>
+                    <?php
+                    $_files = explode(',', $this->answers[$question->baq_id]->_files);
+                    ?>
+                    Attachments:<br />
+                    <?php foreach ($_files as $_file): ?>
+                        <?php
+                        $_file = explode('::', $_file);
+                        $_fileName = $_file[0];
+                        $_fileId = $_file[1];
+                        ?>
+                        <span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/note/<?php echo $this->answers[$question->baq_id]->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            <?php endif; ?>
+
+            <div class="cboth"><br /><br /><p></p><br /></div>
+        <?php endforeach; ?>
+
+        <div class="cboth"></div>
+        <?php if ($this->signoff == 0): ?>
+            <div class="form-buttons">
+                <input type="submit" class="form-button" value="Save" />
+            </div>
+        <?php endif; ?>
+    </form>
+
+</div>
+
+<script type="text/javascript">
+
+    var browseFilesCounter = new Object();
+    $(document).ready(function() {
+        $('#questionsForm').validate();
+        $('.browseFile').click(function() {
+            var baqId = $(this).attr('rel');
+
+            if (browseFilesCounter[baqId] == undefined) {
+                browseFilesCounter[baqId] = 1;
+            } else {
+                browseFilesCounter[baqId]++;
+            }
+            $('#filesToUploadBox' + baqId).append('<input type="file" name="notesFiles[' + baqId + '][]" id="file' + baqId + '_' + browseFilesCounter[baqId] + '" />');
+
+            $('#file' + baqId + '_' + browseFilesCounter[baqId]).click();
+        });
+    });
+</script>

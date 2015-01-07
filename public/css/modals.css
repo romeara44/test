@@ -1,0 +1,409 @@
+/*
+HIPAA COMPLIANCE
+by click5 Interactive
+*/
+
+
+/* Elements */
+
+body {
+	margin: 0;
+	padding: 0;
+	color: #0d3253;
+	font-family: 'proxima-nova', 'Proxima Nova', 'Helvetica Neue', helvetica, arial, tahoma, verdana, sans-serif;
+	font-size: 15px;
+	font-weight: 400;
+	line-height: 21px;
+	background: #fff;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+#modal {
+	min-height: 230px;
+}
+
+#wrap {
+	padding: 25px 40px 20px 40px;
+}
+
+
+/* Content */
+
+h1, h2, h3, h4, h5, h6 {
+	clear: both;
+	margin: 0;
+	padding: 12px 0 6px 0;
+	color: #0d3253;
+	font-weight: 700;
+}
+h1 strong, h2 strong, h3 strong, h4 strong, h5 strong, h6 strong { color: #666; font-weight: 600; }
+
+h1 { padding: 18px 0 12px 0; font-size: 36px; line-height: 40px; }
+h2 { padding: 16px 0 12px 0; font-size: 26px; line-height: 30px; }
+h3 { padding: 14px 0 12px 0; font-size: 21px; line-height: 25px; }
+h4 { padding: 12px 0 12px 0; font-size: 18px; line-height: 22px; }
+h5 { padding: 10px 0 12px 0; font-size: 16px; line-height: 20px; }
+h6 { padding: 8px 0 12px 0; font-size: 12px; line-height: 16px; }
+
+.page-title {
+	margin: 0 0 12px 0;
+	border-bottom: 4px solid #dedede;
+}
+
+.page-title h1.fleft { width: auto; padding-right: 25px; }
+
+.page-title .label { float: left; margin: 24px 10px 0 0; }
+
+.page-title .button { float: right;	margin: 18px 0 0 14px; }
+
+hr {
+	color: #dcdcdc;
+	background: #dcdcdc;
+	height: 1px;
+}
+
+p {
+	margin: 0;
+	padding: 2px 0 16px 0;
+}
+
+a {
+	color: #185C8E;
+	text-decoration: underline;
+}
+
+a:hover {
+	color: #189696;
+	text-decoration: none;
+}
+
+a:active, a:focus {
+	outline: none;
+}
+
+small {
+	color: #888;
+	font-size: 14px;
+	line-height: 20px;
+	margin: 0;
+}
+
+blockquote {
+	background: #efefef;
+	margin: 0 15px;
+}
+
+blockquote p {
+	padding: 8px 10px 9px 10px;
+}
+
+ul {
+	margin: 0;
+	padding: 4px 0 12px 35px;
+	list-style-type: none;
+	list-style-image: none;
+}
+
+ul ul {
+	padding: 10px 16px 0 40px;
+	list-style-type: circle;
+}
+
+ol {
+	margin: 0;
+	padding: 4px 40px 12px 75px;
+}
+
+ol ol {
+	padding: 10px 40px 0 50px;
+}
+
+li {
+	padding: 0 0 6px 12px;
+	background: transparent url(../images/bullet.gif) left 9px no-repeat;
+}
+
+dl {
+	margin: 0;
+	padding: 4px 40px 12px 55px;
+}
+
+dt {
+	padding: 0 0 6px 0;
+	font-weight: bold;
+}
+
+dd {
+	padding: 0 0 9px 0;
+	font-style: italic;
+}
+
+strong {
+	color: #666;
+}
+
+.i-contact { display: block; width: 36px; height: 36px; background: transparent url(../images/i-contact.png) center center no-repeat; background-size: 34px 34px; }
+.i-company { display: block; width: 36px; height: 36px; background: transparent url(../images/i-company.png) center center no-repeat; }
+
+.button {
+	float: left;
+	display: block;
+	width: auto;
+	height: 39px;
+	margin: 0 14px 16px 0;
+	padding: 0 16px;
+	color: #fff;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 38px;
+	background: #258e8f url(../images/button-bg.png) left top repeat-x;
+	border: 0;
+	border-radius: 3px;
+	text-decoration: none;
+	text-transform: uppercase;
+}
+.button:hover { color: #fff; background: #117a7a; }
+th .button { margin-bottom: 0; }
+
+.button .fa { margin-left: -2px; margin-right: 4px; }
+
+.form-button {
+	float: left;
+	display: block;
+	width: auto;
+	height: 35px;
+	margin: 0 14px 16px 0;
+	padding: 0 16px;
+	color: #fff;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 34px;
+	background: #258e8f url(../images/button-bg.png) left top repeat-x;
+	border: 0;
+	border-radius: 3px;
+	text-decoration: none;
+	text-transform: uppercase;
+	cursor: pointer;
+}
+.form-button:hover { color: #fff; background: #117a7a; }
+
+.form-button .fa { margin-left: -2px; margin-right: 4px; }
+
+.label {
+	float: left;
+	display: block;
+	width: auto;
+	margin: 0 10px 16px 0;
+	padding: 3px 12px;
+	color: #666;
+	font-size: 13px;
+	font-weight: 400;
+	line-height: 19px;
+	background: #f7fafb;
+	border: 1px solid #a5bed4;
+	border-radius: 8px;
+	text-decoration: none;
+}
+.label:hover,
+.label.selected { color: #fff; background: #a5bed4; }
+
+
+/* Modals */
+
+.fancybox-wrap {
+	top: 180px !important;
+}
+
+.fancybox-skin {
+	background: #c7d8e2 !important;
+	border-radius: 0 !important;
+}
+
+#modal h1 {
+	padding: 10px 0 20px 40px;
+	line-height: 28px;
+	background: #c7d8e2 !important;
+}
+
+#modal form { min-height: 100px; }
+
+
+/* Forms */
+
+form {
+	margin: 2px 0 16px 0;
+	padding: 0;
+}
+
+form p {
+	clear: both;
+	margin: 0;
+	padding: 10px 0 0 0;
+	border-top: 1px solid #e1ebf0;
+}
+
+form p .fleft {
+	float: left;
+	width: 400px;
+	margin: 0 0 10px 0;
+	padding: 5px 6px;
+	color: #0d3253;
+	font-family: 'proxima-nova', 'Proxima Nova', 'Helvetica Neue', helvetica, arial, tahoma, verdana, sans-serif;
+	font-size: 15px;
+	line-height: 21px;
+}
+
+label {
+	float: left;
+	width: 150px;
+	margin: 0;
+	padding: 6px 0 0 1px;
+	color: #3c5f7d;
+	line-height: 22px;
+}
+label.checkbox,
+label.checkbox.fleft { width: auto; padding: 0; line-height: 14px; }
+
+input {
+	float: left;
+	width: 300px;
+	margin: 0 0 10px 0;
+	padding: 6px 8px;
+	color: #081c2f;
+	font-family: 'proxima-nova', 'Proxima Nova', 'Helvetica Neue', helvetica, arial, tahoma, verdana, sans-serif;
+	font-size: 15px;
+	line-height: 21px;
+	background: #fdfdfd;
+	border: 1px solid #bfcfd7;
+	border-radius: 3px;
+}
+
+input.error { border: 1px solid #ec2b2b; }
+
+input.phone { width: 230px; }
+input.ext { width: 44px; margin-left: 12px; }
+
+input.checkbox { width: 35px; }
+input.radio { width: 35px; }
+
+input.button {
+	float: left;
+	display: block;
+	width: auto;
+	margin: 0 14px 16px 0;
+	padding: 6px 18px;
+	color: #fff;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 22px;
+	background: #bebebe;
+	border: 1px solid #bababa;
+	border-radius: 3px;
+	text-decoration: none;
+	text-transform: uppercase;
+	cursor: pointer;
+}
+input.button:hover { background: #999; border: 1px solid #999; }
+
+input.button .fa { margin-left: -2px; margin-right: 4px; }
+
+select {
+	float: left;
+	width: 314px;
+	margin: 0 0 10px 0;
+	padding: 6px 8px;
+	color: #081c2f;
+	font-family: 'proxima-nova', 'Proxima Nova', 'Helvetica Neue', helvetica, arial, tahoma, verdana, sans-serif;
+	font-size: 15px;
+	line-height: 21px;
+	background: #fdfdfd;
+	border: 1px solid #bfcfd7;
+	border-radius: 3px;
+}
+
+optgroup option {
+	padding: 0 0 0 15px;
+	color: #081c2f;
+	font-family: 'proxima-nova', 'Proxima Nova', 'Helvetica Neue', helvetica, arial, tahoma, verdana, sans-serif;
+	font-size: 15px;
+	line-height: 21px;
+}
+
+textarea {
+	float: left;
+	width: 400px;
+	height: 85px;
+	margin: 0 0 10px 0;
+	padding: 6px 8px;
+	color: #081c2f;
+	font-family: 'proxima-nova', 'Proxima Nova', 'Helvetica Neue', helvetica, arial, tahoma, verdana, sans-serif;
+	font-size: 15px;
+	line-height: 21px;
+	background: #fdfdfd;
+	border: 1px solid #bfcfd7;
+	border-radius: 3px;
+}
+textarea.double { width: 586px; }
+textarea.email {
+	width: 550px;
+	height: 370px;
+	margin: 5px 0 10px 0;
+}
+
+.form-buttons {
+	margin: 20px 0 0 0;
+	padding: 15px 0 0 0;
+	border-top: 2px solid #e1ebf0;
+}
+
+.form-buttons .fleft {
+	margin: 0 11px 0 0;
+	color: #999;
+	line-height: 34px;
+}
+
+.form-buttons a.cancel {
+	color: #ec2b2b;
+	line-height: 34px;
+	text-decoration: none;
+}
+.form-buttons a.cancel:hover { text-decoration: underline; }
+
+
+/* Toolbox */
+
+.aleft { text-align: left; }
+.acenter { text-align: center; }
+.aright { text-align: right; }
+
+.fleft { float: left; }
+.fright { float: right; }
+
+.cboth { clear: both; }
+.cleft { clear: left; }
+.cright { clear: right; }
+
+form ul {
+    padding-left: 0;
+    clear: both;
+}
+
+form ul li {
+    font-size: 11px;
+    color: red;
+    padding-left: 0;
+}
+
+.i-file { display: block; width: 16px; height: 16px; background: transparent url(../images/i-file.gif) left center no-repeat; }
+.i-pdf { display: block; width: 16px; height: 16px; background: transparent url(../images/i-pdf.gif) left center no-repeat; }
+.i-word { display: block; width: 16px; height: 16px; background: transparent url(../images/i-word.gif) left center no-repeat; }
+.i-doc { display: block; width: 16px; height: 16px; background: transparent url(../images/i-word.gif) left center no-repeat; }
+.i-docx { display: block; width: 16px; height: 16px; background: transparent url(../images/i-word.gif) left center no-repeat; }
+.i-excel { display: block; width: 16px; height: 16px; background: transparent url(../images/i-excel.gif) left center no-repeat; }
+.i-excelx { display: block; width: 16px; height: 16px; background: transparent url(../images/i-excel.gif) left center no-repeat; }
+.i-zip { display: block; width: 16px; height: 16px; background: transparent url(../images/i-zip.gif) left center no-repeat; }

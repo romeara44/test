@@ -1,0 +1,70 @@
+<?php
+$_options = $this->questionEl['_options'];
+$_optionsT = explode(',', $_options);
+?>
+<h3>Question <span class="questionNum"><?php echo $this->counterQuestions ?></span> of <span class="maxNum"><?php echo $this->maxCounterQuestions ?></span> <span class="fright aright" style="color: #aaa; font-size: 16px; font-weight: 600;">Reference #<?php echo $this->counterQuestions ?></span></h3>
+<p style="border: 0;">
+    <?php $aqTitle = str_replace('Â', '', $this->questionEl['aq_title']); ?>
+    <?php echo $aqTitle; ?>
+</p>
+<p style="padding: 22px 0 32px 0; border: 0;">
+    <?php $isAnswered = 0; ?>
+    <?php foreach ($_optionsT as $_option): ?>
+        <?php
+        $_optionT = explode('::', $_option);
+        if (isset($this->answers[$this->questionEl['aq_id']]) && ($this->answers[$this->questionEl['aq_id']]['answerId'] == $_optionT[0])):
+            $isAnswered = 1;
+        endif;
+        ?>
+        <input <?php echo $this->isClosed ? ' DISABLED ' : '' ?> <?php echo isset($this->answers[$this->questionEl['aq_id']]) && ($this->answers[$this->questionEl['aq_id']]['answerId'] == $_optionT[0]) ? ' CHECKED ' : '' ?> type="radio" value="<?php echo $_optionT[0] ?>" name="question[<?php echo $this->questionEl['aq_id'] ?>]" id="question_<?php echo $this->questionEl['aq_id'] ?>_<?php echo $_optionT[0] ?>" rel="<?php echo $_optionT[1] ?>" class="<?php echo $this->isParent ? 'parentInput' : '' ?> radio" value="" /> <label for="question_<?php echo $this->questionEl['aq_id'] ?>_<?php echo $_optionT[0] ?>" class="checkbox fleft"><strong><?php echo $_optionT[1] ?> &nbsp; &nbsp; &nbsp; </strong></label>
+    <?php endforeach; ?>
+    <input id="answered<?php echo $this->questionEl['aq_id'] ?>" value="<?php echo $isAnswered ?>" type="hidden" />
+</p>
+
+<?php if (!$this->isClosed): ?>
+    <p style="border: 0;">
+        <strong style="line-height: 30px;">Notes</strong><br />
+        <textarea name="notes[<?php echo $this->questionEl['aq_id'] ?>]" id="" style="width: 570px;"></textarea>
+    </p>
+<?php endif; ?>
+
+<p style="border: 0;">
+    <strong style="line-height: 30px;">Attachments</strong><br />
+    <?php if (!$this->isClosed): ?>
+        <a rel="<?php echo $this->questionEl['aq_id'] ?>" href="javascript:" class="browseFile button"><i class="fa fa-plus-circle"></i> Browse Files...</a>
+    <?php endif; ?>
+</p>
+
+<div class="cboth"></div>
+<div id="filesToUploadBox<?php echo $this->questionEl['aq_id'] ?>">
+
+</div>
+
+<?php if (isset($this->answers[$this->questionEl['aq_id']]['notes']) && ($this->answers[$this->questionEl['aq_id']]['notes']->count())): ?>
+    <?php foreach ($this->answers[$this->questionEl['aq_id']]['notes'] as $note): ?>
+        <div class="note">
+            <strong><?php echo $note->_username ?></strong> <small> on <?php echo $note->_note_create_date_format ?></small><br />
+            <p>
+                <?php echo $note->note_text ?><br />
+                <?php if ($note->_files != ''): ?>
+                    <?php
+                    $_files = explode(',', $note->_files);
+                    ?>
+                    <strong>Attachments:</strong><br />
+                    <?php foreach ($_files as $_file): ?>
+                        <?php
+                        $_file = explode('::', $_file);
+                        $_fileName = $_file[0];
+                        $_fileId = $_file[1];
+                        ?>
+                        <span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </p>
+        </div>
+    <?php endforeach; ?>
+<?php endif; ?>
+
+
+<div class="cboth"><br /><p></p><br /></div>

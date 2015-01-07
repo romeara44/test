@@ -1,0 +1,356 @@
+<?php
+
+// within a view script
+$form = $this->form;
+$form->prepare();
+
+// Assuming the "contact/process" route exists...
+$form->setAttribute('action', '/company/edit');
+
+// Set the method attribute for the form
+$form->setAttribute('method', 'post');
+
+// Render the opening tag
+?>
+
+<div class="page-title">
+    <h1 class="fleft"><?php if ($this->cId): ?>Company Details<?php else: ?>Add New Company<?php endif; ?></h1>
+    <a href="/client/edit/company/<?php echo $this->cId ?>" class="button"><i class="fa fa-plus-circle"></i> Add New Contact</a>
+
+    <?php if ($this->cId): ?>
+        <ul id="tabs-nav">
+            <li><a href="#tab1">Details</a></li>
+            <li><a href="#tab2">Notes</a></li>
+        </ul>
+        <div class="cboth"></div>
+    <?php endif; ?>
+
+    <div class="cboth"></div>
+
+</div>
+
+<p></p>
+
+<div class="col-left">
+    <div id="tab1">
+        <form action="/company/edit/<?php echo $this->cId ?>" method="post" name="company" id="company">
+            <?php
+                $fn = $form->get('c_id');
+                echo $this->formHidden($fn);
+            ?>
+
+            <?php if (in_array($this->roleId, array(\Admin\Model\User::ROLE_SALES_REP, \Admin\Model\User::ROLE_ADMIN))): ?>
+                <p>
+                    <?php $fn = $form->get('c_consultant_u_id');
+                    echo $this->formLabel($fn);
+                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <h2>Company Information</h2>
+            <?php endif; ?>
+
+            <p>
+                <?php
+                $fn = $form->get('c_name');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('c_phone');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('c_other_phone');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                echo $this->formElementErrors($fn);
+                ?>
+                <?php
+                $fn = $form->get('c_other_phone_inner');
+                echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('c_fax');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('c_email');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('c_website');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+
+            <?php if ($this->cId): ?>
+                <?php $counter = 1;
+
+                foreach ($this->addresses as $address): ?>
+                    <h2>
+                        <?php if ($counter == 1): ?>
+                            Primary Location
+                        <?php else: ?>
+                            Location #<?php echo $counter ?> <a class="i-delete" href="/company/deleteaddress/<?php echo $this->cId ?>/adrId/<?php echo $address->adr_id ?>"><i class="fa fa-trash-o"></i></a>
+                        <?php endif; ?>
+                    </h2>
+                    <div id="<?php echo ($counter == 1) ? 'location' : '' ?>">
+                        <p>
+                            <label for="exists_adr_address1[<?php echo $address->adr_id ?>]">Address 1</label>
+                            <input type="text" value="<?php echo $address->adr_address1 ?>" class="form-control" name="exists_adr_address1[<?php echo $address->adr_id ?>]">
+                        </p>
+
+                        <p>
+                            <label for="exists_adr_address2[<?php echo $address->adr_id ?>]">Address 2</label>
+                            <input type="text" value="<?php echo $address->adr_address2 ?>" class="form-control" name="exists_adr_address2[<?php echo $address->adr_id ?>]">
+                        </p>
+
+                        <p>
+                            <label for="exists_adr_city[<?php echo $address->adr_id ?>]">City</label>
+                            <input type="text" value="<?php echo $address->adr_city ?>" class="form-control" name="exists_adr_city[<?php echo $address->adr_id ?>]">
+                        </p>
+
+                        <p>
+                            <?php $fn = $form->get('adr_state_id[]');
+                            $fn->setValue($address->adr_state_id);
+                            $fn->setName('exists_adr_state_id[' . $address->adr_id .']');
+                            echo $this->formLabel($fn);
+                            echo $this->formSelect($fn->setAttributes(array('class'=>'form-control'))); ?>
+                        </p>
+
+                        <p>
+                            <label for="exists_adr_zip[<?php echo $address->adr_id ?>]">ZIP Code</label>
+                            <input type="text" value="<?php echo $address->adr_zip ?>" class="form-control" name="exists_adr_zip[<?php echo $address->adr_id ?>]">
+                        </p>
+                    </div>
+                <?php $counter++; endforeach; ?>
+            <?php endif; ?>
+
+            <?php if (!$this->cId || !count($this->addresses)): ?>
+                <h2>Primary Location</h2>
+                <div id="location">
+                    <p>
+                        <?php
+                        $fn = $form->get('adr_address1[]');
+                        echo $this->formLabel($fn);
+                        echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                        echo $this->formElementErrors($fn);
+                        ?>
+                    </p>
+                    <p>
+                        <?php
+                        $fn = $form->get('adr_address2[]');
+                        echo $this->formLabel($fn);
+                        echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                        echo $this->formElementErrors($fn);
+                        ?>
+                    </p>
+                    <p>
+                        <?php
+                        $fn = $form->get('adr_city[]');
+                        echo $this->formLabel($fn);
+                        echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                        echo $this->formElementErrors($fn);
+                        ?>
+                    </p>
+                    <p>
+                        <?php $fn = $form->get('adr_state_id[]');
+                        echo $this->formLabel($fn);
+                        echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                        echo $this->formElementErrors($fn);
+                        ?>
+                    </p>
+                    <p>
+                        <?php
+                        $fn = $form->get('adr_zip[]');
+                        echo $this->formLabel($fn);
+                        echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                        echo $this->formElementErrors($fn);
+                        ?>
+                    </p>
+                </div>
+            <?php endif; ?>
+
+            <p>
+                <a id="addLocationButton" href="javascript:" onclick="return addLocation()" class="button"><i class="fa fa-plus-circle"></i> Add Additional Location</a>
+            </p>
+
+            <div class="cboth"></div>
+            <div class="form-buttons">
+                <input type="submit" value="Save" class="form-button" />
+                <div class="fleft">or</div>
+                <a href="/client/list" class="cancel">Cancel</a>
+            </div>
+        <?php echo $this->form()->closeTag() ?>
+    </div>
+
+    <?php if ($this->cId): ?>
+        <div id="tab2">
+            <h3>Add a note about this Company</h3>
+
+            <form action="/company/edit/<?php echo $this->cId ?>" name="" id="" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="noteform" value="1" />
+
+                <?php
+                $fn = $formNote->get('note_id');
+                echo $this->formHidden($fn);
+                ?>
+
+                <?php
+                $fn = $formNote->get('note_item_type');
+                $fn->setValue(1);
+                echo $this->formHidden($fn);
+                ?>
+
+                <?php
+                $fn = $formNote->get('note_item_id');
+                $fn->setValue($this->cId);
+                echo $this->formHidden($fn);
+                ?>
+
+                <p>
+                    <?php
+                    $fn = $formNote->get('note_text');
+                    echo $this->formTextarea($fn->setAttributes(array('class' => 'double')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+
+                <p style="border: 0;">
+                    <strong style="line-height: 30px;">Attachments</strong><br />
+                    <a id="browseFile" href="javascript:" class="button"><i class="fa fa-plus-circle"></i> Browse Files...</a>
+                </p>
+
+                <div class="cboth"></div>
+                <div id="filesToUploadBox">
+
+                </div>
+
+                <div class="cboth"></div>
+                <div class="form-buttons">
+                    <input type="submit" value="Save" class="form-button" />
+                    <div class="fleft">or</div>
+                    <a href="/company/list" class="cancel">Cancel</a>
+                </div>
+                <div class="cboth"><br /></div>
+
+            </form>
+
+            <?php if ($this->cId && is_object($notes) && ($notes->count())): ?>
+                <?php foreach ($notes as $note): ?>
+                    <div class="note">
+                        <strong><?php echo $note->_username ?></strong> <small> on <?php echo $note->_note_create_date_format ?></small><br />
+                        <p>
+                            <?php echo $note->note_text ?><br />
+                            <?php if ($note->_files != ''): ?>
+                                <?php
+                                    $_files = explode(',', $note->_files);
+                                ?>
+                                <strong>Attachments:</strong><br />
+                                <?php foreach ($_files as $_file): ?>
+                                    <?php
+                                        $_file = explode('::', $_file);
+                                        $_fileName = $_file[0];
+                                        $_fileId = $_file[1];
+                                    ?>
+                                    <span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </p>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+</div>
+
+<?php if ($this->cId && is_array($contacts) && (count($contacts))): ?>
+    <div class="col-right">
+        <h3 style="padding-top: 0;">Related Contacts</h3>
+
+        <?php foreach ($contacts as $user): ?>
+            <h5>
+                <span class="fleft"><?php echo $user->u_firstname ?> <?php echo $user->u_lastname ?></span>
+                <?php if ($user->u_id == $primaryContactId): ?>
+                    <span class="label primary">Primary Contact</span>
+                <?php endif; ?>
+                <br class="cboth" />
+                <em style="font-weight: 400;"><?php echo $user->u_title ?></em>
+            </h5>
+            <p><small>Office Phone:</small> <?php echo $user->u_office_phone ?> <?php echo $user->u_office_phone_inner != '' ? ' x ' . $user->u_office_phone_inner : '' ?><br /><small>Email:</small> <a href="mailto:<?php echo $user->u_email ?>"><?php echo $user->u_email ?></a></p>
+            <p><a href="/client/edit/<?php echo $user->u_id ?>" class="button"><i class="fa fa-pencil"></i> Contact Details</a></p>
+
+            <div class="cboth"><br /></div>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
+
+
+<div class="cboth"><br /></div>
+
+<script type="text/javascript">
+
+    var browseFilesCounter = 0;
+    $(document).ready(function() {
+        $('#browseFile').click(function() {
+            $('#filesToUploadBox').append('<input type="file" name="notesFiles[]" id="file' + browseFilesCounter + '" />');
+
+            $('#file' + browseFilesCounter).click();
+            browseFilesCounter++;
+        });
+    });
+
+    var counterLocation = <?php if ($this->cId): ?><?php echo $this->addresses->count() + 1 ?><?php else: ?>2<?php endif;?>;
+    var locationAddress = $('#location').html();
+
+    locationAddress = locationAddress.replace(/exists_/g, '');
+
+    function addLocation()
+    {
+        var locationHtml = '<div id="location' + counterLocation + '" class="additionalLocation"><h2>Location #' + counterLocation + ' <a onclick="$(this).parent().parent().remove()" class="i-delete" href="javascript:"><i class="fa fa-trash-o"></i></a></h2>' + locationAddress + '</div>';
+        $('#addLocationButton').before(locationHtml);
+        $('#location' + counterLocation).find('input').val('');
+        $('#location' + counterLocation).find('select').val('');
+
+        $('#location' + counterLocation + ' input, #location' + counterLocation + ' select').each(function() {
+            var name = $(this).attr('name');
+            var n = name.indexOf("[");
+            var newName = name.substr(0, n) + '[]';
+            $(this).attr('name', newName);
+        });
+
+        counterLocation++;
+    }
+
+</script>
+
+<script type="text/javascript">
+    jQuery(function() {
+        $('#company').validate();
+        //jQuery("#phone, #otherphone, #fax").mask("(999) 999-9999");
+        $("input[name=c_phone], input[name=c_other_phone], input[name=c_fax]").mask("(999) 999-9999");
+    });
+</script>

@@ -1,0 +1,152 @@
+<?php
+
+// within a view script
+$form = $this->form;
+$form->prepare();
+
+// Assuming the "contact/process" route exists...
+$form->setAttribute('action', '/assessment/edit');
+
+// Set the method attribute for the form
+$form->setAttribute('method', 'post');
+
+// Render the opening tag
+?>
+
+<style>
+    .labelBold label {
+        font-weight: 700;
+    }
+    #step1 {
+        margin-top: 30px;
+    }
+</style>
+
+<div class="page-title">
+    <h1 class="fleft">
+        <?php if ($this->aId): ?>
+            Assessment for <?php echo $this->aObj->_client_name; ?>
+        <?php endif; ?>
+    </h1>
+
+    <div class="cboth"></div>
+</div>
+
+    <?php if (!$this->isClosed): ?>
+        <form action="/assessment/edit/<?php echo $this->aId ?>/step/2" method="post" name="assessment" id="assessment">
+    <?php endif; ?>
+        <h2>Step 2 of 5 - Assign Roles</h2>
+
+        <?php $locationName = ''; ?>
+        <p>
+            <label style="font-weight: 700;">Select Location</label>
+            <select name="arlc_adr_id" id="selectLocation">
+                <option value="">Select Location</option>
+                <option value="">---</option>
+                <?php foreach ($this->addresses as $address): ?>
+                    <?php if ($this->location == $address->adr_id) $locationName = $address->adr_name; ?>
+                    <option <?php echo $this->location == $address->adr_id ? ' SELECTED ' : '' ?> value="<?php echo $address->adr_id ?>"><?php echo $address->adr_name ?></option>
+                <?php endforeach; ?>
+            </select>
+        </p>
+        <p></p>
+
+        <input id="setStep" type="hidden" name="setStep" value="" />
+        <input type="hidden" name="locationHidden" value="<?php echo $this->location ?>" />
+
+        <?php
+            $fn = $form->get('a_id');
+            echo $this->formHidden($fn);
+        ?>
+
+        <div class="cboth"></div>
+
+        <?php if ($this->location): ?>
+            <h3><?php echo $locationName ?> Roles</h3>
+
+            <div class="cboth"></div>
+
+            <?php $maxInRows = 3; $counterRoles = 0; $last = ''; ?>
+            <?php foreach ($this->assessmentsRoles as $ar): ?>
+                <?php
+                if (($counterRoles % $maxInRows) == 0):
+                    $last = 'last';
+                else:
+                    $last = '';
+                endif;
+                ?>
+                <div class="col3 <?php echo $last ?>"><br />
+                    <p>
+                        <strong style="line-height: 32px;"><?php echo $ar['ar_name'] ?></strong><br />
+                        <select name="arlc[<?php echo $this->location ?>][<?php echo $ar['ar_id'] ?>]" id="" class="contactSelect w225">
+                            <option value="">Select Contact</option>
+                            <option value="">---</option>
+
+                            <?php foreach ($this->contacts as $u): ?>
+                                <?php $selected = ''; ?>
+                                <?php if (isset($this->arlcContacts) && isset($this->arlcContacts[$ar['ar_id']]) && ($this->arlcContacts[$ar['ar_id']] == $u->u_id)):
+                                    $selected = ' SELECTED ';
+                                else:
+                                    if (isset($this->rolesAdr1[$ar['ar_id']]) && ($this->rolesAdr1[$ar['ar_id']] == $u->u_id)):
+                                        $selected = ' SELECTED ';
+                                    endif;
+                                endif; ?>
+
+                                <option <?php echo $selected ?> value="<?php echo $u->u_id ?>"><?php echo $u->u_firstname . ' ' . $u->u_lastname ?></option>
+                            <?php endforeach; ?>
+
+                            <option value="addNewContactSelect">&rarr; Add New Contact</option>
+                        </select>
+                    </p>
+                    <a id="addNewContactLink" style="display: none" href="/assessment/addnewcontact/<?php echo $this->aId ?>/step/2/location/<?php echo $this->location ?>/companyId/<?php echo $this->aObj->a_c_id; ?>" class="fancybox" title="Edit"><i class="fa fa-pencil"></i></a>
+                </div>
+
+            <?php $counterRoles++; endforeach; ?>
+
+            <div class="cboth"><br /><br /><br /><br /></div>
+
+
+            <div class="cboth"></div>
+            <div class="form-buttons">
+                <?php if (!$this->isClosed): ?>
+                    <input id="saveAndContinue" type="button" value="Save and Continue" class="form-button" />
+                    <input type="submit" value="Save" class="form-button" />
+                    <div class="fleft">or</div>
+                <?php endif; ?>
+
+                <a href="/assessment/list" class="cancel">Cancel</a>
+            </div>
+
+        <?php endif; ?>
+
+    <?php echo $this->form()->closeTag() ?>
+
+
+<div class="cboth"><br /></div>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        $('#saveAndContinue').click(function() {
+            $('#setStep').val(3);
+            $('#assessment').submit();
+        });
+
+        $('#selectLocation').change(function() {
+            var location = $(this).val();
+
+            if (location) {
+                window.location.href = '/assessment/edit/<?php echo $this->aId ?>/step/<?php echo $this->step ?>/location/' + location;
+            }
+        });
+    });
+
+    $('.contactSelect').change(function() {
+        var valueContact = $(this).val();
+        if (valueContact == 'addNewContactSelect') {
+            $('#addNewContactLink').click();
+        }
+    });
+
+
+</script>

@@ -1,0 +1,22 @@
+<?php foreach ($this->logsOpen as $log): ?>
+    <tr rel="<?php echo $log->lo_id ?>">
+        <td>
+            <?php if ($log->lo_item_type == \Application\Model\LogsTable::ITEM_TYPE_COMPANY): ?>
+                <a href="/company/edit/<?php echo $log->_c_id; ?>"><?php echo $log->_c_name ?> profile</a>
+            <?php elseif ($log->lo_item_type == \Application\Model\LogsTable::ITEM_TYPE_CLIENT): ?>
+                <a href="/client/edit/<?php echo $log->_cl_id; ?>"><?php echo $log->_cl_name ?> profile</a>
+            <?php elseif ($log->lo_item_type == \Application\Model\LogsTable::ITEM_TYPE_BA): ?>
+                <a href="/businessassociate/edit/<?php echo $log->_ba_id; ?>"><?php echo $log->_ba_name ?> Details</a>
+            <?php elseif ($log->lo_item_type == \Application\Model\LogsTable::ITEM_TYPE_BREACHLOG): ?>
+                <a href="/breachlog/edit/<?php echo $log->_bl_id; ?>">Breach Incident Log for <?php echo $log->_blc_name ?></a>
+            <?php elseif ($log->lo_item_type == \Application\Model\LogsTable::ITEM_TYPE_BRP): ?>
+                <a href="/breachremediationplan/edit/<?php echo $log->_brp_id; ?>">Breach Remediation Plan for <?php echo $log->_brpc_name ?></a>
+            <?php elseif ($log->lo_item_type == \Application\Model\LogsTable::ITEM_TYPE_ASSESSMENT): ?>
+                <a href="/assessment/edit/<?php echo $log->_a_id; ?>">Assessment for <?php echo $log->_ac_name ?></a>
+            <?php elseif ($log->lo_item_type == \Application\Model\LogsTable::ITEM_TYPE_RP): ?>
+                <a href="/remediationplan/edit/<?php echo $log->_rp_id; ?>">Remediation Plan for <?php echo $log->_rpc_name ?></a>
+            <?php endif; ?>
+            <br /><small><?php echo $this->formatDateA($log->lo_create_date, true, false, true) ?></small>
+        </td>
+    </tr>
+<?php endforeach; ?>

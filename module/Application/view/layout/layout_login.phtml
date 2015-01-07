@@ -1,0 +1,97 @@
+<?php echo $this->doctype(); ?>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>HIPAA Compliance by The Carosh Group</title>
+
+        <?php echo $this->headMeta()
+            ->appendName('viewport', 'width=device-width, initial-scale=1.0')
+            ->appendHttpEquiv('X-UA-Compatible', 'IE=edge')
+        ?>
+
+        <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+        <!-- Le styles -->
+        <?php echo $this->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/images/favicon.ico'))
+                        ->prependStylesheet($this->basePath() . '/css/login.css')
+        ?>
+
+        <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+        <link rel="apple-touch-icon" sizes="114x114" href="/images/apple-touch-icon-iphone-retina.png" />
+        <link rel="apple-touch-icon" sizes="72x72" href="/images/apple-touch-icon-ipad.png" />
+        <link rel="apple-touch-icon" sizes="57x57" href="/images/apple-touch-icon-iphone.png" />
+
+        <script type="text/javascript" src="/js/jquery.min.js"></script>
+        <script type="text/javascript" src="/js/jquery.validate.min.js"></script>
+    </head>
+
+    <body id="login">
+
+        <?php if (isset($flashMessagesSuccess) && count($flashMessagesSuccess)) : ?>
+            <div class="confirmation-box">
+                <?php foreach ($flashMessagesSuccess as $msg) : ?>
+                    <p><?php echo $msg; ?></p>
+                <?php endforeach; ?>
+            </div>
+            <script type="text/javascript">
+                jQuery('.confirmation-box').stop().show().animate({opacity: 1.0}, 3000).fadeOut(1000);
+            </script>
+        <?php endif; ?>
+        <?php if (isset($flashMessagesErrors) && count($flashMessagesErrors)) : ?>
+            <div class="confirmation-box-error">
+                <?php foreach ($flashMessagesErrors as $msg) : ?>
+                    <p><?php echo $msg; ?></p>
+                <?php endforeach; ?>
+            </div>
+            <script type="text/javascript">
+                jQuery('.confirmation-box-error').stop().show().animate({opacity: 1.0}, 3000).fadeOut(1000);
+            </script>
+        <?php endif; ?>
+
+        <div id="footer" class="links">
+            <p class="acenter">
+            </p>
+        </div>
+
+        <div id="wrap">
+            <div id="canvas">
+
+                <div id="logo">
+                    <h1>HIPAA <span>Compliance</span></h1>
+                </div>
+
+                <div class="cboth"></div>
+
+                <?php echo $this->content; ?>
+
+            </div>
+
+            <div id="footer">
+                <p class="acenter">
+                    Copyright &copy; <?php echo date('Y'); ?> <a href="http://www.carosh.com/" target="_blank">The Carosh Group</a>. All rights reserved.<br />
+                    <a href="http://hipaa.carosh.com/Privacy_Policy.pdf">Privacy Statement</a> &nbsp; | &nbsp; <a href="http://hipaa.carosh.com/Terms_of_Use.pdf">Terms and Conditions</a>
+                </p>
+            </div>
+        </div>
+    </body>
+
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            jQuery('.confirmation-box').hover(
+                function() {
+                    jQuery('.confirmation-box').stop(true, true).show();
+                }, function() {
+                    jQuery('.confirmation-box').stop().animate({opacity: 1.0}, 3000).fadeOut(1000);
+                }
+            );
+
+            jQuery('.confirmation-box-error').hover(
+                function() {
+                    jQuery('.confirmation-box-error').stop(true, true).show();
+                }, function() {
+                    jQuery('.confirmation-box-error').stop().animate({opacity: 1.0}, 3000).fadeOut(1000);
+                }
+            );
+        });
+    </script>
+</html>

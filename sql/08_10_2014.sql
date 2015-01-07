@@ -1,0 +1,1 @@
+alter table assessments_questions_categories add column aqc_additional_location tinyint(1)  default 0 after aqc_description;

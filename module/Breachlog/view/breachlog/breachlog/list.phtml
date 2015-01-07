@@ -1,0 +1,93 @@
+<?php
+$urlOrder = $order == 'ASC' ? 'DESC' : 'ASC';
+$authService = new \Zend\Authentication\AuthenticationService();
+$authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+$identity = $authService->getIdentity();
+$isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
+?>
+
+<div class="page-title">
+    <h1 class="fleft">Suspected Breach Incident Logs</h1>
+    <a href="/breachlog/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Incident Log</a>
+    <div class="cboth"></div>
+</div>
+
+<p></p>
+
+<table cellpadding="0" cellspacing="0">
+    <thead>
+        <tr>
+            <?php $classSort = ($order_by == 'id') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('breachlog', array('action' => 'list', 'page' => $page, 'order_by' => 'id', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    ID <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'name') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('breachlog', array('action' => 'list', 'page' => $page, 'order_by' => 'name', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Name <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php if (!$isClientRole): ?>
+                <?php $classSort = ($order_by == 'cId') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+                <th>
+                    <a href="<?php echo $this->url('breachlog', array('action' => 'list', 'page' => $page, 'order_by' => 'cId', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                        Client <i class="fa <?php echo $classSort ?>"></i>
+                    </a>
+                </th>
+            <?php endif; ?>
+
+            <?php $classSort = ($order_by == 'reportable') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('breachlog', array('action' => 'list', 'page' => $page, 'order_by' => 'reportable', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Reportable <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'date') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('breachlog', array('action' => 'list', 'page' => $page, 'order_by' => 'date', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Date <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->paginator as $bl): ?>
+            <tr>
+                <td><?php echo $bl->bl_id ?></td>
+                <td><a href="/breachlog/edit/<?php echo $bl->bl_id ?>"><?php echo $bl->bl_name ?></a></td>
+                <?php if (!$isClientRole): ?>
+                    <td><?php echo stripslashes($bl->_client_name) ?></td>
+                <?php endif; ?>
+                <td><?php echo $bl->bl_reportable ? 'Yes' : 'No' ?></td>
+                <td><?php echo ($bl->bl_date_of_occurrence != '0000-00-00 00:00:00') ? $this->formatDateA($bl->bl_date_of_occurrence) : '' ?></td>
+                <td style="white-space: nowrap;" class="aright">
+                    <a href="/breachlog/edit/<?php echo $bl->bl_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+                    <?php if ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
+                        <a href="/breachlog/unarchive/<?php echo $bl->bl_id  ?>" class="">Unarchive</a>
+                    <?php else: ?>
+                        <?php $deleteUrl = '/breachlog/delete/' . $bl->bl_id; ?>
+                        <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
+                    <?php endif; ?>
+                </td>
+            </tr>
+
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+<?php echo $this->paginationControl(
+    $this->paginator,
+    'sliding',
+    array('partial/paginator.phtml', 'Breachlog'),
+    array('route' => 'list', 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'roleFilter' => $roleFilter, 'role' => 1, 'controller' => 'breachlog', 'action' => 'list')
+);
+?>
+
+<div class="cboth"><br /></div>

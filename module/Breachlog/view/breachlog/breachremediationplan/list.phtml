@@ -1,0 +1,122 @@
+<?php
+$urlOrder = $order == 'ASC' ? 'DESC' : 'ASC';
+$authService = new \Zend\Authentication\AuthenticationService();
+$authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+$identity = $authService->getIdentity();
+$isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
+?>
+
+<div class="page-title">
+    <h1 class="fleft">Breach Remediation Plans</h1>
+    <div class="cboth"></div>
+</div>
+
+<p></p>
+
+<table cellpadding="0" cellspacing="0">
+    <thead>
+        <tr>
+            <?php $classSort = ($order_by == 'id') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('breachremediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'id', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    ID <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php if (!$isClientRole): ?>
+                <?php $classSort = ($order_by == 'cId') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+                <th>
+                    <a href="<?php echo $this->url('breachremediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'cId', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                        Client <i class="fa <?php echo $classSort ?>"></i>
+                    </a>
+                </th>
+            <?php endif; ?>
+
+            <?php $classSort = ($order_by == 'status') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('breachremediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'status', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Status <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'date') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('breachremediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'date', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Date <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php $isVersion = false; $counterVersion = 0; $paddingVersion = 0; $rowIdParent = ''; $isParentActive = false; $lastVersionIndex = 0;
+        foreach ($this->paginator as $brp): ?>
+            <?php
+            if (!$brp->brp_parent_brp_id):
+                $rowId = $brp->brp_id;
+                $rowIdParent = $brp->brp_id;
+                if ($isVersion):
+                    $counterVersion = 0;
+                endif;
+                $paddingVersion = 0;
+                $isVersion = false;
+                $isParentActive = true;
+                $lastVersionIndex = $brp->brp_id;
+            else:
+                if ($lastVersionIndex != $brp->brp_version_index):
+                    $lastVersionIndex = $brp->brp_version_index;
+                    $isParentActive = false;
+                endif;
+
+                $counterVersion++;
+                if (!$isParentActive):
+                    $isParentActive = true;
+                    $counterVersion = 0;
+                    $isVersion = false;
+                else:
+                    $isVersion = true;
+                endif;
+
+                $paddingVersion = $counterVersion * 20;
+                $rowId = $brp->brp_version_index . '-' . $brp->brp_version_index_item;
+            endif;
+            $classBold = '';
+            if ($brp->brp_status == 10):
+                $classBold = ' bold ';
+            endif;
+
+            ?>
+            <tr>
+                <td class="<?php echo $classBold ?>"><?php echo $rowId ?></td>
+                <?php if (!$isClientRole): ?>
+                    <td class="<?php echo $classBold ?>" style="padding-left: <?php echo $paddingVersion ?>px"><?php if ($isVersion): ?><i class="fa fa-code-fork"></i> &nbsp; <?php endif ?><a href="/breachremediationplan/edit/<?php echo $brp->brp_id ?>"><?php echo stripslashes($brp->_client_name) ?></a></td>
+                <?php endif; ?>
+                <td class="<?php echo $classBold ?>"><?php echo \Breachlog\Model\Breachremediationplan::$statusesNames[$brp->brp_status]  ?></td>
+                <td class="<?php echo $classBold ?>"><?php echo ($brp->brp_incident_date != '0000-00-00') ? $this->formatDateA($brp->brp_incident_date) : '' ?></td>
+                <td style="white-space: nowrap;" class="aright <?php echo $classBold ?>">
+                    <a class="<?php echo $classBold ?>" href="/breachremediationplan/edit/<?php echo $brp->brp_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+                    <?php if (!$isClientRole): ?>
+                        <?php if (($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN) && ($brp->brp_active == 0)): ?>
+                            <a href="/breachremediationplan/unarchive/<?php echo $brp->brp_id ?>" class="">Unarchive</a>
+                        <?php else: ?>
+                            <?php $deleteUrl = '/breachremediationplan/delete/' . $brp->brp_id; ?>
+                            <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete <?php echo $classBold ?>"><i class="fa fa-trash-o"></i></a>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </td>
+            </tr>
+
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+<?php echo $this->paginationControl(
+    $this->paginator,
+    'sliding',
+    array('partial/paginator.phtml', 'Breachremediationplan'),
+    array('route' => 'list', 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'roleFilter' => $roleFilter, 'role' => 1, 'controller' => 'breachremediationplan', 'action' => 'list')
+);
+?>
+
+<div class="cboth"><br /></div>

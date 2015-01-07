@@ -1,0 +1,83 @@
+<?php
+    $urlOrder = $order == 'ASC' ? 'DESC' : 'ASC';
+
+    $action = isset($action) && ($action != '') ? $action : 'list';
+    $hasIdentity = isset($hasIdentity) ? $hasIdentity : false;
+?>
+
+<div id="canvas">
+    <div class="page-title">
+        <h1 class="fleft">Users</h1>
+        <a href="<?php echo $this->url('admin', array('action' => 'users', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 0)); ?>" class="label <?php echo $roleFilter == 0 ? ' selected ' : '' ?>">All</a>
+        <a href="<?php echo $this->url('admin', array('action' => 'users', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 3)); ?>" class="label <?php echo $roleFilter == 3 ? ' selected ' : '' ?>">Consultants</a>
+        <a href="<?php echo $this->url('admin', array('action' => 'users', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 2)); ?>" class="label <?php echo $roleFilter == 2 ? ' selected ' : '' ?>">Senior Consultants</a>
+        <a href="<?php echo $this->url('admin', array('action' => 'users', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 4)); ?>" class="label <?php echo $roleFilter == 4 ? ' selected ' : '' ?>">Sales Reps</a>
+        <a href="<?php echo $this->url('admin', array('action' => 'users', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 5)); ?>" class="label <?php echo $roleFilter == 5 ? ' selected ' : '' ?>">Clients</a>
+        <a href="<?php echo $this->url('admin', array('action' => 'users', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 6)); ?>" class="label <?php echo $roleFilter == 6 ? ' selected ' : '' ?>">Business Associates</a>
+        <a href="/admin/edituser" class="button"><i class="fa fa-plus-circle"></i> Add New User</a>
+        <div class="cboth"></div>
+    </div>
+
+    <p></p>
+
+    <table cellpadding="0" cellspacing="0">
+        <thead>
+            <tr>
+                <?php $classSort = ($order_by == 'id') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+                <th>
+                    <a href="<?php echo $this->url('admin', array('action' => 'users', 'page' => $page, 'order_by' => 'id', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                        ID <i class="fa <?php echo $classSort ?>"></i>
+                    </a>
+                </th>
+
+                <?php $classSort = ($order_by == 'name') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+                <th>
+                    <a href="<?php echo $this->url('admin', array('action' => 'users', 'page' => $page, 'order_by' => 'name', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Name <i class="fa <?php echo $classSort ?>"></i>
+                </th>
+
+                <?php $classSort = ($order_by == 'role') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+                <th>
+                    <a href="<?php echo $this->url('admin', array('action' => 'users', 'page' => $page, 'order_by' => 'role', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Account Type <i class="fa <?php echo $classSort ?>"></i>
+                </th>
+
+                <?php $classSort = ($order_by == 'status') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+                <th>
+                    <a href="<?php echo $this->url('admin', array('action' => 'users', 'page' => $page, 'order_by' => 'status', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Status <i class="fa <?php echo $classSort ?>"></i>
+                <th>Phone</th>
+                <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($this->paginator as $user): ?>
+                <tr>
+                    <td><?php echo $user->u_id ?></td>
+                    <td><a href="/admin/edituser/<?php echo $user->u_id ?>"><?php echo $user->u_firstname ?> <?php echo $user->u_lastname ?></a></td>
+                    <td><?php echo $user->_rolename ?></td>
+                    <td><?php echo $user->u_active ? 'Active' : 'Archived'  ?></td>
+                    <td><?php echo $user->u_office_phone ?></td>
+                    <td class="aright">
+                        <a href="/admin/edituser/<?php echo $user->u_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+                        <?php $deleteUrl = '/admin/deleteuser/' . $user->u_id; ?>
+                        <?php if ($user->u_active == 1): ?>
+                            <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+
+    <?php echo $this->paginationControl(
+        $this->paginator,
+        'sliding',
+        array('partial/paginator.phtml', 'User'),
+        array('route' => 'users', 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'roleFilter' => $roleFilter, 'role' => 1, 'controller' => 'admin', 'action' => 'users')
+    );
+    ?>
+
+    <div class="cboth"><br /></div>
+
+</div>

@@ -1,0 +1,1 @@
+alter table notes add column note_subitem_id int(11) after note_item_id;

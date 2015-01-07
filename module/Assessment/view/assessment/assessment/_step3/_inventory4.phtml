@@ -1,0 +1,35 @@
+<?php if ($this->withHeader): ?>
+    <thead>
+        <tr>
+            <th colspan="3"><span class="fleft" style="line-height: 34px;">ISP, WAN and Data Circuit Summary</span></th>
+        </tr>
+    </thead>
+<?php endif; ?>
+
+<?php if ($this->withHeader): ?>
+    <tbody>
+<?php endif; ?>
+
+    <tr>
+        <td><?php echo $this->counterAili ?>.</td>
+        <td><input type="text" style="width: 766px; margin: 2px 30px 12px 0;" name="aili_name<?php echo (!$this->empty) ? '_exists[' . $this->aili->aili_id . ']' : $this->aiId ?>" id="" value="<?php echo is_object($this->aili) ? $this->aili->aili_name : '' ?>" /></td>
+
+        <?php if ($this->empty): ?>
+            <?php if (!$this->isClosed): ?>
+                <td class="aright">
+                    <a href="javascript:" rel="<?php echo $this->aiId ?>" class="button buttonAdd"><i class="fa fa-plus-circle"></i> Add</a>
+                </td>
+            <?php endif; ?>
+        <?php else: ?>
+            <?php if (!$this->isClosed): ?>
+                <td class="acenter">
+                    <a title="Delete" class="i-delete" href="/assessment/deleteaili/<?php echo $this->aili->aili_a_id ?>/adrId/<?php echo $this->aili->aili_adr_id ?>/ailiId/<?php echo $this->aili->aili_id ?>"><i class="fa fa-trash-o"></i></a>
+                </td>
+            <?php endif; ?>
+        <?php endif; ?>
+    </tr>
+
+
+<?php if ($this->withHeader): ?>
+    </tbody>
+<?php endif; ?>

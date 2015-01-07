@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head profile="http://gmpg.org/xfn/11">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <title>HIPAA Compliance - Application Wireframes v2.0</title>
+
+    <script type="text/javascript" src="//use.typekit.net/znb8skn.js"></script>
+    <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+    <link rel="stylesheet" href="/css/modals.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/css/font-awesome.css" type="text/css" media="screen" />
+    <!--<link rel="stylesheet" href="css/responsive.css" type="text/css" media="screen" />-->
+
+    <!--<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;" />-->
+
+    <!--<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.10.0/jquery.validate.min.js"></script>-->
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.fancybox.pack.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+
+            /*jQuery('#click5-newsletter').validate({
+             errorPlacement: function(error, element) {}
+             });*/
+
+        });
+    </script>
+
+</head>
+
+
+<body>
+
+<div id="modal">
+
+    <h1><?php echo $this->title ?></h1>
+
+    <div id="wrap">
+
+        <form id="form" action="/mail/send" name="" method="POST">
+            <input type="hidden" name="subject" value="<?php echo $this->subject ?>" />
+            <input type="hidden" name="addto" value="<?php echo $this->addTo ?>" />
+            <input type="hidden" name="passwordUId" value="<?php echo $this->passwordUId ?>" />
+            <input type="hidden" name="passwordToSent" value="<?php echo $this->passwordToSent ?>" />
+            <p>
+                <label><?php echo $this->title_label ?></label>
+                <span class="fleft"><?php echo $this->header_title ?></span>
+            </p>
+            <p>
+                <textarea name="text" id="" class="email"><?php echo $this->text ?></textarea>
+            </p>
+
+            <div class="cboth"><br /></div>
+            <div class="form-buttons">
+                <input type="submit" value="Send" class="form-button" onclick="parent.jQuery.fancybox.close();" />
+                <div class="fleft">or</div>
+                <a href="javascript:void(0);" onclick="parent.jQuery.fancybox.close();" class="cancel">Cancel</a>
+            </div>
+
+        </form>
+
+        <div class="cboth"></div>
+
+    </div>
+
+</div>
+
+
+</body>
+</html>

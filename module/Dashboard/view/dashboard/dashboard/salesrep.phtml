@@ -1,0 +1,52 @@
+<div class="page-title">
+    <h1 class="fleft">Dashboard</h1>
+    <a href="/client/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Contact</a>
+    <a href="/company/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Company</a>
+    <div class="cboth"></div>
+</div>
+
+<p></p>
+
+<div class="col2">
+
+    <table cellpadding="0" cellspacing="0">
+        <thead>
+        <tr>
+            <th><h3 style="padding: 2px 0;">Recent Activities</h3></th>
+        </tr>
+        </thead>
+        <tbody id="logsActivities">
+        <?php echo $this->partial('dashboard/dashboard/_logs_activities.phtml', array('logsActivities' => $this->logsActivities)); ?>
+        </tbody>
+    </table>
+    <p>
+        <a href="javascript:" id="loadMoreActivities" class="button" style="float: none; width: 80px; margin: 0 auto;">Load More</a>
+    </p>
+
+</div>
+
+<div class="col2 last">
+
+</div>
+
+<div class="cboth"><br /></div>
+
+
+<script>
+    var lastActId = 0;
+
+    $(document).ready(function() {
+        var trs = $('#logsActivities tr');
+        lastActId = $(trs[trs.length - 1]).attr('rel');
+    });
+
+    $('#loadMoreActivities').click(function() {
+        $.getJSON("/dashboard/getmore/" + lastActId + "/type/activities", {  }, function(data) {
+            var trs = $('#logsActivities tr');
+            $(trs[trs.length - 1]).after(data);
+            var trs = $('#logsActivities tr');
+            lastActId = $(trs[trs.length - 1]).attr('rel');
+        });
+    });
+
+</script>

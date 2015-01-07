@@ -1,0 +1,148 @@
+<?php
+$urlOrder = $order == 'ASC' ? 'DESC' : 'ASC';
+$authService = new \Zend\Authentication\AuthenticationService();
+$authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+$identity = $authService->getIdentity();
+$isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
+?>
+
+<div class="page-title">
+    <h1 class="fleft">Remediation Plans</h1>
+    <div class="cboth"></div>
+</div>
+
+<p></p>
+
+<table cellpadding="0" cellspacing="0">
+    <thead>
+        <tr>
+            <?php $classSort = ($order_by == 'id') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'id', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    ID <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php if (!$isClientRole): ?>
+                <?php $classSort = ($order_by == 'cId') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+                <th>
+                    <a href="<?php echo $this->url('remediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'cId', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                        Client <i class="fa <?php echo $classSort ?>"></i>
+                    </a>
+                </th>
+            <?php endif; ?>
+
+            <?php $classSort = ($order_by == 'status') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'status', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Status <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'type') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'type', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Type <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'date') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'date', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Date <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php $postFix = ''; $isVersion = false; $counterVersion = 0; $paddingVersion = 0; $rowIdParent = ''; $isParentActive = false; $lastVersionIndex = 0;
+        foreach ($this->paginator as $rp): ?>
+            <?php
+            if (!$rp->rp_parent_rp_id):
+                if ($rp->rp_type == 2):
+                    $rowId = $rp->rp_security_rp_id;
+                    if (!$rowId):
+                        $rowId = $rp->rp_id;
+                    endif;
+                else:
+                    $rowId = $rp->rp_id;
+                endif;
+                $rowIdParent = $rp->rp_id;
+                if ($isVersion):
+                    $counterVersion = 0;
+                endif;
+                $paddingVersion = 0;
+                $isVersion = false;
+                $isParentActive = true;
+                $lastVersionIndex = $rp->rp_id;
+            else:
+                if ($lastVersionIndex != $rp->rp_version_index):
+                    $lastVersionIndex = $rp->rp_version_index;
+                    $isParentActive = false;
+                endif;
+
+                $counterVersion++;
+                if (!$isParentActive):
+                    $isParentActive = true;
+                    $counterVersion = 0;
+                    $isVersion = false;
+                else:
+                    $isVersion = true;
+                endif;
+
+                $paddingVersion = $counterVersion * 20;
+                if ($rp->rp_type == 2):
+                    $rowId = $rp->rp_security_rp_id . '-' . $rp->rp_version_index_item;
+                    if (!$rp->rp_security_rp_id):
+                        $rowId = $rp->rp_id . '-' . $rp->rp_version_index_item;
+                    endif;
+                else:
+                    $rowId = $rp->rp_version_index . '-' . $rp->rp_version_index_item;
+                endif;
+            endif;
+            $postFix = '-S';
+            if ($rp->rp_type == 2):
+                $postFix = '-P';
+            endif;
+            $classBold = '';
+            if ($rp->rp_status == 10):
+                $classBold = ' bold ';
+            endif;
+            ?>
+            <tr>
+                <td><?php echo $rowId ?><?php echo $postFix ?></td>
+                <?php if (!$isClientRole): ?>
+                    <td class="<?php echo $classBold ?>" style="padding-left: <?php echo $paddingVersion ?>px"><?php if ($isVersion): ?><i class="fa fa-code-fork"></i> &nbsp; <?php endif ?><a href="/remediationplan/edit/<?php echo $rp->rp_id ?>"><?php echo stripslashes($rp->_client_name) ?></a></td>
+                <?php endif; ?>
+                <td class="<?php echo $classBold ?>"><?php echo \Assessment\Model\Remediationplan::$statusesNames[$rp->rp_status]  ?></td>
+                <td class="<?php echo $classBold ?>"><?php echo \Assessment\Model\Assessment::$typesNames[$rp->rp_type] ?></td>
+                <td class="<?php echo $classBold ?>"><?php echo ($rp->rp_incident_date != '0000-00-00') ? $this->formatDateA($rp->rp_incident_date) : '' ?></td>
+                <td style="white-space: nowrap;" class="aright <?php echo $classBold ?>">
+                    <a class="<?php echo $classBold ?>" href="/remediationplan/edit/<?php echo $rp->rp_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+                    <?php if (!$isClientRole): ?>
+                        <?php if (($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN) && ($rp->rp_active == 0)): ?>
+                            <a href="/remediationplan/unarchive/<?php echo $rp->rp_id ?>" class="">Unarchive</a>
+                        <?php else: ?>
+                            <?php $deleteUrl = '/remediationplan/delete/' . $rp->rp_id; ?>
+                            <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
+                        <?php endif; ?>
+
+                    <?php endif; ?>
+                </td>
+            </tr>
+
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+<?php echo $this->paginationControl(
+    $this->paginator,
+    'sliding',
+    array('partial/paginator.phtml', 'Remediationplan'),
+    array('route' => 'list', 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'roleFilter' => $roleFilter, 'role' => 1, 'controller' => 'remediationplan', 'action' => 'list')
+);
+?>
+
+<div class="cboth"><br /></div>

@@ -1,0 +1,149 @@
+<?php
+$urlOrder = $order == 'ASC' ? 'DESC' : 'ASC';
+$authService = new \Zend\Authentication\AuthenticationService();
+$authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+$identity = $authService->getIdentity();
+$isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
+?>
+
+<div class="page-title">
+    <h1 class="fleft">Assessments</h1>
+
+    <?php
+    $authService = new \Zend\Authentication\AuthenticationService();
+    $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+    $identity = $authService->getIdentity();
+    ?>
+    <?php if (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT))): ?>
+        <a href="/assessment/edit/0/step/1" class="button"><i class="fa fa-clipboard"></i> Start New Assessment</a>
+    <?php endif; ?>
+    <div class="cboth"></div>
+</div>
+
+
+<p></p>
+
+<table cellpadding="0" cellspacing="0">
+    <thead>
+        <tr>
+            <?php $classSort = ($order_by == 'id') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('assessment', array('action' => 'list', 'page' => $page, 'order_by' => 'id', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    ID <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php if (!$isClientRole): ?>
+                <?php $classSort = ($order_by == 'cId') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+                <th>
+                    <a href="<?php echo $this->url('assessment', array('action' => 'list', 'page' => $page, 'order_by' => 'cId', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                        Client <i class="fa <?php echo $classSort ?>"></i>
+                    </a>
+                </th>
+            <?php endif; ?>
+
+            <?php $classSort = ($order_by == 'status') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('assessment', array('action' => 'list', 'page' => $page, 'order_by' => 'status', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Status <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'type') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('assessment', array('action' => 'list', 'page' => $page, 'order_by' => 'type', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Type <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'date') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('assessment', array('action' => 'list', 'page' => $page, 'order_by' => 'date', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Date <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php $postFix = ''; $isVersion = false; $counterVersion = 0; $paddingVersion = 0; $rowIdParent = ''; $isParentActive = false; $lastVersionIndex = 0;
+        foreach ($this->paginator as $a): ?>
+            <?php
+            if (!$a->a_parent_a_id):
+                if ($a->a_type == 2):
+                    $rowId = $a->a_security_a_id;
+                else:
+                    $rowId = $a->a_id;
+                endif;
+                $rowIdParent = $a->a_id;
+                if ($isVersion):
+                    $counterVersion = 0;
+                endif;
+                $paddingVersion = 0;
+                $isVersion = false;
+                $isParentActive = true;
+                $lastVersionIndex = $a->a_id;
+            else:
+                if ($lastVersionIndex != $a->a_version_index):
+                    $lastVersionIndex = $a->a_version_index;
+                    $isParentActive = false;
+                endif;
+
+                $counterVersion++;
+                if (!$isParentActive):
+                    $isParentActive = true;
+                    $counterVersion = 0;
+                    $isVersion = false;
+                else:
+                    $isVersion = true;
+                endif;
+
+                $paddingVersion = $counterVersion * 20;
+                if ($a->a_type == 2):
+                    $rowId = $a->a_security_a_id . '-' . $a->a_version_index_item;
+                else:
+                    $rowId = $a->a_version_index . '-' . $a->a_version_index_item;
+                endif;
+            endif;
+            $postFix = '-S';
+            if ($a->a_type == 2):
+                $postFix = '-P';
+            endif;
+            $classBold = '';
+            ?>
+            <tr>
+                <td><?php echo $rowId ?><?php echo $postFix ?></td>
+                <?php if (!$isClientRole): ?>
+                    <td style="padding-left: <?php echo $paddingVersion ?>px"><?php if ($isVersion): ?><i class="fa fa-code-fork"></i> &nbsp; <?php endif ?><a href="/assessment/editlist/<?php echo $a->a_id ?>"><?php echo stripslashes($a->_client_name) ?></a></td>
+                <?php endif; ?>
+                <td><?php echo $this->asessmentProgressBar($a) ?></td>
+                <td><?php echo \Assessment\Model\Assessment::$typesNames[$a->a_type] ?></td>
+                <td><?php echo ($a->a_create_date != '0000-00-00 00:00:00') ? $this->formatDateA($a->a_create_date) : '' ?></td>
+                <td style="white-space: nowrap;" class="aright">
+                    <a href="/assessment/editlist/<?php echo $a->a_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+                    <?php if (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT))): ?>
+                        <a href="/assessment/duplicate/<?php echo $a->a_id ?>" title="Duplicate"><i class="fa fa-copy"></i></a> &nbsp;
+                        <?php $deleteUrl = '/assessment/delete/' . $a->a_id; ?>
+                        <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
+                    <?php endif; ?>
+
+                    <?php if ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
+                        <a href="/assessment/unarchive/<?php echo $a->a_id ?>" class="">Unarchive</a>
+                    <?php endif; ?>
+                </td>
+            </tr>
+
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+<?php echo $this->paginationControl(
+    $this->paginator,
+    'sliding',
+    array('partial/paginator.phtml', 'Assessment'),
+    array('route' => 'list', 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'roleFilter' => $roleFilter, 'role' => 1, 'controller' => 'assessment', 'action' => 'list')
+);
+?>
+
+<div class="cboth"><br /></div>

@@ -1,0 +1,398 @@
+<?php
+namespace Breachlog\Model;
+
+use Admin\Model\User;
+use Zend\Db\TableGateway\TableGateway;
+use Zend\Mail;
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use Zend\ServiceManager\ServiceLocatorInterface;
+
+use Zend\Db\ResultSet\ResultSet;
+use Zend\Db\Sql\Select;
+use Zend\Paginator\Adapter\DbSelect;
+use Zend\Paginator\Paginator;
+use Breachlog\Model\Breachremediationplan;
+
+class BreachremediationplanTable implements ServiceLocatorAwareInterface
+{
+    protected $tableGateway;
+    protected $serviceLocator;
+
+    public function __construct(TableGateway $tableGateway)
+    {
+        $this->tableGateway = $tableGateway;
+    }
+
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
+    {
+        $this->serviceLocator = $serviceLocator;
+    }
+
+    public function getServiceLocator() {
+        return $this->serviceLocator;
+    }
+
+    public function getBreachremediationplans($paginated = false, $orderBy = null, $order = null, $identity = null, $searchValue = null, $params = array())
+    {
+        if ($paginated) {
+            $select = new Select('breach_remediation_plans');
+            $resultSetPrototype = new ResultSet();
+            $resultSetPrototype->setArrayObjectPrototype(new Breachremediationplan());
+            $paginatorAdapter = new DbSelect(
+                $select,
+                $this->tableGateway->getAdapter(),
+                $resultSetPrototype
+            );
+
+
+            if ($identity['u_role_id'] == User::ROLE_ADMIN) {
+                $select->where('(brp_status = 30 AND brp_active = 1) || (brp_active = 0)');
+            } else {
+                $select->where('brp_active = 1');
+
+                if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
+                    $select->where('brp_consultant_u_id = ' . $identity['u_id']);
+                } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
+                    $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
+                    $ids[] = $identity['u_id'];
+                    $select->where('brp_consultant_u_id IN (' . implode(',', $ids) . ')');
+                } elseif ($identity['u_role_id'] == User::ROLE_CLIENT) {
+                    $select->where('brp_c_id = ' . $identity['u_company_id']);
+                }
+            }
+
+            $select->join(array('c' => 'companies'), 'brp_c_id = c_id', array('_client_name' => 'c_name'), 'left');
+            $select->join(array('u' => 'users'), 'brp_approver_u_id = u_id', array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)')), 'left');
+            ///////////////
+
+            $order = $order ? $order : 'ASC';
+
+            $orders[] = 'brp_version_index ' . $order;
+            $orders[] = 'brp_id ASC';
+            if ($orderBy) {
+                $orders[] = $orderBy . ' ' . $order;
+            }
+
+            $select->order($orders);
+
+            $paginator = new Paginator($paginatorAdapter);
+
+            return $paginator;
+        }
+        $resultSet = $this->tableGateway->select();
+        return $resultSet;
+    }
+
+    public function getForReport($conditionNum = 0, $status = 1, $uId = 0)
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('brp_active = 1');
+        $condition = isset(\Admin\Model\UserTable::$reportCondition[$conditionNum]) ? \Admin\Model\UserTable::$reportCondition[$conditionNum] : null;
+
+        if ($condition != '') {
+            $condition = str_replace('?', 'brp_create_date', $condition);
+            $select->where($condition);
+        }
+
+        $select->columns(array('_client_name' => new \Zend\Db\Sql\Expression('COUNT(brp_id)')));
+
+        if ($status == 1) {
+            $select->where("brp_status IN (10, 20)");
+        } else {
+            $select->where("brp_status IN (30, 40)");
+        }
+
+        if ($uId) {
+            $identity = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUser($uId);
+
+            if ($identity->u_role_id == User::ROLE_CONSULTANT) {
+                $select->where('brp_consultant_u_id = ' . $identity->u_id);
+            } elseif ($identity->u_role_id == User::ROLE_SENIOR_CONSULTANT) {
+                $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity->u_id);
+                $ids[] = $identity->u_id;
+                $select->where('brp_consultant_u_id IN (' . implode(',', $ids) . ')');
+            }
+        }
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        $row = $resultSet->current();
+
+        if (!$row) {
+            return false;
+        }
+
+        return ($row->_client_name);
+    }
+
+    public function getBreachremediationplan($id)
+    {
+        $id  = (int) $id;
+
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('brp_id = ' . $id);
+        $select->where('brp_active = 1');
+        $select->join(array('c' => 'companies'), 'brp_c_id = c_id', array('_client_name' => 'c_name'), 'left');
+        $select->join(array('u' => 'users'), 'brp_approver_u_id = u_id', array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)'), '_brp_incident_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(brp_incident_date, "%m/%d/%Y")'), '_brp_remediation_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(brp_remediation_date, "%m/%d/%Y")')), 'left');
+        $select->join(array('u2' => 'users'), 'brp_consultant_u_id = u2.u_id', array('_consultant_name' => new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)')), 'left');
+        $select->join(array('u3' => 'users'), 'brp_performed_u_id = u3.u_id', array('_performed_name' => new \Zend\Db\Sql\Expression('CONCAT(u3.u_firstname, " ", u3.u_lastname)')), 'left');
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        $row = $resultSet->current();
+        if (!$row) {
+            return false;
+        }
+
+        return $row;
+    }
+
+    public function saveBreachremediationplan(Breachremediationplan $brp)
+    {
+        $data = array(
+            'brp_bl_id' => $brp->brp_bl_id,
+            'brp_c_id' => $brp->brp_c_id,
+            'brp_consultant_u_id' => $brp->brp_consultant_u_id,
+            'brp_approver_u_id' => $brp->brp_approver_u_id,
+            'brp_performed_u_id' => $brp->brp_performed_u_id,
+            'brp_parent_brp_id' => $brp->brp_parent_brp_id,
+            'brp_version_index' => $brp->brp_version_index,
+            'brp_initials' => $brp->brp_initials,
+            'brp_initials_approver' => $brp->brp_initials_approver,
+            'brp_remediation_date' => $brp->brp_remediation_date,
+            'brp_incident_date' => $brp->brp_incident_date,
+            'brp_status' => $brp->brp_status,
+            'brp_is_version' => $brp->brp_is_version,
+        );
+
+        if (!$data['brp_status']) {
+            $data['brp_status'] = \Breachlog\Model\Breachremediationplan::STATUS_NEW;
+        }
+
+        $id = (int) $brp->brp_id;
+
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
+        if (!$id) {
+            $data['brp_consultant_u_id'] = $brp->brp_consultant_u_id;
+
+            if (in_array($identity['u_role_id'], array(User::ROLE_CONSULTANT, User::ROLE_SENIOR_CONSULTANT))) {
+                $data['brp_consultant_u_id'] = $brp->brp_consultant_u_id;
+            } elseif ($identity['u_role_id'] == User::ROLE_CLIENT) {
+                $data['brp_consultant_u_id'] = $identity['u_senior_consultant_u_id'];
+                $data['brp_c_id'] = $identity['u_company_id'];
+            }
+
+            $data['brp_create_u_id'] = $identity['u_id'];
+        }
+
+        if ($id == 0) {
+            $this->tableGateway->insert($data);
+            $id = $this->tableGateway->lastInsertValue;
+
+            if ($data['brp_status'] == \Breachlog\Model\Breachremediationplan::STATUS_NEW) {
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_EDIT, \Application\Model\LogsTable::ITEM_TYPE_BRP, $id);
+            }
+
+            if (!(int) $brp->brp_version_index) {
+                $this->tableGateway->update(array('brp_version_index' => $id), array('brp_id' => $id));
+            }
+        } else {
+            if ($this->getBreachremediationplan($id)) {
+
+                $this->tableGateway->update($data, array('brp_id' => $id));
+                throw new \Exception('Form id does not exist');            } else {
+
+            }
+        }
+        if ((int) $data['brp_parent_brp_id']) {
+            $this->reindexVersion($brp->brp_version_index);
+        }
+
+        return $id;
+    }
+
+    public function reindexVersion($versionIndex)
+    {
+        $versionIndex  = (int) $versionIndex;
+
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('brp_version_index = ' . $versionIndex);
+        $select->where('brp_active = 1');
+        $select->where('brp_parent_brp_id IS NOT NULL');
+
+        $select->order('brp_id ASC');
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        $indexItem = 1;
+        foreach ($resultSet as $rs) {
+            $data = array(
+                'brp_id' => $rs->brp_id,
+                'brp_version_index_item' => $indexItem,
+            );
+
+            $this->tableGateway->update(array('brp_version_index_item' => $indexItem), array('brp_id' => $rs->brp_id));
+            $indexItem++;
+
+        }
+    }
+
+    public function setStatus($id, $status)
+    {
+        $data = array(
+            'brp_id' => $id,
+            'brp_status' => $status,
+        );
+
+        if ($brp = $this->getBreachremediationplan($id)) {
+            $currentStatus = $brp->brp_status;
+            if ($status < $currentStatus) {
+                return;
+            }
+            if ($status == \Breachlog\Model\Breachremediationplan::STATUS_SIGNED_OFF) {
+                $data['brp_writable'] = 0;
+            }
+            $this->tableGateway->update($data, array('brp_id' => $id));
+        }
+
+        return $id;
+    }
+
+    public function setFieldValue($id, $field, $value)
+    {
+        $data = array(
+            'brp_id' => $id,
+            $field => $value,
+        );
+
+        if ($this->getBreachremediationplan($id)) {
+            $this->tableGateway->update($data, array('brp_id' => $id));
+        }
+
+        return $id;
+    }
+
+    public function deleteBreachremediationplan($id)
+    {
+        $brp = $this->getBreachremediationplan($id);
+
+        $data['brp_id'] = $id;
+        $data['brp_active'] = 0;
+        $this->tableGateway->update($data, array('brp_id' => $id));
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_DELETE, \Application\Model\LogsTable::ITEM_TYPE_BRP, $id);
+
+        $this->reindexVersion($brp->brp_version_index);
+
+        return true;
+    }
+
+    public function unarchiveBreachremediationplan($id)
+    {
+        $data['brp_id'] = $id;
+        $data['brp_active'] = 1;
+        $this->tableGateway->update($data, array('brp_id' => $id));
+
+        return true;
+    }
+
+    public function deleteBreachremediationplansByCompanyId($cId, $value = 0)
+    {
+        $data['brp_active'] = $value;
+        $this->tableGateway->update($data, array('brp_c_id' => $cId));
+
+        return true;
+    }
+
+
+    public function reopenBreachremediationplan($id)
+    {
+        $brp = $this->getBreachremediationplan($id);
+
+        $data['brp_id'] = $id;
+        $data['brp_status'] = 20;
+        $data['brp_writable'] = 1;
+        $this->tableGateway->update($data, array('brp_id' => $id));
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_REOPEN, \Application\Model\LogsTable::ITEM_TYPE_BRP, $id);
+
+        $this->reindexVersion($brp->brp_version_index);
+
+        return true;
+    }
+
+    public function clonePlan($id)
+    {
+        $brp = $this->getBreachremediationplan($id);
+
+        // writable to false
+        $this->tableGateway->update(array('brp_writable' => 0, 'brp_status' =>  \Breachlog\Model\Breachremediationplan::STATUS_CLOSED), array('brp_id' => $id));
+
+        // create new row
+        $brp->brp_id = 0;
+        $brp->brp_parent_brp_id = $id;
+        $brp->brp_status = \Breachlog\Model\Breachremediationplan::STATUS_NEW;
+
+        $newId = $this->saveBreachremediationplan($brp);
+
+        // copy notes with files
+        $noteDb = $this->getServiceLocator()->get('Note\Model\NoteTable');
+        $notes = $noteDb->getNotes($id, \Note\Model\Note::NOTE_BRP);
+        foreach ($notes as $note) {
+            $oldNoteId = $note->note_id;
+            $note->note_id = 0;
+            $note->note_item_id = $newId;
+            $noteId = $noteDb->saveNote($note, array(), true);
+
+            // copy files to notes
+            $noteFilesDb = $this->getServiceLocator()->get('Note\Model\NotesFilesTable');
+            $files = $noteFilesDb->getFilesByNoteId($oldNoteId);
+
+            foreach ($files as $file) {
+                $dataFile = array();
+                $dataFile['nf_f_id'] = $file['nf_f_id'];
+                $dataFile['nf_note_id'] = $noteId;
+
+                $noteFilesDb->saveFile($dataFile);
+            }
+        }
+
+        // copy actions
+        $brpaDb = $this->getServiceLocator()->get('Breachlog\Model\BreachremediationplanactionTable');
+        $actions = $brpaDb->getBreachremediationplanactions($id);
+        foreach ($actions as $action) {
+            $oldActionId = $action->brpa_id;
+            $action->brpa_id = 0;
+            $action->brpa_brp_id = $newId;
+            $newActionId = $brpaDb->saveBreachremediationplanaction($action);
+
+            // copy notes with files to actions
+            $noteDb = $this->getServiceLocator()->get('Note\Model\NoteTable');
+            $notes = $noteDb->getNotes($oldActionId, \Note\Model\Note::NOTE_BRPA);
+            foreach ($notes as $note) {
+                $oldNoteId = $note->note_id;
+                $note->note_id = 0;
+                $note->note_item_id = $newActionId;
+                $noteId = $noteDb->saveNote($note, array(), true);
+
+                // copy files to notes
+                $noteFilesDb = $this->getServiceLocator()->get('Note\Model\NotesFilesTable');
+                $files = $noteFilesDb->getFilesByNoteId($oldNoteId);
+
+                foreach ($files as $file) {
+                    $dataFile = array();
+                    $dataFile['nf_f_id'] = $file['nf_f_id'];
+                    $dataFile['nf_note_id'] = $noteId;
+
+                    $noteFilesDb->saveFile($dataFile);
+                }
+            }
+        }
+
+        return $newId;
+    }
+
+}

@@ -1,0 +1,142 @@
+<div class="page-title">
+    <h1 class="fleft">Dashboard</h1>
+    <div class="cboth"></div>
+</div>
+
+<p style="padding: 8px 0 0 0;">
+    <a href="/company/edit" class="button" style="padding: 0 15px;"><i class="fa fa-plus-circle"></i> Add Company</a>
+    <a href="/client/edit" class="button" style="padding: 0 15px;"><i class="fa fa-plus-circle"></i> Add Contact</a>
+    <a href="/businessassociate/edit" class="button" style="padding: 0 15px;"><i class="fa fa-plus-circle"></i> Add Business Associate</a>
+    <a href="/breachlog/edit" class="button" style="padding: 0 15px;"><i class="fa fa-plus-circle"></i> Add Incident Log</a>
+    <a href="/assessment/edit/0/step/1" class="button"><i class="fa fa-clipboard"></i> Start New Assessment</a>
+<div class="cboth"></div>
+</p>
+
+<div class="col3">
+
+    <table cellpadding="0" cellspacing="0">
+        <thead>
+            <tr>
+                <th><h3 style="padding: 2px 0;">Recent Activities</h3></th>
+            </tr>
+        </thead>
+        <tbody id="logsActivities">
+            <?php echo $this->partial('dashboard/dashboard/_logs_activities.phtml', array('logsActivities' => $this->logsActivities)); ?>
+        </tbody>
+    </table>
+    <p>
+        <a href="javascript:" id="loadMoreActivities" class="button" style="float: none; width: 80px; margin: 0 auto;">Load More</a>
+    </p>
+
+</div>
+
+<div class="col3">
+
+    <table cellpadding="0" cellspacing="0">
+        <thead>
+        <tr>
+            <th><h3 style="padding: 2px 0;">Upcoming Tasks</h3></th>
+        </tr>
+        </thead>
+            <tbody id="logsUpcoming">
+                <?php echo $this->partial('dashboard/dashboard/_logs_upcoming.phtml', array('logsUpcoming' => $this->logsUpcoming)); ?>
+            </tbody>
+
+        <?php /*<tr>
+            <td><a href="assessment-new-step1.php">Start assessment</a> for &lt;Client Name&gt;.</td>
+        </tr>
+        <tr>
+            <td>Assessment has been completed for &lt;Client Name&gt;, <a href="remediation-plan.php">review remediation plan.</a></td>
+        </tr>
+        <tr>
+            <td><a href="assessment-new-step1.php">Start assessment</a> for &lt;Client Name&gt;.</td>
+        </tr>
+        <tr>
+            <td>Assessment has been completed for &lt;Client Name&gt;, <a href="remediation-plan.php">review remediation plan.</a></td>
+        </tr>
+        <tr>
+            <td><a href="assessment-new-step1.php">Start assessment</a> for &lt;Client Name&gt;.</td>
+        </tr>
+        <tr>
+            <td>Assessment has been completed for &lt;Client Name&gt;, <a href="remediation-plan.php">review remediation plan.</a></td>
+        </tr>
+        <tr>
+            <td><a href="assessment-new-step1.php">Start assessment</a> for &lt;Client Name&gt;.</td>
+        </tr>
+        <tr>
+            <td>Assessment has been completed for &lt;Client Name&gt;, <a href="remediation-plan.php">review remediation plan.</a></td>
+        </tr>
+        <tr>
+            <td><a href="assessment-new-step1.php">Start assessment</a> for &lt;Client Name&gt;.</td>
+        </tr>
+        <tr>
+            <td>Assessment has been completed for &lt;Client Name&gt;, <a href="remediation-plan.php">review remediation plan.</a></td>
+        </tr> */ ?>
+    </table>
+    <p>
+        <a href="javascript:" id="loadMoreUpcoming" class="button" style="float: none; width: 80px; margin: 0 auto;">Load More</a>
+    </p>
+
+</div>
+
+<div class="col3 last">
+
+    <table cellpadding="0" cellspacing="0">
+        <thead>
+            <tr>
+                <th><h3 style="padding: 2px 0;">Recently Opened</h3></th>
+            </tr>
+        </thead>
+        <tbody id="logsOpen">
+            <?php echo $this->partial('dashboard/dashboard/_logs_open.phtml', array('logsOpen' => $this->logsOpen)); ?>
+        </tbody>
+    </table>
+    <p>
+        <a href="javascript:" id="loadMoreOpen" class="button" style="float: none; width: 80px; margin: 0 auto;">Load More</a>
+    </p>
+
+</div>
+
+<script>
+    var lastActId = 0;
+    var lastOpenId = 0;
+    var lastUpId = 0;
+
+    $(document).ready(function() {
+        var trs = $('#logsActivities tr');
+        lastActId = $(trs[trs.length - 1]).attr('rel');
+
+        var trs = $('#logsOpen tr');
+        lastOpenId = $(trs[trs.length - 1]).attr('rel');
+
+        var trs = $('#logsUpcoming tr');
+        lastUpId = $(trs[trs.length - 1]).attr('rel');
+    });
+
+    $('#loadMoreActivities').click(function() {
+        $.getJSON("/dashboard/getmore/" + lastActId + "/type/activities", {  }, function(data) {
+            var trs = $('#logsActivities tr');
+            $(trs[trs.length - 1]).after(data);
+            var trs = $('#logsActivities tr');
+            lastActId = $(trs[trs.length - 1]).attr('rel');
+        });
+    });
+
+    $('#loadMoreOpen').click(function() {
+        $.getJSON("/dashboard/getmore/" + lastOpenId + "/type/open", {  }, function(data) {
+            var trs = $('#logsOpen tr');
+            $(trs[trs.length - 1]).after(data);
+            var trs = $('#logsOpen tr');
+            lastOpenId = $(trs[trs.length - 1]).attr('rel');
+        });
+    });
+
+    $('#loadMoreUpcoming').click(function() {
+        $.getJSON("/dashboard/getmore/" + lastUpId + "/type/upcoming", {  }, function(data) {
+            var trs = $('#logsUpcoming tr');
+            $(trs[trs.length - 1]).after(data);
+            var trs = $('#logsUpcoming tr');
+            lastUpId = $(trs[trs.length - 1]).attr('rel');
+        });
+    });
+</script>

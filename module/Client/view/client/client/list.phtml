@@ -1,0 +1,107 @@
+<?php
+$urlOrder = $order == 'ASC' ? 'DESC' : 'ASC';
+$authService = new \Zend\Authentication\AuthenticationService();
+$authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+$identity = $authService->getIdentity();
+?>
+
+<div class="page-title">
+    <h1 class="fleft">Clients</h1>
+    <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 0)); ?>" class="label <?php echo $roleFilter == 0 ? ' selected ' : '' ?>">All</a>
+    <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 1)); ?>" class="label <?php echo $roleFilter == 1 ? ' selected ' : '' ?>">Companies</a>
+    <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 2)); ?>" class="label <?php echo $roleFilter == 2 ? ' selected ' : '' ?>">Contacts</a>
+    <a href="/client/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Contact</a>
+    <a href="/company/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Company</a>
+    <div class="cboth"></div>
+</div>
+
+<p></p>
+
+<table cellpadding="0" cellspacing="0">
+    <thead>
+        <tr>
+            <?php $classSort = ($order_by == 'id') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => 'id', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    ID <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'typeItem') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => 'typeItem', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Type <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'name') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => 'name', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Name <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'company') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => 'company', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Company <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <th>Phone <i class="fa fa-unsorted"></i></th>
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->paginator as $company): ?>
+            <?php $isUser = ($company->u_id > 0) ? 1 : 0; ?>
+            <?php
+           // echo $company->_c_active;
+            ?>
+
+            <tr>
+                <td><?php echo ($isUser) ? $company->u_id : $company->c_id ?></td>
+                <td><span class="<?php echo ($isUser) ? 'i-contact' : 'i-company' ?>"></span></td>
+                <td>
+                    <span class="fleft"><a href="/client/edit/<?php echo ($isUser) ? $company->u_id : '' ?>"><?php echo ($isUser) ? $company->u_firstname . ' ' . $company->u_lastname : '' ?></a></span>
+                    <?php if ($isUser): ?>
+                        <?php if ($company->u_id == $company->c_primary_contact_u_id): ?>
+                            <span class="label primary">Primary Contact</span>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </td>
+                <td>
+                    <?php if ($company->_c_active || ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN)): ?>
+                        <a href="/company/edit/<?php echo $company->c_id ?>"><?php echo $company->c_name ?></a>
+                    <?php endif; ?>
+                </td>
+                <td><?php echo ($isUser) ? $company->u_office_phone : $company->c_phone ?></td>
+                <td class="aright">
+                    <a href="/<?php echo ($isUser) ? 'client' : 'company' ?>/edit/<?php echo ($isUser) ? $company->u_id : $company->c_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+                    <?php if ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
+                        <?php if ($company->_c_active): ?>
+                            <?php $deleteUrl = '/' . (($isUser) ? 'client' : 'company') . '/delete/' . (($isUser) ? $company->u_id : $company->c_id); ?>
+                            <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
+                        <?php else: ?>
+                            <?php $unarchiveUrl = '/' . (($isUser) ? 'client' : 'company') . '/unarchive/' . (($isUser) ? $company->u_id : $company->c_id); ?>
+                            <a href="<?php echo $unarchiveUrl ?>" class="confirmation-modal i-delete">Unarchive</a>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <?php $deleteUrl = '/' . (($isUser) ? 'client' : 'company') . '/delete/' . (($isUser) ? $company->u_id : $company->c_id); ?>
+                        <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
+                    <?php endif; ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+<?php echo $this->paginationControl(
+    $this->paginator,
+    'sliding',
+    array('partial/paginator.phtml', 'Client'),
+    array('route' => 'list', 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'roleFilter' => $roleFilter, 'role' => 1, 'controller' => 'client', 'action' => 'list')
+);
+?>
+
+<div class="cboth"><br /></div>

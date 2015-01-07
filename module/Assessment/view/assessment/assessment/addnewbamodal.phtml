@@ -1,0 +1,308 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head profile="http://gmpg.org/xfn/11">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <title>HIPAA Compliance - Application Wireframes v2.0</title>
+
+    <script type="text/javascript" src="//use.typekit.net/znb8skn.js"></script>
+    <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+    <link rel="stylesheet" href="/css/modals.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/css/font-awesome.css" type="text/css" media="screen" />
+    <!--<link rel="stylesheet" href="css/responsive.css" type="text/css" media="screen" />-->
+
+    <!--<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;" />-->
+
+    <!--<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.10.0/jquery.validate.min.js"></script>-->
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.fancybox.pack.js"></script>
+    <script type="text/javascript" src="/js/jquery.maskedinput.min.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+
+            /*jQuery('#click5-newsletter').validate({
+             errorPlacement: function(error, element) {}
+             });*/
+
+        });
+    </script>
+
+</head>
+
+<style type="text/css">
+    #statuses label { width: auto; }
+</style>
+
+<body>
+
+<?php if ($this->added): ?>
+    <script type="text/javascript">
+        window.parent.location.href = '/assessment/edit/<?php echo $this->aId ?>/step/4/location/<?php echo $this->location ?>';
+        parent.jQuery.fancybox.close();
+    </script>
+<?php endif; ?>
+
+<div id="modal">
+
+    <h1>Add New Business Associate</h1>
+
+    <div id="wrap">
+
+        <form action="/assessment/addnewba/<?php echo $this->aId ?>/step/2/location/<?php echo $this->location ?>/companyId/<?php echo $this->companyId; ?>" method="post" name="user" id="user">
+            <div class="col-left">
+            <?php
+            $fn = $form->get('ba_id');
+            echo $this->formHidden($fn);
+            ?>
+
+            <p>
+                <?php
+                $fn = $form->get('ba_name');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+
+            <p>
+                <?php
+                $fn = $form->get('ba_office_phone');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                echo $this->formElementErrors($fn);
+                ?>
+                <?php
+                $fn = $form->get('ba_office_phone_inner');
+                echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+
+            <p>
+                <?php
+                $fn = $form->get('ba_direct_phone');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                echo $this->formElementErrors($fn);
+                ?>
+                <?php
+                $fn = $form->get('ba_direct_phone_inner');
+                echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+
+            <p>
+                <?php
+                $fn = $form->get('ba_other_phone');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                echo $this->formElementErrors($fn);
+                ?>
+                <?php
+                $fn = $form->get('ba_other_phone_inner');
+                echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+
+            <p>
+                <?php
+                $fn = $form->get('ba_fax');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+
+            </p>
+
+            <p>
+                <?php
+                $fn = $form->get('ba_email');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+
+            <p>
+                <?php
+                $fn = $form->get('ba_website');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+
+            <p>
+                <?php
+                $fn = $form->get('ba_address1');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+
+            <p>
+                <?php
+                $fn = $form->get('ba_address2');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+
+            <p>
+                <?php
+                $fn = $form->get('ba_city');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+
+            <p>
+                <?php $fn = $form->get('ba_state_id');
+                echo $this->formLabel($fn);
+                echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+
+            <p>
+                <?php
+                $fn = $form->get('ba_zip');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+
+            <h2>Contact Person</h2>
+
+            <?php
+            $fn = $form->get('u_id');
+            echo $this->formHidden($fn);
+            ?>
+
+            <p>
+                <?php
+                $fn = $form->get('u_firstname');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_lastname');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_title');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_office_phone');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                echo $this->formElementErrors($fn);
+                ?>
+
+                <?php
+                $fn = $form->get('u_office_phone_inner');
+                echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_direct_phone');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                echo $this->formElementErrors($fn);
+                ?>
+                <?php
+                $fn = $form->get('u_direct_phone_inner');
+                echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_cell_phone');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_other_phone');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                echo $this->formElementErrors($fn);
+                ?>
+                <?php
+                $fn = $form->get('u_other_phone_inner');
+                echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_fax');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_email');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+
+            <div class="cboth"></div>
+            <div class="form-buttons">
+                <input type="submit" value="Save" class="form-button" />
+
+                <div class="fleft">or</div>
+                <a href="javascript:void(0);" onclick="parent.jQuery.fancybox.close();" class="cancel">Cancel</a>
+            </div>
+        </div>
+
+        <?php echo $this->form()->closeTag() ?>
+
+        <div class="cboth"></div>
+
+    </div>
+
+</div>
+
+<script>
+    jQuery(document).ready(function() {
+        $('input[name="ba_office_phone"], input[name="ba_direct_phone"], input[name="ba_other_phone"], input[name="ba_fax"]').mask("(999) 999-9999");
+        $('input[name=u_cell_phone], input[name="u_office_phone"], input[name="u_direct_phone"], input[name="u_other_phone"], input[name="u_fax"]').mask("(999) 999-9999");
+        $('input[name="ba_zip"]').mask("99999");
+    });
+
+</script>
+</body>
+</html>

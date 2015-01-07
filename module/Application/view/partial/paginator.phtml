@@ -1,0 +1,70 @@
+<?php if ($this->pageCount): ?>
+    <?php
+        $action = isset($action) && ($action != '') ? $action : 'list';
+    ?>
+        <div class="pagination">
+            <?php
+            $params = array('action' => $action, 'page' => 1, 'order_by' => $order_by, 'order' => $order);
+            isset($role) ? ($params['roleFilter'] = $roleFilter) : '';
+            if ($this->controller == 'search'):
+                $params['searchValue'] = $searchValue;
+            endif;
+            ?>
+            <a href="<?php echo $this->url($this->controller, $params); ?>"><i class="fa fa-caret-left"></i><i class="fa fa-caret-left"></i>&nbsp; First</a>
+            <!-- Previous page link -->
+            <?php if (isset($this->previous)): ?>
+                <?php
+                    $params = array('action' => $action, 'page' => $this->previous, 'order_by' => $order_by, 'order' => $order);
+                    if ($this->controller == 'search'):
+                        $params['searchValue'] = $searchValue;
+                    endif
+                ?>
+                <a href="<?php echo $this->url($this->controller, $params); ?>">
+                    <i class="fa fa-caret-left"></i>&nbsp; Previous
+                </a>
+            <?php else: ?>
+
+            <?php endif; ?>
+            <!-- Numbered page links -->
+            <?php foreach ($this->pagesInRange as $page): ?>
+                <?php if ($page != $this->current): ?>
+                    <?php
+                    $params = array('action' => $action, 'page' => $page, 'order_by' => $order_by, 'order' => $order);
+                    isset($role) ? ($params['roleFilter'] = $roleFilter) : '';
+                    if ($this->controller == 'search'):
+                        $params['searchValue'] = $searchValue;
+                    endif
+                    ?>
+                    <a href="<?php echo $this->url($this->controller, $params); ?>">
+                        <?php echo $page; ?>
+                    </a>
+                <?php else: ?>
+                    <a id="current" href="#"><?php echo $page; ?></a>
+                <?php endif; ?>
+            <?php endforeach; ?>
+
+            <!-- Next page link -->
+            <?php if (isset($this->next)): ?>
+                <?php
+                $params = array('action' => $action, 'page' => $this->next, 'order_by' => $order_by, 'order' => $order);
+                isset($role) ? ($params['roleFilter'] = $roleFilter) : '';
+                if ($this->controller == 'search'):
+                    $params['searchValue'] = $searchValue;
+                endif
+                ?>
+                <a href="<?php echo $this->url($this->controller, $params); ?>">Next &nbsp;<i class="fa fa-caret-right"></i></a>
+            <?php else: ?>
+
+            <?php endif; ?>
+
+            <?php
+            $params = array('action' => $action, 'page' => $this->last, 'order_by' => $order_by, 'order' => $order);
+            isset($role) ? ($params['roleFilter'] = $roleFilter) : '';
+            if ($this->controller == 'search'):
+                $params['searchValue'] = $searchValue;
+            endif
+            ?>
+            <a href="<?php echo $this->url($this->controller, $params); ?>">Last &nbsp;<i class="fa fa-caret-right"></i><i class="fa fa-caret-right"></i></a>
+        </div>
+
+<?php endif; ?>

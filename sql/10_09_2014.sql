@@ -1,0 +1,1 @@
+alter table users add column u_sent_password tinyint(1) default 1 after u_hash;

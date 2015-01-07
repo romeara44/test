@@ -1,0 +1,2 @@
+alter table business_associates add column ba_assessment_invited_date datetime after ba_assessment_invited_status;
+alter table business_associates add column ba_phone_call_date datetime after ba_phone_call_status;

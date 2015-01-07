@@ -1,0 +1,11 @@
+<?php foreach ($this->logsUpcoming as $log): ?>
+    <tr rel="<?php echo $log->lo_id ?>">
+        <td>
+            <?php if ($log->lo_item_type == \Application\Model\LogsTable::ITEM_TYPE_RP): ?>
+                Assessment has been completed for <?php echo $log->_rpc_name ?>, <a href="/remediationplan/edit/<?php echo $log->_rp_id ?>">review remediation plan.</a>
+            <?php elseif ($log->lo_type == 100): ?>
+                <a href="/assessmnet/edit/0/step/<?php echo $log->lo_id ?>">Start assessment</a> for <?php echo $log->_rpc_name ?>.
+            <?php endif; ?>
+        </td>
+    </tr>
+<?php endforeach; ?>
