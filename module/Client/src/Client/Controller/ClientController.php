@@ -192,9 +192,18 @@ class ClientController extends AbstractActionController
                     if ($iisPrimaryContact || (count($users) == 1)) {
                         $this->getCompanyTable()->setPrimaryContactId($post['u_company_id'], $uId);
                     }
+                    
+                    if($request->getPost('save_send_email')) {
+                        $password = sha1($user->u_email . time());
+                        $password = substr($password, 0, 6);
+                        $this->getServiceLocator()->get('Admin\Model\UserTable')->setNewPassword($uId, $password);
 
-                    $this->flashMessenger()->addSuccessMessage('Client saved');
-
+                        $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'createuser', 'uId' => $uId, 'password' => $password));
+                        $this->flashMessenger()->addSuccessMessage('Client saved and invitation has been sent');
+                    } else {
+                        $this->flashMessenger()->addSuccessMessage('Client saved');
+                    }
+                    
                     return $this->redirect()->toRoute('client', array('controller' => 'client', 'action' => 'list'));
 
                 } else {

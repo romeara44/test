@@ -198,9 +198,11 @@ $form->setAttribute('method', 'post');
 
             <div class="cboth"></div>
             <div class="form-buttons">
-                <input type="submit" value="Save" class="form-button" />
+                <input type="submit"  name="save" value="Save" class="form-button" />
                 <?php if ($this->uId): ?>
                     <a href="/client/sendinvite/<?php echo $this->uId ?>" class="form-button">Send Invite Email</a>
+                <?php else: ?>
+                    <input type="submit" name="save_send_email" value="Save & Send Invite Email" class="form-button" />
                 <?php endif; ?>
                 <div class="fleft">or</div>
                 <a href="/client/list" class="cancel">Cancel</a>
