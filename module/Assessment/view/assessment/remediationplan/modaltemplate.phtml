@@ -48,7 +48,7 @@
 
 <div id="modal">
 
-    <h1><?php if ($added): ?>Add<?php else: ?>Edit<?php endif; ?> Assignment</h1>
+    <h1><?php if (!$this->id): ?>Add<?php else: ?>Edit<?php endif; ?> Assignment</h1>
 
     <div id="wrap">
 
