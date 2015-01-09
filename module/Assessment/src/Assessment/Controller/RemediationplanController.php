@@ -286,7 +286,7 @@ class RemediationplanController extends AbstractActionController
         ));
 
         if ($type == 'pdf') {
-            $domLibPath = ($_SERVER['SERVER_ADDR'] == '127.0.0.1') ? $_SERVER['DOCUMENT_ROOT'] . '/../vendor' : $_SERVER['DOCUMENT_ROOT'] . '/vendor';
+            $domLibPath =  $_SERVER['DOCUMENT_ROOT'] . '/../vendor';
 
             $domLibPath = $domLibPath . "/dompdf/dompdf_config.inc.php";
             require_once $domLibPath;
@@ -294,7 +294,7 @@ class RemediationplanController extends AbstractActionController
             $renderer = new PhpRenderer();
 
             $map = new Resolver\TemplateMapResolver(array(
-                'remediationplan/pdftemplate' => ($_SERVER['SERVER_ADDR'] == '127.0.0.1') ? $_SERVER['DOCUMENT_ROOT'] . '/../module/Assessment/view/assessment/remediationplan/edit.phtml' : $_SERVER['DOCUMENT_ROOT'] . '/module/Assessment/view/assessment/remediationplan/edit.phtml',
+                'remediationplan/pdftemplate' => $_SERVER['DOCUMENT_ROOT'] . '/../module/Assessment/view/assessment/remediationplan/edit.phtml',
             ));
 
             $renderer->setResolver($map);
