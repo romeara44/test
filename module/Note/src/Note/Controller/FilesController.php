@@ -80,7 +80,7 @@ class FilesController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'application', 'action' => 'index'));
         }
 
-        $docRoot = $_SERVER['SERVER_NAME'] == 'hipaa' ? $_SERVER['DOCUMENT_ROOT'] : $_SERVER['DOCUMENT_ROOT'] . '/public';
+        $docRoot = $_SERVER['DOCUMENT_ROOT'];
 
         $filename = '';
         $filetype = '';
