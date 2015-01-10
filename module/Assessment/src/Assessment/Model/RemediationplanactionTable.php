@@ -43,7 +43,7 @@ class RemediationplanactionTable implements ServiceLocatorAwareInterface
         $select->join(array('u2' => 'users'), new \Zend\Db\Sql\Expression('rpa_approver_u_id = u2.u_id'), array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)')), 'left');
         $select->join(array('adr' => 'addresses'), new \Zend\Db\Sql\Expression('adr_id = rpa_adr_id'), array('_location_name' => new \Zend\Db\Sql\Expression('adr_name')), 'left');
 
-        $orderStr = '_rpa_risk_level_sort DESC, -rpa_adr_id DESC';
+        $orderStr = '-rpa_adr_id DESC, _rpa_risk_level_sort DESC';
         
         $order = $order ? $order : 'ASC';
         
