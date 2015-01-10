@@ -86,6 +86,15 @@ class RemediationplanController extends AbstractActionController
         return $this->mailtemplateTable;
     }
 
+    public function getNotefilesTable()
+    {
+        if (!$this->noteFilesTable) {
+            $sm = $this->getServiceLocator();
+            $this->noteFilesTable = $sm->get('Note\Model\NotesFilesTable');
+        }
+        return $this->noteFilesTable;
+    }
+
     public function getIdentity()
     {
         $authService = new \Zend\Authentication\AuthenticationService();
