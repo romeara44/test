@@ -150,6 +150,9 @@ class RemediationplanController extends AbstractActionController
     {
         $id = (int) $this->params('id');
         $type = $this->params('type');
+        $orderBy = $this->params()->fromRoute('order_by') ? $this->params()->fromRoute('order_by') : 'id';
+        $order = $this->params()->fromRoute('order') ? $this->params()->fromRoute('order') : 'DESC';
+        $roleFilter = $this->params()->fromRoute('roleFilter') ? (int) $this->params()->fromRoute('roleFilter') : 0;
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_RP, $id);
 
@@ -228,10 +231,20 @@ class RemediationplanController extends AbstractActionController
                 return $this->redirect()->toRoute('remediationplan', array('controller' => 'remediationplan', 'action' => 'list'));
             }
         }
-
+        
+        $mappingSortCol = array(
+            'status' => 'rpa_status',
+            'type' => 'rpa_type',
+            'assignee' => '_contact_name',
+            'approver' => '_approver_name',
+            'date' => 'rpa_target_date',
+        );
+        
+        $sortCol = isset($mappingSortCol[$orderBy]) ? $mappingSortCol[$orderBy] : '';
+        
         $rpObj = $this->getRemediationplanTable()->getRemediationplan($id);
         $rpObj->_client_name = stripslashes($rpObj->_client_name);
-        $actions = $this->getRemediationplanactionTable()->getRemediationplanactions($id);
+        $actions = $this->getRemediationplanactionTable()->getRemediationplanactions($id, $sortCol, $order);
 
         $noteTable = $this->getNoteTable();
 
@@ -291,7 +304,11 @@ class RemediationplanController extends AbstractActionController
             'noteTable' => $noteTable,
             'isAdmin' => $identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN ? true : false,
             'contacts' => $contacts,
-            'contactsApr' => $contactsApr
+            'contactsApr' => $contactsApr,
+            'order_by' => $orderBy,
+            'order' => $order,
+            'urlOrder' => $order == 'ASC' ? 'DESC' : 'ASC',
+            'roleFilter' => $roleFilter
         ));
 
         if ($type == 'pdf') {

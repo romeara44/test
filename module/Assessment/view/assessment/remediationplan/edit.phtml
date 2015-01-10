@@ -105,10 +105,33 @@
             <?php if ($this->isPdf): ?>
                 <th>Policy number</th>
             <?php endif; ?>
-            <th>Status <i class="fa fa-unsorted"></i></th>
-            <th>Assignee <i class="fa fa-unsorted"></i></th>
-            <th>Approver <i class="fa fa-unsorted"></i></th>
-            <th>Target Date <i class="fa fa-unsorted"></i></th>
+            <?php $classSort = ($order_by == 'status') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'edit', 'id' => $this->id, 'order_by' => 'status', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Status <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'assignee') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'edit', 'id' => $this->id, 'page' => $page, 'order_by' => 'assignee', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Assignee <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+            
+            <?php $classSort = ($order_by == 'approver') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'edit', 'id' => $this->id, 'page' => $page, 'order_by' => 'approver', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Approver <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'date') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'edit', 'id' => $this->id, 'page' => $page, 'order_by' => 'date', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Target Date <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
             <th>&nbsp;</th>
         </tr>
     </thead>
