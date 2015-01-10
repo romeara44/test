@@ -234,7 +234,15 @@
             $('#formTask textarea, #formTask input').removeAttr('disabled');
         });
 
-        $('#browseFileTask').click(function() {
+        $('#browseFileTask').click(function() { 
+            if(browseFilesCounter > 0) {
+                var prevFile = $('#file' + (browseFilesCounter - 1)).val();
+                if(prevFile == undefined || prevFile == '') {
+                    $('#file' + (browseFilesCounter - 1)).click();
+                    return;
+                }
+            }
+            
             $('#filesToUploadBoxTask').append('<input type="file" name="notesFiles[]" id="file' + browseFilesCounter + '" />');
 
             $('#file' + browseFilesCounter).click();
