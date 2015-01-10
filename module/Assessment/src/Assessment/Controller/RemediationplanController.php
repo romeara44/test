@@ -664,7 +664,7 @@ class RemediationplanController extends AbstractActionController
         
         $notes = null;
         $files = array();
-        if ($id && $addAttachments) { echo $addAttachments;
+        if ($id && $addAttachments) {
             $notesDef = $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_RPA);
             if (is_object($notes) && ($notes->count())) {
                 $docRoot = $_SERVER['DOCUMENT_ROOT'];
@@ -737,7 +737,7 @@ class RemediationplanController extends AbstractActionController
         $notes = null;
         $files = array();
         if ($id && $addAttachments) {
-            $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_RPA);print_r($notes);
+            $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_RPA);
              if (is_object($notes) && ($notes->count())) {
                 $docRoot = $_SERVER['DOCUMENT_ROOT'];
                 foreach($notes as $note) {
