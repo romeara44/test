@@ -646,7 +646,7 @@ class RemediationplanController extends AbstractActionController
         $mt = $this->getMailtemplateTable()->getMailtemplateByKey('remediationplan');
 
         $text = $mt->mt_text;
-        $text = str_replace('<Client Name>',  $rpObj->_performed_name, $text);
+        $text = str_replace('<Client Name>',  $rpaObj->_contact_name, $text);
         $text = str_replace('<Target Date>',  $rpaObj->rpa_target_date, $text);
 
         $subject = str_replace('<Company>', $rpObj->_client_name, $mt->mt_subject);
