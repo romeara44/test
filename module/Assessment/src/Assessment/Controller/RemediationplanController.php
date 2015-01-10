@@ -637,7 +637,8 @@ class RemediationplanController extends AbstractActionController
         $id = $this->params('id');
         $contactUId = $this->params('rpa_contact_u_id');
         $contactUId = $this->params('rpa_contact_u_id');
-
+        $addAttachments = $this->params('add_atts');
+        
         $rpaObj = $this->getRemediationplanactionTable()->getRemediationplanaction($id);
         $rpObj = $this->getRemediationplanTable()->getRemediationplan($rpaObj->rpa_rp_id);
         $contact = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUser($rpObj->rp_consultant_u_id);
@@ -660,14 +661,44 @@ class RemediationplanController extends AbstractActionController
         $text = str_replace('<Policy>',  $rpaObj->rpa_policy, $text);
 
         $assignee = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUser($rpaObj->rpa_contact_u_id);
-
+        
+        $notes = null;
+        $files = array();
+        if ($id && $addAttachments) { echo $addAttachments;
+            $notesDef = $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_RPA);
+            if (is_object($notes) && ($notes->count())) {
+                $docRoot = $_SERVER['DOCUMENT_ROOT'];
+                foreach($notes as $note) {
+                    if ($note->_files != '') {
+                        $_files = explode(',', $note->_files);
+                        if($_files) {
+                            foreach ($_files as $_file) {
+                                list($fName, $fId) = explode('::', $_file);
+                                $filepath = $docRoot . '/data/notefiles/' . $note->note_id . '/' . $fId;
+                                if (!file_exists($filepath)) {
+                                    $note_id = $this->getNotefilesTable()->getFileNoteByFId($fId);
+                                    $filepath = $docRoot . '/data/notefiles/' . $note_id . '/' . $fId;
+                                }
+                                $files[$fId]['file_name'] = $fName;
+                                $files[$fId]['file_path'] = $filepath;
+                            }
+                        }
+                    }
+                }
+                $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_RPA);
+            }
+        }
+        
         $viewModel = new ViewModel(array(
             'title' => $mt->mt_name,
             'text' => $text,
             'header_title' => $rpaObj->_contact_name,
             'title_label' => 'Assignee',
             'subject' => $subject,
-            'addTo' => isset($assignee->u_email)&& ($assignee->u_email != '') ? $assignee->u_email : ''
+            'addTo' => isset($assignee->u_email)&& ($assignee->u_email != '') ? $assignee->u_email : '',
+            'addAttachments' => $addAttachments,
+            'notes' => $notes,
+            'files' => $files
         ));
 
         $viewModel->setTemplate('businessassociate/businessassociate/modaltemplate.phtml');
@@ -683,6 +714,7 @@ class RemediationplanController extends AbstractActionController
         $rpaObj = $this->getRemediationplanactionTable()->getRemediationplanaction($id);
         $rpObj = $this->getRemediationplanTable()->getRemediationplan($rpaObj->rpa_rp_id);
         $contact = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUser($rpObj->rp_consultant_u_id);
+        $addAttachments = $this->params('add_atts');
 
         $mt = $this->getMailtemplateTable()->getMailtemplateByKey('emailapprover');
 
@@ -701,14 +733,44 @@ class RemediationplanController extends AbstractActionController
         $text = str_replace('<Action plan>', $rpaObj->rpa_action_plan, $text);
 
         $approver = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUser($rpaObj->rpa_approver_u_id);
-
+        
+        $notes = null;
+        $files = array();
+        if ($id && $addAttachments) {
+            $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_RPA);print_r($notes);
+             if (is_object($notes) && ($notes->count())) {
+                $docRoot = $_SERVER['DOCUMENT_ROOT'];
+                foreach($notes as $note) {
+                    if ($note->_files != '') {
+                        $_files = explode(',', $note->_files);
+                        if($_files) {
+                            foreach ($_files as $_file) {
+                                list($fName, $fId) = explode('::', $_file);
+                                $filepath = $docRoot . '/data/notefiles/' . $note->note_id . '/' . $fId;
+                                if (!file_exists($filepath)) {
+                                    $note_id = $this->getNotefilesTable()->getFileNoteByFId($fId);
+                                    $filepath = $docRoot . '/data/notefiles/' . $note_id . '/' . $fId;
+                                }
+                                $files[$fId]['file_name'] = $fName;
+                                $files[$fId]['file_path'] = $filepath;
+                            }
+                        }
+                    }
+                }
+                $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_RPA);
+            }
+        }
+        
         $viewModel = new ViewModel(array(
             'title' => $mt->mt_name,
             'text' => $text,
             'header_title' => $rpaObj->_contact_name,
             'title_label' => 'Assignee',
             'subject' => $subject,
-            'addTo' => isset($approver->u_email)&& ($approver->u_email != '') ? $approver->u_email : ''
+            'addTo' => isset($approver->u_email)&& ($approver->u_email != '') ? $approver->u_email : '',
+            'addAttachments' => $addAttachments,
+            'notes' => $notes,
+            'files' => $files
         ));
 
         $viewModel->setTemplate('businessassociate/businessassociate/modaltemplate.phtml');

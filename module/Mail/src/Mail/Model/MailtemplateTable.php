@@ -9,6 +9,9 @@ use Zend\View\Model\ViewModel;
 use Zend\Mail\Transport\Smtp as SmtpTransport;
 use Zend\Mail\Transport\SmtpOptions;
 
+use Zend\Mail\Transport\File as FileTransport;
+use Zend\Mail\Transport\FileOptions;
+
 class MailtemplateTable
 {
     protected $tableGateway;
@@ -163,7 +166,21 @@ class MailtemplateTable
         $html->type = 'text/html';
         $body = new \Zend\Mime\Message;
 
-        $body->setParts(array($html));
+        $body->addPart($html);
+        
+        if($params['post']['addAttachments'] && $params['post']['attachments']) {
+            foreach($params['post']['attachments'] as $attachment) {
+                $attachmentContent = fopen($attachment['file_path'], 'r');
+                $attach = new \Zend\Mime\Part($attachmentContent);
+                $attach->filename    = $attachment['file_name'];
+                $attach->type        = \Zend\Mime\Mime::TYPE_OCTETSTREAM;
+                $attach->encoding    = \Zend\Mime\Mime::ENCODING_BASE64;
+                $attach->disposition = \Zend\Mime\Mime::DISPOSITION_ATTACHMENT;
+                
+                $body->addPart($attach);
+            }
+        }
+        
         $mail->setBody($body);
 
 
@@ -214,7 +231,18 @@ class MailtemplateTable
         $transport = new SmtpTransport();
         $transport->setOptions($options);
 
-        if ($_SERVER['SERVER_NAME'] != 'hipaa') {
+        if($_SERVER['SERVER_ADDR'] == '127.0.0.1') {
+            // Setup File transport
+            $transport = new FileTransport();
+            $options   = new FileOptions(array(
+                'path'              => $_SERVER['DOCUMENT_ROOT'] . '/data/mail/',
+                'callback'  => function (FileTransport $transport) {
+                    return 'Message_' . microtime(true) . '_' . mt_rand() . '.txt';
+                },
+            ));
+            $transport->setOptions($options);
+            $transport->send($mail);
+        } else if ($_SERVER['SERVER_NAME'] != 'hipaa') {
             $mail->addTo($addTo, $addToName);
             $mail->addBcc('compliance@carosh.com');
 

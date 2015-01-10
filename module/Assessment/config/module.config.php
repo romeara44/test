@@ -41,7 +41,7 @@ return array(
             'remediationplan' => array(
                 'type'    => 'segment',
                 'options' => array(
-                    'route'    => '/remediationplan[/:action][/:id][/page/:page][/order_by/:order_by][/:order][/roleFilter/:roleFilter][/rpId/:rpId][/type/:type]',
+                    'route'    => '/remediationplan[/:action][/:id][/page/:page][/order_by/:order_by][/:order][/roleFilter/:roleFilter][/rpId/:rpId][/type/:type][/add_atts/:add_atts]',
                     'constraints' => array(
                         'action' => '(?!\bpage\b)(?!\border_by\b)[a-zA-Z][a-zA-Z0-9_-]*',
                         'id'     => '[0-9]+',
@@ -51,6 +51,7 @@ return array(
                         'roleFilter' => '[0-9]+',
                         'rpId' => '[0-9]+',
                         'type' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'add_atts' => '[01]*',
                     ),
                     'defaults' => array(
                         'controller' => 'Assessment\Controller\Remediationplan',

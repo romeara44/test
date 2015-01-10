@@ -193,7 +193,15 @@
                 <div class="cboth"><br /></div>
             <?php endif; ?>
 
-
+            <p>
+                <?php;
+                $fn = $formTask->get('rpa_add_attachments');
+                echo $this->formLabel($fn);
+                echo $this->formCheckbox($fn);
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <div class="cboth"></div>
             <div class="form-buttons">
                 <input type="submit" value="Save" class="form-button" />
 
@@ -229,13 +237,13 @@
 
         $('.emailClick1').click(function() {
             $.post("/remediationplan/savetask", { values: $('#formTask').serialize() }, function(data) {
-                window.location.href = '/remediationplan/remediationplanemail/<?php echo $this->id ?>/rpId/<?php echo $this->rpId ?>';
+                window.location.href = '/remediationplan/remediationplanemail/<?php echo $this->id ?>/rpId/<?php echo $this->rpId ?>/add_atts/' + (+!!$('#rpa_add_attachments').is(':checked'));
             });
         });
 
         $('.emailClick2').click(function() {
             $.post("/remediationplan/savetask", { values: $('#formTask').serialize() }, function(data) {
-                window.location.href = '/remediationplan/remediationplanapproveremail/<?php echo $this->id ?>/rpId/<?php echo $this->rpId ?>';
+                window.location.href = '/remediationplan/remediationplanapproveremail/<?php echo $this->id ?>/rpId/<?php echo $this->rpId ?>/add_atts/' + (+!!$('#rpa_add_attachments').is(':checked'));
             });
         });
     });

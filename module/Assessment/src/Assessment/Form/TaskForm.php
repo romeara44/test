@@ -120,6 +120,21 @@ class TaskForm extends Form
         ));
 
         $this->add(array(
+            'name' => 'rpa_add_attachments',
+            'type' => 'Zend\Form\Element\Checkbox',
+            'options' => array(
+                'label' => 'Add Attachments',
+                'use_hidden_element' => false,
+                'checked_value' => '1',
+                'unchecked_value' => '0'
+            ),
+            'attributes' => array(
+                'checked' => 'checked',
+                'id' => 'rpa_add_attachments',
+            )
+        ));
+
+        $this->add(array(
             'name' => 'submit',
             'attributes' => array(
                 'type'  => 'submit',
