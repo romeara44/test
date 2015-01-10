@@ -124,6 +124,10 @@ class Remediationplanaction
                 'required' => false,
             )));
 
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'rpa_add_attachments',
+                'required' => false,
+            )));
 
             $this->inputFilter = $inputFilter;
         }
