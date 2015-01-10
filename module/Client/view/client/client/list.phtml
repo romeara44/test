@@ -27,12 +27,7 @@ $identity = $authService->getIdentity();
                 </a>
             </th>
 
-            <?php $classSort = ($order_by == 'typeItem') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
-            <th>
-                <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => 'typeItem', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
-                    Type <i class="fa <?php echo $classSort ?>"></i>
-                </a>
-            </th>
+            <th>Type </th>
 
             <?php $classSort = ($order_by == 'name') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
