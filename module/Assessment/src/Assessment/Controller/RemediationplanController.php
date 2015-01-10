@@ -391,9 +391,14 @@ class RemediationplanController extends AbstractActionController
             'Target Date',
         );
         $csvList[] = '';
+        $continue = true;
+        
         foreach ($actions as $rpa) {
             //$rpa->rpa_threat = str_replace('§', utf8_decode('§'), $rpa->rpa_threat);
-
+            if($continue) {
+                $continue = false;
+                continue;
+            }
             $rpa->rpa_threat = str_replace('Â', '', $rpa->rpa_threat);
 
             //echo $rpa->rpa_threat;
