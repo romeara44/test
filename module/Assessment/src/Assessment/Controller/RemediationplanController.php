@@ -607,7 +607,7 @@ class RemediationplanController extends AbstractActionController
         $mt = $this->getMailtemplateTable()->getMailtemplateByKey('breachplan');
 
         $text = $mt->mt_text;
-        $text = str_replace('<Client Name>',  $rpObj->_client_name, $text);
+        $text = str_replace('<Client Name>',  $rpObj->_performed_name, $text);
         $text = str_replace('<Target Date>',  $rpaObj->rpa_target_date, $text);
 
         $text = str_replace('<Consultant Name>',  $contact->u_firstname . ' ' . $contact->u_firstname, $text);
@@ -646,7 +646,7 @@ class RemediationplanController extends AbstractActionController
         $mt = $this->getMailtemplateTable()->getMailtemplateByKey('remediationplan');
 
         $text = $mt->mt_text;
-        $text = str_replace('<Client Name>',  $rpObj->_client_name, $text);
+        $text = str_replace('<Client Name>',  $rpObj->_performed_name, $text);
         $text = str_replace('<Target Date>',  $rpaObj->rpa_target_date, $text);
 
         $subject = str_replace('<Company>', $rpObj->_client_name, $mt->mt_subject);
@@ -656,7 +656,7 @@ class RemediationplanController extends AbstractActionController
         $text = str_replace('<Consultant phone>',  $contact->u_office_phone, $text);
         $text = str_replace('<Consultant email>',  $contact->u_email, $text);
 
-        $text = str_replace('<Task>',  $rpaObj->rpa_threat, $text);
+        $text = str_replace('<Task>',  str_replace('Â', '', $rpaObj->rpa_threat), $text);
         $text = str_replace('<Action plan>',  $rpaObj->rpa_action_plan, $text);
         $text = str_replace('<Policy>',  $rpaObj->rpa_policy, $text);
 
@@ -729,7 +729,7 @@ class RemediationplanController extends AbstractActionController
         $text = str_replace('<Consultant phone>',  $contact->u_office_phone, $text);
         $text = str_replace('<Consultant email>',  $contact->u_email, $text);
 
-        $text = str_replace('<Task>', $rpaObj->rpa_threat, $text);
+        $text = str_replace('<Task>', str_replace('Â', '', $rpaObj->rpa_threat), $text);
         $text = str_replace('<Action plan>', $rpaObj->rpa_action_plan, $text);
 
         $approver = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUser($rpaObj->rpa_approver_u_id);
