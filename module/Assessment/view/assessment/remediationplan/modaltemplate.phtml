@@ -165,6 +165,7 @@
             <div class="cboth"><br /></div>
 
             <?php if ($this->id && is_object($notes) && ($notes->count())): ?>
+                <?php $hasAttacments = false;?>
                 <strong>Attachments:</strong><br />
                 <?php foreach ($notes as $note): ?>
                     <div class="note">
@@ -175,6 +176,7 @@
                             <?php endif; ?>
                             <?php if ($note->_files != ''): ?>
                                 <?php
+                                $hasAttacments = true;
                                 $_files = explode(',', $note->_files);
                                 ?>
                                 <?php foreach ($_files as $_file): ?>
@@ -191,16 +193,20 @@
                     </div>
                 <?php endforeach; ?>
                 <div class="cboth"><br /></div>
+                <?php if(hasAttacments): ?>
+                    <p>
+                        <?php;
+                        $fn = $formTask->get('rpa_add_attachments');
+                        echo $this->formLabel($fn);
+                        echo $this->formCheckbox($fn);
+                        echo $this->formElementErrors($fn);
+                        ?>
+                    </p>
+                <?php endif; ?>
             <?php endif; ?>
+            
 
-            <p>
-                <?php;
-                $fn = $formTask->get('rpa_add_attachments');
-                echo $this->formLabel($fn);
-                echo $this->formCheckbox($fn);
-                echo $this->formElementErrors($fn);
-                ?>
-            </p>
+
             <div class="cboth"></div>
             <div class="form-buttons">
                 <input type="submit" value="Save" class="form-button" />
