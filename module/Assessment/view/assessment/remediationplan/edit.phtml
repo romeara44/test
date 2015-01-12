@@ -157,8 +157,10 @@
                 </td>
             </tr>
         <?php endif; ?>
-        <?php $notesTaskAtt = $this->noteTable->getNotes($rpa->rpa_id, \Note\Model\Note::NOTE_RPA); ?>
-        <?php $notesTaskAssessments = $this->noteTable->getNotesForRemedTask($rpa->rpa_id, $adrId); ?>
+        <?php $notesTaskAtt = $this->noteTable->getNotes($rpa->rpa_id, \Note\Model\Note::NOTE_RPA, 0, 'file'); ?>
+        <?php $notesTaskAssessments = $this->noteTable->getNotesForRemedTask($rpa->rpa_id, $adrId, 'file'); ?>
+        <?php $notesTaskAttText = $this->noteTable->getNotes($rpa->rpa_id, \Note\Model\Note::NOTE_RPA, 0, 'text'); ?>
+        <?php $notesTaskAssessmentsText = $this->noteTable->getNotesForRemedTask($rpa->rpa_id, $adrId, 'text'); ?>
 
         <tr>
             <td class="tdSmall"><?php echo \Assessment\Model\Remediationplanaction::$levelsNames[$rpa->rpa_risk_level] ?></td>
@@ -183,11 +185,37 @@
                 <?php if ($notesTaskAtt->count() || $notesTaskAssessments->count()): ?>
                     <a style="margin-left: 10px;" href="" class="attachments" rel="<?php echo $rpa->rpa_id ?>" title="View Attachments"><i class="fa fa-paperclip"></i></a>
                 <?php endif; ?>
+                <?php if ($notesTaskAttText->count() || $notesTaskAssessmentsText->count()): ?>
+                    <a style="margin-left: 10px;" href="" class="notes" rel="<?php echo $rpa->rpa_id ?>" title="View Notes"><i class="fa fa-file-text-o fa-1"></i></a>
+                <?php endif; ?>
             </td>
         </tr>
 
         <?php //if (!$this->writable): ?>
 
+            <tr class="expandable" id="notes<?php echo $rpa->rpa_id ?>">
+                <td>&nbsp;</td>
+                    <?php $colspan = 2; ?>
+                    <?php foreach (array('Task attachments' => $notesTaskAttText, 'Questions attachments' => $notesTaskAssessmentsText) as $keyAtt => $notesTask): ?>
+                        <td colspan="<?php echo $colspan ?>">
+                            <?php if (is_object($notesTask) && ($notesTask->count())): ?>
+                                <div>
+                                    <div><strong><?php echo $keyAtt ?>:</strong></div>
+                                    <div>
+                                        <?php $notesTask->buffer() ?>
+                                        <?php foreach ($notesTask as $note): ?>
+                                            <?php if ($note->note_text != ''): ?>
+                                                <div><?php echo $note->note_text ?></div>
+                                            <?php endif; ?>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        </td>
+                        <?php $colspan = 5; ?>
+                    <?php endforeach; ?>
+            </tr>
+            
             <tr class="expandable" id="attachments<?php echo $rpa->rpa_id ?>">
                 <td>&nbsp;</td>
                     <?php $colspan = 2; ?>
@@ -198,7 +226,7 @@
                                     <div><strong><?php echo $keyAtt ?>:</strong></div>
                                     <div>
                                         <?php foreach ($notesTask as $note): ?>
-                                            <?php if (($note->_files != '') || ($note->note_text != '')): ?>
+                                            <?php if ($note->_files != ''): ?>
                                                 <?php
                                                 $_files = explode(',', $note->_files);
                                                 ?>
@@ -212,7 +240,6 @@
                                                         <?php if ($note->_files != ''): ?>
                                                             <span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="http://<?php echo $_SERVER['HTTP_HOST'] ?>/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
                                                         <?php endif; ?>
-                                                        <div><?php echo $note->note_text ?></div>
                                                     <?php endif; ?>
                                                 <?php endforeach; ?>
                                             <?php endif; ?>
@@ -414,15 +441,34 @@
         });
         //form disclaimer slide out
         jQuery('.expandable').hide();
-        jQuery('.attachments').toggle(
-            function() {
-                var idA = $(this).attr('rel');
-                jQuery('#attachments' + idA).slideDown();
-            }, function() {
-                var idA = $(this).attr('rel');
-                jQuery('#attachments' + idA).slideUp();
-            }
-        );
+        jQuery('.attachments, .notes').click(function(e) {
+                e.preventDefault();
+                var $this = $(this);
+                var idA = $this.attr('rel');
+                var delay = 0;
+                if($this.hasClass('notes')) {
+                    if(jQuery('#attachments' + idA).is(':visible')) {
+                        delay = 900;
+                        jQuery('#attachments' + idA).slideUp();
+                    }
+                    if(jQuery('#notes' + idA).is(':visible')) {
+                        jQuery('#notes' + idA).delay(delay).slideUp();
+                    } else {
+                        jQuery('#notes' + idA).delay(delay).slideDown();
+                    }
+                } else {
+                    if(jQuery('#notes' + idA).is(':visible')) {
+                        delay = 900;
+                        jQuery('#notes' + idA).slideUp();
+                    }
+                    if(jQuery('#attachments' + idA).is(':visible')) {
+                        jQuery('#attachments' + idA).delay(delay).slideUp();
+                    } else {
+                        jQuery('#attachments' + idA).delay(delay).slideDown();
+                    }
+                }
+                
+            });
 
     });
 
