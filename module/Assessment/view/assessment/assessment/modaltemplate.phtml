@@ -46,7 +46,7 @@
             <input type="hidden" name="subject" value="<?php echo $this->subject ?>" />
             <input type="hidden" name="addto" value="<?php echo $this->addto ?>" />
             <input type="hidden" name="passwordUId" value="<?php echo $this->passwordUId ?>" />
-            <input type="hidden" name="passwordToSent" value="1" />
+            <input type="hidden" name="passwordToSent" value="<?php echo isset($this->passwordToSent) ? $this->passwordToSent : 1?>" />
             <p>
                 <label><?php echo $this->title_label ?></label>
                 <span class="fleft"><?php echo $this->header_title ?></span>

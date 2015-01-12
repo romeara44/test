@@ -655,7 +655,6 @@ class AssessmentController extends AbstractActionController
 
         $text = str_replace('<Client Name>', $contact->u_firstname, $text);
         $text = str_replace('<username>',  $contact->u_email, $text);
-        $text = str_replace('<password>',  '********', $text);
 
         $text = str_replace('<Consultant Name>',  $identity['u_firstname'] . ' ' . $identity['u_firstname'], $text);
         $text = str_replace('<Consultant Title>',  $identity['u_title'], $text);
@@ -670,7 +669,7 @@ class AssessmentController extends AbstractActionController
             'title_label' => 'Name',
             'subject' => $mt->mt_subject,
             'addto' => $contact->u_email,
-            'passwordToSent' => 1,
+            'passwordToSent' => 0,
             'passwordUId' => $company->c_primary_contact_u_id
         ));
 
