@@ -32,7 +32,7 @@ class NoteTable implements ServiceLocatorAwareInterface
         return $this->serviceLocator;
     }
 
-    public function getNotes($itemId = 0, $itemType = 1, $subItemId = 0)
+    public function getNotes($itemId = 0, $itemType = 1, $subItemId = 0, $type = Null)
     {
         $select = $this->tableGateway->getSql()->select();
         $select->join(array('u' => 'users'), 'note_u_id = u_id', array('_username' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'), '_note_create_date_format' => new \Zend\Db\Sql\Expression("DATE_FORMAT(note_create_date, '%b %D, %Y')")));
@@ -43,6 +43,12 @@ class NoteTable implements ServiceLocatorAwareInterface
         $select->where('note_item_type = ' . $itemType);
         $select->where('note_item_id = ' . $itemId);
 
+        if($type == 'text') {
+            $select->where("nf_note_id IS NULL");
+        } else if($type == 'file') {
+            $select->where("nf_note_id IS NOT NULL");
+        }
+        
         if ($subItemId) {
             $select->where('note_subitem_id = ' . $subItemId);
         }
@@ -54,7 +60,7 @@ class NoteTable implements ServiceLocatorAwareInterface
         return $resultSet;
     }
 
-    public function getNotesForRemedTask($rpaId, $subItemId)
+    public function getNotesForRemedTask($rpaId, $subItemId, $type = Null)
     {
         $rpa = $this->getServiceLocator()->get('Assessment\Model\RemediationplanactionTable')->getRemediationplanaction($rpaId);
         $rp = $this->getServiceLocator()->get('Assessment\Model\RemediationplanTable')->getRemediationplan($rpa->rpa_rp_id);
@@ -78,6 +84,12 @@ class NoteTable implements ServiceLocatorAwareInterface
 
         $select->where('note_subitem_id = ' . $subItemId); // adr id
 
+        if($type == 'text') {
+            $select->where("nf_note_id IS NULL");
+        } else if($type == 'file') {
+            $select->where("nf_note_id IS NOT NULL");
+        }
+        
         $select->group(array('note_id'));
 
         $resultSet = $this->tableGateway->selectWith($select);
