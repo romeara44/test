@@ -259,23 +259,32 @@ class AssessmentQuestionAnswerTable implements ServiceLocatorAwareInterface
                 }
 
                 if (isset($files['notesFiles'][$questionId]) || ($post['notes'][$questionId] != '')) {
-                    // save note to answer
-                    $note = new Note();
-
-                    $postNote['note_text'] = $post['notes'][$questionId];
+                    
                     $postNote['note_item_type'] = \Note\Model\Note::NOTE_ASSESSMENT_ANSWER;
                     $postNote['note_item_id'] = $aqaId;
                     $postNote['note_subitem_id'] = $adrId;
-                    $note->exchangeArray($postNote);
 
-                    if (isset($files['notesFiles'][$questionId])) {
-                        $notesFiles = $files['notesFiles'][$questionId];
-                    } else {
-                        $notesFiles = array();
+                    // save text note
+                    if($post['notes'][$questionId] != '')
+                    {
+                        $note = new Note();
+                        $postNote['note_text'] = $post['notes'][$questionId];
+                        $note->exchangeArray($postNote);
+                        $this->getServiceLocator()->get('Note\Model\NoteTable')->setServiceLocator($this->getServiceLocator());
+                        $this->getServiceLocator()->get('Note\Model\NoteTable')->saveNote($note);
                     }
-
-                    $this->getServiceLocator()->get('Note\Model\NoteTable')->setServiceLocator($this->getServiceLocator());
-                    $this->getServiceLocator()->get('Note\Model\NoteTable')->saveNote($note, array('notesFiles' => $notesFiles));
+                    
+                    // save file note
+                    if (isset($files['notesFiles'][$questionId]))
+                    {
+                        $note = new Note();
+                        $postNote['note_text'] = '';
+                        $note->exchangeArray($postNote);
+                        $notesFiles = $files['notesFiles'][$questionId];
+                        
+                        $this->getServiceLocator()->get('Note\Model\NoteTable')->setServiceLocator($this->getServiceLocator());
+                        $this->getServiceLocator()->get('Note\Model\NoteTable')->saveNote($note, array('notesFiles' => $notesFiles));
+                    }
                 }
             }
 

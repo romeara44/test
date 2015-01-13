@@ -373,13 +373,25 @@ class AssessmentController extends AbstractActionController
                     // save reports files
                     $pp = $post['aili_adr_id'];
                     $idAili = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationReportTable')->saveAilr($id, $pp, $request->getFiles());
-
-                    // save notes
+                  
+                    $noteData['note_item_id'] = $id;
+                    $noteData['note_subitem_id'] = $post['aili_adr_id'];
+                    $noteData['note_item_type'] = $post['note_item_type'];
+                    
+                    // save text note
+                    if($post['note_text'])
+                    {
+                        $note = new Note();
+                        $noteData['note_text'] = $post['note_text'];
+                        $note->exchangeArray($noteData);
+                        $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
+                        $noteId = $this->getNoteTable()->saveNote($note);
+                    }
+                   
+                    // save file note
                     $note = new Note();
-                    $post['note_item_id'] = $id;
-                    $post['note_subitem_id'] = $post['aili_adr_id'];
-                    $note->exchangeArray($post);
-
+                    $noteData['note_text'] = '';
+                    $note->exchangeArray($noteData);
                     $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
                     $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
                 }
@@ -434,13 +446,25 @@ class AssessmentController extends AbstractActionController
                 // save reports files
                 $pp = $post['abal_adr_id'];
                 $idAili = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationReportTable')->saveAilr($id, $pp, $request->getFiles());
-
-                // save notes
+                
+                $noteData['note_item_id'] = $id;
+                $noteData['note_subitem_id'] = $post['abal_adr_id'];
+                $noteData['note_item_type'] = $post['note_item_type'];
+                
+                // save text note
+                if($post['note_text'])
+                {
+                    $note = new Note();
+                    $noteData['note_text'] = $post['note_text'];
+                    $note->exchangeArray($noteData);
+                    $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
+                    $noteId = $this->getNoteTable()->saveNote($note);
+                }
+               
+                // save file note
                 $note = new Note();
-                $post['note_item_id'] = $id;
-                $post['note_subitem_id'] = $post['abal_adr_id'];
-                $note->exchangeArray($post);
-
+                $noteData['note_text'] = '';
+                $note->exchangeArray($noteData);
                 $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
                 $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
 
