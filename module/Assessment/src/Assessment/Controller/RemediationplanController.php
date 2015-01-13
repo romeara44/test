@@ -563,9 +563,20 @@ class RemediationplanController extends AbstractActionController
                 $this->getRemediationplanactionTable()->setServiceLocator($this->getServiceLocator());
                 $rpaId = $this->getRemediationplanactionTable()->saveRemediationplanaction($rpa, 1);
 
+                // save text note
+                if($post['note_text'])
+                {
+                    $note = new Note();
+                    $noteData['note_text'] = $post['note_text'];
+                    $noteData['note_item_type'] = \Note\Model\Note::NOTE_RPA;
+                    $noteData['note_item_id'] = $rpaId;
+                    $note->exchangeArray($noteData);
+                    $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
+                    $noteId = $this->getNoteTable()->saveNote($note);
+                }
                 // save files
                 $note = new Note();
-                $noteData['note_text'] = $post['note_text'];
+                $noteData['note_text'] = '';
                 $noteData['note_item_type'] = \Note\Model\Note::NOTE_RPA;
                 $noteData['note_item_id'] = $rpaId;
                 $note->exchangeArray($noteData);
