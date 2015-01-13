@@ -1,0 +1,13 @@
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_title` = 'Are workforce members aware of the risks to which the practice is exposed to from the use of social media for malware (trojans, viruses, etc)', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 271; 
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_title` = 'Are workforce members aware of the risks to which the practice is exposed to from the use of social media for data leaks', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 272; 
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_title` = 'Are workforce members aware of the risks to which the practice is exposed to from the use of social media for PHI breach disclosure violations', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 273; 
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_title` = 'Are workforce members aware of the risks to which the practice is exposed to from the use of social media for impersonation', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 274; 
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_title` = 'Are workforce members aware of the risks to which the practice is exposed to from the use of social media for system hacking', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 275; 
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_title` = 'Are workforce members aware of the risks to which the practice is exposed to from the use of social media for libel', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 276;
+DELETE FROM `hipaacar_app`.`assessments_questions_options` WHERE `assessments_questions_options`.`aqo_id` = 13;
+DELETE FROM `hipaacar_app`.`assessments_questions_options` WHERE `assessments_questions_options`.`aqo_id` = 14;
+DELETE FROM `hipaacar_app`.`assessments_questions_options` WHERE `assessments_questions_options`.`aqo_id` = 15;
+DELETE FROM `hipaacar_app`.`assessments_questions_options` WHERE `assessments_questions_options`.`aqo_id` = 16;
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_title` = 'Do the Business Associate Agreement require that the Business Associate will report to the practice an security incident of which it becomes aware' WHERE `assessments_questions`.`aq_id` = 228;
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_title` = 'Is there a risk that the practice will have policies and procedures that do not comply with the standards, implementation specifications or other requirements of the regulation' WHERE `assessments_questions`.`aq_id` = 230;
+UPDATE `assessments_questions` `aq` SET `aq_parent_aq_id` = NULL WHERE `aq`.`aq_id` IN(1,2,3,4,5,6,7,8,9,10,110,111,112,113,220,221,222,223,224,225,226,227,228,229)
