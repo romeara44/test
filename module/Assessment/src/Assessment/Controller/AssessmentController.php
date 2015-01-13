@@ -263,24 +263,14 @@ class AssessmentController extends AbstractActionController
                         $aId = $this->getAssessmentTable()->saveAssessment($a);
                         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_ADD, \Application\Model\LogsTable::ITEM_TYPE_ASSESSMENT, $aId);
                         $id = $aId;
-                    } else {
-                        if (!(int) $post['setStep']) {
-                            $cloneObj = $this->getAssessmentTable()->cloneAssessment($id, 1);
-                            $id = $cloneObj;
-                        }
                     }
 
                     if ($isNew && $isPrivacy) {
                         //$this->getAssessmentTable()->copyAdressesToPrivacy($isPossible->a_id, $aId);
                     } else {
-                        $newAdressesKeys = $this->getAssessmentTable()->saveAddresses($id, $request->getPost(), !(int) $post['setStep']);
+                        $newAdressesKeys = $this->getAssessmentTable()->saveAddresses($id, $request->getPost());
                     }
 
-                    if (!$isNew) {
-                        if (!(int) $post['setStep']) {
-                            $cloneObj = $this->getAssessmentTable()->cloneAssessment($id, 1, 0, false, $oldId, $newAdressesKeys);
-                        }
-                    }
 
                     $this->getAssessmentTable()->checkStepFinished($id, 1, $isNew);
                 }
@@ -290,18 +280,13 @@ class AssessmentController extends AbstractActionController
                 $valid = true;
                 $post = $request->getPost();
 
-                if (!(int) $post['setStep']) {
-                    $cloneObj = $this->getAssessmentTable()->cloneAssessment($id, 2, $post['locationHidden']);
-                    $id = $cloneObj[0];
-                }
-
                 if (isset($post['arlc'])) {
                     foreach ($post['arlc'] as $locationId => $valueArlc) {
                         foreach ($valueArlc as $arId => $uId) {
                             $arlc = new AssessmentRoleLocationContact();
 
                             $dataArlc['arlc_a_id'] = $id;
-                            $dataArlc['arlc_adr_id'] = !(int) $post['setStep'] ? $cloneObj[1][$locationId] : $locationId;
+                            $dataArlc['arlc_adr_id'] = $locationId;
                             $dataArlc['arlc_ar_id'] = $arId;
                             $dataArlc['arlc_u_id'] = $uId;
 
@@ -361,10 +346,6 @@ class AssessmentController extends AbstractActionController
                     }
 
                     if (isset($post['aili_name_exists'])) {
-                        if (!(int) $post['setStep']) {
-                            $cloneObj = $this->getAssessmentTable()->cloneAssessment($id, 3, $post['locationHidden'], false);
-                            $id = $cloneObj[0];
-                        }
 
                         foreach ($post['aili_name_exists'] as $ailiId => $ailiItem) {
                             $aili = new AssessmentInventoryLocationItem();
@@ -372,7 +353,7 @@ class AssessmentController extends AbstractActionController
 
                             $existsAili = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationItemTable')->getAili($ailiId);
                             $dataAili['aili_id'] = $ailiId;
-                            $dataAili['aili_adr_id'] = !(int) $post['setStep'] ? $cloneObj[1][$post['aili_adr_id']] : $post['aili_adr_id'];
+                            $dataAili['aili_adr_id'] = $post['aili_adr_id'];
                             $dataAili['aili_a_id'] = $id;
                             $dataAili['aili_ai_id'] = $existsAili->aili_ai_id;
 
@@ -390,13 +371,13 @@ class AssessmentController extends AbstractActionController
                     }
 
                     // save reports files
-                    $pp = (!(int) $post['setStep'] && isset($post['aili_name_exists'])) ? $cloneObj[1][$post['aili_adr_id']] : $post['aili_adr_id'];
+                    $pp = $post['aili_adr_id'];
                     $idAili = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationReportTable')->saveAilr($id, $pp, $request->getFiles());
 
                     // save notes
                     $note = new Note();
                     $post['note_item_id'] = $id;
-                    $post['note_subitem_id'] = (!(int) $post['setStep'] && isset($post['aili_name_exists'])) ? $cloneObj[1][$post['aili_adr_id']] : $post['aili_adr_id'];
+                    $post['note_subitem_id'] = $post['aili_adr_id'];
                     $note->exchangeArray($post);
 
                     $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
@@ -436,16 +417,12 @@ class AssessmentController extends AbstractActionController
                 }
 
                 if (isset($post['abal_ba_id_exists'])) {
-                    if (!(int) $post['setStep']) {
-                        $cloneObj = $this->getAssessmentTable()->cloneAssessment($id, 4, $post['locationHidden'], false);
-                        $id = $cloneObj[0];
-                    }
 
                     foreach ($post['abal_ba_id_exists'] as $abalId => $abalItem) {
                         $abal = new AssessmentBusinessAssociateLocation();
                         $dataAbal = array();
 
-                        $dataAbal['abal_adr_id'] = !(int) $post['setStep'] ? $cloneObj[1][$post['abal_adr_id']] : $post['abal_adr_id'];
+                        $dataAbal['abal_adr_id'] = $post['abal_adr_id'];
                         $dataAbal['abal_a_id'] = $id;
                         $dataAbal['abal_id'] = $abalId;
                         $dataAbal['abal_ba_id'] = $abalItem;
@@ -455,14 +432,13 @@ class AssessmentController extends AbstractActionController
                     }
                 }
                 // save reports files
-                $clAdrId = isset($cloneObj[1][$post['abal_adr_id']]) ? $cloneObj[1][$post['abal_adr_id']] : $post['abal_adr_id'];
-                $pp = !(int) $post['setStep'] ? $clAdrId : $post['abal_adr_id'];
+                $pp = $post['abal_adr_id'];
                 $idAili = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationReportTable')->saveAilr($id, $pp, $request->getFiles());
 
                 // save notes
                 $note = new Note();
                 $post['note_item_id'] = $id;
-                $post['note_subitem_id'] = !(int) $post['setStep'] ? $clAdrId : $post['abal_adr_id'];
+                $post['note_subitem_id'] = $post['abal_adr_id'];
                 $note->exchangeArray($post);
 
                 $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
