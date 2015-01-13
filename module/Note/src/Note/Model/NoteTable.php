@@ -117,13 +117,13 @@ class NoteTable implements ServiceLocatorAwareInterface
         return $row;
     }
 
-    public function saveNote(Note $note, $files, $isCopy = false)
+    public function saveNote(Note $note, $files = null, $isCopy = false)
     {
         $authService = new \Zend\Authentication\AuthenticationService();
         $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
         $identity = $authService->getIdentity();
 
-        if (!$isCopy) {
+        if (!$isCopy && $files) {
             if ((trim($note->note_text) == '') && (!isset($files['notesFiles']) || count($files['notesFiles']) == 0)) {
                 return;
             }
@@ -157,7 +157,8 @@ class NoteTable implements ServiceLocatorAwareInterface
             }
         }
 
-        $this->_saveFiles($id, $files);
+        if($files) $this->_saveFiles($id, $files);
+
         return $id;
     }
 
