@@ -196,7 +196,7 @@
             <tr class="expandable" id="notes<?php echo $rpa->rpa_id ?>">
                 <td>&nbsp;</td>
                     <?php $colspan = 2; ?>
-                    <?php foreach (array('Task attachments' => $notesTaskAttText, 'Questions attachments' => $notesTaskAssessmentsText) as $keyAtt => $notesTask): ?>
+                    <?php foreach (array('Task notes' => $notesTaskAttText, 'Questions notes' => $notesTaskAssessmentsText) as $keyAtt => $notesTask): ?>
                         <td colspan="<?php echo $colspan ?>">
                             <?php if (is_object($notesTask) && ($notesTask->count())): ?>
                                 <div>
