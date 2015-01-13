@@ -369,7 +369,7 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
         return true;
     }
 
-    public function clonePlan($id, $post)
+    public function clonePlan($id, $post, $signedOffCopy = false)
     {
         $rp = $this->getRemediationplan($id);
 
@@ -406,13 +406,15 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
                 $changed = true;
             }
         }
-        if (!$changed) {
+        if (!$changed && !$signedOffCopy) {
             return $id;
         }
-
-        // writable to false
-        $this->tableGateway->update(array('rp_writable' => 0, 'rp_status' =>  \Assessment\Model\Remediationplan::STATUS_CLOSED), array('rp_id' => $id));
-
+        
+        if(!$signedOffCopy) {
+            // writable to false
+            $this->tableGateway->update(array('rp_writable' => 0, 'rp_status' =>  \Assessment\Model\Remediationplan::STATUS_CLOSED), array('rp_id' => $id));
+        }
+        
         // create new row
         $rp->rp_id = 0;
         $rp->rp_parent_rp_id = $id;

@@ -180,6 +180,8 @@ class RemediationplanController extends AbstractActionController
                 }
                 if ($post['signedoff'] != 1) {
                     $id = $this->getRemediationplanTable()->clonePlan($id, $post);
+                } else {
+                    $this->getRemediationplanTable()->clonePlan($id, $post, true);
                 }
 
                 $this->getRemediationplanTable()->setFieldValue($id, 'rp_initials', $post['rp_initials']);
