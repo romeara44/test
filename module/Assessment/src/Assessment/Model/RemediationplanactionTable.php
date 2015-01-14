@@ -64,7 +64,8 @@ class RemediationplanactionTable implements ServiceLocatorAwareInterface
 
         $select = $this->tableGateway->getSql()->select();
         $select->where('rpa_id = ' . $id);
-        $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('rpa_contact_u_id = u_id'), array('_contact_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)')), 'left');
+        $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('rpa_contact_u_id = u.u_id'), array('_contact_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)')), 'left');
+        $select->join(array('u2' => 'users'), new \Zend\Db\Sql\Expression('rpa_approver_u_id = u2.u_id'), array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)')), 'left');
 
         $resultSet = $this->tableGateway->selectWith($select);
 

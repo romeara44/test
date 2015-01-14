@@ -676,9 +676,12 @@ class RemediationplanController extends AbstractActionController
     public function remediationplanemailAction()
     {
         $id = $this->params('id');
+        $rpId = $this->params('rpId');
         $contactUId = $this->params('rpa_contact_u_id');
         $contactUId = $this->params('rpa_contact_u_id');
         $addAttachments = $this->params('add_atts');
+        $uri = $this->getRequest()->getUri();
+        $editTaskUrl = sprintf('%s://%s', $uri->getScheme(), $uri->getHost()) . $this->url()->fromRoute('remediationplan', array('action' => 'edit', 'id' => $rpId)) . '?edittask=' . $id;
         
         $rpaObj = $this->getRemediationplanactionTable()->getRemediationplanaction($id);
         $rpObj = $this->getRemediationplanTable()->getRemediationplan($rpaObj->rpa_rp_id);
@@ -689,6 +692,9 @@ class RemediationplanController extends AbstractActionController
         $text = $mt->mt_text;
         $text = str_replace('<Client Name>',  $rpaObj->_contact_name, $text);
         $text = str_replace('<Target Date>',  $rpaObj->rpa_target_date, $text);
+        $text = str_replace('<Link>',  $editTaskUrl, $text);
+        $text = str_replace('<Approver>',  $rpaObj->_approver_name ? $rpaObj->_approver_name : "Approver", $text);
+        $text = str_replace('<Company>',  $rpObj->_client_name, $text);
 
         $subject = str_replace('<Company>', $rpObj->_client_name, $mt->mt_subject);
 
@@ -698,7 +704,7 @@ class RemediationplanController extends AbstractActionController
         $text = str_replace('<Consultant email>',  $contact->u_email, $text);
 
         $text = str_replace('<Task>',  str_replace('Â', '', $rpaObj->rpa_threat), $text);
-        $text = str_replace('<Action plan>',  $rpaObj->rpa_action_plan, $text);
+        $text = str_replace('<Action plan>', str_replace("\r\n", '', $rpaObj->rpa_action_plan), $text);
         $text = str_replace('<Policy>',  $rpaObj->rpa_policy, $text);
 
         $assignee = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUser($rpaObj->rpa_contact_u_id);
@@ -752,16 +758,21 @@ class RemediationplanController extends AbstractActionController
     public function remediationplanapproveremailAction()
     {
         $id = $this->params('id');
+        $rpId = $this->params('rpId');
         $rpaObj = $this->getRemediationplanactionTable()->getRemediationplanaction($id);
         $rpObj = $this->getRemediationplanTable()->getRemediationplan($rpaObj->rpa_rp_id);
         $contact = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUser($rpObj->rp_consultant_u_id);
         $addAttachments = $this->params('add_atts');
+        $uri = $this->getRequest()->getUri();
+        $editTaskUrl = sprintf('%s://%s', $uri->getScheme(), $uri->getHost()) . $this->url()->fromRoute('remediationplan', array('action' => 'edit', 'id' => $rpId)) . '?edittask=' . $id;
 
         $mt = $this->getMailtemplateTable()->getMailtemplateByKey('emailapprover');
 
         $text = $mt->mt_text;
-        $text = str_replace('<Client Name>',  $rpObj->_client_name, $text);
+        $text = str_replace('<Client Name>',  $rpaObj->_approver_name ? $rpaObj->_approver_name : "Approver", $text);
         $text = str_replace('<Target Date>',  $rpaObj->rpa_target_date, $text);
+        $text = str_replace('<Link>',  $editTaskUrl, $text);
+        $text = str_replace('<Company>',  $rpObj->_client_name, $text);
 
         $subject = str_replace('<Company>', $rpObj->_client_name, $mt->mt_subject);
 
@@ -771,7 +782,7 @@ class RemediationplanController extends AbstractActionController
         $text = str_replace('<Consultant email>',  $contact->u_email, $text);
 
         $text = str_replace('<Task>', str_replace('Â', '', $rpaObj->rpa_threat), $text);
-        $text = str_replace('<Action plan>', $rpaObj->rpa_action_plan, $text);
+        $text = str_replace('<Action plan>', str_replace("\r\n", '', $rpaObj->rpa_action_plan), $text);
 
         $approver = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUser($rpaObj->rpa_approver_u_id);
         

@@ -177,7 +177,7 @@
             <td><?php echo $rpa->_approver_name ?></td>
             <td><?php echo $rpa->rpa_target_date ?></td>
             <td class="aright nowrap">
-                <a href="/remediationplan/edittask/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>" class="fancybox" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+                <a href="/remediationplan/edittask/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>" id="edittask<?php echo $rpa->rpa_id ?>" class="fancybox" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
                 <?php /* <a href="/remediationplan/planemail/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>" class="fancybox" title="Email Assignee"><i class="fa fa-envelope"></i></a> &nbsp; */ ?>
                 <?php if ($this->writable): ?>
                     <a href="/remediationplan/deletetask/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>" class="i-delete" title="Delete"><i class="fa fa-trash-o"></i></a>
@@ -415,8 +415,37 @@
             $('#file' + noteId + browseFilesCounter).click();
             browseFilesCounter++;
         });
-
+        
+        openEditTask();
     });
+    
+    function openEditTask()
+    {
+        var get = parseGET();
+        if(get['edittask'] != undefined)
+        {
+            $('#edittask' + get['edittask']).click();
+        }
+    }
+    
+    function parseGET() 
+    {
+      var tmp = new Array();
+      var tmp2 = new Array();
+      var get = new Array();
+      var url = location.search;
+
+      if(url != '') {
+
+        tmp = (url.substr(1)).split('&');
+
+        for(var i=0; i < tmp.length; i++) {
+          tmp2 = tmp[i].split('=');
+          get[tmp2[0]] = tmp2[1];
+        }
+      }
+        return get;
+    }
 
 
 </script>
