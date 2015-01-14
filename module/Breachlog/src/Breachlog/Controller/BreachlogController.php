@@ -167,14 +167,18 @@ class BreachlogController extends AbstractActionController
             $bl = new Breachlog();
             $post = $request->getPost();
 
-            $ymd1 = \DateTime::createFromFormat('m/d/Y', $post['bl_date_of_occurrence']);
-            if (is_object($ymd1)) {
-                $ymd1 = $ymd1->format('Y-m-d');
-            } else {
-                $ymd1 = '';
+            $ymds['bl_date_of_occurrence'] = \DateTime::createFromFormat('m/d/Y', $post['bl_date_of_occurrence']);
+            $ymds['bl_date_invest_start'] = \DateTime::createFromFormat('m/d/Y', $post['bl_date_invest_start']);
+            $ymds['bl_date_invest_complete'] = \DateTime::createFromFormat('m/d/Y', $post['bl_date_invest_complete']);
+            
+            foreach($ymds as $ymdKey => $ymd) {
+                if (is_object($ymd)) {
+                    $post[$ymdKey] = $ymd->format('Y-m-d');
+                } else {
+                    $post[$ymdKey] = '';
+                }
             }
-            $post['bl_date_of_occurrence'] = $ymd1;
-
+            
             $form->setInputFilter($bl->getInputFilter($this->getServiceLocator(), $id));
             $form->setData($post);
 
@@ -183,7 +187,7 @@ class BreachlogController extends AbstractActionController
                     foreach ($post['questions'] as $questionId => $question) {
                         $questionsFormAnswers[$questionId] = $question;
                     }
-                    if (count($questionsFormAnswers) < 8) {
+                    if (count($questionsFormAnswers) < 9) {
                         $questionsErrors = true;
                     }
                 } else {
@@ -193,7 +197,7 @@ class BreachlogController extends AbstractActionController
 
             if ($form->isValid() && !$questionsErrors) {
                 $post['bl_consultant_u_id'] = $identity['u_id'];
-
+                if(isset($post['questions'][11]) && $post['questions'][11] == 2) $post['bl_date_of_occurrence'] = '';
                 $bl->exchangeArray($post);
                 $this->getBreachlogTable()->setServiceLocator($this->getServiceLocator());
                 $blId = $this->getBreachlogTable()->saveBreachlog($bl);
@@ -214,10 +218,14 @@ class BreachlogController extends AbstractActionController
                     $brpId = $this->getBreachlogquestionTable()->setReportable($blId);
                     if ($brpId) {
                         return $this->redirect()->toRoute('breachremediationplan', array('controller' => 'breachremediationplan', 'action' => 'edit', 'id' => $brpId));
+                    } else {
+                        if(isset($post['questions'][11]) && $post['questions'][11] == 2) {
+                            $this->flashMessenger()->addSuccessMessage('A breach has occurred, but is not reportable, under the Safe Harbor Exemption for encrypted data');
+                        } else {
+                            $this->flashMessenger()->addSuccessMessage('A reportable breach has not occurred, no additional reporting is necessary');
+                        }
                     }
                 }
-
-                $this->flashMessenger()->addSuccessMessage('Breach log saved');
 
                 return $this->redirect()->toRoute('breachlog', array('controller' => 'breachlog', 'action' => 'list'));
             } else {
@@ -235,6 +243,8 @@ class BreachlogController extends AbstractActionController
 
             if ((int) $id) {
                 $blObj->bl_date_of_occurrence = ($blObj->bl_date_of_occurrence != '0000-00-00 00:00:00') ? substr($blObj->bl_date_of_occurrence, 0, 10) : '';
+                $blObj->bl_date_invest_start = ($blObj->bl_date_invest_start != '0000-00-00 00:00:00') ? substr($blObj->bl_date_invest_start, 0, 10) : '';
+                $blObj->bl_date_invest_complete = ($blObj->bl_date_invest_complete != '0000-00-00 00:00:00') ? substr($blObj->bl_date_invest_complete, 0, 10) : '';
                 $form->bind($blObj);
             }
         }

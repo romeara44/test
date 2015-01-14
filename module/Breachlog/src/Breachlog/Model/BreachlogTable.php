@@ -155,9 +155,14 @@ class BreachlogTable implements ServiceLocatorAwareInterface
         $data = array(
             'bl_c_id' => $bl->bl_c_id,
             'bl_name' => $bl->bl_name,
+            'bl_invest_led_by' => $bl->bl_invest_led_by,
             'bl_date_of_occurrence' => $bl->bl_date_of_occurrence,
+            'bl_date_invest_start' => $bl->bl_date_invest_start,
+            'bl_date_invest_complete' => $bl->bl_date_invest_complete,
             'bl_size' => $bl->bl_size,
             'bl_description' => $bl->bl_description,
+            'bl_initials_approver' => $bl->bl_initials_approver,
+            'bl_initials' => $bl->bl_initials,
             'bl_reportable' => $bl->bl_reportable
         );
 

@@ -51,6 +51,15 @@ $form->setAttribute('method', 'post');
             echo $this->formElementErrors($fn);
             ?>
         </p>
+        
+        <p>
+            <?php
+            $fn = $form->get('bl_invest_led_by');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
 
         <p>
             <?php
@@ -63,12 +72,36 @@ $form->setAttribute('method', 'post');
             echo $this->formElementErrors($fn);
             ?>
         </p>
+        
+        <p>
+            <?php
+            $fn = $form->get('bl_date_invest_start');
+            if ($this->blObj):
+                $fn->setValue($this->formatDateA($this->blObj->bl_date_invest_start, false, true));
+            endif;
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'bl_date_invest_start')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+        
+        <p>
+            <?php
+            $fn = $form->get('bl_date_invest_complete');
+            if ($this->blObj):
+                $fn->setValue($this->formatDateA($this->blObj->bl_date_invest_complete, false, true));
+            endif;
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'bl_date_invest_complete')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
 
         <p>
             <?php
             $fn = $form->get('bl_size');
             echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id'=>'bl_size')));
             echo $this->formElementErrors($fn);
             ?>
         </p>
@@ -116,7 +149,44 @@ $form->setAttribute('method', 'post');
                 <input <?php echo $checked ?> <?php echo $disabled ?> type="radio" name="questions[<?php echo $question->blq_id ?>]" id="q<?php echo $question->blq_id ?>1" value="1" class="radio" style="margin-top: 10px; margin-bottom: 20px;" /> <label for="q<?php echo $question->blq_id ?>1" class="checkbox fleft" style="margin-top: 10px; margin-bottom: 20px;"><?php echo $qLabel ?> &nbsp; &nbsp; &nbsp; </label>
             </p>
         <?php endforeach; ?>
+        
+        <div class="cboth"></div>
 
+        <p style="border: 0;"><strong>Reviewed and approved by</strong></p>
+        <?php if (!$this->blId): ?>
+            <p style="border: 0;">
+                <?php
+                    $fn = $form->get('bl_initials_approver');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id'=>'bl_initials_approver')));
+                    echo $this->formElementErrors($fn);
+                ?>
+            </p>
+        <?php else: ?>
+            <p style="border: 0;">
+                <label>Initials: <?php echo $this->blObj->bl_initials_approver ?></label>
+            </p>
+        <?php endif; ?>
+
+        <div class="cboth"></div>
+
+        <p><strong>Agreed to and accepted by</strong></p>
+        <?php if (!$this->blId): ?>
+            <p style="border: 0;">
+                <?php
+                    $fn = $form->get('bl_initials');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id'=>'bl_initials')));
+                    echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            </p>
+        <?php else: ?>
+            <p style="border: 0;">
+                <label>Initials: <?php echo $this->blObj->bl_initials ?></label>
+            </p>
+        <?php endif; ?>
+        
         <div class="cboth"></div>
         <div class="form-buttons">
             <input type="submit" value="Save" class="form-button" />
@@ -135,7 +205,7 @@ $form->setAttribute('method', 'post');
         $('#breachlog').validate();
         $('input[name="u_zip"]').mask("99999");
         //$('input[name="bl_size"]').mask("99999");
-        jQuery("#bl_date_of_occurrence").mask("99/99/9999");
+        jQuery("#bl_date_of_occurrence, #bl_date_invest_start, #bl_date_invest_complete").mask("99/99/9999");
 
         $('#q22, #q21').change(function() {
             var isChecked = $('#q22').attr('checked');
@@ -147,5 +217,12 @@ $form->setAttribute('method', 'post');
         });
 
         $('#q22, #q21').change();
+        $('#bl_size').change(function(){ console.log(1);
+            if(parseFloat($('#bl_size').val()) >= 500) {
+                $('#q102').attr('checked', 'checked');
+            } else {
+                $('#q101').attr('checked', 'checked');
+            }
+        });
     });
 </script>

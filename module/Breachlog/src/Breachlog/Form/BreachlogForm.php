@@ -41,6 +41,16 @@ class BreachlogForm extends Form
                 'label' => 'Breach Name',
             )
         ));
+        
+        $this->add(array(
+            'name' => 'bl_invest_led_by',
+            'attributes' => array(
+                'type'  => 'text',
+            ),
+            'options' => array(
+                'label' => 'Investigation Led By',
+            )
+        ));
 
         $this->add(array(
             'name' => 'bl_date_of_occurrence',
@@ -49,6 +59,26 @@ class BreachlogForm extends Form
             ),
             'options' => array(
                 'label' => 'Date of Occurrence',
+            )
+        ));
+        
+        $this->add(array(
+            'name' => 'bl_date_invest_start',
+            'attributes' => array(
+                'type'  => 'text',
+            ),
+            'options' => array(
+                'label' => 'Date Investigation Started',
+            )
+        ));
+        
+        $this->add(array(
+            'name' => 'bl_date_invest_complete',
+            'attributes' => array(
+                'type'  => 'text',
+            ),
+            'options' => array(
+                'label' => 'Date Investigation Complete',
             )
         ));
 
@@ -69,6 +99,26 @@ class BreachlogForm extends Form
             ),
             'options' => array(
                 'label' => 'Description of the Breach Event',
+            )
+        ));
+        
+        $this->add(array(
+            'name' => 'bl_initials_approver',
+            'attributes' => array(
+                'type'  => 'text',
+            ),
+            'options' => array(
+                'label' => 'Initials',
+            )
+        ));
+        
+        $this->add(array(
+            'name' => 'bl_initials',
+            'attributes' => array(
+                'type'  => 'text',
+            ),
+            'options' => array(
+                'label' => 'Initials',
             )
         ));
 

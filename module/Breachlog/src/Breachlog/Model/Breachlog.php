@@ -22,6 +22,11 @@ class Breachlog
     public $bl_create_date;
     public $bl_update_date;
     public $_client_name;
+    public $bl_invest_led_by;
+    public $bl_date_invest_start;
+    public $bl_date_invest_complete;
+    public $bl_initials_approver;
+    public $bl_initials;
 
     protected $inputFilter;
 
@@ -41,6 +46,11 @@ class Breachlog
         $this->bl_create_date     = (isset($data['bl_create_date'])) ? $data['bl_create_date'] : null;
         $this->bl_update_date     = (isset($data['bl_update_date'])) ? $data['bl_update_date'] : null;
         $this->_client_name     = (isset($data['_client_name'])) ? $data['_client_name'] : null;
+        $this->bl_invest_led_by     = (isset($data['bl_invest_led_by'])) ? $data['bl_invest_led_by'] : null;
+        $this->bl_date_invest_start     = (isset($data['bl_date_invest_start'])) ? $data['bl_date_invest_start'] : null;
+        $this->bl_date_invest_complete     = (isset($data['bl_date_invest_complete'])) ? $data['bl_date_invest_complete'] : null;
+        $this->bl_initials_approver     = (isset($data['bl_initials_approver'])) ? $data['bl_initials_approver'] : null;
+        $this->bl_initials     = (isset($data['bl_initials'])) ? $data['bl_initials'] : null;
     }
 
     public function getArrayCopy()
@@ -96,6 +106,82 @@ class Breachlog
                             'encoding' => 'UTF-8',
                             'min'      => 1,
                             'max'      => 100,
+                        ),
+                    ),
+                ),
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'bl_date_invest_start',
+                'required' => true,
+                'filters'  => array(
+                    array('name' => 'StripTags'),
+                    array('name' => 'StringTrim'),
+                ),
+                'validators' => array(
+                    array(
+                        'name'    => 'StringLength',
+                        'options' => array(
+                            'encoding' => 'UTF-8',
+                            'min'      => 1,
+                            'max'      => 100,
+                        ),
+                    ),
+                ),
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'bl_date_invest_complete',
+                'required' => true,
+                'filters'  => array(
+                    array('name' => 'StripTags'),
+                    array('name' => 'StringTrim'),
+                ),
+                'validators' => array(
+                    array(
+                        'name'    => 'StringLength',
+                        'options' => array(
+                            'encoding' => 'UTF-8',
+                            'min'      => 1,
+                            'max'      => 100,
+                        ),
+                    ),
+                ),
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'bl_initials_approver',
+                'required' => true,
+                'filters'  => array(
+                    array('name' => 'StripTags'),
+                    array('name' => 'StringTrim'),
+                ),
+                'validators' => array(
+                    array(
+                        'name'    => 'StringLength',
+                        'options' => array(
+                            'encoding' => 'UTF-8',
+                            'min'      => 1,
+                            'max'      => 255,
+                        ),
+                    ),
+                ),
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'bl_initials',
+                'required' => true,
+                'filters'  => array(
+                    array('name' => 'StripTags'),
+                    array('name' => 'StringTrim'),
+                ),
+                'validators' => array(
+                    array(
+                        'name'    => 'StringLength',
+                        'options' => array(
+                            'encoding' => 'UTF-8',
+                            'min'      => 1,
+                            'max'      => 255,
                         ),
                     ),
                 ),

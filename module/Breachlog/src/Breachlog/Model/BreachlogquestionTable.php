@@ -72,7 +72,7 @@ class BreachlogquestionTable implements ServiceLocatorAwareInterface
             $questionsAnwers[$question->blq_id] = $question->_bla_value;
         }
 
-        if (($questionsAnwers[1] == 2) && ($questionsAnwers[2] == 2) && ($questionsAnwers[3] == 2) && ($questionsAnwers[4] == 2) && ($questionsAnwers[5] == 1) && ($questionsAnwers[6] == 1) && ($questionsAnwers[7] == 2) && ($questionsAnwers[8] == 1)) {
+        if (($questionsAnwers[1] == 2) && ($questionsAnwers[2] == 2) && (empty($questionsAnwers[3]) || $questionsAnwers[3] == 2) && ($questionsAnwers[4] == 2) && ($questionsAnwers[5] == 1) && ($questionsAnwers[6] == 1) && ($questionsAnwers[7] == 2) && ($questionsAnwers[8] == 1) && ($questionsAnwers[11] == 1)) {
             $blDb = $this->getServiceLocator()->get('Breachlog\Model\BreachlogTable');
             $bl = $blDb->getBreachlog($blId);
             $bl->bl_reportable = 1;
