@@ -217,7 +217,8 @@ $form->setAttribute('method', 'post');
         });
 
         $('#q22, #q21').change();
-        $('#bl_size').change(function(){ console.log(1);
+        $('#bl_size').change(function(){
+            if($('#q102').is(':disabled')) return;
             if(parseFloat($('#bl_size').val()) >= 500) {
                 $('#q102').attr('checked', 'checked');
             } else {
