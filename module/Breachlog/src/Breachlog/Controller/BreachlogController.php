@@ -219,6 +219,9 @@ class BreachlogController extends AbstractActionController
                     if ($brpId) {
                         return $this->redirect()->toRoute('breachremediationplan', array('controller' => 'breachremediationplan', 'action' => 'edit', 'id' => $brpId));
                     } else {
+                        $bl->bl_id = $blId;
+                        $bl->bl_date_of_occurrence = '';
+                        $this->getBreachlogTable()->saveBreachlog($bl);
                         if(isset($post['questions'][11]) && $post['questions'][11] == 2) {
                             $this->flashMessenger()->addSuccessMessage('A breach has occurred, but is not reportable, under the Safe Harbor Exemption for encrypted data');
                         } else {
