@@ -319,13 +319,13 @@ class RemediationplanController extends AbstractActionController
             $domLibPath = $domLibPath . "/dompdf/dompdf_config.inc.php";
             require_once $domLibPath;
 
-            $renderer = new PhpRenderer();
+            $renderer = $this->getServiceLocator()->get('Zend\View\Renderer\RendererInterface');
 
-            $map = new Resolver\TemplateMapResolver(array(
-                'remediationplan/pdftemplate' => $_SERVER['DOCUMENT_ROOT'] . '/../module/Assessment/view/assessment/remediationplan/edit.phtml',
-            ));
+            // $map = new Resolver\TemplateMapResolver(array(
+                // 'remediationplan/pdftemplate' => $_SERVER['DOCUMENT_ROOT'] . '/../module/Assessment/view/assessment/remediationplan/edit.phtml',
+            // ));
 
-            $renderer->setResolver($map);
+            // $renderer->setResolver($map);
 
             $model = new ViewModel(array(
                 'id' => $id,
