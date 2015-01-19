@@ -42,26 +42,15 @@
 </div>
 <div class="col5"  style="float: left;">
     <p>
-        <strong>APPROVED BY:</strong><br />
-        <?php if ($this->isPdf): ?>
-            <?php echo $this->rpObj->_approver_name ?>
-        <?php else: ?>
-            <?php if ($this->writable): ?>
-                <span id="toggle-edit-show-4">
-                    <?php echo $this->rpObj->_approver_name ?> &nbsp;<a href="" title="Edit"><i class="fa fa-pencil"></i></a>
-                </span>
-                <span id="toggle-edit-4">
-                    <select id="rp_approver_u_id" id="" class="w175">
-                        <option value="">Please Select</option>
-                        <option value="">---</option>
-                        <?php foreach ($this->contactsApr as $uId => $contact): ?>
-                            <option <?php echo ($uId == $this->rpObj->rp_approver_u_id) ? ' SELECTED ' : '' ?> value="<?php echo $uId ?>"><?php echo $contact ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </span>
+        <?php if ($this->writable): ?>
+            <?php if ($this->rpObj->rp_parent_rp_id): ?>
+                <strong>Work Plan in Process</strong>
             <?php else: ?>
-                <?php echo $this->rpObj->_approver_name ?>
+                <strong>Awaiting Approval</strong>
             <?php endif; ?>
+        <?php else: ?>
+            <strong>APPROVED BY:</strong><br />
+            <?php echo $this->rpObj->_approver_name ?>
         <?php endif; ?>
     </p>
 </div>
@@ -262,7 +251,6 @@
 
 <form action="/remediationplan/edit/<?php echo $this->id ?>" name="" style="width: 600px;" id="formNote" method="POST" enctype="multipart/form-data" class="col2" >
     <input id="rp_performed_u_id_hidden" name="rp_performed_u_id" type="hidden" value="<?php echo $this->rpObj->rp_performed_u_id ?>" />
-    <input id="rp_approver_u_id_hidden" name="rp_approver_u_id" type="hidden" value="<?php echo $this->rpObj->rp_approver_u_id ?>" />
     <input id="rp_incident_date_hidden" name="rp_incident_date" type="hidden" value="<?php echo ($this->rpObj->rp_incident_date != '0000-00-00') ? $this->rpObj->_rp_incident_date_formatted : '' ?>" />
     <input id="rp_remediation_date_hidden" name="rp_remediation_date" type="hidden" value="<?php echo ($this->rpObj->rp_remediation_date != '0000-00-00') ? $this->rpObj->_rp_remediation_date_formatted : '' ?>" />
 
@@ -336,43 +324,75 @@
 
     <div class="cboth"></div>
 
-    <p style="border: 0;"><strong>Reviewed and approved by <?php echo $this->rpObj->_approver_name ?><!-- on March 10th, 2014 --></strong></p>
     <?php if ($this->writable): ?>
+        <p style="border: 0;"><label style="width:195px"><strong>Reviewed and approved by </strong></label>
+            <select name="rp_approver_u_id" id="rp_approver_u_id" id="" class="w175 valid_input form-control required">
+                <option value="">Please Select</option>
+                <option value="">---</option>
+                <?php $this->approverAccepter->buffer() ?>
+                <?php foreach ($this->approverAccepter as $contact): ?>
+                    <option <?php echo ($contact->_u_id == $this->rpObj->rp_approver_u_id) ? ' SELECTED ' : '' ?> value="<?php echo $contact->_u_id ?>"><?php echo $contact->_u_name ?></option>
+                <?php endforeach; ?>
+            </select>
+        </p>
         <p style="border: 0;">
             <label>Initials</label>
-            <input type="text" name="rp_initials_approver" id="rp_initials_approver" value="<?php echo $this->rpObj->rp_initials_approver ?>" />
-            <ul style="display: none" id="rp_initials_approver_val"><li>Value is required and can't be empty</li></ul>
+            <input type="text" name="rp_initials_approver" class="valid_input form-control required" id="rp_initials_approver" value="<?php echo $this->rpObj->rp_initials_approver ?>" />
+        </p>
+        <p style="border: 0;">
+            <label>Date: </label>
+            <input type="text" name="rp_approved_date" class="valid_input form-control required" id="rp_approved_date" value="<?php $this->rpObj->approved_date?>">
         </p>
     <?php else: ?>
+        <p style="border: 0;"><strong>Reviewed and approved by <?php echo $this->rpObj->_approver_name?></strong></p>
         <p style="border: 0;">
             <label>Initials: <?php echo $this->rpObj->rp_initials_approver ?></label>
+        </p>
+        <p style="border: 0;">
+            <label>Date: <?php echo $this->rpObj->rp_approved_date != '0000-00-00' ? $this->rpObj->rp_approved_date : ''?></label>
         </p>
     <?php endif; ?>
 
     <div class="cboth"></div>
 
-    <p style="border: 0;"><strong>Agreed to and accepted by <?php echo $this->rpObj->_client_name ?><!-- on March 10th, 2014 --></strong></p>
     <?php if ($this->writable): ?>
+        <p style="border: 0;"><label style="width:195px"><strong>Agreed to and accepted by</strong></label>
+            <select name="rp_accepter_u_id" id="rp_accepter_u_id" id="" class="w175 valid_input form-control required">
+                <option value="">Please Select</option>
+                <option value="">---</option>
+                <?php foreach ($this->approverAccepter as $contact): ?>
+                    <option <?php echo ($contact->_u_id == $this->rpObj->rp_accepter_u_id) ? ' SELECTED ' : '' ?> value="<?php echo $contact->_u_id ?>"><?php echo $contact->_u_name ?></option>
+                <?php endforeach; ?>
+            </select>
+        </p>
         <p style="border: 0;">
             <label>Initials</label>
-            <input type="text" name="rp_initials" id="" value="<?php echo $this->rpObj->rp_initials ?>" />
+            <input type="text" name="rp_initials" id="" class="valid_input form-control required" value="<?php echo $this->rpObj->rp_initials ?>" />
         </p>
+        <p style="border: 0;">
+            <label>Date: </label>
+            <input type="text" name="rp_accepted_date" class="valid_input form-control required" id="rp_accepted_date" value="<?php $this->rpObj->rp_accepted_date?>">
         </p>
     <?php else: ?>
+        <p style="border: 0;"><strong>Agreed to and accepted by <?php echo $this->rpObj->_accepter_name?></strong></p>
         <p style="border: 0;">
             <label>Initials: <?php echo $this->rpObj->rp_initials ?></label>
         </p>
+        <p style="border: 0;">
+            <label>Date: <?php echo $this->rpObj->rp_accepted_date != '0000-00-00' ? $this->rpObj->rp_accepted_date : '' ?></label>
+        </p>
+
     <?php endif; ?>
 
     <div class="cboth"></div>
 
     <div class="form-buttons">
         <?php if ($this->writable && !$this->isPdf): ?>
-            <input type="submit" value="Save" class="form-button" />
+            <input type="submit" id="save_button" value="Save" class="form-button" />
             <?php if ($rpObj->rp_approver_u_id): ?>
-                <input type="button" onclick="$('#requestreview').val(1); $('#formNote').submit()" value="Request Review" class="form-button" />
+                <input type="button" id="requestreview_button" value="Request Review" class="form-button" />
             <?php endif; ?>
-            <input type="button" onclick="if ($('#rp_initials_approver').val() == '') $('#rp_initials_approver_val').show(); else {  $('#signedoff').val(1); $('#formNote').submit() }" value="Sign-off and Close" class="form-button" />
+            <input type="button" id="signedoff_button" value="Sign-off and Close" class="form-button" />
             <div class="fleft">or</div>
             <a href="/remediationplan/list" class="cancel">Cancel</a>
         <?php else: ?>
@@ -457,10 +477,6 @@
             $('#rp_performed_u_id_hidden').val($(this).val());
         });
 
-        $('#rp_approver_u_id').change(function() {
-            $('#rp_approver_u_id_hidden').val($(this).val());
-        });
-
         $('#rp_incident_date').change(function() {
             $('#rp_incident_date_hidden').val($(this).val());
         });
@@ -489,7 +505,36 @@
             }
             
         });
+        
+        $('#save_button').click(function() {
+            $('#signedoff, #requestreview').val('');
+            $('.valid_input').removeClass('required');
+            $('#formNote').submit();
+        });
+        
+        $('#requestreview_button').click(function() {
+            $('#signedoff').val('');
+            $('#requestreview').val(1);
+            $('.valid_input').removeClass('required');
+            $('#formNote').submit();
+        });
+        
+        $('#signedoff_button').click(function() {
+            $('#requestreview').val('');
+            $('#signedoff').val(1);
+            $('.valid_input').addClass('required');
+            $('#formNote').submit();
+        });
+        
+        $('#formNote').submit(function() {
+            
+            var isValid = $('#formNote').valid();
 
+            if (isValid) {
+                return true;
+            }
+            return false;
+        });
     });
 
 </script>
@@ -498,6 +543,8 @@
     jQuery(function(){
         jQuery("#rp_incident_date").mask("99/99/9999");
         jQuery("#rp_remediation_date").mask("99/99/9999");
+        jQuery("#rp_approved_date").mask("99/99/9999");
+        jQuery("#rp_accepted_date").mask("99/99/9999");
 
         jQuery("#toggle-edit-1").hide();
         jQuery("#toggle-edit-show-1").toggle(function() {

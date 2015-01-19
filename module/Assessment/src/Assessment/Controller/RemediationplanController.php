@@ -189,7 +189,30 @@ class RemediationplanController extends AbstractActionController
 
                 $this->getRemediationplanTable()->setFieldValue($id, 'rp_performed_u_id', $post['rp_performed_u_id']);
                 $this->getRemediationplanTable()->setFieldValue($id, 'rp_approver_u_id', $post['rp_approver_u_id']);
+                $this->getRemediationplanTable()->setFieldValue($id, 'rp_accepter_u_id', $post['rp_accepter_u_id']);
 
+                $ymd1 = \DateTime::createFromFormat('m/d/Y', $post['rp_approved_date']);
+                if (is_object($ymd1)) {
+                    if ($ymd1->format('Y') > date("Y")) {
+                        $ymd1->setDate('2014', $ymd1->format('m'), $ymd1->format('d'));
+                    }
+                    $ymd1 = $ymd1->format('Y-m-d');
+                } else {
+                    $ymd1 = '';
+                }
+                $this->getRemediationplanTable()->setFieldValue($id, 'rp_approved_date', $ymd1);
+
+                $ymd2 = \DateTime::createFromFormat('m/d/Y', $post['rp_accepted_date']);
+                if (is_object($ymd2)) {
+                    if ($ymd2->format('Y') > date("Y")) {
+                        $ymd2->setDate('2014', $ymd2->format('m'), $ymd2->format('d'));
+                    }
+                    $ymd2 = $ymd2->format('Y-m-d');
+                } else {
+                    $ymd2 = '';
+                }
+                $this->getRemediationplanTable()->setFieldValue($id, 'rp_accepted_date', $ymd2);
+                
                 $ymd1 = \DateTime::createFromFormat('m/d/Y', $post['rp_incident_date']);
                 if (is_object($ymd1)) {
                     if ($ymd1->format('Y') > date("Y")) {
@@ -307,6 +330,7 @@ class RemediationplanController extends AbstractActionController
             'isAdmin' => $identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN ? true : false,
             'contacts' => $contacts,
             'contactsApr' => $contactsApr,
+            'approverAccepter' => $this->getRemediationplanTable()->getApproverAccepter($rpObj->rp_id),
             'order_by' => $orderBy,
             'order' => $order,
             'urlOrder' => $order == 'ASC' ? 'DESC' : 'ASC',

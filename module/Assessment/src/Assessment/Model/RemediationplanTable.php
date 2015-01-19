@@ -159,6 +159,7 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
         $select->join(array('u' => 'users'), 'rp_approver_u_id = u_id', array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)'), '_rp_incident_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(rp_incident_date, "%m/%d/%Y")'), '_rp_remediation_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(rp_remediation_date, "%m/%d/%Y")')), 'left');
         $select->join(array('u2' => 'users'), 'rp_consultant_u_id = u2.u_id', array('_consultant_name' => new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)')), 'left');
         $select->join(array('u3' => 'users'), 'rp_performed_u_id = u3.u_id', array('_performed_name' => new \Zend\Db\Sql\Expression('CONCAT(u3.u_firstname, " ", u3.u_lastname)')), 'left');
+        $select->join(array('u4' => 'users'), 'rp_accepter_u_id = u4.u_id', array('_accepter_name' => new \Zend\Db\Sql\Expression('CONCAT(u4.u_firstname, " ", u4.u_lastname)')), 'left');
 
         $resultSet = $this->tableGateway->selectWith($select);
 
@@ -206,6 +207,9 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
             'rp_incident_date' => $rp->rp_incident_date,
             'rp_status' => $rp->rp_status,
             'rp_is_version' => $rp->rp_is_version,
+            'rp_approved_date' => $rp->rp_approved_date,
+            'rp_accepted_date' => $rp->rp_accepted_date,
+            'rp_accepter_u_id' => $rp->rp_accepter_u_id,
         );
 
         if ($rp->rp_security_rp_id) {
@@ -419,7 +423,19 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
         $rp->rp_id = 0;
         $rp->rp_parent_rp_id = $id;
         $rp->rp_status = \Assessment\Model\Remediationplan::STATUS_NEW;
-
+        if($signedOffCopy) {
+            $ymd3 = \DateTime::createFromFormat('m/d/Y', date('m/d/Y'));
+            if (is_object($ymd3)) {
+                if ($ymd3->format('Y') > date("Y")) {
+                    $ymd3->setDate('2014', $ymd3->format('m'), $ymd3->format('d'));
+                }
+                $ymd3 = $ymd3->format('Y-m-d');
+            } else {
+                $ymd3 = '';
+            }
+            $rp->rp_remediation_date = $ymd3;
+        }
+        
         $newId = $this->saveRemediationplan($rp);
 
         // copy notes with files
@@ -477,6 +493,22 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
         }
 
         return $newId;
+    }
+
+    public function getApproverAccepter($id)
+    {
+        $id  = (int) $id;
+        
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('rp_id = ' . $id);
+        $select->join(array('arlc' => 'assessments_roles_locations_contacts'), 'arlc.arlc_a_id = rp_a_id', array(), 'inner');
+        $select->join(array('ar' => 'assessments_roles'), 'arlc.arlc_ar_id = ar.ar_id', array(), 'inner');
+        $select->join(array('u1' => 'users'), 'arlc.arlc_u_id = u1.u_id', array('_u_id' => 'u_id', '_u_name' => new \Zend\Db\Sql\Expression('CONCAT(u1.u_firstname, " ", u1.u_lastname)')), 'inner');
+        $select->where('ar.ar_id IN(8,9,10)');
+        
+        $resultSet = $this->tableGateway->selectWith($select);
+        
+        return $resultSet;
     }
 
 }
