@@ -163,7 +163,9 @@ class BreachlogTable implements ServiceLocatorAwareInterface
             'bl_description' => $bl->bl_description,
             'bl_initials_approver' => $bl->bl_initials_approver,
             'bl_initials' => $bl->bl_initials,
-            'bl_reportable' => $bl->bl_reportable
+            'bl_reportable' => $bl->bl_reportable,
+            'bl_approver_u_id' => $bl->bl_approver_u_id,
+            'bl_accepter_u_id' => $bl->bl_accepter_u_id
         );
 
         $id = (int) $bl->bl_id;

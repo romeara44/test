@@ -57,6 +57,9 @@ return array(
             'breachlog' => __DIR__ . '/../view',
             'breachremediationplan' => __DIR__ . '/../view',
         ),
+        'strategies' => array (
+            'ViewJsonStrategy'
+        )
     ),
 
 );

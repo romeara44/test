@@ -123,6 +123,22 @@ class BreachlogForm extends Form
         ));
 
         $this->add(array(
+            'name' => 'bl_approver_u_id',
+            'type' => 'Zend\Form\Element\Select',
+            'options' => array(
+                'label' => 'Reviewed and approved by',
+            )
+        ));
+        
+        $this->add(array(
+            'name' => 'bl_accepter_u_id',
+            'type' => 'Zend\Form\Element\Select',
+            'options' => array(
+                'label' => 'Agreed to and accepted by',
+            )
+        ));
+        
+        $this->add(array(
             'name' => 'submit',
             'attributes' => array(
                 'type'  => 'submit',

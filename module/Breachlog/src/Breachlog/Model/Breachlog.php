@@ -27,6 +27,8 @@ class Breachlog
     public $bl_date_invest_complete;
     public $bl_initials_approver;
     public $bl_initials;
+    public $bl_approver_u_id;
+    public $bl_accepter_u_id;
 
     protected $inputFilter;
 
@@ -51,6 +53,8 @@ class Breachlog
         $this->bl_date_invest_complete     = (isset($data['bl_date_invest_complete'])) ? $data['bl_date_invest_complete'] : null;
         $this->bl_initials_approver     = (isset($data['bl_initials_approver'])) ? $data['bl_initials_approver'] : null;
         $this->bl_initials     = (isset($data['bl_initials'])) ? $data['bl_initials'] : null;
+        $this->bl_approver_u_id     = (isset($data['bl_approver_u_id'])) ? $data['bl_approver_u_id'] : null;
+        $this->bl_accepter_u_id     = (isset($data['bl_accepter_u_id'])) ? $data['bl_accepter_u_id'] : null;
     }
 
     public function getArrayCopy()
@@ -185,6 +189,22 @@ class Breachlog
                         ),
                     ),
                 ),
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'bl_approver_u_id',
+                'required' => false,
+                'filters'  => array(
+                    array('name' => 'Int'),
+                )
+            )));
+            
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'bl_accepter_u_id',
+                'required' => false,
+                'filters'  => array(
+                    array('name' => 'Int'),
+                )
             )));
 
 

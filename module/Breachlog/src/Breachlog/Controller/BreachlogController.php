@@ -18,6 +18,7 @@ use Breachlog\Model\Breachlog;
 use Breachlog\Model\Breachloganswer;
 use Mail\Model\Mailtemplate;
 use Zend\Session\Container;
+use Zend\View\Model\JsonModel;
 
 class BreachlogController extends AbstractActionController
 {
@@ -154,9 +155,16 @@ class BreachlogController extends AbstractActionController
         $form = new BreachlogForm($this->getServiceLocator());
         $blObj = null;
         $userObj = null;
-
+        $companyUsers[''] = 'Please Select';
+        
         if ((int) $id) {
             $blObj = $this->getBreachlogTable()->getBreachlog($id);
+            $companyUsersObj = $this->getUserTable()->getUsersByCompany($blObj->bl_c_id);
+            if($companyUsersObj) {
+                foreach($companyUsersObj as $companyUserObj) {
+                    $companyUsers[$companyUserObj->u_id] = $companyUserObj->u_firstname . ' ' . $companyUserObj->u_lastname; 
+                }
+            }
         }
         $questionsErrors = false;
         $answers = array();
@@ -258,6 +266,7 @@ class BreachlogController extends AbstractActionController
             'form' => $form,
             'blId' => $id,
             'blObj' => $blObj,
+            'companyUsers' => $companyUsers,
             'questions' => $questions,
             'questionsFormAnswers' => $questionsFormAnswers,
             'questionsErrors' => $questionsErrors
@@ -282,6 +291,16 @@ class BreachlogController extends AbstractActionController
         $this->flashMessenger()->addSuccessMessage('Breach log has been deleted');
 
         return $this->redirect()->toRoute('breachlog', array('controller' => 'breachlog', 'action' => 'list'));
+
+    }
+    
+    public function getCompanyUsersAction()
+    {
+        $cId = $this->params('id');
+
+        $users = $this->getUserTable()->getUsersByCompany($cId);
+        
+        return new JsonModel($users);
 
     }
 }
