@@ -341,7 +341,7 @@
         </p>
         <p style="border: 0;">
             <label>Date: </label>
-            <input type="text" name="rp_approved_date" class="valid_input form-control required" id="rp_approved_date" value="<?php $this->rpObj->approved_date?>">
+            <input type="text" name="rp_approved_date" class="valid_input form-control required" id="rp_approved_date" value="<?php echo $this->rpObj->rp_approved_date != '0000-00-00' ? $this->rpObj->rp_approved_date : date('m/d/Y')?>">
         </p>
     <?php else: ?>
         <p style="border: 0;"><strong>Reviewed and approved by <?php echo $this->rpObj->_approver_name?></strong></p>
@@ -371,7 +371,7 @@
         </p>
         <p style="border: 0;">
             <label>Date: </label>
-            <input type="text" name="rp_accepted_date" class="valid_input form-control required" id="rp_accepted_date" value="<?php $this->rpObj->rp_accepted_date?>">
+            <input type="text" name="rp_accepted_date" class="valid_input form-control required" id="rp_accepted_date" value="<?php echo $this->rpObj->rp_accepted_date != '0000-00-00' ? $this->rpObj->rp_accepted_date : date('m/d/Y')?>">
         </p>
     <?php else: ?>
         <p style="border: 0;"><strong>Agreed to and accepted by <?php echo $this->rpObj->_accepter_name?></strong></p>
