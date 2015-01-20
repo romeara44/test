@@ -19,6 +19,7 @@ class Note
     const NOTE_CONTACT = 9;
     const NOTE_RP = 10;
     const NOTE_RPA = 11;
+    const NOTE_BL = 12;
 
     public $note_id;
     public $note_text;

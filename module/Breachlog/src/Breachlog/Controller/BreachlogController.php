@@ -19,6 +19,8 @@ use Breachlog\Model\Breachloganswer;
 use Mail\Model\Mailtemplate;
 use Zend\Session\Container;
 use Zend\View\Model\JsonModel;
+use Note\Form\NoteForm;
+use Note\Model\Note;
 
 class BreachlogController extends AbstractActionController
 {
@@ -90,6 +92,15 @@ class BreachlogController extends AbstractActionController
         return $this->mailtemplateTable;
     }
 
+    public function getNoteTable()
+    {
+        if (!$this->noteTable) {
+            $sm = $this->getServiceLocator();
+            $this->noteTable = $sm->get('Note\Model\NoteTable');
+        }
+        return $this->noteTable;
+    }
+    
     public function getIdentity()
     {
         $authService = new \Zend\Authentication\AuthenticationService();
@@ -153,6 +164,9 @@ class BreachlogController extends AbstractActionController
         }
 
         $form = new BreachlogForm($this->getServiceLocator());
+        $formNote = new NoteForm($this->getServiceLocator());
+        
+        $notes = null;
         $blObj = null;
         $userObj = null;
         $companyUsers[''] = 'Please Select';
@@ -165,7 +179,9 @@ class BreachlogController extends AbstractActionController
                     $companyUsers[$companyUserObj->u_id] = $companyUserObj->u_firstname . ' ' . $companyUserObj->u_lastname; 
                 }
             }
+            $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_BL);
         }
+        
         $questionsErrors = false;
         $answers = array();
         $questionsFormAnswers = array();
@@ -175,7 +191,9 @@ class BreachlogController extends AbstractActionController
             $bl = new Breachlog();
             $post = $request->getPost();
 
-            $ymds['bl_date_of_occurrence'] = \DateTime::createFromFormat('m/d/Y', $post['bl_date_of_occurrence']);
+            if(!$blObj || $blObj->bl_reportable == 1) {
+                $ymds['bl_date_of_occurrence'] = \DateTime::createFromFormat('m/d/Y', $post['bl_date_of_occurrence']);
+            }
             $ymds['bl_date_invest_start'] = \DateTime::createFromFormat('m/d/Y', $post['bl_date_invest_start']);
             $ymds['bl_date_invest_complete'] = \DateTime::createFromFormat('m/d/Y', $post['bl_date_invest_complete']);
             
@@ -237,7 +255,28 @@ class BreachlogController extends AbstractActionController
                         }
                     }
                 }
-
+                
+                // save text note
+                if($post['note_text'])
+                {
+                    $note = new Note();
+                    $noteData['note_text'] = $post['note_text'];
+                    $noteData['note_item_type'] = \Note\Model\Note::NOTE_BL;
+                    $noteData['note_item_id'] = $blId;
+                    $note->exchangeArray($noteData);
+                    $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
+                    $noteId = $this->getNoteTable()->saveNote($note);
+                }
+                
+                // save files
+                $note = new Note();
+                $noteData['note_text'] = '';
+                $noteData['note_item_type'] = \Note\Model\Note::NOTE_BL;
+                $noteData['note_item_id'] = $blId;
+                $note->exchangeArray($noteData);
+                $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
+                $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
+                
                 return $this->redirect()->toRoute('breachlog', array('controller' => 'breachlog', 'action' => 'list'));
             } else {
                 foreach ($form->getMessages() as $messageId => $message) {
@@ -264,6 +303,8 @@ class BreachlogController extends AbstractActionController
 
         return array(
             'form' => $form,
+            'notes' => $notes,
+            'formNote' => $formNote,
             'blId' => $id,
             'blObj' => $blObj,
             'companyUsers' => $companyUsers,
