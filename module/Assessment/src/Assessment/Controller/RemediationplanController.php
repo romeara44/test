@@ -714,7 +714,7 @@ class RemediationplanController extends AbstractActionController
         $rpId = $this->params('rpId');
         $contactUId = $this->params('rpa_contact_u_id');
         $contactUId = $this->params('rpa_contact_u_id');
-        $addAttachments = $this->params('add_atts');
+        $attachmentsIds = $this->params('add_atts') ? explode(',', $this->params('add_atts')) : array();
         $uri = $this->getRequest()->getUri();
         $editTaskUrl = sprintf('%s://%s', $uri->getScheme(), $uri->getHost()) . $this->url()->fromRoute('remediationplan', array('action' => 'edit', 'id' => $rpId)) . '?edittask=' . $id;
         
@@ -746,28 +746,31 @@ class RemediationplanController extends AbstractActionController
         
         $notes = null;
         $files = array();
-        if ($id && $addAttachments) {
-            $notesDef = $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_RPA);
+        if ($id && !empty($attachmentsIds)) {
+            $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_RPA);
             if (is_object($notes) && ($notes->count())) {
                 $docRoot = $_SERVER['DOCUMENT_ROOT'];
+                $notes->buffer();
                 foreach($notes as $note) {
                     if ($note->_files != '') {
                         $_files = explode(',', $note->_files);
                         if($_files) {
                             foreach ($_files as $_file) {
                                 list($fName, $fId) = explode('::', $_file);
+                                
+                                if(!in_array($fId, $attachmentsIds)) continue;
+                                
                                 $filepath = $docRoot . '/data/notefiles/' . $note->note_id . '/' . $fId;
                                 if (!file_exists($filepath)) {
                                     $note_id = $this->getNotefilesTable()->getFileNoteByFId($fId);
                                     $filepath = $docRoot . '/data/notefiles/' . $note_id . '/' . $fId;
                                 }
-                                $files[$fId]['file_name'] = $fName;
-                                $files[$fId]['file_path'] = $filepath;
+                                $files[$note->note_id][$fId]['file_name'] = $fName;
+                                $files[$note->note_id][$fId]['file_path'] = $filepath;
                             }
                         }
                     }
                 }
-                $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_RPA);
             }
         }
         
@@ -778,7 +781,6 @@ class RemediationplanController extends AbstractActionController
             'title_label' => 'Assignee',
             'subject' => $subject,
             'addTo' => isset($assignee->u_email)&& ($assignee->u_email != '') ? $assignee->u_email : '',
-            'addAttachments' => $addAttachments,
             'notes' => $notes,
             'files' => $files
         ));
@@ -797,7 +799,7 @@ class RemediationplanController extends AbstractActionController
         $rpaObj = $this->getRemediationplanactionTable()->getRemediationplanaction($id);
         $rpObj = $this->getRemediationplanTable()->getRemediationplan($rpaObj->rpa_rp_id);
         $contact = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUser($rpObj->rp_consultant_u_id);
-        $addAttachments = $this->params('add_atts');
+        $attachmentsIds = $this->params('add_atts') ? explode(',', $this->params('add_atts')) : array();
         $uri = $this->getRequest()->getUri();
         $editTaskUrl = sprintf('%s://%s', $uri->getScheme(), $uri->getHost()) . $this->url()->fromRoute('remediationplan', array('action' => 'edit', 'id' => $rpId)) . '?edittask=' . $id;
 
@@ -823,28 +825,31 @@ class RemediationplanController extends AbstractActionController
         
         $notes = null;
         $files = array();
-        if ($id && $addAttachments) {
+        if ($id && !empty($attachmentsIds)) {
             $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_RPA);
              if (is_object($notes) && ($notes->count())) {
                 $docRoot = $_SERVER['DOCUMENT_ROOT'];
+                $notes->buffer();
                 foreach($notes as $note) {
                     if ($note->_files != '') {
                         $_files = explode(',', $note->_files);
                         if($_files) {
                             foreach ($_files as $_file) {
                                 list($fName, $fId) = explode('::', $_file);
+                                
+                                if(!in_array($fId, $attachmentsIds)) continue;
+
                                 $filepath = $docRoot . '/data/notefiles/' . $note->note_id . '/' . $fId;
                                 if (!file_exists($filepath)) {
                                     $note_id = $this->getNotefilesTable()->getFileNoteByFId($fId);
                                     $filepath = $docRoot . '/data/notefiles/' . $note_id . '/' . $fId;
                                 }
-                                $files[$fId]['file_name'] = $fName;
-                                $files[$fId]['file_path'] = $filepath;
+                                $files[$note->note_id][$fId]['file_name'] = $fName;
+                                $files[$note->note_id][$fId]['file_path'] = $filepath;
                             }
                         }
                     }
                 }
-                $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_RPA);
             }
         }
         
@@ -855,7 +860,6 @@ class RemediationplanController extends AbstractActionController
             'title_label' => 'Assignee',
             'subject' => $subject,
             'addTo' => isset($approver->u_email)&& ($approver->u_email != '') ? $approver->u_email : '',
-            'addAttachments' => $addAttachments,
             'notes' => $notes,
             'files' => $files
         ));

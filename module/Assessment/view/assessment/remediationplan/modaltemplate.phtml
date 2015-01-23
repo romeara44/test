@@ -187,7 +187,7 @@
                                     $_fileName = $_file[0];
                                     $_fileId = $_file[1];
                                     ?>
-                                    <span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+                                    <input type="checkbox" class="attachment_checkbox" value="<?php echo $_fileId?>"><span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
 
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -197,15 +197,6 @@
                 <div class="cboth"><br /></div>
 
             <?php endif; ?>
-            
-            <p>
-                <?php;
-                $fn = $formTask->get('rpa_add_attachments');
-                echo $this->formLabel($fn);
-                echo $this->formCheckbox($fn);
-                echo $this->formElementErrors($fn);
-                ?>
-            </p>
 
             <div class="cboth"></div>
             <div class="form-buttons">
@@ -251,16 +242,29 @@
 
         $('.emailClick1').click(function() {
             $.post("/remediationplan/savetask", { values: $('#formTask').serialize() }, function(data) {
-                window.location.href = '/remediationplan/remediationplanemail/<?php echo $this->id ?>/rpId/<?php echo $this->rpId ?>/add_atts/' + (+!!$('#rpa_add_attachments').is(':checked'));
+                window.location.href = '/remediationplan/remediationplanemail/<?php echo $this->id ?>/rpId/<?php echo $this->rpId ?>/add_atts/' + getAttsIds();
             });
         });
 
         $('.emailClick2').click(function() {
             $.post("/remediationplan/savetask", { values: $('#formTask').serialize() }, function(data) {
-                window.location.href = '/remediationplan/remediationplanapproveremail/<?php echo $this->id ?>/rpId/<?php echo $this->rpId ?>/add_atts/' + (+!!$('#rpa_add_attachments').is(':checked'));
+                window.location.href = '/remediationplan/remediationplanapproveremail/<?php echo $this->id ?>/rpId/<?php echo $this->rpId ?>/add_atts/' + getAttsIds();
             });
         });
         $( "#rpa_target_date" ).datepicker({dateFormat: 'mm/dd/yy'});
+        
+        function getAttsIds()
+        {
+            var attsId = '';
+            var attsIds = [];
+            
+            $('.attachment_checkbox:checked').each(function() {
+                attsId = parseInt($(this).val());
+                if(!isNaN(attsId)) attsIds.push(attsId);
+            })
+            
+            return attsIds.join(',');
+        }
     });
 
 </script>

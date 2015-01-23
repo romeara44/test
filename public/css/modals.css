@@ -408,7 +408,7 @@ form ul li {
 .i-excelx { display: block; width: 16px; height: 16px; background: transparent url(../images/i-excel.gif) left center no-repeat; }
 .i-zip { display: block; width: 16px; height: 16px; background: transparent url(../images/i-zip.gif) left center no-repeat; }
 
-#rpa_add_attachments {
+.attachment_checkbox {
     width: auto;
-    margin-top: 10px;
+    margin: 5px 5px 0 -25px;
 }

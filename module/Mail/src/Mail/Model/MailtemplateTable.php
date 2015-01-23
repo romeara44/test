@@ -168,7 +168,7 @@ class MailtemplateTable
 
         $body->addPart($html);
         
-        if($params['post']['addAttachments'] && $params['post']['attachments']) {
+        if($params['post']['attachments']) {
             foreach($params['post']['attachments'] as $attachment) {
                 $attachmentContent = fopen($attachment['file_path'], 'r');
                 $attach = new \Zend\Mime\Part($attachmentContent);

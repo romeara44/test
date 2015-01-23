@@ -47,7 +47,6 @@
             <input type="hidden" name="addto" value="<?php echo $this->addTo ?>" />
             <input type="hidden" name="passwordUId" value="<?php echo $this->passwordUId ?>" />
             <input type="hidden" name="passwordToSent" value="<?php echo $this->passwordToSent ?>" />
-            <input type="hidden" name="addAttachments" value="<?php echo $this->addAttachments ?>" />
             <p>
                 <label><?php echo $this->title_label ?></label>
                 <span class="fleft"><?php echo $this->header_title ?></span>
@@ -60,6 +59,7 @@
             <?php if (is_object($notes) && ($notes->count())): ?>
                 <strong>Attachments:</strong><br />
                 <?php foreach ($notes as $note): ?>
+                    <?php if(!array_key_exists($note->note_id, $files)) continue;?>
                     <div class="note">
                         <strong><?php echo $note->_username ?></strong> <small> on <?php echo $note->_note_create_date_format ?></small><br />
                         <p>
@@ -75,9 +75,10 @@
                                     $_file = explode('::', $_file);
                                     $_fileName = $_file[0];
                                     $_fileId = $_file[1];
+                                    if(!array_key_exists($_fileId, $files[$note->note_id])) continue;
                                     ?>
-                                    <input type="hidden" name="attachments[<?php echo $_fileId ?>][file_name]" value="<?php echo $files[$_fileId]['file_name']?>">
-                                    <input type="hidden" name="attachments[<?php echo $_fileId ?>][file_path]" value="<?php echo $files[$_fileId]['file_path']?>">
+                                    <input type="hidden" name="attachments[<?php echo $_fileId ?>][file_name]" value="<?php echo $files[$note->note_id][$_fileId]['file_name']?>">
+                                    <input type="hidden" name="attachments[<?php echo $_fileId ?>][file_path]" value="<?php echo $files[$note->note_id][$_fileId]['file_path']?>">
                                     <span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
 
                                 <?php endforeach; ?>

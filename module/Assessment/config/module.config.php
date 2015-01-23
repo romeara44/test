@@ -51,7 +51,7 @@ return array(
                         'roleFilter' => '[0-9]+',
                         'rpId' => '[0-9]+',
                         'type' => '[a-zA-Z][a-zA-Z0-9_-]*',
-                        'add_atts' => '[01]*',
+                        'add_atts' => '[\,0-9]*',
                     ),
                     'defaults' => array(
                         'controller' => 'Assessment\Controller\Remediationplan',
