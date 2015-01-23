@@ -64,7 +64,7 @@
                 <?php echo ($this->brpObj->brp_incident_date != '0000-00-00') ? $this->brpObj->_brp_incident_date_formatted : '' ?> &nbsp;<a href="" title="Edit"><i class="fa fa-pencil"></i></a>
             </span>
             <span id="toggle-edit-2">
-                <input type="text" id="brp_incident_date" class="w175" value="<?php echo ($this->brpObj->brp_incident_date != '0000-00-00') ? $this->brpObj->_brp_incident_date_formatted : '' ?>" />
+                <input type="text" id="brp_incident_date" class="w175" readonly="readonly" value="<?php echo ($this->brpObj->brp_incident_date != '0000-00-00') ? $this->brpObj->_brp_incident_date_formatted : '' ?>" />
             </span>
         <?php else: ?>
             <?php echo ($this->brpObj->brp_incident_date != '0000-00-00') ? $this->brpObj->_brp_incident_date_formatted : '' ?>
@@ -78,7 +78,7 @@
             <?php echo ($this->brpObj->brp_remediation_date != '0000-00-00') ? $this->brpObj->_brp_remediation_date_formatted : '' ?> &nbsp;<a href="" title="Edit"><i class="fa fa-pencil"></i></a>
         </span>
         <span id="toggle-edit-3">
-            <input type="text" id="brp_remediation_date" class="w175" value="<?php echo ($this->brpObj->brp_remediation_date != '0000-00-00') ? $this->brpObj->_brp_remediation_date_formatted : '' ?>" />
+            <input type="text" id="brp_remediation_date" class="w175" readonly="readonly" value="<?php echo ($this->brpObj->brp_remediation_date != '0000-00-00') ? $this->brpObj->_brp_remediation_date_formatted : '' ?>" />
         </span>
     <?php else: ?>
         <?php echo ($this->brpObj->brp_remediation_date != '0000-00-00') ? $this->brpObj->_brp_remediation_date_formatted : '' ?>
@@ -360,9 +360,8 @@
 
 
 <script type="text/javascript">
-    jQuery(function(){
-        jQuery("#brp_incident_date").mask("99/99/9999");
-        jQuery("#brp_remediation_date").mask("99/99/9999");
+    jQuery(function(){        
+        $( "#brp_incident_date, #brp_remediation_date, #bl_date_invest_complete" ).datepicker({dateFormat: 'mm/dd/yy'});
 
         jQuery("#toggle-edit-1").hide();
         jQuery("#toggle-edit-show-1").toggle(function() {

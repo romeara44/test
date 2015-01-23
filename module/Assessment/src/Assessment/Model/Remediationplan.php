@@ -36,8 +36,9 @@ class Remediationplan
     public $rp_accepter_u_id;
     public $rp_approved_date;
     public $rp_accepted_date;
-
-
+    public $_rp_approved_date_formatted;
+    public $_rp_accepted_date_formatted;
+    
     public $rp_security_rp_id;
     public $_client_name;
     public $_approver_name;
@@ -83,6 +84,8 @@ class Remediationplan
         $this->_performed_name     = (isset($data['_performed_name'])) ? $data['_performed_name'] : null;
         $this->_rp_incident_date_formatted     = (isset($data['_rp_incident_date_formatted'])) ? $data['_rp_incident_date_formatted'] : null;
         $this->_rp_remediation_date_formatted     = (isset($data['_rp_remediation_date_formatted'])) ? $data['_rp_remediation_date_formatted'] : null;
+        $this->_rp_approved_date_formatted     = (isset($data['_rp_approved_date_formatted'])) ? $data['_rp_approved_date_formatted'] : null;
+        $this->_rp_accepted_date_formatted     = (isset($data['_rp_accepted_date_formatted'])) ? $data['_rp_accepted_date_formatted'] : null;
         $this->_u_id     = (isset($data['_u_id'])) ? $data['_u_id'] : null;
         $this->_u_name     = (isset($data['_u_name'])) ? $data['_u_name'] : null;
 

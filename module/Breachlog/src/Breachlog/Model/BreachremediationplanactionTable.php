@@ -53,7 +53,7 @@ class BreachremediationplanactionTable implements ServiceLocatorAwareInterface
 
         $select = $this->tableGateway->getSql()->select();
         $select->where('brpa_id = ' . $id);
-        $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('brpa_contact_u_id = u_id'), array('_contact_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'), '_brpa_target_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(brpa_target_date, "m/d/y")')), 'left');
+        $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('brpa_contact_u_id = u_id'), array('_contact_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'), '_brpa_target_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(brpa_target_date, "%m/%d/%Y")')), 'left');
 
         $resultSet = $this->tableGateway->selectWith($select);
 

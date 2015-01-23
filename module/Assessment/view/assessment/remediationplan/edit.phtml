@@ -61,7 +61,7 @@
                 <?php echo ($this->rpObj->rp_incident_date != '0000-00-00') ? $this->rpObj->_rp_incident_date_formatted : '' ?> &nbsp;<a href="" title="Edit"><i class="fa fa-pencil"></i></a>
             </span>
             <span id="toggle-edit-2">
-                <input type="text" id="rp_incident_date" class="w175" value="<?php echo ($this->rpObj->rp_incident_date != '0000-00-00') ? $this->rpObj->_rp_incident_date_formatted : '' ?>" />
+                <input type="text" id="rp_incident_date" readonly="readonly" class="w175" value="<?php echo ($this->rpObj->rp_incident_date != '0000-00-00') ? $this->rpObj->_rp_incident_date_formatted : '' ?>" />
             </span>
         <?php else: ?>
             <?php echo ($this->rpObj->rp_incident_date != '0000-00-00') ? $this->rpObj->_rp_incident_date_formatted : '' ?>
@@ -75,7 +75,7 @@
             <?php echo ($this->rpObj->rp_remediation_date != '0000-00-00') ? $this->rpObj->_rp_remediation_date_formatted : '' ?> &nbsp;<a href="" title="Edit"><i class="fa fa-pencil"></i></a>
         </span>
             <span id="toggle-edit-3">
-            <input type="text" id="rp_remediation_date" class="w175" value="<?php echo ($this->rpObj->rp_remediation_date != '0000-00-00') ? $this->rpObj->_rp_remediation_date_formatted : '' ?>" />
+            <input type="text" id="rp_remediation_date" readonly="readonly" class="w175" value="<?php echo ($this->rpObj->rp_remediation_date != '0000-00-00') ? $this->rpObj->_rp_remediation_date_formatted : '' ?>" />
         </span>
         <?php else: ?>
             <?php echo ($this->rpObj->rp_remediation_date != '0000-00-00') ? $this->rpObj->_rp_remediation_date_formatted : '' ?>
@@ -164,7 +164,7 @@
             <td class="acenter"><?php echo \Assessment\Model\Remediationplanaction::$statusesNames[$rpa->rpa_status] ?></td>
             <td><?php echo $rpa->_contact_name ?></td>
             <td><?php echo $rpa->_approver_name ?></td>
-            <td><?php echo $rpa->rpa_target_date ?></td>
+            <td><?php echo $rpa->_rpa_target_date_formatted ?></td>
             <td class="aright nowrap">
                 <a href="/remediationplan/edittask/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>" id="edittask<?php echo $rpa->rpa_id ?>" class="fancybox" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
                 <?php /* <a href="/remediationplan/planemail/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>" class="fancybox" title="Email Assignee"><i class="fa fa-envelope"></i></a> &nbsp; */ ?>
@@ -341,7 +341,7 @@
         </p>
         <p style="border: 0;">
             <label>Date: </label>
-            <input type="text" name="rp_approved_date" class="valid_input form-control required" id="rp_approved_date" value="<?php echo $this->rpObj->rp_approved_date != '0000-00-00' ? $this->rpObj->rp_approved_date : date('m/d/Y')?>">
+            <input type="text" name="rp_approved_date" readonly="readonly" class="valid_input form-control required" id="rp_approved_date" value="<?php echo $this->rpObj->rp_approved_date != '0000-00-00' ? $this->rpObj->_rp_approved_date_formatted : date('m/d/Y')?>">
         </p>
     <?php else: ?>
         <p style="border: 0;"><strong>Reviewed and approved by <?php echo $this->rpObj->_approver_name?></strong></p>
@@ -349,7 +349,7 @@
             <label>Initials: <?php echo $this->rpObj->rp_initials_approver ?></label>
         </p>
         <p style="border: 0;">
-            <label>Date: <?php echo $this->rpObj->rp_approved_date != '0000-00-00' ? $this->rpObj->rp_approved_date : ''?></label>
+            <label>Date: <?php echo $this->rpObj->rp_approved_date != '0000-00-00' ? $this->rpObj->_rp_approved_date_formatted : ''?></label>
         </p>
     <?php endif; ?>
 
@@ -371,7 +371,7 @@
         </p>
         <p style="border: 0;">
             <label>Date: </label>
-            <input type="text" name="rp_accepted_date" class="valid_input form-control required" id="rp_accepted_date" value="<?php echo $this->rpObj->rp_accepted_date != '0000-00-00' ? $this->rpObj->rp_accepted_date : date('m/d/Y')?>">
+            <input type="text" name="rp_accepted_date" readonly="readonly" class="valid_input form-control required" id="rp_accepted_date" value="<?php echo $this->rpObj->rp_accepted_date != '0000-00-00' ? $this->rpObj->_rp_accepted_date_formatted : date('m/d/Y')?>">
         </p>
     <?php else: ?>
         <p style="border: 0;"><strong>Agreed to and accepted by <?php echo $this->rpObj->_accepter_name?></strong></p>
@@ -379,7 +379,7 @@
             <label>Initials: <?php echo $this->rpObj->rp_initials ?></label>
         </p>
         <p style="border: 0;">
-            <label>Date: <?php echo $this->rpObj->rp_accepted_date != '0000-00-00' ? $this->rpObj->rp_accepted_date : '' ?></label>
+            <label>Date: <?php echo $this->rpObj->rp_accepted_date != '0000-00-00' ? $this->rpObj->_rp_accepted_date_formatted : '' ?></label>
         </p>
 
     <?php endif; ?>
@@ -541,11 +541,8 @@
 
 <script type="text/javascript">
     jQuery(function(){
-        jQuery("#rp_incident_date").mask("99/99/9999");
-        jQuery("#rp_remediation_date").mask("99/99/9999");
-        jQuery("#rp_approved_date").mask("99/99/9999");
-        jQuery("#rp_accepted_date").mask("99/99/9999");
-
+        $( "#rp_incident_date, #rp_remediation_date, #rp_approved_date, #rp_accepted_date" ).datepicker({dateFormat: 'mm/dd/yy'});
+        
         jQuery("#toggle-edit-1").hide();
         jQuery("#toggle-edit-show-1").toggle(function() {
             jQuery("#toggle-edit-1").show();

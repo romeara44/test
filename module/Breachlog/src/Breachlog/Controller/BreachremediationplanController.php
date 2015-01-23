@@ -480,6 +480,17 @@ class BreachremediationplanController extends AbstractActionController
                 if (!$id) {
                     $brpId = $this->getBreachremediationplanTable()->clonePlan($brpId);
                 }
+                
+                $ymds['brpa_target_date'] = \DateTime::createFromFormat('m/d/Y', $post['brpa_target_date']);
+                
+                foreach($ymds as $ymdKey => $ymd) {
+                    if (is_object($ymd)) {
+                        $post[$ymdKey] = $ymd->format('Y-m-d');
+                    } else {
+                        $post[$ymdKey] = '';
+                    }
+                }
+                
                 $post['brpa_brp_id'] = $brpId;
                 $brpa->exchangeArray($post);
                 $this->getBreachremediationplanactionTable()->setServiceLocator($this->getServiceLocator());

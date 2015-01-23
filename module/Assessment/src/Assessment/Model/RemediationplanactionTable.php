@@ -39,7 +39,7 @@ class RemediationplanactionTable implements ServiceLocatorAwareInterface
         $select->where('rpa_rp_id = ' . $rpId);
         $select->where('rpa_active = 1');
 
-        $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('rpa_contact_u_id = u_id'), array('_rpa_risk_level_sort' => new \Zend\Db\Sql\Expression('IF(rpa_risk_level = 3, -1, rpa_risk_level)'), '_contact_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)'), '_rpa_target_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(rpa_target_date, "%c/%e/%Y")')), 'left');
+        $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('rpa_contact_u_id = u_id'), array('_rpa_risk_level_sort' => new \Zend\Db\Sql\Expression('IF(rpa_risk_level = 3, -1, rpa_risk_level)'), '_contact_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)'), '_rpa_target_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(rpa_target_date, "%m/%d/%Y")')), 'left');
         $select->join(array('u2' => 'users'), new \Zend\Db\Sql\Expression('rpa_approver_u_id = u2.u_id'), array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)')), 'left');
         $select->join(array('adr' => 'addresses'), new \Zend\Db\Sql\Expression('adr_id = rpa_adr_id'), array('_location_name' => new \Zend\Db\Sql\Expression('adr_name')), 'left');
 
@@ -64,7 +64,7 @@ class RemediationplanactionTable implements ServiceLocatorAwareInterface
 
         $select = $this->tableGateway->getSql()->select();
         $select->where('rpa_id = ' . $id);
-        $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('rpa_contact_u_id = u.u_id'), array('_contact_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)')), 'left');
+        $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('rpa_contact_u_id = u.u_id'), array('_contact_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)'), '_rpa_target_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(rpa_target_date, "%m/%d/%Y")')), 'left');
         $select->join(array('u2' => 'users'), new \Zend\Db\Sql\Expression('rpa_approver_u_id = u2.u_id'), array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)')), 'left');
 
         $resultSet = $this->tableGateway->selectWith($select);

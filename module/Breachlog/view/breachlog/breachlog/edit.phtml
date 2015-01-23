@@ -68,7 +68,7 @@ $form->setAttribute('method', 'post');
                 $fn->setValue($this->formatDateA($this->blObj->bl_date_of_occurrence, false, true));
             endif;
             echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'bl_date_of_occurrence')));
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'bl_date_of_occurrence', 'readonly' => 'readonly')));
             echo $this->formElementErrors($fn);
             ?>
         </p>
@@ -80,7 +80,7 @@ $form->setAttribute('method', 'post');
                 $fn->setValue($this->formatDateA($this->blObj->bl_date_invest_start, false, true));
             endif;
             echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'bl_date_invest_start')));
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'bl_date_invest_start', 'readonly' => 'readonly')));
             echo $this->formElementErrors($fn);
             ?>
         </p>
@@ -92,7 +92,7 @@ $form->setAttribute('method', 'post');
                 $fn->setValue($this->formatDateA($this->blObj->bl_date_invest_complete, false, true));
             endif;
             echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'bl_date_invest_complete')));
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'bl_date_invest_complete', 'readonly' => 'readonly')));
             echo $this->formElementErrors($fn);
             ?>
         </p>
@@ -252,7 +252,6 @@ $form->setAttribute('method', 'post');
         $('#breachlog').validate();
         $('input[name="u_zip"]').mask("99999");
         //$('input[name="bl_size"]').mask("99999");
-        jQuery("#bl_date_of_occurrence, #bl_date_invest_start, #bl_date_invest_complete").mask("99/99/9999");
 
         $('#q22, #q21').change(function() {
             var isChecked = $('#q22').attr('checked');
@@ -313,6 +312,8 @@ $form->setAttribute('method', 'post');
                 $('#file' + browseFilesCounter).click();
                 browseFilesCounter++;
             });
+            
+            $( "#bl_date_of_occurrence, #bl_date_invest_start, #bl_date_invest_complete" ).datepicker({dateFormat: 'mm/dd/yy'});
         });
     });
 </script>

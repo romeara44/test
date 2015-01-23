@@ -584,6 +584,17 @@ class RemediationplanController extends AbstractActionController
                 if (!$id) {
                     $rpId = $this->getRemediationplanTable()->clonePlan($rpId);
                 }
+                                
+                $ymds['rpa_target_date'] = \DateTime::createFromFormat('m/d/Y', $post['rpa_target_date']);
+                
+                foreach($ymds as $ymdKey => $ymd) {
+                    if (is_object($ymd)) {
+                        $post[$ymdKey] = $ymd->format('Y-m-d');
+                    } else {
+                        $post[$ymdKey] = '';
+                    }
+                }
+                
                 $post['rpa_rp_id'] = $rpId;
                 $rpa->exchangeArray($post);
                 $this->getRemediationplanactionTable()->setServiceLocator($this->getServiceLocator());

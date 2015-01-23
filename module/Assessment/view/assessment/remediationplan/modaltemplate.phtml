@@ -11,6 +11,9 @@
 
     <link rel="stylesheet" href="/css/modals.css" type="text/css" media="screen" />
     <link rel="stylesheet" href="/css/font-awesome.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/css/jquery-ui.min.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/css/jquery-ui.structure.min.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/css/jquery-ui.theme.min.css" type="text/css" media="screen" />
     <!--<link rel="stylesheet" href="css/responsive.css" type="text/css" media="screen" />-->
 
     <!--<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;" />-->
@@ -19,6 +22,7 @@
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
     <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.10.0/jquery.validate.min.js"></script>-->
     <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/jquery-ui.min.js"></script>
     <script type="text/javascript" src="/js/jquery.validate.min.js"></script>
     <script type="text/javascript" src="/js/jquery.fancybox.pack.js"></script>
     <script type="text/javascript">
@@ -136,7 +140,7 @@
                 <?php
                 $fn = $formTask->get('rpa_target_date');
                 echo $this->formLabel($fn);
-                echo $this->formText($fn);
+                echo $this->formText($fn->setAttributes(array('id' => 'rpa_target_date', 'readonly' => 'readonly', 'value' => $this->rpaObj->_rpa_target_date_formatted)));
                 echo $this->formElementErrors($fn);
                 ?>
             </p>
@@ -256,6 +260,7 @@
                 window.location.href = '/remediationplan/remediationplanapproveremail/<?php echo $this->id ?>/rpId/<?php echo $this->rpId ?>/add_atts/' + (+!!$('#rpa_add_attachments').is(':checked'));
             });
         });
+        $( "#rpa_target_date" ).datepicker({dateFormat: 'mm/dd/yy'});
     });
 
 </script>
