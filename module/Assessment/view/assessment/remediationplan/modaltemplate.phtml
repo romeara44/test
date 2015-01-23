@@ -187,7 +187,7 @@
                                     $_fileName = $_file[0];
                                     $_fileId = $_file[1];
                                     ?>
-                                    <input type="checkbox" class="attachment_checkbox" value="<?php echo $_fileId?>"><span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+                                    <input type="checkbox" class="attachment_checkbox" value="<?php echo $_fileId?>" checked="checked"><span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
 
                                 <?php endforeach; ?>
                             <?php endif; ?>
