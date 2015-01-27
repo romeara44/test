@@ -324,7 +324,7 @@
 
     <div class="cboth"></div>
 
-    <?php if ($this->writable): ?>
+    <?php if ($this->writable && !$this->isPdf): ?>
         <p style="border: 0;"><label style="width:195px"><strong>Reviewed and approved by </strong></label>
             <select name="rp_approver_u_id" id="rp_approver_u_id" id="" class="w175 valid_input form-control required">
                 <option value="">Please Select</option>
@@ -355,7 +355,7 @@
 
     <div class="cboth"></div>
 
-    <?php if ($this->writable): ?>
+    <?php if ($this->writable && !$this->isPdf): ?>
         <p style="border: 0;"><label style="width:195px"><strong>Agreed to and accepted by</strong></label>
             <select name="rp_accepter_u_id" id="rp_accepter_u_id" id="" class="w175 valid_input form-control required">
                 <option value="">Please Select</option>
@@ -420,7 +420,7 @@
 <script type="text/javascript">
 
     var browseFilesCounter = 0;
-    $(document).ready(function() {
+    jQuery(document).ready(function() {
         $('#browseFile').click(function() {
             $('#filesToUploadBox').append('<input type="file" name="notesFiles[]" id="file' + browseFilesCounter + '" />');
 
