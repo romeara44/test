@@ -121,7 +121,7 @@ class RemediationplanactionTable implements ServiceLocatorAwareInterface
             if ($rpaAction = $this->getRemediationplanaction($id)) {
 
                 if ($rpa->rpa_status == Remediationplanaction::STATUS_PENDING_APPROVAL) {
-                    $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'pendingapproval', 'rpaId' => $id));
+                    // $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'pendingapproval', 'rpaId' => $id));
                 }
                 $this->tableGateway->update($data, array('rpa_id' => $id));
             } else {
