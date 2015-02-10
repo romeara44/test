@@ -248,7 +248,7 @@ class MailtemplateTable
 
             $transport->send($mail);
         } else {
-            $mail->addTo('tomasz.boch@gmail.com', $addToName); // LOCAL
+            //$mail->addTo('tomasz.boch@gmail.com', $addToName); // LOCAL
             $transport->send($mail);
         }
 
