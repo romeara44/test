@@ -64,7 +64,7 @@ $identity = $authService->getIdentity();
         </tr>
     </thead>
     <tbody>
-        <?php foreach ($this->paginator as $tl): ?> <?php print_r($tl);?>
+        <?php foreach ($this->paginator as $tl): ?>
             <tr>
                 <td><?php echo $tl->_tlt_name ?></td>
                 <td><?php echo ($tl->tl_conducted_date != '0000-00-00') ? $this->formatDateA($tl->tl_conducted_date) : '' ?></td>
