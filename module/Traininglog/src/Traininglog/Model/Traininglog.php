@@ -13,7 +13,6 @@ class Traininglog
     public $tl_conducted_date;
     public $tl_hire_date;
     public $tl_trainer;
-    public $tl_regulation;
     public $tl_attendees;
     public $tl_active;
 
@@ -35,7 +34,6 @@ class Traininglog
         $this->tl_conducted_date   = (isset($data['tl_conducted_date']))   ? $data['tl_conducted_date']   : null;
         $this->tl_hire_date        = (isset($data['tl_hire_date']))        ? $data['tl_hire_date']        : null;
         $this->tl_trainer          = (isset($data['tl_trainer']))          ? $data['tl_trainer']          : null;
-        $this->tl_regulation       = (isset($data['tl_regulation']))       ? $data['tl_regulation']       : null;
         $this->tl_attendees        = (isset($data['tl_attendees']))        ? $data['tl_attendees']        : null;
         $this->tl_active           = (isset($data['tl_active']))           ? $data['tl_active']           : null;
         $this->_tlt_name           = (isset($data['_tlt_name']))           ? $data['_tlt_name']           : null;

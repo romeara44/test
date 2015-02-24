@@ -270,7 +270,7 @@ class UserTable implements ServiceLocatorAwareInterface
 
         if (isset($user->u_sent_password) && ($user->u_sent_password == 0)) {
         } else {
-            $link = 'user/confirm/' . $id . '/'. $data['u_hash'];
+            $link = "http://" . $_SERVER['HTTP_HOST'] . '/user/confirm/' . $id . '/'. $data['u_hash'];
             $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'registeruser', 'uId' => $id, 'password' => $password, 'link' => $link));
         }
         

@@ -51,13 +51,7 @@ $identity = $authService->getIdentity();
                 </a>
             </th>
 
-            <?php $classSort = ($order_by == 'regulation') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
-            <th>
-                <a href="<?php echo $this->url('traininglog', array('action' => 'list', 'page' => $page, 'order_by' => 'regulation', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
-                    Regulation <i class="fa <?php echo $classSort ?>"></i>
-                </a>
-            </th>
-
+            <th>Regulation</th>
             <th>Attendees</th>
             <th>Comments</th>
             <th>&nbsp;</th>

@@ -120,8 +120,7 @@ class TraininglogController extends AbstractActionController
             'type'           => 'tl_tlt_id',
             'conducted_date' => 'tl_conducted_date',
             'hire_date'      => 'tl_hire_date',
-            'trainer'        => 'tl_trainer',
-            'regulation'     => 'tl_regulation'
+            'trainer'        => 'tl_trainer'
         );
 
         $mappingTypeItem = array(

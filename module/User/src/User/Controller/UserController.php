@@ -206,7 +206,9 @@ class UserController extends AbstractActionController
         $hash = $this->params()->fromRoute('hash') ? $this->params()->fromRoute('hash') : null;
 
         if ($id && $hash) {
-            $this->getUserTable()->setConfirmed($id, $hash);
+            if($this->getUserTable()->setConfirmed($id, $hash)) {
+                $this->flashMessenger()->addSuccessMessage('Account succesfuly confirmed. Please, login.');
+            }
         }
 
         return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));

@@ -304,7 +304,7 @@ class CompanyTable implements ServiceLocatorAwareInterface
             'c_other_phone_inner' => $company->c_other_phone_inner,
             'c_owner_u_id' => $company->c_owner_u_id,
             'c_primary_contact_u_id' => $company->c_primary_contact_u_id,
-            'c_active' => $company->c_active
+            'c_active' => 1
         );
 
         $this->tableGateway->insert($data);

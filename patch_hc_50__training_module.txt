@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS `training_logs` (
   `tl_conducted_date` date NOT NULL,
   `tl_hire_date` date NOT NULL,
   `tl_trainer` varchar(255) NOT NULL,
-  `tl_regulation` varchar(255) NOT NULL,
   `tl_attendees` text NOT NULL,
   `tl_active` tinyint(1) NOT NULL DEFAULT '1',
   `tl_archived` tinyint(1) NOT NULL DEFAULT '0',
@@ -36,14 +35,15 @@ CREATE TABLE IF NOT EXISTS `distribution_types` (
 
 INSERT INTO `roles` (`role_id`, `role_name`, `role_create_date`, `role_active`) VALUES (NULL, 'Partial', CURRENT_TIMESTAMP, '1');
 
-INSERT INTO `hipaacar_app`.`mail_templates` (`mt_id`, `mt_name`, `mt_key`, `mt_subject`, `mt_text`, `mt_active`, `mt_create_date`) VALUES (NULL, NULL, 'registeruser', 'New account', '<div style="font-size: 24px; color: #189696"><Full Name>,</div>
+INSERT INTO `hipaacar_app`.`mail_templates` (`mt_id`, `mt_name`, `mt_key`, `mt_subject`, `mt_text`, `mt_active`, `mt_create_date`) VALUES (NULL, NULL, 'registeruser', 'Register account', '<div style="font-size: 24px; color: #189696"><Full Name>,</div>
 <br />
 <b>You have been registered in HIPAA Compliance application by <Consultant Name>.</b>
 <br /><br />
 
-Your login information is:<br />
+Confirmation link: <link><br /><br />
 
-Confirmation link: <link><br />
+Your login information is:<br /><br />
+
 Login page: http://hipaa.carosh.com/<br />
 Your login: <login><br/>
 Your password: <password><br />
@@ -69,3 +69,20 @@ CREATE TABLE IF NOT EXISTS `training_logs_regulations` (
   `tlrg_rg_id` int(11) NOT NULL,
   PRIMARY KEY (`tlrg_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+ALTER TABLE  `users` ADD  `u_confirmed` TINYINT( 1 ) NOT NULL DEFAULT  '0' AFTER  `u_password` ;
+UPDATE `users` SET `u_confirmed`=1;
+
+INSERT INTO `training_log_types` (`tlt_id`, `tlt_name`) VALUES
+(1, 'Initial'),
+(2, 'Recurrent post breach');
+
+INSERT INTO `regulations` (`rg_id`, `rg_pp_name`, `rg_pp_number`, `rg_number`, `rg_description`, `rg_u_owner_id`) VALUES
+(1, 'first', '1', '1', 'first', NULL),
+(2, 'second', '2', '2', 'second', NULL);
+
+INSERT INTO `distribution_types` (`dt_id`, `dt_type`) VALUES
+(1, 'Pop-up'),
+(2, 'Email'),
+(3, 'Text'),
+(4, 'Signage');

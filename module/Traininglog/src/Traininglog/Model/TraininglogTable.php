@@ -120,7 +120,6 @@ class TraininglogTable implements ServiceLocatorAwareInterface
             'tl_conducted_date' => $traininglog->tl_conducted_date,
             'tl_hire_date'      => $traininglog->tl_hire_date,
             'tl_trainer'        => $traininglog->tl_trainer,
-            'tl_regulation'     => $traininglog->tl_regulation,
             'tl_attendees'      => $traininglog->tl_attendees
         );
 
