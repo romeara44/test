@@ -270,7 +270,7 @@ h6 { padding: 8px 0 12px 0; font-size: 12px; line-height: 16px; }
 
 .page-title h1.fleft { width: auto; padding-right: 25px; }
 
-.page-title .label { float: left; margin: 24px 10px 0 0; }
+.page-title .label { float: left; margin: 24px 5px 0 0; }
 
 .page-title .button { float: right;	margin: 18px 0 0 14px; }
 
@@ -628,7 +628,45 @@ th .button { margin-bottom: 0; }
 
 a.i-external { padding: 0 17px 0 0; background: transparent url(images/i-external.gif) right center no-repeat; }
 
+#list_search_form {
+	float: left;
+	width: 190px;
+	position: relative;
+	margin: 20px 0 0 20px;
+}
 
+#list_search {
+    width: 100%;
+    margin: 0;
+    float: right;
+}
+
+#list_search-button {
+	float: right;
+	width: 25px;
+	height: 24px;
+	margin: 1px 0 0 0;
+	position: absolute;
+	right: 0;
+	padding: 9px 0 0 10px;
+}
+
+h1.security_reminders {
+	font-size: 33px;
+}
+
+.registation_captcha {
+    overflow: hidden;
+}
+.registation_captcha label {
+    width: 200px;
+    clear: left;
+}
+
+.registation_captcha_wrap img {
+    display: block;
+    margin: 10px 0;
+}
 /* Tabs */
 
 ul#tabs-nav {
@@ -921,6 +959,10 @@ table thead tr th, table tr th {
 	background: #e7f0f4;
 	text-align: left;
 	white-space: nowrap;
+}
+
+table.traininglogs thead tr th, table.traininglogs tr th {
+	font-size: 14px;
 }
 
 table thead tr th .fa, table tr th .fa { margin-left: 6px; }

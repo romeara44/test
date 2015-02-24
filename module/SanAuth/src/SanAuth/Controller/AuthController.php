@@ -178,11 +178,21 @@ class AuthController extends AbstractActionController
             $form->setData($request->getPost());
 
             if ($form->isValid()) {
+                $usersTable = $this->getServiceLocator()->get('UsersTableGateway');
+                $usersDb = new \Admin\Model\UserTable($usersTable);
+                $user = $usersDb->getUserByEmail($request->getPost('u_email'));
+
+                if($user['u_confirmed'] == 0) {
+                    $this->flashmessenger()->addErrorMessage('Wrong email or password. Please try again.');
+                    return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+                }
+
                 $this->getAuthService()->getAdapter()
                                        ->setIdentity($request->getPost('u_email'))
                                        ->setCredential($request->getPost('u_password'));
 
                 $result = $this->getAuthService()->authenticate();
+
                 foreach($result->getMessages() as $message)
                 {
                     //save message temporary into flashmessenger
@@ -201,8 +211,6 @@ class AuthController extends AbstractActionController
                     }
                     $this->getAuthService()->setStorage($this->getSessionStorage());
 
-                    $usersTable = $this->getServiceLocator()->get('UsersTableGateway');
-                    $usersDb = new \Admin\Model\UserTable($usersTable);
                     $user = $usersDb->getUserByEmail($request->getPost('u_email'));
 
                     $dataStorage['u_email'] = $request->getPost('u_email');
@@ -214,6 +222,8 @@ class AuthController extends AbstractActionController
                     $dataStorage['u_senior_consultant_u_id'] = $user->u_senior_consultant_u_id;
                     $dataStorage['u_company_id'] = $user->u_company_id;
                     $dataStorage['u_office_phone'] = $user->u_office_phone;
+                    $dataStorage['u_register'] = $user->u_register;
+                    $dataStorage['u_first_login'] = $user->u_first_login;
 
                     $this->getAuthService()->getStorage()->write($dataStorage);
                     //$this->getAuthService()->getStorage()->write($request->getPost('u_name'));

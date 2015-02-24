@@ -1,8 +1,15 @@
 
 <ul>
     <?php foreach ($items as $item): ?>
-        <li id="<?php echo isset($item['active']) ? 'current' : '' ?>">
-            <a href="<?php echo $item['url'] ?>"><?php echo $item['title'] ?></a>
+        <li id="<?php echo isset($item['active']) ? 'current' : '' ?>" <?php if(isset($item['disabled'])) {?> class="disabled"<?php }?>>
+            <a href="javascrip:;"><?php echo $item['title'] ?></a>
+            <?php if($item['items']) {?>
+                <ul>
+                    <?php foreach ($item['items'] as $value) {?>
+                        <li <?php if(isset($value['disabled'])) {?> class="disabled"<?php }?>><a href="<?php echo $value['url'] ?>"><?php echo $value['title'] ?></a></li>
+                    <?php } ?>
+                </ul>
+            <?php } ?>
         </li>
     <?php endforeach; ?>
 </ul>

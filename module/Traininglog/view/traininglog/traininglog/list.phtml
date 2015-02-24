@@ -1,0 +1,138 @@
+<?php
+$urlOrder = $order == 'ASC' ? 'DESC' : 'ASC';
+$authService = new \Zend\Authentication\AuthenticationService();
+$authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+$identity = $authService->getIdentity();
+?>
+
+<div class="page-title">
+    <h1 class="fleft">Training Logs</h1>
+    <a href="<?php echo $this->url('traininglog', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 0)); ?>" class="label <?php echo $roleFilter == 0 ? ' selected ' : '' ?>">All</a>
+    <a href="<?php echo $this->url('traininglog', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 1)); ?>" class="label <?php echo $roleFilter == 1 ? ' selected ' : '' ?>">Active</a>
+    <a href="<?php echo $this->url('traininglog', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 2)); ?>" class="label <?php echo $roleFilter == 2 ? ' selected ' : '' ?>">Archived</a>
+    <form id="list_search_form" method="GET" action="<?php echo $this->url('traininglog', array('action' => 'list', 'roleFilter' => $roleFilter)); ?>">
+        <a href="javascript:" onclick="$('#list_search_form').submit()" id="list_search-button"><i class="fa fa-search"></i></a>
+        <input type="text" name="search" id="list_search" placeholder="Search" value="<?php echo $search?>">
+    </form>
+    <a href="/traininglog/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Training Log</a>
+    <div class="cboth"></div>
+</div>
+
+<p></p>
+
+<table class="traininglogs" cellpadding="0" cellspacing="0">
+    <thead>
+        <tr>
+            <?php $classSort = ($order_by == 'id') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('traininglog', array('action' => 'list', 'page' => $page, 'order_by' => 'type', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Type <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'conducted_date') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('traininglog', array('action' => 'list', 'page' => $page, 'order_by' => 'conducted_date', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Conducted Date <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'hire_date') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('traininglog', array('action' => 'list', 'page' => $page, 'order_by' => 'hire_date', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Hire Date <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'trainer') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('traininglog', array('action' => 'list', 'page' => $page, 'order_by' => 'trainer', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Trainer <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'regulation') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('traininglog', array('action' => 'list', 'page' => $page, 'order_by' => 'regulation', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Regulation <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <th>Attendees</th>
+            <th>Comments</th>
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->paginator as $tl): ?> <?php print_r($tl);?>
+            <tr>
+                <td><?php echo $tl->_tlt_name ?></td>
+                <td><?php echo ($tl->tl_conducted_date != '0000-00-00') ? $this->formatDateA($tl->tl_conducted_date) : '' ?></td>
+                <td><?php echo ($tl->tl_hire_date != '0000-00-00') ? $this->formatDateA($tl->tl_hire_date) : '-' ?></td>
+                <td><?php echo $tl->tl_trainer ?></td>
+                <td><?php echo $this->textHelper($tl->_tl_regulation, 20); ?></td>
+                <td><?php echo $this->textHelper($tl->tl_attendees, 20); ?></td>
+                <td><?php echo $this->textHelper($tl->_tl_comment, 20); ?></td>
+                <td style="white-space: nowrap;" class="aright">
+                    <?php if ($tl->_tl_attachment): ?>
+                        <i class="fa fa-paperclip"></i> &nbsp;
+                    <?php endif; ?>
+                    <a href="/traininglog/edit/<?php echo $tl->tl_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+                    <?php if ($tl->tl_active == 0): ?>
+                        <a href="/traininglog/unarchive/<?php echo $tl->tl_id  ?>" class="">Unarchive</a>
+                    <?php else: ?>
+                        <?php $deleteUrl = '/traininglog/delete/' . $tl->tl_id; ?>
+                        <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
+                    <?php endif; ?>
+                </td>
+            </tr>
+
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+<?php echo $this->paginationControl(
+    $this->paginator,
+    'sliding',
+    array('partial/paginator.phtml', 'Traininglog'),
+    array('route' => 'list', 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'roleFilter' => $roleFilter, 'role' => 1, 'controller' => 'traininglog', 'action' => 'list')
+);
+?>
+
+<div class="cboth"><br /></div>
+
+<script type="text/javascript">
+    jQuery(function() {
+        $(document).ready(function() {
+            $('.tl_active_checkbox').click(function() {
+                var $this  = $(this);
+                var id  = $(this).attr('data-id');
+                var archived  = $(this).attr('data-archived') == 1 ? 0 : 1;
+
+                $.ajax({
+                    type:"POST",
+                    url:"/traininglog/setstatus",
+                    data: {'id': id, 'archived': archived},
+                    success: function(data){
+                        if(data.result == 'true') {
+                            $this.attr('data-archived', archived);
+                            if(archived == 1) $this.attr('checked', true);
+                                else $this.attr('checked', false);
+                        }
+                    }
+                });
+
+            });
+
+            $('#list_search_form').submit(function(e){
+                e.preventDefault();
+                var search = $('#list_search').val();
+                if(search === '') {
+                    window.location.href = $(this).attr('action');
+                } else if(search !== undefined) {
+                    window.location.href = $(this).attr('action') + '/search/' + search;
+                }
+            });
+        });
+    });
+</script>

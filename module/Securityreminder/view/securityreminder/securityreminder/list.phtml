@@ -1,0 +1,123 @@
+<?php
+$urlOrder = $order == 'ASC' ? 'DESC' : 'ASC';
+$authService = new \Zend\Authentication\AuthenticationService();
+$authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+$identity = $authService->getIdentity();
+?>
+
+<div class="page-title">
+    <h1 class="fleft security_reminders">Security reminders</h1>
+    <a href="<?php echo $this->url('securityreminder', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 0)); ?>" class="label <?php echo $roleFilter == 0 ? ' selected ' : '' ?>">All</a>
+    <a href="<?php echo $this->url('securityreminder', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 1)); ?>" class="label <?php echo $roleFilter == 1 ? ' selected ' : '' ?>">Active</a>
+    <a href="<?php echo $this->url('securityreminder', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 2)); ?>" class="label <?php echo $roleFilter == 2 ? ' selected ' : '' ?>">Archived</a>
+    <form id="list_search_form" method="GET" action="<?php echo $this->url('securityreminder', array('action' => 'list', 'roleFilter' => $roleFilter)); ?>">
+        <a href="javascript:" onclick="$('#list_search_form').submit()" id="list_search-button"><i class="fa fa-search"></i></a>
+        <input type="text" name="search" id="list_search" placeholder="Search" value="<?php echo $search?>">
+    </form>
+    <a href="/securityreminder/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Security reminder</a>
+    <div class="cboth"></div>
+</div>
+
+<p></p>
+
+<table class="securityreminders" cellpadding="0" cellspacing="0">
+    <thead>
+        <tr>
+            <?php $classSort = ($order_by == 'launched_date') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('securityreminder', array('action' => 'list', 'page' => $page, 'order_by' => 'launched_date', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Launched Date <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'developed_by') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('securityreminder', array('action' => 'list', 'page' => $page, 'order_by' => 'developed_by', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Developed By <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'regulation') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('securityreminder', array('action' => 'list', 'page' => $page, 'order_by' => 'regulation', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Regulation <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <th> Distribution Type</th>
+
+            <th>Comments</th>
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->paginator as $sr): ?>
+            <tr>
+                <td><?php echo ($sr->sr_launched_date != '0000-00-00') ? $this->formatDateA($sr->sr_launched_date) : '' ?></td>
+                <td><?php echo $sr->sr_developed_by ?></td>
+                <td><?php echo $sr->sr_regulation ?></td>
+                <td><?php echo $sr->_dt_type ?></td>
+                <td><?php echo $this->textHelper($sr->_sr_comment, 20); ?></td>
+                <td style="white-space: nowrap;" class="aright">
+                    <?php if ($sr->_sr_attachment): ?>
+                        <i class="fa fa-paperclip"></i> &nbsp;
+                    <?php endif; ?>
+                    <a href="/securityreminder/edit/<?php echo $sr->sr_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+                    <?php if ($sr->sr_active == 0): ?>
+                        <a href="/securityreminder/unarchive/<?php echo $sr->sr_id  ?>" class="">Unarchive</a>
+                    <?php else: ?>
+                        <?php $deleteUrl = '/securityreminder/delete/' . $sr->sr_id; ?>
+                        <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
+                    <?php endif; ?>
+                </td>
+            </tr>
+
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+<?php echo $this->paginationControl(
+    $this->paginator,
+    'sliding',
+    array('partial/paginator.phtml', 'securityreminder'),
+    array('route' => 'list', 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'roleFilter' => $roleFilter, 'role' => 1, 'controller' => 'securityreminder', 'action' => 'list')
+);
+?>
+
+<div class="cboth"><br /></div>
+
+<script type="text/javascript">
+    jQuery(function() {
+        $(document).ready(function() {
+            $('.sr_active_checkbox').click(function() {
+                var $this  = $(this);
+                var id  = $(this).attr('data-id');
+                var archived  = $(this).attr('data-archived') == 1 ? 0 : 1;
+
+                $.ajax({
+                    type:"POST",
+                    url:"/securityreminder/setstatus",
+                    data: {'id': id, 'archived': archived},
+                    success: function(data){
+                        if(data.result == 'true') {
+                            $this.attr('data-archived', archived);
+                            if(archived == 1) $this.attr('checked', true);
+                                else $this.attr('checked', false);
+                        }
+                    }
+                });
+
+            });
+
+            $('#list_search_form').submit(function(e){
+                e.preventDefault();
+                var search = $('#list_search').val();
+                if(search === '') {
+                    window.location.href = $(this).attr('action');
+                } else if(search !== undefined) {
+                    window.location.href = $(this).attr('action') + '/search/' + search;
+                }
+            });
+        });
+    });
+</script>

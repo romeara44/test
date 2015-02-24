@@ -117,14 +117,14 @@ class NoteTable implements ServiceLocatorAwareInterface
         return $row;
     }
 
-    public function saveNote(Note $note, $files = null, $isCopy = false)
+    public function saveNote(Note $note, $files = null, $isCopy = false, $fileName = 'notesFiles')
     {
         $authService = new \Zend\Authentication\AuthenticationService();
         $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
         $identity = $authService->getIdentity();
 
         if (!$isCopy && $files) {
-            if ((trim($note->note_text) == '') && (!isset($files['notesFiles']) || count($files['notesFiles']) == 0)) {
+            if ((trim($note->note_text) == '') && (!isset($files[$fileName]) || count($files[$fileName]) == 0)) {
                 return;
             }
         }
@@ -157,14 +157,14 @@ class NoteTable implements ServiceLocatorAwareInterface
             }
         }
 
-        if($files) $this->_saveFiles($id, $files);
+        if($files) $this->_saveFiles($id, $files, $fileName);
 
         return $id;
     }
 
-    public function _saveFiles($id, $files)
+    public function _saveFiles($id, $files, $fileName)
     {
-        if (!isset($files['notesFiles'])) {
+        if (!isset($files[$fileName])) {
             return;
         }
 
@@ -180,8 +180,8 @@ class NoteTable implements ServiceLocatorAwareInterface
         $filesTable = $this->getServiceLocator()->get('Application\Model\FilesTable');
         $notesFilesTable = $this->getServiceLocator()->get('Note\Model\NotesFilesTable');
 
-        if (isset($files['notesFiles'])) {
-            foreach ($files['notesFiles'] as $file) {
+        if (isset($files[$fileName])) {
+            foreach ($files[$fileName] as $file) {
 
                 if ($file['tmp_name'] == '') continue;
 

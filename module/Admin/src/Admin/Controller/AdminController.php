@@ -113,11 +113,15 @@ class AdminController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
 
-        $form = new UserForm($this->getServiceLocator());
         $userObj = null;
+
         if ((int) $id) {
             $userObj = $this->getUserTable()->getUser($id);
         }
+
+        $uRoleId = is_object($userObj) ? $userObj->u_role_id : null;
+
+        $form = new UserForm($this->getServiceLocator(), $uRoleId);
 
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -127,7 +131,10 @@ class AdminController extends AbstractActionController
             $form->setData($request->getPost());
 
             if ($form->isValid()) {
-                $user->exchangeArray($request->getPost());
+                $post = $request->getPost();
+                $post['u_confirmed'] = $uId ? $userObj->u_confirmed : null;
+                
+                $user->exchangeArray($post);
                 $this->getUserTable()->saveUser($user);
 
                 $this->flashMessenger()->addSuccessMessage('User has been added');
@@ -169,7 +176,6 @@ class AdminController extends AbstractActionController
             'roleId' => is_object($userObj) ? $userObj->u_role_id : -1,
             'isActive' => is_object($userObj) ? $userObj->u_active : -1,
             'username' => is_object($userObj) ? $userObj->u_firstname . ' ' . $userObj->u_lastname : '',
-
             'c1Param' => $c1,
             'c2Param' => $c2,
             'c3Param' => $c3,

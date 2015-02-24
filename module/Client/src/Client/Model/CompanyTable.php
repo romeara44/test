@@ -51,14 +51,15 @@ class CompanyTable implements ServiceLocatorAwareInterface
                 $resultSetPrototype
             );
 
-            //$select->where('c_active = 1');
-
             if (in_array($typeItems, array('all', 'contacts'))) {
                 $select->join(array('u' => 'users'), 'u_company_id = c_id', array('u_id', 'u_firstname', 'u_lastname', 'u_office_phone', '_name' => 'u_lastname', '_id' => 'u_id', '_c_active' => new \Zend\Db\Sql\Expression('u.u_active')), 'left');
                 if ($identity['u_role_id'] == User::ROLE_ADMIN) {
                     $select->where('u_active IN (0, 1)');
                 } else {
                     $select->where('u_active = 1');
+                }
+                if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
+                     $select->where('u_senior_consultant_u_id = ' . $identity['u_id']);
                 }
             }
             if ($identity['u_role_id'] == User::ROLE_SALES_REP) {
@@ -69,6 +70,8 @@ class CompanyTable implements ServiceLocatorAwareInterface
                 $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
                 $ids[] = $identity['u_id'];
                 $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR c_consultant_u_id IN (' . implode(',', $ids) . '))');
+            } else if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
+                $select->where('c_owner_u_id = ' . $identity['u_id']);
             }
 
             if ($typeItems == 'companies') {
@@ -108,6 +111,8 @@ class CompanyTable implements ServiceLocatorAwareInterface
                         $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
                         $ids[] = $identity['u_id'];
                         $selectCom->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR c_consultant_u_id IN (' . implode(',', $ids) . '))');
+                    } else if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
+                        $selectCom->where('c_owner_u_id = ' . $identity['u_id']);
                     }
                 }
 
@@ -173,6 +178,8 @@ class CompanyTable implements ServiceLocatorAwareInterface
             $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
             $ids[] = $identity['u_id'];
             $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR c_consultant_u_id IN (' . implode(',', $ids) . '))');
+        } else if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
+            $select->where('c_owner_u_id = ' . $identity['u_id']);
         }
 
 
@@ -199,6 +206,8 @@ class CompanyTable implements ServiceLocatorAwareInterface
             $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
             $ids[] = $identity['u_id'];
             $select->where('c_owner_u_id IN (' . implode(',', $ids) . ') OR c_consultant_u_id IN (' . implode(',', $ids) . ')');
+        } else if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
+            $select->where('c_owner_u_id = ' . $identity['u_id']);
         }
 
         $resultSet = $this->tableGateway->selectWith($select);
@@ -213,14 +222,26 @@ class CompanyTable implements ServiceLocatorAwareInterface
 
     public function getCompany($id)
     {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
         $id  = (int) $id;
-        $rowset = $this->tableGateway->select(array('c_id' => $id));
-        $row = $rowset->current();
-        if (!$row) {
+        $select = $this->tableGateway->getSql()->select();
+
+        if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
+            $select->where('c_owner_u_id = ' . $identity['u_id']);
+        }
+
+        $select->where('c_id = ' . $id);
+
+        $resultSet = $this->tableGateway->selectWith($select)->current();
+
+        if (!$resultSet) {
             return false;
         }
 
-        return $row;
+        return $resultSet;
     }
 
     public function saveCompany(Company $company)
@@ -271,6 +292,45 @@ class CompanyTable implements ServiceLocatorAwareInterface
         }
 
         return $id;
+    }
+
+    public function addClientCompany(Company $company)
+    {
+        $data = array(
+            'c_name' => $company->c_name,
+            'c_email' => $company->c_email,
+            'c_phone' => $company->c_phone,
+            'c_other_phone' => $company->c_other_phone,
+            'c_other_phone_inner' => $company->c_other_phone_inner,
+            'c_owner_u_id' => $company->c_owner_u_id,
+            'c_primary_contact_u_id' => $company->c_primary_contact_u_id,
+            'c_active' => $company->c_active
+        );
+
+        $this->tableGateway->insert($data);
+        $id = $this->tableGateway->lastInsertValue;
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_ADD, \Application\Model\LogsTable::ITEM_TYPE_COMPANY, $id);
+        
+        return $id;
+    }
+
+    public function checkClientLimitCompany()
+    {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
+        if (!in_array($identity['u_role_id'], array(User::ROLE_CLIENT, User::ROLE_PARTIAL))) {
+            return true;
+        }
+        $select = $this->tableGateway->getSql()->select();
+
+        $select->where('c_primary_contact_u_id = ' . $identity['u_id']);
+
+        $resultSet = $this->tableGateway->selectWith($select)->count();
+        
+        return (bool) $resultSet <= 5;
     }
 
     public function setPrimaryAddressId($companyId, $addressId)

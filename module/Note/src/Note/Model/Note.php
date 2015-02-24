@@ -20,6 +20,10 @@ class Note
     const NOTE_RP = 10;
     const NOTE_RPA = 11;
     const NOTE_BL = 12;
+    const NOTE_TLT = 13;
+    const NOTE_TLC = 14;
+    const NOTE_SRM = 15;
+    const NOTE_SRC = 16;
 
     public $note_id;
     public $note_text;

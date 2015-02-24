@@ -64,6 +64,8 @@ class MenuTop extends AbstractHelper
             $this->_prepareItemsForSalesRep();
         } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_BUSINESS_ASSOCIATE) {
             // nothing
+        } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_PARTIAL) {
+            $this->_prepareItemsForPartial();
         }
     }
 
@@ -85,13 +87,16 @@ class MenuTop extends AbstractHelper
                 'url' => '/businessassociate/list',
             ),
             array(
-                'title' => 'Breach Logs',
+                'title' => 'Breach Management',
                 'url' => '/breachlog/list',
-            ),
-
-            array(
-                'title' => 'Breach Remediation Plans',
-                'url' => '/breachremediationplan/list',
+                'items' => array(
+                    array('title' => 'Breach Logs',
+                          'url' => '/breachlog/list',
+                        ),
+                    array('title' => 'Breach Remediation Plans',
+                         'url' => '/breachremediationplan/list',
+                        )
+                )
             ),
             array(
                 'title' => 'Assessments',
@@ -104,11 +109,23 @@ class MenuTop extends AbstractHelper
                 )
             ),
             array(
+                'title' => 'Trainings',
+                'url' => '/traininglog/list',
+                'items' => array(
+                    array('title' => 'Training Logs',
+                            'url' => '/traininglog/list'
+                        ),
+                    array('title' => 'Security Reminder',
+                         'url' => '/securityreminder/list',
+                        )
+                )
+            ),
+            array(
                 'title' => 'Users',
                 'url' => '/admin/users',
-                'items' => array(
-                    array('title' => 'Add new user', 'url' => '/admin/adduser'),
-                )
+                // 'items' => array(
+                //     array('title' => 'Add new user', 'url' => '/admin/adduser'),
+                // )
             ),
         );
     }
@@ -129,12 +146,16 @@ class MenuTop extends AbstractHelper
                 'url' => '/businessassociate/list',
             ),
             array(
-                'title' => 'Breach Logs',
+                'title' => 'Breach Management',
                 'url' => '/breachlog/list',
-            ),
-            array(
-                'title' => 'Breach Remediation Plans',
-                'url' => '/breachremediationplan/list',
+                'items' => array(
+                    array('title' => 'Breach Logs',
+                          'url' => '/breachlog/list',
+                        ),
+                    array('title' => 'Breach Remediation Plans',
+                         'url' => '/breachremediationplan/list',
+                        )
+                )
             ),
             array(
                 'title' => 'Assessments',
@@ -143,6 +164,18 @@ class MenuTop extends AbstractHelper
             array(
                 'title' => 'Remediation Plans',
                 'url' => '/remediationplan/list',
+            ),
+            array(
+                'title' => 'Trainings',
+                'url' => '/traininglog/list',
+                'items' => array(
+                    array('title' => 'Training Logs',
+                            'url' => '/traininglog/list'
+                        ),
+                    array('title' => 'Security Reminder',
+                         'url' => '/securityreminder/list',
+                        )
+                )
             )
         );
     }
@@ -155,16 +188,24 @@ class MenuTop extends AbstractHelper
                 'url' => '/dashboard/client',
             ),
             array(
+                'title' => 'Clients',
+                'url' => '/client/list'
+            ),
+            array(
                 'title' => 'Business Associates',
                 'url' => '/businessassociate/list',
             ),
             array(
-                'title' => 'Breach Logs',
+                'title' => 'Breach Management',
                 'url' => '/breachlog/list',
-            ),
-            array(
-                'title' => 'Breach Remediation Plans',
-                'url' => '/breachremediationplan/list',
+                'items' => array(
+                    array('title' => 'Breach Logs',
+                          'url' => '/breachlog/list',
+                        ),
+                    array('title' => 'Breach Remediation Plans',
+                          'url' => '/breachremediationplan/list',
+                        )
+                )
             ),
             array(
                 'title' => 'Assessments',
@@ -173,6 +214,74 @@ class MenuTop extends AbstractHelper
             array(
                 'title' => 'Remediation Plans',
                 'url' => '/remediationplan/list',
+            ),
+            array(
+                'title' => 'Trainings',
+                'url' => '/traininglog/list',
+                'items' => array(
+                    array('title' => 'Training Logs',
+                          'url' => '/traininglog/list'
+                        ),
+                    array('title' => 'Security Reminder',
+                          'url' => '/securityreminder/list',
+                        )
+                )
+            )
+        );
+    }
+
+    private function _prepareItemsForPartial()
+    {
+        $this->items = array(
+            array(
+                'title' => 'Dashboard',
+                'url' => '/dashboard/client'
+            ),
+            array(
+                'title' => 'Clients',
+                'url' => '/client/list'
+            ),
+            array(
+                'title' => 'Business Associates',
+                'url' => '/businessassociate/list',
+                'disabled' => true
+            ),
+            array(
+                'title' => 'Breach Management',
+                'url' => '/breachlog/list',
+                'disabled' => true,
+                'items' => array(
+                    array('title' => 'Breach Logs',
+                          'url' => '/breachlog/list',
+                          'disabled' => true
+                        ),
+                    array('title' => 'Breach Remediation Plans',
+                          'url' => '/breachremediationplan/list',
+                          'disabled' => true
+                        )
+                )
+            ),
+            array(
+                'title' => 'Assessments',
+                'url' => '/assessment/list',
+                'disabled' => true
+            ),
+            array(
+                'title' => 'Remediation Plans',
+                'url' => '/remediationplan/list',
+                'disabled' => true
+            ),
+            array(
+                'title' => 'Trainings',
+                'url' => '/traininglog/list',
+                'items' => array(
+                    array('title' => 'Training Logs',
+                            'url' => '/traininglog/list'
+                        ),
+                    array('title' => 'Security Reminder',
+                         'url' => '/securityreminder/list',
+                        )
+                )
             )
         );
     }

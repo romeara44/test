@@ -15,6 +15,7 @@ class User
     const ROLE_SALES_REP = 4;
     const ROLE_CLIENT = 5;
     const ROLE_BUSINESS_ASSOCIATE = 6;
+    const ROLE_PARTIAL = 7;
 
     /*
      * u_active
@@ -49,6 +50,10 @@ class User
     public $u_hash;
     public $u_sent_password;
     public $u_status;
+    public $u_confirm_email;
+    public $u_register;
+    public $u_first_login;
+    public $u_confirmed;
 
     public $_rolename;
 
@@ -84,6 +89,10 @@ class User
         $this->u_sent_password     = (isset($data['u_sent_password'])) ? $data['u_sent_password'] : null;
         $this->u_status     = (isset($data['u_status'])) ? $data['u_status'] : null;
         $this->_rolename     = (isset($data['_rolename'])) ? $data['_rolename'] : null;
+        $this->u_confirm_email     = (isset($data['u_confirm_email'])) ? $data['u_confirm_email'] : null;
+        $this->u_register     = (isset($data['u_register'])) ? $data['u_register'] : null;
+        $this->u_first_login     = (isset($data['u_first_login'])) ? $data['u_first_login'] : null;
+        $this->u_confirmed     = (isset($data['u_confirmed'])) ? $data['u_confirmed'] : null;
     }
 
     public function getArrayCopy()
@@ -356,4 +365,121 @@ class User
         return $this->inputFilter;
     }
 
+    public function getRegistrationInputFilter($sl)
+    {
+        if (!$this->inputFilter) {
+            $inputFilter = new InputFilter();
+            $factory     = new InputFactory();
+
+
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'u_firstname',
+                'required' => true,
+                'filters'  => array(
+                    array('name' => 'StripTags'),
+                    array('name' => 'StringTrim'),
+                ),
+                'validators' => array(
+                    array(
+                        'name'    => 'StringLength',
+                        'options' => array(
+                            'encoding' => 'UTF-8',
+                            'min'      => 1,
+                            'max'      => 100,
+                        ),
+                    ),
+                ),
+            )));
+
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'u_lastname',
+                'required' => true,
+                'filters'  => array(
+                    array('name' => 'StripTags'),
+                    array('name' => 'StringTrim'),
+                ),
+                'validators' => array(
+                    array(
+                        'name'    => 'StringLength',
+                        'options' => array(
+                            'encoding' => 'UTF-8',
+                            'min'      => 1,
+                            'max'      => 100,
+                        ),
+                    ),
+                ),
+            )));
+
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'u_company',
+                'required' => true,
+                'filters'  => array(
+                    array('name' => 'StripTags'),
+                    array('name' => 'StringTrim'),
+                ),
+                'validators' => array(
+                    array(
+                        'name'    => 'StringLength',
+                        'options' => array(
+                            'encoding' => 'UTF-8',
+                            'min'      => 1,
+                            'max'      => 100,
+                        ),
+                    ),
+                ),
+            )));
+
+            $ee = new \Mylib\Validator\EmailExists($sl);
+
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'u_email',
+                'required' => true,
+                'filters'  => array(
+                    array('name' => 'StripTags'),
+                    array('name' => 'StringTrim'),
+                ),
+                'validators' => array(
+                    array(
+                        'name'    => 'EmailAddress',
+                        'options' => array(
+                            'encoding' => 'UTF-8',
+                            'min'      => 1,
+                            'max'      => 100,
+                        ),
+                    )
+                ),
+            )));
+
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'u_confirm_email',
+                'required' => true,
+                'filters'  => array(
+                    array('name' => 'StripTags'),
+                    array('name' => 'StringTrim'),
+                ),
+                'validators' => array(
+                    array(
+                        'name'    => 'EmailAddress',
+                        'options' => array(
+                            'encoding' => 'UTF-8',
+                            'min'      => 1,
+                            'max'      => 100,
+                        ),
+                    ),
+                    array(
+                        'name' => 'Identical',
+                        'options' => array(
+                            'token' => 'u_email',
+                            'messages' => array(\Zend\Validator\Identical::NOT_SAME => 'The email is mis matched')
+                        )
+                    ),
+                    $ee
+                ),
+            )));
+
+            $this->inputFilter = $inputFilter;
+        }
+
+        return $this->inputFilter;
+    }
 }

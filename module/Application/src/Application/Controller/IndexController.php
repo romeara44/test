@@ -58,6 +58,12 @@ class IndexController extends AbstractActionController
                 return $this->redirect()->toRoute('dashboard', array('controller' => 'dashboard', 'action' => 'client'));
             } elseif (in_array($identity['u_role_id'], array(4))) {
                 return $this->redirect()->toRoute('dashboard', array('controller' => 'dashboard', 'action' => 'salesrep'));
+            } elseif (in_array($identity['u_role_id'], array(7))) {
+                if($identity['u_register'] == 1 && $identity['u_first_login'] == 1) {
+                    $this->redirect()->toRoute('client', array('controller' => 'client', 'action' => 'edit', 'id' => $identity['u_id']));
+                } else {
+                     return $this->redirect()->toRoute('dashboard', array('controller' => 'dashboard', 'action' => 'client'));
+                }
             }
 
         } else {

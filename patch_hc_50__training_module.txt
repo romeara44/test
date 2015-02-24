@@ -1,0 +1,71 @@
+CREATE TABLE IF NOT EXISTS `training_logs` (
+  `tl_id` int(11) NOT NULL AUTO_INCREMENT,
+  `tl_tlt_id` int(11) NOT NULL,
+  `tl_conducted_date` date NOT NULL,
+  `tl_hire_date` date NOT NULL,
+  `tl_trainer` varchar(255) NOT NULL,
+  `tl_regulation` varchar(255) NOT NULL,
+  `tl_attendees` text NOT NULL,
+  `tl_active` tinyint(1) NOT NULL DEFAULT '1',
+  `tl_archived` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`tl_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `training_log_types` (
+  `tlt_id` int(11) NOT NULL AUTO_INCREMENT,
+  `tlt_name` varchar(255) NOT NULL,
+  PRIMARY KEY (`tlt_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `security_reminders` (
+  `sr_id` int(11) NOT NULL AUTO_INCREMENT,
+  `sr_launched_date` date NOT NULL,
+  `sr_developed_by` varchar(255) NOT NULL,
+  `sr_regulation` varchar(255) CHARACTER SET utf32 NOT NULL,
+  `sr_dt_id` int(11) NOT NULL,
+  `sr_archived` tinyint(1) NOT NULL DEFAULT '0',
+  `sr_active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`sr_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `distribution_types` (
+  `dt_id` int(11) NOT NULL AUTO_INCREMENT,
+  `dt_type` varchar(255) NOT NULL,
+  PRIMARY KEY (`dt_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+INSERT INTO `roles` (`role_id`, `role_name`, `role_create_date`, `role_active`) VALUES (NULL, 'Partial', CURRENT_TIMESTAMP, '1');
+
+INSERT INTO `hipaacar_app`.`mail_templates` (`mt_id`, `mt_name`, `mt_key`, `mt_subject`, `mt_text`, `mt_active`, `mt_create_date`) VALUES (NULL, NULL, 'registeruser', 'New account', '<div style="font-size: 24px; color: #189696"><Full Name>,</div>
+<br />
+<b>You have been registered in HIPAA Compliance application by <Consultant Name>.</b>
+<br /><br />
+
+Your login information is:<br />
+
+Confirmation link: <link><br />
+Login page: http://hipaa.carosh.com/<br />
+Your login: <login><br/>
+Your password: <password><br />
+<br />
+Please do not hesitate to contact us with any questions.', '0', CURRENT_TIMESTAMP);
+
+ALTER TABLE  `users` ADD  `u_first_login` TINYINT( 1 ) NOT NULL DEFAULT  '0' AFTER  `u_status` ;
+ALTER TABLE  `users` ADD  `u_register` TINYINT( 1 ) NOT NULL DEFAULT  '0' AFTER  `u_status` ;
+
+CREATE TABLE IF NOT EXISTS `regulations` (
+  `rg_id` int(11) NOT NULL AUTO_INCREMENT,
+  `rg_pp_name` varchar(255) NOT NULL,
+  `rg_pp_number` varchar(255) NOT NULL,
+  `rg_number` varchar(255) NOT NULL,
+  `rg_description` text NOT NULL,
+  `rg_u_owner_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`rg_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `training_logs_regulations` (
+  `tlrg_id` int(11) NOT NULL AUTO_INCREMENT,
+  `tlrg_tl_id` int(11) NOT NULL,
+  `tlrg_rg_id` int(11) NOT NULL,
+  PRIMARY KEY (`tlrg_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;

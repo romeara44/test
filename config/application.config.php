@@ -18,7 +18,9 @@ return array(
         'Breachlog',
         'Assessment',
         'Dashboard',
-        'Search'
+        'Search',
+        'Traininglog',
+        'Securityreminder'
         ),
     'module_listener_options' => array(
         'module_paths' => array(

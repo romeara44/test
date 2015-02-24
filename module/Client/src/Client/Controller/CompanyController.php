@@ -34,7 +34,7 @@ class CompanyController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
         $identity = $this->getIdentity();
-        if (!in_array($identity['u_role_id'], array(1, 2, 3, 4))) {
+        if (!in_array($identity['u_role_id'], array(1, 2, 3, 4, 5, 7))) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
 
@@ -110,6 +110,13 @@ class CompanyController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
 
+        if(!$id) {
+            if(!$this->getCompanyTable()->checkClientLimitCompany()) {
+                $this->flashMessenger()->addErrorMessage('You cannot create more than 5 companies');
+                return $this->redirect()->toRoute('client', array('controller' => 'client', 'action' => 'list'));
+            }
+        }
+
         $form = new CompanyForm($this->getServiceLocator());
         $formNote = new NoteForm($this->getServiceLocator());
         $companyObj = null;
@@ -117,8 +124,12 @@ class CompanyController extends AbstractActionController
         $primaryContactId = null;
         $notes = null;
 
-        if ((int) $id) {
+        if ($id) {
             $companyObj = $this->getCompanyTable()->getCompany($id);
+            if(!$companyObj) {
+                return $this->redirect()->toRoute('client', array('controller' => 'client', 'action' => 'list'));
+            }
+
             $contacts = $this->getUserTable()->getUsersByCompany($id, $companyObj->c_primary_contact_u_id);
             $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_COMPANY);
 
@@ -139,6 +150,10 @@ class CompanyController extends AbstractActionController
                     $post['c_owner_u_id'] = $identity['u_id'];
                     $post['c_update_u_id'] = $identity['u_id'];
 
+                    if (!$id) {
+                        $post['c_primary_contact_u_id'] = $identity['u_id'];
+                    }
+
                     $company->exchangeArray($request->getPost());
                     $this->getCompanyTable()->setServiceLocator($this->getServiceLocator());
                     $companyId = $this->getCompanyTable()->saveCompany($company);
@@ -148,7 +163,7 @@ class CompanyController extends AbstractActionController
 
                     return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
                 } else {
-                    if ((int) $id) {
+                    if ($id) {
                         $form->bind($companyObj);
                         $addresses = $this->getAddressTable()->getAddresses($id, \Client\Model\AddressItem::COMPANY_TYPE);
                     }
@@ -169,7 +184,7 @@ class CompanyController extends AbstractActionController
 
                     return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
                 } else {
-                    if ((int) $id) {
+                    if ($id) {
                         $form->bind($companyObj);
                         $addresses = $this->getAddressTable()->getAddresses($id, \Client\Model\AddressItem::COMPANY_TYPE);
                     }
@@ -177,7 +192,7 @@ class CompanyController extends AbstractActionController
             }
 
         } else {
-            if ((int) $id) {
+            if ($id) {
                 $form->bind($companyObj);
                 $addresses = $this->getAddressTable()->getAddresses($id, \Client\Model\AddressItem::COMPANY_TYPE);
             }

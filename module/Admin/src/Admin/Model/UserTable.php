@@ -185,6 +185,7 @@ class UserTable implements ServiceLocatorAwareInterface
             'u_city' => $user->u_city,
             'u_zip' => $user->u_zip,
             'u_state_id' => $user->u_state_id,
+            'u_confirmed' => isset($user->u_confirmed) ? $user->u_confirmed : 1,
         );
 
         if (!(int) $user->u_senior_consultant_u_id) {
@@ -225,6 +226,58 @@ class UserTable implements ServiceLocatorAwareInterface
         return $id;
     }
 
+    public function registerUser(User $user)
+    {
+        $data = array(
+            'u_role_id' => $user->u_role_id,
+            'u_senior_consultant_u_id' => $user->u_senior_consultant_u_id,
+            'u_company_id' => $user->u_company_id,
+            'u_firstname' => $user->u_firstname,
+            'u_lastname' => $user->u_lastname,
+            'u_email' => $user->u_email,
+            'u_title' => $user->u_title,
+            'u_company' => $user->u_company,
+            'u_office_phone' => $user->u_office_phone,
+            'u_office_phone_inner' => $user->u_office_phone_inner,
+            'u_direct_phone' => $user->u_direct_phone,
+            'u_direct_phone_inner' => $user->u_direct_phone_inner,
+            'u_cell_phone' => $user->u_cell_phone,
+            'u_other_phone' => $user->u_other_phone,
+            'u_other_phone_inner' => $user->u_other_phone_inner,
+            'u_fax' => $user->u_fax,
+            'u_address1' => $user->u_address1,
+            'u_address2' => $user->u_address2,
+            'u_city' => $user->u_city,
+            'u_zip' => $user->u_zip,
+            'u_first_login' => $user->u_first_login,
+            'u_register' => $user->u_register,
+            'u_zip' => $user->u_zip,
+            'u_state_id' => $user->u_state_id,
+            'u_confirmed' => $user->u_confirmed,
+        );
+    
+        $data['u_hash'] = sha1($user->u_email . time());
+        if (isset($user->u_sent_password) && ($user->u_sent_password == 0)) {
+            $data['u_sent_password'] = 0;
+        } else {
+            $password = sha1($user->u_email . time());
+            $password = substr($password, 0, 6);
+            $data['u_password'] = sha1($password);
+        }
+
+        $this->tableGateway->insert($data);
+        $id = $this->tableGateway->lastInsertValue;
+
+        if (isset($user->u_sent_password) && ($user->u_sent_password == 0)) {
+        } else {
+            $link = 'user/confirm/' . $id . '/'. $data['u_hash'];
+            $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'registeruser', 'uId' => $id, 'password' => $password, 'link' => $link));
+        }
+        
+
+        return $id;
+    }
+
     public function sendPasswordReminder($email)
     {
         if (!$this->checkIfUserExists($email)) {
@@ -239,18 +292,27 @@ class UserTable implements ServiceLocatorAwareInterface
 
     }
 
-    public function setConfirmed($uid, $hash)
+    public function setConfirmed($uId, $hash)
     {
-        $user = $this->getUser($uid);
+        $user = $this->getUser($uId);
         if  ($user->u_hash == $hash) {
-            $data['u_id'] = $uid;
+            $data['u_id'] = $uId;
             $data['u_confirmed'] = 1;
-            $this->tableGateway->update($data, array('u_id' => $uid));
+            $this->tableGateway->update($data, array('u_id' => $uId));
 
             return true;
         } else {
             return false;
         }
+    }
+
+    public function unSetFirstLogin($uid)
+    {
+        $data['u_id'] = $uid;
+        $data['u_first_login'] = 0;
+        $this->tableGateway->update($data, array('u_id' => $uid));
+
+        return true;
     }
 
     public function checkIfUserExists($email, $uId = 0)

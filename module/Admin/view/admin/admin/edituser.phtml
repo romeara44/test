@@ -42,7 +42,7 @@ $_options = array(0 => 'Current Month', 1 => 'Last Month', 2 => 'Last 3 Months',
                     <?php $fn = $form->get('u_role_id');
                     echo $this->formLabel($fn);
                     $attrs = array('id'=>'accountType', 'class'=>'form-control required');
-                    if ($this->uId):
+                    if ($this->uId && $this->roleId != \Admin\Model\User::ROLE_PARTIAL):
                         $attrs['disabled'] = 'disabled';
                     endif;
                     echo $this->formSelect($fn->setAttributes($attrs));

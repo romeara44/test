@@ -35,7 +35,7 @@ class ClientController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
         $identity = $this->getIdentity();
-        if (!in_array($identity['u_role_id'], array(1, 2, 3, 4))) {
+        if (!in_array($identity['u_role_id'], array(1, 2, 3, 4, 5, 7))) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
 
@@ -158,6 +158,9 @@ class ClientController extends AbstractActionController
         $notes = null;
         if ((int) $id) {
             $userObj = $this->getUserTable()->getUser($id);
+            if($userObj->u_first_login == 1) {
+                $this->getUserTable()->unSetFirstLogin($id);
+            }
             $clientObj = $this->getCompanyTable()->getCompany($userObj->u_company_id);
             $primaryAddressObj = $this->getAddressTable()->getAddress($clientObj->c_primary_adr_id);
             $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_CONTACT);
@@ -175,7 +178,7 @@ class ClientController extends AbstractActionController
                 if ($form->isValid()) {
 
                     $post = $request->getPost();
-                    $post['u_role_id'] = \Admin\Model\User::ROLE_CLIENT;
+                    $post['u_role_id'] = $identity['u_role_id'] == \Admin\Model\User::ROLE_PARTIAL ? \Admin\Model\User::ROLE_PARTIAL : \Admin\Model\User::ROLE_CLIENT;
                     $post['u_senior_consultant_u_id'] = $identity['u_id'];
                     $user->exchangeArray($post);
                     $user->u_sent_password = 0;

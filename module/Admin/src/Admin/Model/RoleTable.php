@@ -30,10 +30,16 @@ class RoleTable implements ServiceLocatorAwareInterface
         return $this->serviceLocator;
     }
 
-    public function getRoles()
+    public function getRoles($uRoleId = null)
     {
         $select = $this->tableGateway->getSql()->select();
-        $select->where('role_id <> 1');
+
+        if($uRoleId != \Admin\Model\User::ROLE_PARTIAL) {
+            $select->where('role_id <> 1');
+        } else {
+            $select->where('role_id IN (5, 7)');
+        }
+
         $resultSet = $this->tableGateway->selectWith($select);
 
         $roles = array();
