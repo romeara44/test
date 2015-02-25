@@ -91,15 +91,15 @@ $form->setAttribute('method', 'post');
             <?php foreach ($regulations as $key => $value) {?>
                 <div id="_regulation_wrap_<?php echo $value->rg_id?>" style="display:none">
                     <p>
-                        <label for="regulation_pp_name_<?php echo $value->rg_id?>">Policy&Procedure Names</label>
+                        <label for="regulation_pp_name_<?php echo $value->rg_id?>">Policy&Procedure Name</label>
                         <input type="text" name="_regulation[<?php echo $value->rg_id?>][rg_pp_name]" id="_regulation_pp_name_<?php echo $value->rg_id?>" value="<?php echo $value->rg_pp_name?>" readonly="readonly" disabled="disabled">
                     </p>
                     <p style="border: 0;">
-                        <label for="regulation_pp_number_<?php echo $value->rg_id?>">Policy&Procedure Numbers</label>
+                        <label for="regulation_pp_number_<?php echo $value->rg_id?>">Policy&Procedure Number</label>
                         <input type="text" name="_regulation[<?php echo $value->rg_id?>][rg_pp_number]" id="_regulation_pp_number_<?php echo $value->rg_id?>" value="<?php echo $value->rg_pp_number?>" readonly="readonly" disabled="disabled">
                     </p>
                     <p style="border: 0;">
-                        <label for="regulation_number_<?php echo $value->rg_id?>">Regulation Numbers</label>
+                        <label for="regulation_number_<?php echo $value->rg_id?>">Regulation Number</label>
                         <input type="text" name="_regulation[<?php echo $value->rg_id?>][rg_number]" id="_regulation_number_<?php echo $value->rg_id?>" value="<?php echo $value->rg_number?>" readonly="readonly" disabled="disabled">
                     </p>
                 </div>
