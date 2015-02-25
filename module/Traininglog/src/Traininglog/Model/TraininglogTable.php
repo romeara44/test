@@ -54,7 +54,7 @@ class TraininglogTable implements ServiceLocatorAwareInterface
             }
 
             if ($searchValue !== null) {
-                $select->where('(tl_regulation LIKE "%' . $searchValue . '%" OR  tl_attendees LIKE "%' . $searchValue . '%")');
+                $select->where('(tl_attendees LIKE "%' . $searchValue . '%")');
             }
 
             $select->join(array('tlt' => 'training_log_types'), 'tl_tlt_id = tlt_id', array('_tlt_name' => 'tlt_name'), 'inner');

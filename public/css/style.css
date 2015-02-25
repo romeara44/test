@@ -1,4 +1,4 @@
-/*
+g/*
 Theme Name: HIPAA Compliance by The Carosh Group
 Version: 1.0
 Author: click5 Interactive
@@ -214,12 +214,13 @@ body {
 	list-style-image: none;
 }
 
-#nav ul li {
+#nav > ul > li {
 	float: left;
 	height: 45px;
 	margin: 0;
 	padding: 0;
 	background: none;
+	position: relative;
 }
 
 #nav ul li a {
@@ -233,11 +234,64 @@ body {
 	line-height: 44px;
 	text-decoration: none;
 }
+
+#nav ul li ul{
+	position: absolute;
+	display: none;
+	left: 0;
+}
+
+#nav ul li:hover ul{
+	display: block;
+}
+
+#nav ul li li{
+	padding: 0;
+	display: block;
+}
+#nav ul li li a {
+	color: #fff;
+	height: auto;
+	padding: 10px 16px 10px 17px;
+	line-height: normal;
+	min-width: 143px;
+	background: #2e9f9f url(../images/nav-over.png) left top repeat-x;
+}
+#nav ul li li:hover a{
+	background-image: none;
+	color: #000!important;
+	-webkit-transition: all 0.5s ease;
+	-moz-transition: all 0.5s ease;
+	transition: all 0.5s ease;
+}
+
+#nav > ul > li.drop-down > a:after {
+	content: '';
+	display: inline-block;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 5px 4px 0 4px;
+	border-color: #ffffff transparent transparent transparent;
+	margin-left: 4px;
+	vertical-align: middle;
+	-webkit-transition: all 0.1s ease;
+	-moz-transition: all 0.1s ease;
+	transition: all 0.1s ease;
+}
+
+#nav > ul > li.drop-down:hover > a:after {
+	border-width: 4px 0 4px 5px;
+	padding-right: 3px;
+	border-color: transparent transparent transparent #ffffff;
+}
+
 .admin #nav ul li a { padding: 0 11px; }
 .client #nav ul li a { padding: 0 23px; }
 .sales-rep #nav ul li a { padding: 0 50px; }
 
-#nav ul li a:hover,
+#nav ul li:hover,
+#nav ul li:hover a,
 #nav ul li#current a {
 	color: #fff;
 	text-decoration: none;

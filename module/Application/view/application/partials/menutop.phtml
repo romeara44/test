@@ -1,9 +1,9 @@
 
 <ul>
     <?php foreach ($items as $item): ?>
-        <li id="<?php echo isset($item['active']) ? 'current' : '' ?>" <?php if(isset($item['disabled'])) {?> class="disabled"<?php }?>>
-            <a href="<?php echo $item['url'] ?>"><?php echo $item['title'] ?></a>
-            <?php if($item['items']) {?>
+        <li id="<?php echo isset($item['active']) ? 'current' : '' ?>" class="<?php echo (isset($item['disabled']) ? 'disabled ' : '')?><?php echo (isset($item['items']) ? 'drop-down' : '')?>">
+            <a href="<?php echo isset($item['items']) ? 'javascript:;' : $item['url'] ?>"><?php echo $item['title'] ?></a>
+            <?php if(isset($item['items'])) {?>
                 <ul>
                     <?php foreach ($item['items'] as $value) {?>
                         <li <?php if(isset($value['disabled'])) {?> class="disabled"<?php }?>><a href="<?php echo $value['url'] ?>"><?php echo $value['title'] ?></a></li>
