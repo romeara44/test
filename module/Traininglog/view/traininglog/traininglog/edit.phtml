@@ -127,7 +127,7 @@ $form->setAttribute('method', 'post');
 
         <div class="cboth"></div>
 
-        <p>
+        <p style="overflow: hidden;">
             <strong style="line-height: 40px; float:left;">Attendees</strong>
             <a id="browseFile_attendees" style="margin-right: 130px; float:right" href="javascript:" class="button"><i class="fa fa-plus-circle"></i> Import from CSV</a>
             <div id="filesToUploadBox_attendees">
@@ -135,10 +135,12 @@ $form->setAttribute('method', 'post');
             </div>
             <?php
             $fn = $form->get('tl_attendees');
+            ?>
+            <span class="tl_attendees_description">"CSV file format: First name, Last name, title, email address"</span>
+            <?php
             echo $this->formTextarea($fn->setAttributes(array('class'=>'', 'style' => 'width: 450px; height: 85px;')));
             echo $this->formElementErrors($fn);
             ?>
-            <span class="tl_attendees_description">"CSV file format: First name, Last name, title, email address"</span>
         </p>
 
         <p style="border: 0;">
