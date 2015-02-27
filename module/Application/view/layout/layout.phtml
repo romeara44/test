@@ -141,7 +141,7 @@
         <div class="activity-box">
             <p>You will be log out after <span id="secLeft">60</span> sec. Click <a id="resetActivity" href="javascript:">OK</a> to continue</p>
         </div>
-        <div id="need-activation-box">
+        <div class="need-activation-box">
             <?php $application_vars = new Zend\Session\Container('application_vars');?>
             <p>This module is not activated, contact <?php  echo $application_vars->storage['register_email']?> to find out about activation</p>
         </div>
@@ -197,7 +197,7 @@
             }, 10000);
         }
         $('li.disabled a').click(function() {
-            $('#need-activation-box').show().animate({opacity: 1.0}, 3000).fadeOut(1000);
+            $('.need-activation-box').show().animate({opacity: 1.0}, 3000).fadeOut(1000);
         })
     </script>
 </html>
