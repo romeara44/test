@@ -30,5 +30,8 @@ return array(
     'translator' => array(
         'locale' => 'pl_PL'
     ),
+    'application_vars' => array(
+        'register_email' => 'Registration@Carosh.com'
+    )
 );
 

@@ -112,7 +112,8 @@ class DashboardController extends AbstractActionController
         $container = new Container('activity');
         $container->activity = time();
         $container = new Container('files');
-
+        $identity  = $this->getIdentity();
+        
         if ($container->item != '') {
             $container->item = '';
             $this->redirect()->toUrl($container->item);
@@ -121,7 +122,7 @@ class DashboardController extends AbstractActionController
         $container = new Container('files');
 
         $viewModel = new ViewModel(array(
-
+            'usRoleId' => $identity['u_role_id']
         ));
 
         return $viewModel;
@@ -129,6 +130,11 @@ class DashboardController extends AbstractActionController
 
     public function consultantAction()
     {
+        $identity = $this->getIdentity();
+        if (!in_array($identity['u_role_id'], array(1, 2, 3))) {
+            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+        }
+
         $container = new Container('activity');
         $container->activity = time();
         $container = new Container('files');
@@ -155,6 +161,10 @@ class DashboardController extends AbstractActionController
 
     public function salesrepAction()
     {
+        $identity = $this->getIdentity();
+        if (!in_array($identity['u_role_id'], array(1, 2, 3, 4))) {
+            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+        }
         $container = new Container('activity');
         $container->activity = time();
         $container = new Container('files');
@@ -176,6 +186,10 @@ class DashboardController extends AbstractActionController
 
     public function adminAction()
     {
+        $identity = $this->getIdentity();
+        if (!in_array($identity['u_role_id'], array(1))) {
+            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+        }
         $container = new Container('activity');
         $container->activity = time();
         $container = new Container('files');

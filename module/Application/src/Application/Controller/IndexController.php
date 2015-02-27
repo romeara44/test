@@ -48,6 +48,12 @@ class IndexController extends AbstractActionController
         $this->layout()->flashMessagesErrors = $this->flashMessenger()->getErrorMessages();
         if ($this->hasIdentity()) {
             $identity = $this->getIdentity();
+            $config = $this->getServiceLocator()->get('config');
+            if(isset($config['application_vars'])) {
+                $container = new Container('application_vars');
+                $container->storage = $config['application_vars'];
+            }
+            
             if ($identity['u_role_id'] == 1) {
                 return $this->redirect()->toRoute('dashboard', array('controller' => 'dashboard', 'action' => 'admin'));
             } elseif (in_array($identity['u_role_id'], array(2, 3))) {

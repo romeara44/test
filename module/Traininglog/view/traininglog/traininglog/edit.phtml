@@ -15,7 +15,7 @@ $form->setAttribute('method', 'post');
 
 
     <div class="page-title">
-        <h1 class="fleft">Add New Training Log</h1>
+        <h1 class="fleft"><?php if($this->tlId) {?>Edit<?php } else {?>Add New <?php }?>Training Log</h1>
         <div class="cboth"></div>
     </div>
 
@@ -129,7 +129,7 @@ $form->setAttribute('method', 'post');
 
         <p>
             <strong style="line-height: 40px; float:left;">Attendees</strong>
-            <a id="browseFile_attendees" style="margin-right: 130px; float:right" href="javascript:" class="button"><i class="fa fa-plus-circle"></i> Browse Files...</a>
+            <a id="browseFile_attendees" style="margin-right: 130px; float:right" href="javascript:" class="button"><i class="fa fa-plus-circle"></i> Import from CSV</a>
             <div id="filesToUploadBox_attendees">
 
             </div>
@@ -138,6 +138,7 @@ $form->setAttribute('method', 'post');
             echo $this->formTextarea($fn->setAttributes(array('class'=>'', 'style' => 'width: 450px; height: 85px;')));
             echo $this->formElementErrors($fn);
             ?>
+            <span class="tl_attendees_description">"CSV file format: First name, Last name, title, email address"</span>
         </p>
 
         <p style="border: 0;">
@@ -297,7 +298,7 @@ $form->setAttribute('method', 'post');
             $('#type').change(function(){
                 if($('#type option:selected').text() != 'Initial') {
                     $("#tl_hire_date").datepicker("disable").val('-');
-                } else { console.log(1);
+                } else {
                     $("#tl_hire_date").val('').attr('disabled',false).datepicker('enable');
                 }
             });

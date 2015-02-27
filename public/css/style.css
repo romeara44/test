@@ -721,6 +721,11 @@ h1.security_reminders {
     display: block;
     margin: 10px 0;
 }
+.tl_attendees_description {
+    clear: left;
+    display: block;
+    margin: 3px 0;
+}
 /* Tabs */
 
 ul#tabs-nav {
@@ -1170,7 +1175,8 @@ form ul li {
 
 .confirmation-box,
 .confirmation-box-error,
-.activity-box {
+.activity-box,
+.need-activation-box {
     display: none;
     z-index: 10000;
     position: absolute;
@@ -1180,7 +1186,8 @@ form ul li {
 }
 
 .confirmation-box p,
-.activity-box p {
+.activity-box p,
+.need-activation-box p {
     display: block;
     padding: 15px 30px;
     text-align: center;
