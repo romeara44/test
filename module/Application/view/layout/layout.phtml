@@ -143,7 +143,7 @@
         </div>
         <div class="need-activation-box">
             <?php $application_vars = new Zend\Session\Container('application_vars');?>
-            <p>This module is not activated, contact <?php  echo $application_vars->storage['register_email']?> to find out about activation</p>
+            <p>This module is not activated, contact <a href="mailto:<?php  echo $application_vars->storage['register_email']?>"><?php  echo $application_vars->storage['register_email']?></a> to find out about activation</p>
         </div>
     </body>
 
