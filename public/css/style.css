@@ -227,9 +227,9 @@ body {
 	display: block;
 	height: 45px;
 	margin: 0;
-	padding: 0 16px 0 17px;
+	padding: 0 15px;
 	color: #b6c1cb;
-	font-size: 16px;
+	font-size: 15px;
 	font-weight: 300;
 	line-height: 44px;
 	text-decoration: none;
@@ -286,10 +286,10 @@ body {
 	border-color: transparent transparent transparent #ffffff;
 }
 
-.admin #nav ul li a { padding: 0 11px; }
-.client #nav ul li a { padding: 0 23px; }
-.sales-rep #nav ul li a { padding: 0 50px; }
-
+.admin #nav ul li a, .sales-rep #nav ul li a, .client #nav ul li a { padding: 0 15px}
+.client #nav ul li li a, .sales-rep #nav ul li li a, .admin #nav ul li li a{
+	padding: 10px 16px 10px 17px;
+}
 #nav ul li:hover,
 #nav ul li:hover a,
 #nav ul li#current a {

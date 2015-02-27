@@ -74,9 +74,7 @@ class MenuTop extends AbstractHelper
         $this->items = array(
             array(
                 'title' => 'Dashboard',
-                'url' => '/dashboard/admin',
-                'items' => array(
-                )
+                'url' => '/dashboard/admin'
             ),
             array(
                 'title' => 'Clients',
@@ -104,9 +102,7 @@ class MenuTop extends AbstractHelper
             ),
             array(
                 'title' => 'Remediation Plans',
-                'url' => '/remediationplan/list',
-                'items' => array(
-                )
+                'url' => '/remediationplan/list'
             ),
             array(
                 'title' => 'Trainings',
