@@ -75,14 +75,14 @@
                     <a href="/user/account">My Profile</a><br />
                     <a href="/auth/logout">Logout</a>
                 </div>
-                    <?php if (($uRoleId != 6) && ($uRoleId != 5)): ?>
+                    <?php if (!in_array($uRoleId, array(5, 6, 7))): ?>
                         <div id="top-search">
                             <form id="formLogin" method="POST" action="/search/search">
                                 <a href="javascript:" onclick="$('#formLogin').submit()" id="search-button"></a>
                                 <input type="text" name="search" id="search" value="<?php echo (isset($this->query) && $this->query != '') ? $query : 'Search' ?>" onfocus="if (this.value=='Search') this.value='';" onblur="if (this.value=='') this.value='Search';" />
                             </form>
                         </div>
-                    <?php else: ?>
+                    <?php elseif($uRoleId != 7): ?>
                         <div id="top-contact">
                             <?php $uConsultant = $this->getConsultant($sl); ?>
                             <strong>Your Consultant</strong> &mdash; <?php echo $uConsultant->u_firstname ?> <?php echo $uConsultant->u_lastname ?><br />
