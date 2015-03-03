@@ -893,7 +893,7 @@ class RemediationplanController extends AbstractActionController
     public function sendemailtestAction()
     {
         $mail = new Mail\Message();
-        $mail->setFrom('postmaster@click5dev7.com', 'HIPAA Compliance');
+        $mail->setFrom('postmaster@click5dev7.com', 'HIPAA Suite');
 
 
         $html = new \Zend\Mime\Part('test');

@@ -144,8 +144,8 @@ class MailtemplateTable
             $mail->setFrom('hipaa@hipaa.carosh.com', $identity['u_firstname'] . ' ' . $identity['u_lastname']);
             $mail->setReplyTo($identity['u_email'], $identity['u_firstname'] . ' ' . $identity['u_lastname']);
         } else {
-            $mail->setFrom('hipaa@hipaa.carosh.com', 'HIPAA Compliance');
-            $mail->addReplyTo('hipaa@hipaa.carosh.com', 'HIPAA Compliance');
+            $mail->setFrom('hipaa@hipaa.carosh.com', 'HIPAA Suite');
+            $mail->addReplyTo('hipaa@hipaa.carosh.com', 'HIPAA Suite');
         }
 
         $htmlTemplateText = $this->_getHtmlTemplate($sl, $text);

@@ -1,2 +1,28 @@
 TRUNCATE TABLE  `training_log_types`;
 INSERT INTO  `training_log_types` (`tlt_id` ,`tlt_name`) VALUES (NULL ,  'Intial'), (NULL ,  'Reoccurring'), (NULL ,  'Post breach');
+
+UPDATE  `mail_templates` SET  `mt_text` =  '<div style="font-size: 24px; color: #189696"><Full Name>,</div>
+<br />
+<b>You have been invited to use HIPAA Suite application by <Consultant Name>.</b>
+<br /><br />
+
+Your login information is:<br />
+Login page: http://hipaa.carosh.com/<br />
+Your login: <login><br/>
+Your password: <password><br />
+<br />
+Please do not hesitate to contact us with any questions.' WHERE  `mail_templates`.`mt_id` =6;
+
+UPDATE  `hipaacar_app`.`mail_templates` SET  `mt_text` =  '<div style="font-size: 24px; color: #189696"><Full Name>,</div>
+<br />
+<b>You have been registered in HIPAA Suite application by <Consultant Name>.</b>
+<br /><br />
+
+Your login information is:<br />
+
+Confirmation link: http://hipaa.carosh.com/<link><br />
+Login page: http://hipaa.carosh.com/<br />
+Your login: <login><br/>
+Your password: <password><br />
+<br />
+Please do not hesitate to contact us with any questions.' WHERE  `mail_templates`.`mt_id` =11;

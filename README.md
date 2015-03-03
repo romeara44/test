@@ -1,4 +1,4 @@
 HIPAA
 =====
 
-HIPAA Compliance by The Carosh Group
+HIPAA Suite by The Carosh Group
