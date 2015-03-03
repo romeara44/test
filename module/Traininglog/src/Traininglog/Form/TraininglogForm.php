@@ -79,13 +79,20 @@ class TraininglogForm extends Form
             ),
         ));
 
+        $traininglogTable = $sl->get('Traininglog\Model\TraininglogTable');
+        $trainers[''] = 'Please Select';
+        foreach ($traininglogTable->getTrainers() as $key => $r) {
+            $trainers[$key] = $r;
+        }
+
+        $trainers['-1'] = 'Other';
+
         $this->add(array(
-            'name' => 'tl_trainer',
-            'attributes' => array(
-                'type'  => 'text',
-            ),
+            'name' => '_tl_trainer',
+            'type' => 'Zend\Form\Element\Select',
             'options' => array(
                 'label' => 'Trainer',
+                'value_options' => $trainers
             ),
         ));
 

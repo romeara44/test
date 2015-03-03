@@ -12,7 +12,8 @@ class Traininglog
     public $tl_tlt_id;
     public $tl_conducted_date;
     public $tl_hire_date;
-    public $tl_trainer;
+    public $tl_trainer_id;
+    public $tl_trainer_type;
     public $tl_attendees;
     public $tl_active;
 
@@ -24,6 +25,8 @@ class Traininglog
     public $_tl_regulation;
     public $_tl_cur_regulations;
     public $_regulation;
+    public $_tl_trainer;
+    public $_tl_trainer_name;
 
     protected $inputFilter;
 
@@ -33,7 +36,8 @@ class Traininglog
         $this->tl_tlt_id           = (isset($data['tl_tlt_id']))           ? $data['tl_tlt_id']           : null;
         $this->tl_conducted_date   = (isset($data['tl_conducted_date']))   ? $data['tl_conducted_date']   : null;
         $this->tl_hire_date        = (isset($data['tl_hire_date']))        ? $data['tl_hire_date']        : null;
-        $this->tl_trainer          = (isset($data['tl_trainer']))          ? $data['tl_trainer']          : null;
+        $this->tl_trainer_id       = (isset($data['tl_trainer_id']))       ? $data['tl_trainer_id']       : null;
+        $this->tl_trainer_type     = (isset($data['tl_trainer_type']))     ? $data['tl_trainer_type']     : null;
         $this->tl_attendees        = (isset($data['tl_attendees']))        ? $data['tl_attendees']        : null;
         $this->tl_active           = (isset($data['tl_active']))           ? $data['tl_active']           : null;
         $this->_tlt_name           = (isset($data['_tlt_name']))           ? $data['_tlt_name']           : null;
@@ -44,6 +48,8 @@ class Traininglog
         $this->_tl_regulation      = (isset($data['_tl_regulation']))      ? $data['_tl_regulation']      : null;
         $this->_tl_cur_regulations = (isset($data['_tl_cur_regulations'])) ? $data['_tl_cur_regulations'] : null;
         $this->_regulation         = (isset($data['_regulation']))         ? $data['_regulation']         : null;
+        $this->_tl_trainer         = (isset($data['_tl_trainer']))         ? $data['_tl_trainer']         : null;
+        $this->_tl_trainer_name    = (isset($data['_tl_trainer_name']))    ? $data['_tl_trainer_name']    : null;
     }
 
     public function getArrayCopy()

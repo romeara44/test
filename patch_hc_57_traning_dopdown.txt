@@ -1,0 +1,8 @@
+ALTER TABLE  `training_logs` CHANGE  `tl_trainer`  `tl_trainer_id` INT( 11 ) NOT NULL ;
+ALTER TABLE  `training_logs` ADD  `tl_trainer_type` ENUM(  'user',  'trainer' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT  'user' AFTER  `tl_trainer_id` ;
+CREATE TABLE IF NOT EXISTS `trainers` (
+  `tr_id` int(11) NOT NULL AUTO_INCREMENT,
+  `tr_name` varchar(255) NOT NULL,
+  `tr_company_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`tr_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;

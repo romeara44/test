@@ -56,12 +56,14 @@ class TraininglogTable implements ServiceLocatorAwareInterface
             if ($searchValue !== null) {
                 $select->where('(tl_attendees LIKE "%' . $searchValue . '%")');
             }
-
+            $select->columns(array('tl_id', '_tl_trainer_name' => new \Zend\Db\Sql\Expression('IF(tr.tr_name IS NULL, CONCAT(u.u_firstname, " ", u.u_lastname), tr.tr_name)')));
             $select->join(array('tlt' => 'training_log_types'), 'tl_tlt_id = tlt_id', array('_tlt_name' => 'tlt_name'), 'inner');
             $select->join(array('n' => 'notes'), new \Zend\Db\Sql\Expression('tl_id = n.note_item_id'), array('_tl_comment' => new \Zend\Db\Sql\Expression('n.note_text')), 'left');
             $select->join(array('n2' => 'notes'), new \Zend\Db\Sql\Expression('tl_id = n2.note_item_id AND n2.note_text =""'), array('_tl_attachment' => new \Zend\Db\Sql\Expression('n2.note_id')), 'left');
             $select->join(array('tlrg' => 'training_logs_regulations'), new \Zend\Db\Sql\Expression('tl_id = tlrg.tlrg_tl_id'), array('_tl_tlrg_rg_id' => new \Zend\Db\Sql\Expression('tlrg.tlrg_rg_id')), 'left');
             $select->join(array('rg' => 'regulations'), new \Zend\Db\Sql\Expression('tlrg.tlrg_rg_id = rg.rg_id'), array('_tl_regulation' => new \Zend\Db\Sql\Expression('rg.rg_pp_name')), 'left');
+            $select->join(array('tr' => 'trainers'), new \Zend\Db\Sql\Expression('CONCAT(tl_trainer_type, "_", tl_trainer_id) = CONCAT("trainer", "_", tr.tr_id)'), array(), 'left');
+            $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('CONCAT(tl_trainer_type, "_", tl_trainer_id) = CONCAT("user", "_", u.u_id)'), array(), 'left');
 
             if ($orderBy) {
                 $order = $order ? $order : 'ASC';
@@ -73,10 +75,19 @@ class TraininglogTable implements ServiceLocatorAwareInterface
 
             $paginator = new Paginator($paginatorAdapter);
 
- // print_r($select->getSqlString());exit;
             return $paginator;
         }
         $resultSet = $this->tableGateway->select();
+
+        foreach ($resultSet as $key => $trainingLog) {
+            if($trainingLog->tl_trainer_type == 'trainer') {
+                $trainer = $this->getServiceLocator()->get('Traininglog\Model\TrainerTable')->getTrainer($trainingLog->tl_trainer_id);
+                $resultSet[$key]->_trainer_name = $trainer->tr_name;
+            } else {
+                $user = $this->getServiceLocator()->get('Traininglog\Model\UserTable')->getTrainer($trainingLog->tl_trainer_id);
+                $resultSet[$key]->_trainer_name = $user->u_firstname . ' ' . $user->u_lastname;
+            }
+        }
 
         return $resultSet;
     }
@@ -102,11 +113,40 @@ class TraininglogTable implements ServiceLocatorAwareInterface
         $select->where("tl_id =" . $id);
 
         $regulations = $this->tableGateway->selectWith($select);
-        
+
+        $row->_tl_trainer = $row->tl_trainer_type . '_' . $row->tl_trainer_id;
+
         foreach ($regulations as $rs) {
             $row->_tl_cur_regulations[$rs->_tl_tlrg_id] = $rs->_tl_tlrg_rg_id;
         }
         return $row;
+    }
+
+    public function getTrainers()
+    {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
+        $result = array();
+
+        $users    = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUsersByCompany($identity['u_company_id']);
+        $trainers = $this->getServiceLocator()->get('Traininglog\Model\TrainerTable')->getTrainersByCompany($identity['u_company_id']);
+
+        foreach ($users as $key => $user) {
+            $result['user_' . $user->u_id] = $user->u_firstname . ' ' . $user->u_lastname;
+        }
+
+        if($trainers->count() > 0) {
+            foreach ($trainers as $key => $trainer) {
+                $result['trainer_' . $trainer->tr_id] = $trainer->tr_name;
+            }
+
+        }
+
+        natcasesort($result);
+
+        return $result;
     }
 
     public function saveTraininglog(Traininglog $traininglog)
@@ -119,9 +159,13 @@ class TraininglogTable implements ServiceLocatorAwareInterface
             'tl_tlt_id'         => $traininglog->tl_tlt_id,
             'tl_conducted_date' => $traininglog->tl_conducted_date,
             'tl_hire_date'      => $traininglog->tl_hire_date,
-            'tl_trainer'        => $traininglog->tl_trainer,
             'tl_attendees'      => $traininglog->tl_attendees
         );
+
+        if($traininglog->_tl_trainer != '-1') {
+            $data['tl_trainer_id']   = $traininglog->tl_trainer_id;
+            $data['tl_trainer_type'] = $traininglog->tl_trainer_type;
+        }
 
         $id = (int) $traininglog->tl_id;
 
@@ -160,6 +204,14 @@ class TraininglogTable implements ServiceLocatorAwareInterface
                 } else {
                     $traininglogRegulationTable->saveTraininglogRegulation(array('tlrg_tl_id' => $id, 'tlrg_rg_id' => $_tl_cur_regulation));
                 }
+            }
+        }
+
+        if($traininglog->_tl_trainer == '-1' && $traininglog->_tl_trainer_name) {
+            $trainerTable = $this->getServiceLocator()->get('Traininglog\Model\TrainerTable');
+            $trainerId = $trainerTable->saveTrainer(array('tr_company_id' => $identity['u_company_id'], 'tr_name' => $traininglog->_tl_trainer_name));
+            if($trainerId) {
+                 $this->tableGateway->update(array('tl_trainer_id' => $trainerId, 'tl_trainer_type' => 'trainer'), array('tl_id' => $id));
             }
         }
 

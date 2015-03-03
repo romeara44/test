@@ -36,6 +36,17 @@ class Module
                         $resultSetPrototype = new ResultSet();
                         $resultSetPrototype->setArrayObjectPrototype(new \Traininglog\Model\TraininglogRegulation());
                         return new TableGateway('training_logs_regulations', $dbAdapter, null, $resultSetPrototype);
+                },
+                'Traininglog\Model\TrainerTable' =>  function($sm) {
+                    $tableGateway = $sm->get('TrainerTableGateway');
+                    $table = new \Traininglog\Model\TrainerTable($tableGateway);
+                    return $table;
+                },
+                'TrainerTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new \Traininglog\Model\Trainer());
+                    return new TableGateway('trainers', $dbAdapter, null, $resultSetPrototype);
                 },'Traininglog\Model\RegulationTable' =>  function($sm) {
                         $tableGateway = $sm->get('RegulationTableGateway');
                         $table = new \Traininglog\Model\RegulationTable($tableGateway);

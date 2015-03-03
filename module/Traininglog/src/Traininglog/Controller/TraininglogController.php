@@ -120,7 +120,7 @@ class TraininglogController extends AbstractActionController
             'type'           => 'tl_tlt_id',
             'conducted_date' => 'tl_conducted_date',
             'hire_date'      => 'tl_hire_date',
-            'trainer'        => 'tl_trainer'
+            'trainer'        => '_tl_trainer_name'
         );
 
         $mappingTypeItem = array(
@@ -177,7 +177,11 @@ class TraininglogController extends AbstractActionController
         if ($request->isPost()) {
             $tl = new Traininglog();
             $post = $request->getPost();
-            
+
+            if($post['_tl_trainer'] != '-1') {
+                list($post['tl_trainer_type'], $post['tl_trainer_id']) = explode('_', $post['_tl_trainer']);
+            }
+
             $ymds['tl_conducted_date'] = \DateTime::createFromFormat('m/d/Y', $post['tl_conducted_date']);
             $ymds['tl_hire_date']      = \DateTime::createFromFormat('m/d/Y', $post['tl_hire_date']);
             

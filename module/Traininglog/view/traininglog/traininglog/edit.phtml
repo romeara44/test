@@ -72,11 +72,16 @@ $form->setAttribute('method', 'post');
 
         <p>
             <?php
-            $fn = $form->get('tl_trainer');
+            $fn = $form->get('_tl_trainer');
             echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id'=>'tl_trainer')));
+            echo $this->formSelect($fn->setAttributes(array('class'=>'form-control required', 'id'=>'_tl_trainer')));
             echo $this->formElementErrors($fn);
             ?>
+        </p>
+
+        <p id="_tl_trainer_name_wrap" style="border: 0;display: none">
+            <label for="_tl_trainer_name">Trainer Name</label>
+            <input type="text" name="_tl_trainer_name" id="_tl_trainer_name" value="<?php echo $tlObj->_tl_trainer_name?>" required disabled="disabled">
         </p>
 
         <p>
@@ -321,6 +326,16 @@ $form->setAttribute('method', 'post');
 
         $('#_tl_cur_regulations').change(function(){
             regulationHandle();
+        });
+
+        $('#_tl_trainer').change(function(){
+            if($('#_tl_trainer option:selected').val() == '-1') {
+                $('#_tl_trainer_name_wrap').css('display', 'block');
+                $('#_tl_trainer_name').attr('disabled', false);
+            } else {
+                $('#_tl_trainer_name_wrap').css('display', 'none');
+                $('#_tl_trainer_name').attr('disabled', true);
+            }
         });
 
        

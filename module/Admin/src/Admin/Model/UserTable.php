@@ -111,11 +111,15 @@ class UserTable implements ServiceLocatorAwareInterface
         return $select;
     }
 
-    public function getUsersByCompany($companyId, $primaryContactId = null)
+    public function getUsersByCompany($companyId = null, $primaryContactId = null)
     {
         $select = $this->tableGateway->getSql()->select();
         $select->where('u_active = 1');
-        $select->where('u_company_id = ' . $companyId);
+        if($companyId) {
+            $select->where('u_company_id = ' . $companyId);
+        } else {
+            $select->where('u_company_id IS NULL');
+        }
 
         $resultSet = $this->tableGateway->selectWith($select);
 
