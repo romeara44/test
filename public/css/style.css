@@ -94,8 +94,7 @@ body {
 
 #header #logo {
 	float: left;
-	width: 175px;
-	height: 110px;
+	margin-top: 25px;
 }
 
 #header #logo a {

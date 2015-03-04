@@ -208,7 +208,7 @@ class CompanyController extends AbstractActionController
             'contacts' => $contacts,
             'notes' => $notes,
             'primaryContactId'=> $primaryContactId,
-            'roleId' => $identity['u_role_id']
+            'roleId' => $identity['u_role_id'],
             'checkClientLimitCompany' => $checkClientLimitCompany
         );
     }
