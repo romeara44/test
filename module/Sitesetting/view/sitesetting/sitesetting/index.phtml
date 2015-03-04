@@ -1,0 +1,37 @@
+<div class="page-title">
+    <h1 class="fleft">Site Settings</h1>
+    <div class="cboth"></div>
+</div>
+
+<p></p>
+
+<div class="col-left">
+    <form action="/sitesetting" method="post" name="sitesetting" id="sitesetting">
+        <?php if (is_object($ssObjs) && ($ssObjs->count())): ?> 
+            <?php foreach ($ssObjs as $ssObj): ?>
+                <label for="<?php echo $ssObj->ss_name?>"><?php echo $ssObj->ss_title?></label>
+                <?php if($ssObj->ss_name == \Sitesetting\Model\Sitesetting::NUMBER_USERS_OF_COMPANY): ?>
+                    <input type="hidden" name="<?php echo $ssObj->ss_name?>[ss_id]" value="<?php echo $ssObj->ss_id?>">
+                    <select name="<?php echo $ssObj->ss_name?>[ss_value]" id="<?php echo $ssObj->ss_name?>">
+                        <?php for($i = 5; $i < 35; $i += 5): ?>
+                            <option value="<?php echo $i?>" <?php if($i == $ssObj->ss_value):?>selected <?php endif;?>><?php echo $i?></option>
+                        <?php endfor; ?>
+                        <option value="0" <?php if(!$ssObj->ss_value):?>selected <?php endif;?>>unlimited</option>
+                    </select>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        <?php endif; ?>
+        
+        <div class="cboth"></div>
+
+        <div class="form-buttons">
+            <input type="submit" value="Save" class="form-button" />
+            <div class="fleft">or</div>
+            <a href="/sitesetting" class="cancel">Cancel</a>
+        </div>
+
+    </form>
+</div>
+
+<div class="cboth"><br /></div>
+

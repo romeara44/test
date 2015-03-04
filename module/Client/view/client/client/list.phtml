@@ -11,7 +11,9 @@ $identity = $authService->getIdentity();
     <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 1)); ?>" class="label <?php echo $roleFilter == 1 ? ' selected ' : '' ?>">Companies</a>
     <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 2)); ?>" class="label <?php echo $roleFilter == 2 ? ' selected ' : '' ?>">Contacts</a>
     <a href="/client/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Contact</a>
-    <a href="/company/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Company</a>
+    <?php if($checkClientLimitCompany): ?>
+        <a href="/company/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Company</a>
+    <?php endif;?>
     <div class="cboth"></div>
 </div>
 

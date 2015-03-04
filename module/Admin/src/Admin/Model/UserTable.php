@@ -143,6 +143,27 @@ class UserTable implements ServiceLocatorAwareInterface
         return $users;
     }
 
+    public function checkCompanyLimitClient($companyId)
+    {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
+        if (!in_array($identity['u_role_id'], array(User::ROLE_CLIENT, User::ROLE_PARTIAL))) {
+            return true;
+        }
+
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('u_active = 1');
+        $select->where('u_company_id = ' . $companyId);
+
+        $resultSet = $this->tableGateway->selectWith($select)->count();
+
+        $value = $this->getServiceLocator()->get('Sitesetting\Model\SitesettingTable')->getValueByName(\Sitesetting\Model\Sitesetting::NUMBER_USERS_OF_COMPANY);
+
+        return (bool)($value < 1 || $resultSet <= $value);
+    }
+
     public function getUser($id)
     {
         $id  = (int) $id;

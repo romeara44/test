@@ -326,11 +326,11 @@ class CompanyTable implements ServiceLocatorAwareInterface
         }
         $select = $this->tableGateway->getSql()->select();
 
-        $select->where('c_primary_contact_u_id = ' . $identity['u_id']);
+        $select->where('c_owner_u_id = ' . $identity['u_id']);
 
         $resultSet = $this->tableGateway->selectWith($select)->count();
         
-        return (bool) $resultSet <= 5;
+        return (bool)($resultSet <= 1);
     }
 
     public function setPrimaryAddressId($companyId, $addressId)

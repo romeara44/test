@@ -77,7 +77,11 @@ $form->setAttribute('method', 'post');
                 <input type="checkbox" name="is_primary_contact" id="primaryContact" class="checkbox" value="1" />
                 <label for="primaryContact" class="checkbox">Primary Contact</label>
             </p>
-
+            <p style="padding: 0;border-top: 0;">
+                <?php if($clientLimitMsg) :?>
+                    <label style="padding:0" for="u_company_id" generated="true" class="error"><?php echo $clientLimitMsg ?></label>
+                <?php endif; ?>
+            </p>
             <p>
                 <?php
                 $fn = $form->get('u_office_phone');

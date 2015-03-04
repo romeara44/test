@@ -127,7 +127,8 @@ class ClientController extends AbstractActionController
             'page' => $page,
             'paginator' => $paginator,
             'hasIdentity' => $this->hasIdentity(),
-            'roleFilter' => $roleFilter
+            'roleFilter' => $roleFilter,
+            'checkClientLimitCompany' => $this->getCompanyTable()->checkClientLimitCompany()
         ));
 
         return $view;
@@ -156,6 +157,9 @@ class ClientController extends AbstractActionController
         $clientObj = null;
         $primaryAddressObj = null;
         $notes = null;
+        $clienLimit = true;
+        $clientLimitMsg = '';
+
         if ((int) $id) {
             $userObj = $this->getUserTable()->getUser($id);
             if($userObj->u_first_login == 1) {
@@ -175,9 +179,15 @@ class ClientController extends AbstractActionController
                 $form->setInputFilter($user->getClientInputFilter($this->getServiceLocator(), $id, $uId));
                 $form->setData($request->getPost());
 
-                if ($form->isValid()) {
+                $post = $request->getPost();
 
-                    $post = $request->getPost();
+                if($form->isValid() && (!$id && $post['u_company_id'] && !$this->getUserTable()->checkCompanyLimitClient($post['u_company_id']))) {
+                    $clientLimitMsg = 'You cannot create more than ' . $this->getServiceLocator()->get('Sitesetting\Model\SitesettingTable')->getValueByName(\Sitesetting\Model\Sitesetting::NUMBER_USERS_OF_COMPANY) . ' user for company.';
+                    $clienLimit = false;
+                }
+
+                if ($form->isValid() && $clienLimit) {
+
                     $post['u_role_id'] = $identity['u_role_id'] == \Admin\Model\User::ROLE_PARTIAL ? \Admin\Model\User::ROLE_PARTIAL : \Admin\Model\User::ROLE_CLIENT;
                     $post['u_senior_consultant_u_id'] = $identity['u_id'];
                     $user->exchangeArray($post);
@@ -249,7 +259,8 @@ class ClientController extends AbstractActionController
             'primaryAddressObj' => $primaryAddressObj,
             'formNote' => $formNote,
             'notes' => $notes,
-            'cId' => (int) $this->params('company')
+            'cId' => (int) $this->params('company'),
+            'clientLimitMsg' => $clientLimitMsg
         );
     }
 

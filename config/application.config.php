@@ -20,7 +20,8 @@ return array(
         'Dashboard',
         'Search',
         'Traininglog',
-        'Securityreminder'
+        'Securityreminder',
+        'Sitesetting'
         ),
     'module_listener_options' => array(
         'module_paths' => array(

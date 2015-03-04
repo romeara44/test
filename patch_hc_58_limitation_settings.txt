@@ -1,0 +1,14 @@
+CREATE TABLE IF NOT EXISTS `site_settings` (
+  `ss_id` int(11) NOT NULL AUTO_INCREMENT,
+  `ss_name` varchar(255) NOT NULL,
+  `ss_title` varchar(255) NOT NULL,
+  `ss_value` text NOT NULL,
+  PRIMARY KEY (`ss_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+
+--
+-- Дамп данных таблицы `site_settings`
+--
+
+INSERT INTO `site_settings` (`ss_id`, `ss_name`, `ss_title`, `ss_value`) VALUES
+(1, 'number_users_of_company', 'Max. number of users per company', '5');

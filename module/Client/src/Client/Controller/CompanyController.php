@@ -110,9 +110,11 @@ class CompanyController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
 
+        $checkClientLimitCompany = $this->getCompanyTable()->checkClientLimitCompany();
+        
         if(!$id) {
-            if(!$this->getCompanyTable()->checkClientLimitCompany()) {
-                $this->flashMessenger()->addErrorMessage('You cannot create more than 5 companies');
+            if(!$checkClientLimitCompany) {
+                $this->flashMessenger()->addErrorMessage('You cannot create more than 1 companies');
                 return $this->redirect()->toRoute('client', array('controller' => 'client', 'action' => 'list'));
             }
         }
@@ -207,6 +209,7 @@ class CompanyController extends AbstractActionController
             'notes' => $notes,
             'primaryContactId'=> $primaryContactId,
             'roleId' => $identity['u_role_id']
+            'checkClientLimitCompany' => $checkClientLimitCompany
         );
     }
 
