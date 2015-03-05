@@ -22,7 +22,7 @@ return array(
                         'order_by' => '[a-zA-Z][a-zA-Z0-9_-]*',
                         'order' => 'ASC|DESC',
                         'roleFilter' => '[0-9]+',
-                        'search' => '[a-zA-Z0-9_-]*',
+                        'search' => '.*',
                     ),
                     'defaults' => array(
                         'controller' => 'Traininglog\Controller\Traininglog',
