@@ -330,7 +330,7 @@ class CompanyTable implements ServiceLocatorAwareInterface
 
         $resultSet = $this->tableGateway->selectWith($select)->count();
         
-        return (bool)($resultSet <= 1);
+        return (bool)($resultSet < 1);
     }
 
     public function setPrimaryAddressId($companyId, $addressId)
