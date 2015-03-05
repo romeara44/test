@@ -14,8 +14,10 @@ $form->setAttribute('method', 'post');
 ?>
 <div class="page-title">
     <h1 class="fleft"><?php if (!$uId): ?>Add New Contact<?php else: ?>Contact Details<?php endif; ?></h1>
-    <a href="/company/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Company</a>
-
+    <?php if($checkClientLimitCompany): ?>
+        <a href="/company/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Company</a>
+    <?php endif; ?>
+    
     <?php if ($this->uId): ?>
         <ul id="tabs-nav">
             <li><a href="#tab1">Details</a></li>

@@ -260,7 +260,8 @@ class ClientController extends AbstractActionController
             'formNote' => $formNote,
             'notes' => $notes,
             'cId' => (int) $this->params('company'),
-            'clientLimitMsg' => $clientLimitMsg
+            'clientLimitMsg' => $clientLimitMsg,
+            'checkClientLimitCompany' => $this->getCompanyTable()->checkClientLimitCompany()
         );
     }
 

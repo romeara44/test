@@ -161,7 +161,7 @@ class UserTable implements ServiceLocatorAwareInterface
 
         $value = $this->getServiceLocator()->get('Sitesetting\Model\SitesettingTable')->getValueByName(\Sitesetting\Model\Sitesetting::NUMBER_USERS_OF_COMPANY);
 
-        return (bool)($value < 1 || $resultSet <= $value);
+        return (bool)($value < 1 || $resultSet < $value);
     }
 
     public function getUser($id)
