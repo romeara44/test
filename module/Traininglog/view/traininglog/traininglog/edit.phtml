@@ -107,6 +107,12 @@ $form->setAttribute('method', 'post');
                         <label for="regulation_number_<?php echo $value->rg_id?>">Regulation Number</label>
                         <input type="text" name="_regulation[<?php echo $value->rg_id?>][rg_number]" id="_regulation_number_<?php echo $value->rg_id?>" value="<?php echo $value->rg_number?>" readonly="readonly" disabled="disabled">
                     </p>
+                    <?php if($value->rg_u_owner_id): ?>
+                        <p style="border: 0;">
+                            <label for="regulation_description_<?php echo $value->rg_id?>">Regulation Description</label>
+                            <input type="text" name="_regulation[<?php echo $value->rg_id?>][rg_description]" id="_regulation_description_<?php echo $value->rg_id?>" value="<?php echo $value->rg_description?>">
+                        </p>
+                    <?php endif; ?>
                 </div>
             <?php }?>
         

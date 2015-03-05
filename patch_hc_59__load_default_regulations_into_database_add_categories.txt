@@ -1,0 +1,118 @@
+DROP TABLE `regulations`;
+
+CREATE TABLE IF NOT EXISTS `regulations` (
+  `rg_id` int(11) NOT NULL AUTO_INCREMENT,
+  `rg_pp_name` varchar(255) NOT NULL,
+  `rg_pp_number` varchar(255) NOT NULL,
+  `rg_number` varchar(255) NOT NULL,
+  `rg_description` text NOT NULL,
+  `rg_rgc_id` int(111) DEFAULT NULL,
+  `rg_u_owner_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`rg_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+--
+-- ƒ‡ÏÔ ‰‡ÌÌ˚ı Ú‡·ÎËˆ˚ `regulations`
+--
+
+INSERT INTO `regulations` (`rg_id`, `rg_pp_name`, `rg_pp_number`, `rg_number`, `rg_description`, `rg_rgc_id`, `rg_u_owner_id`) VALUES
+(1, 'Notice of Privacy Practices', 'PR-105', 'ß164.520;ß164.522(a)(1)(i);ß164.522(b)(1);ß164.530', '', 5, NULL),
+(2, 'Confidentiality of PHI', 'AS-105', 'ß164.502(a);ß164.502(b);ß164.514;ß164.308(a)(4)(ii)(B)', '', 1, NULL),
+(3, 'Pledge of Confidentiality', 'PR-110', 'ß164.502(a)', '', 5, NULL),
+(4, 'Use of PHI', 'PR-103', 'ß164.502(a);ß164.502(b);ß164.514', '', 5, NULL),
+(5, 'Minimum Necessary Use & Disclosure and Access to Electronic Protected Health Information', 'AS-110', 'ß164.502(b);ß164.514(d);ß164.308(a)(3)(ii)(A);ß164.308(a)(3)(ii)(B);ß164.308(a)(4)(ii)(B)', '', 1, NULL),
+(6, 'Policy for Requiring that Plan Documents include HIPAA disclosure constraints', 'AS-115', 'ß164.502(e);ß164.504(e)(1);ß164.308;ß164.314(a);', '', 1, NULL),
+(7, 'Acknowledgement of Receipt of Notice of Privacy Practices', 'PR-120', 'ß164.520(a)', '', 5, NULL),
+(8, 'Implementation Specifications', 'AS-120', 'ß164.306(d)(1);ß164.306(d)(2)', '', 1, NULL),
+(9, 'Development and Maintenance of Privacy Policies and Procedures', 'AS-125', 'ß164.316(a)', '', 1, NULL),
+(10, 'Disciplinary Actions for Breach of Confidentiality/ Privacy or Security', 'AS-130', 'ß164.308(a)(1)(ii)(c);ß164.530', '', 1, NULL),
+(11, 'Education and Training', 'AS-270', 'ß164.502(a);ß164.502(b);ß164.514;ß164.530;', '', 1, NULL),
+(12, 'Security Reminders', 'AS-135', 'ß164.308(a)(5)(ii)(A)', '', 1, NULL),
+(13, 'Definition of Terms', 'AS-140', 'ß164.502(a)', '', 1, NULL),
+(14, 'Job Description, Chief Privacy Officer', 'AS-140', 'ß 164.503(a)(2);ß 164.530', '', 1, NULL),
+(15, 'Job Description ñ Chief Security Officer', 'AS-145', 'ß164.308(a)(2)(i)', '', 1, NULL),
+(16, 'Non-Retaliation Policy', 'AS-150', 'ß164.530(g)', '', 1, NULL),
+(17, 'Disposal of PHI', 'PS-105', 'ß164.310(d)(2)(i)', '', 2, NULL),
+(18, 'E-Mail Policy', 'PS-110', 'ß164.316(b)(1)(i)', '', 2, NULL),
+(19, 'Fax Transmittal of PHI', 'AS-155', 'ß164.530(c)', '', 1, NULL),
+(20, 'Removal/Transporting PHI', 'AS-165', 'ß164.530(c)', '', 1, NULL),
+(21, 'Privacy Concern and Security Breach Policy', 'AS-170', 'ß164.308(a)(6)(ii);ß164.530(d)', '', 1, NULL),
+(22, 'What Constitutes a Breach of PHI', 'AS-180', 'ß164.400', '', 1, NULL),
+(23, 'Tracking Breach Incidents', 'AS-185', 'ß164.308(a)(1)(ii)(D);ß164.400', '', 1, NULL),
+(24, 'Mitigation After Improper Use and Disclosure of PHI', 'AS-190', 'ß164.530(f)', '', 1, NULL),
+(25, 'Mitigation After Improper Use and Disclosure of PHI', 'AS-195', 'ß164.530(f)', '', 1, NULL),
+(26, 'HIPAA Fraud and Abuse', 'AS-195', 'N/A', '', 1, NULL),
+(27, 'Access & Denial of Request for PHI', 'PR-130', 'ß164.524', '', 5, NULL),
+(28, 'Amending PHI', 'PR-135', 'ß164.526', '', 5, NULL),
+(29, 'Accounting of Disclosures', 'PR-140', 'ß164.528', '', 5, NULL),
+(30, 'Restricting Use and Disclosure', 'AS-200', 'ß164.308(a)(3)(ii)(A);ß164.308(a)(3)(ii)(B);ß164.522', '', 1, NULL),
+(31, 'Patient''s Request for Communications via Alternative Forms ñ part of Restricting Use and Disclosure', 'PR-145', 'ß164.522(b)(1)', '', 5, NULL),
+(32, 'Breach Notification Policy and Procedures', 'PR-150', 'ß164.400', '', 5, NULL),
+(33, 'Patient Authorization', 'PR-155', 'ß164.508', '', 5, NULL),
+(34, 'Family, Friends Notification', 'PR-160', 'ß164.510(b)', '', 5, NULL),
+(35, 'Family, Friends Notification', 'PR-165', 'ß164.510(b)', '', 5, NULL),
+(36, 'Fundraising', 'PR-165', 'ß164.514(f)(1)', '', 5, NULL),
+(37, 'Marketing', 'PR-170', 'ß164.508', '', 5, NULL),
+(38, 'Minors and Next of Kin', 'PR-175', 'ß164.508', '', 5, NULL),
+(39, 'Research', 'PR-180', 'ß164.512(i)', '', 5, NULL),
+(40, 'Revocation of Authorization', 'PR-185', 'ß164.508', '', 5, NULL),
+(41, 'Isolating Healthcare Clearinghouse Functions', 'AS-205', 'ß164.308(a)(4)(ii)(A)', '', 1, NULL),
+(42, 'Use and Disclosure - Not Requiring Authorizations', 'PR-190', 'ß164.512', '', 5, NULL),
+(43, 'De-Identified Patient Information', 'PR-250', 'ß164.502(d);ß164.514(b)', '', 5, NULL),
+(44, 'Development and Maintenance of Security Policies and Procedures', 'DR-105', 'ß164.316(a)', '', 4, NULL),
+(45, 'Risk Analysis', 'AS-210', 'ß164.308(a)(1)(ii)(A);ß164.308(a)(1)(ii)(B)', '', 1, NULL),
+(46, 'Protection from Malicious Software', 'AS-215', 'ß164.308(a)(5)(ii)(B)', '', 1, NULL),
+(47, 'Log in Monitoring', 'AS-220', 'ß164.308(a)(5)(ii)(C);ß164.308(a)(1)(ii)(D)', '', 1, NULL),
+(48, ' Password Management', 'TS-105', 'ß164.312(a)(2)(i);ß164.308(a)(5)(ii)(D)', '', 3, NULL),
+(49, 'Data Back-up and Storage', 'AS-225', 'ß164.308(a)(7)(ii)(A)', '', 1, NULL),
+(50, 'Receipt and Removal of Hardware Containing EPHI', 'PS-115', 'ß164.310(d)(2)(i)', '', 2, NULL),
+(51, 'Automatic Logoff', 'TS-110', 'ß164.312(a)(2)(iii)', '', 3, NULL),
+(52, 'Encryption and Decryption of Electronically Transmitted Data', 'TS-115', 'ß164.312(a)(2)(iv);ß164.312(e)(2)(ii)', '', 3, NULL),
+(53, 'Facility Access Controls', 'PS-120', 'ß164.310(a)(1)', '', 2, NULL),
+(54, 'Access Controls and Validation Procedures', 'PS-125', 'ß164.310(a)(2)(iii)', '', 2, NULL),
+(55, 'Facility Security Plan', 'PS-130', 'ß164.310(a)(2)(ii)', '', 2, NULL),
+(56, 'Periodic Evaluation of Privacy and Security Policies Procedures', 'DR-110', 'ß164.316(b)(2)(iii)', '', 4, NULL),
+(57, 'Standard Documentation Review and Retention', 'DR-115', 'ß164.316(b)(1)(i);ß164.530(j)', '', 4, NULL),
+(58, 'Employee Use of Social Media', 'PR-255', 'ß164.502(a)', '', 5, NULL),
+(59, 'Use of Mobile Devices', 'PR-255', 'Privacy and Security', '', 5, NULL),
+(60, 'Workstation Use', 'PS-135', 'ß164.310(b)', '', 2, NULL),
+(61, 'Disaster Recovery Plan', 'AS-230', 'ß164.308(a)(7)(ii)(B)', '', 1, NULL),
+(62, 'Emergency-mode Operation Plan', 'AS-235', 'ß164.308(a)(7)(ii)(C)', '', 1, NULL),
+(63, 'Access Control and Validation', 'PS-140', 'ß164.310(a)(2)(iii)', '', 2, NULL),
+(64, 'Workstation Security', 'PS-145', 'ß164.310(c)', '', 2, NULL),
+(65, 'Media Reuse', 'PS-150', 'ß164.310(d)(2)(ii)', '', 2, NULL),
+(66, 'Testing and Revision Procedures ñ Contingency Plans', 'AS-240', 'ß164.308(a)(7)(ii)(D)', '', 1, NULL),
+(67, 'Contingency Operations', 'PS-155', 'ß164.310(a)(2)(i)', '', 2, NULL),
+(68, 'Maintenance Records', 'PS-160', 'ß164.310(a)(2)(iv)', '', 2, NULL),
+(69, 'Accountability for Movement of Equipment and Media', 'PS-165', 'ß164.310(d)(2)(iii)', '', 2, NULL),
+(70, 'Availability of Documented Policies and Procedures', 'DR-120', 'ß164.316(b)(2)(ii)', '', 4, NULL),
+(71, 'Integrity Controls ñ Data Transmission', 'TS-120', 'ß164.312(e)(2)(i)', '', 3, NULL),
+(72, 'Workforce Clearance Procedure', 'AS-245', 'ß164.308(a)(3)(ii)(B);ß164.308(a)(3)(ii)(C)', '', 1, NULL),
+(73, 'Integrity - Protect ePHI from improper alteration or destruction', 'TS-125', 'ß164.312(c)(1);ß164.312(c)(2)', '', 3, NULL),
+(74, 'Audit Controls ', 'TS-130', 'ß164.312(b)', '', 3, NULL),
+(75, 'Applications and Data Criticality Analysis', 'AS-250', 'ß164.308(a)(7)(ii)(E)', '', 1, NULL),
+(76, 'Data Backup and Storage', 'TS-135', 'ß164.310(d)(2)(iv)', '', 3, NULL),
+(77, 'Emergency Access Procedure', 'TS-140', 'ß164.312(a)(2)(ii)', '', 3, NULL),
+(78, 'Person or entity authentication', 'TS-145', 'ß164.312(d);ß164.312(a)(2)(i)', '', 3, NULL),
+(79, 'Device and Media ControlsóAccountability', 'AS-255', 'ß164.310(d)(2)(iii)', '', 1, NULL),
+(80, 'Consent for Treatment, Payment and Healthcare Operations (Policy)', 'PR-265', 'ß164.512(e);ß164.530(h)', '', 5, NULL),
+(81, 'Conducting Business with Business Associate', 'AS-260', 'ß164.308(a)(8)(4);ß164.314(a)(1)(ii);ß164.314(a)(2)(i)A),(B),(C),(D);   ß164.502(e);ß164.504(e)(1);ß164.308; ß164.314(a)(i and ii)', '', 1, NULL),
+(82, 'Policies and procedures for identifying business associates and distributing BA amendments', 'AS-265', 'ß164.502(e);ß164.504(e)(1);ß164.308;ß164.314(a)(i and ii)', '', 1, NULL),
+(83, 'Monitoring of PHI Disclosures by Business Associates', 'PR-270', 'ß164.410', '', 5, NULL);
+
+CREATE TABLE IF NOT EXISTS `regulation_categories` (
+  `rgc_id` int(11) NOT NULL AUTO_INCREMENT,
+  `rgc_name` varchar(255) CHARACTER SET utf8 NOT NULL,
+  PRIMARY KEY (`rgc_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+--
+-- ƒ‡ÏÔ ‰‡ÌÌ˚ı Ú‡·ÎËˆ˚ `regulation_categories`
+--
+
+INSERT INTO `regulation_categories` (`rgc_id`, `rgc_name`) VALUES
+(1, 'Administrative Safeguards'),
+(2, 'Physical Safeguards'),
+(3, 'Technical Safeguards'),
+(4, 'Document Retention'),
+(5, 'Privacy Regulations');

@@ -47,7 +47,18 @@ class Module
                     $resultSetPrototype = new ResultSet();
                     $resultSetPrototype->setArrayObjectPrototype(new \Traininglog\Model\Trainer());
                     return new TableGateway('trainers', $dbAdapter, null, $resultSetPrototype);
-                },'Traininglog\Model\RegulationTable' =>  function($sm) {
+                },
+                'Traininglog\Model\RegulationCategoryTable' =>  function($sm) {
+                        $tableGateway = $sm->get('RegulationCategoryTableGateway');
+                        $table = new \Traininglog\Model\RegulationCategoryTable($tableGateway);
+                        return $table;
+                },
+                'RegulationCategoryTableGateway' => function ($sm) {
+                        $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                        $resultSetPrototype = new ResultSet();
+                        return new TableGateway('regulation_categories', $dbAdapter, null, $resultSetPrototype);
+                },
+                'Traininglog\Model\RegulationTable' =>  function($sm) {
                         $tableGateway = $sm->get('RegulationTableGateway');
                         $table = new \Traininglog\Model\RegulationTable($tableGateway);
                         return $table;

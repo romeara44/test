@@ -40,11 +40,9 @@ class TraininglogForm extends Form
         ));
 
         $regulationTable = $sl->get('Traininglog\Model\RegulationTable');
-        $regulations[''] = 'Please Select';
-        foreach ($regulationTable->getRegulations() as $key => $r) {
-            $regulations[$r->rg_id] = $r->rg_pp_name;
-        }
-        
+
+        $regulations = $regulationTable->getRegulationsWithCategories();
+        array_unshift($regulations, 'Please Select');
         $regulations['-1'] = 'Other';
         
         $this->add(array(
