@@ -68,7 +68,7 @@ class RegulationTable implements ServiceLocatorAwareInterface
         foreach ($resultSet as $rs) {
             $rg_rgc_id = $rs->rg_rgc_id ? $rs->rg_rgc_id : 0;
             if(!isset($regulations[$rg_rgc_id])) {
-                $regulations[$rg_rgc_id] = array('label' => $rs->_rg_rgc_name ? $rs->_rg_rgc_name : 'Manual', 'options' => array());
+                $regulations[$rg_rgc_id] = array('label' => $rs->_rg_rgc_name ? $rs->_rg_rgc_name : 'Custom', 'options' => array());
             }
             $regulations[$rg_rgc_id]['options'][$rs->rg_id] = $rs->rg_pp_name;
         }
