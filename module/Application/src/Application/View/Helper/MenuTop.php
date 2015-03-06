@@ -42,7 +42,7 @@ class MenuTop extends AbstractHelper
         $this->_prepareItems();
         $this->_setActive($sl);
 
-        $model = new ViewModel(array('items' => $this->items));
+        $model = new ViewModel(array('items' => $this->items, 'checkClientLimitCompany' => $sl->get('Client\Model\CompanyTable')->checkClientLimitCompany()));
         $model->setTemplate('application/partials/menutop');
 
         return $this->getView()->render($model);
@@ -78,11 +78,21 @@ class MenuTop extends AbstractHelper
             ),
             array(
                 'title' => 'Clients',
-                'url' => '/client/list'
-            ),
-            array(
-                'title' => 'Business Associates',
-                'url' => '/businessassociate/list',
+                'url' => '/client/list',
+                'items' => array(
+                    array('title' => 'Business Associates',
+                          'url' => '/businessassociate/list',
+                    ),
+                    array('title' => 'All Clients',
+                          'url' => '/client/list',
+                        ),
+                    array('title' => 'Create Contact',
+                          'url' => '/client/edit',
+                        ),
+                    array('title' => 'Create Company',
+                          'url' => '/company/edit',
+                        )
+                )
             ),
             array(
                 'title' => 'Breach Management',
@@ -135,11 +145,21 @@ class MenuTop extends AbstractHelper
             ),
             array(
                 'title' => 'Clients',
-                'url' => '/client/list'
-            ),
-            array(
-                'title' => 'Business Associates',
-                'url' => '/businessassociate/list',
+                'url' => '/client/list',
+                'items' => array(
+                    array('title' => 'Business Associates',
+                          'url' => '/businessassociate/list',
+                    ),
+                    array('title' => 'All Clients',
+                          'url' => '/client/list',
+                        ),
+                    array('title' => 'Create Contact',
+                          'url' => '/client/edit',
+                        ),
+                    array('title' => 'Create Company',
+                          'url' => '/company/edit',
+                        )
+                )
             ),
             array(
                 'title' => 'Breach Management',
@@ -185,11 +205,21 @@ class MenuTop extends AbstractHelper
             ),
             array(
                 'title' => 'Clients',
-                'url' => '/client/list'
-            ),
-            array(
-                'title' => 'Business Associates',
-                'url' => '/businessassociate/list',
+                'url' => '/client/list',
+                'items' => array(
+                    array('title' => 'Business Associates',
+                          'url' => '/businessassociate/list',
+                    ),
+                    array('title' => 'All Clients',
+                          'url' => '/client/list',
+                        ),
+                    array('title' => 'Create Contact',
+                          'url' => '/client/edit',
+                        ),
+                    array('title' => 'Create Company',
+                          'url' => '/company/edit',
+                        )
+                )
             ),
             array(
                 'title' => 'Breach Management',
@@ -235,12 +265,22 @@ class MenuTop extends AbstractHelper
             ),
             array(
                 'title' => 'Clients',
-                'url' => '/client/list'
-            ),
-            array(
-                'title' => 'Business Associates',
-                'url' => '/businessassociate/list',
-                'disabled' => true
+                'url' => '/client/list',
+                'items' => array(
+                    array('title' => 'Business Associates',
+                          'url' => '/businessassociate/list',
+                          'disabled' => true
+                         ),
+                    array('title' => 'All Clients',
+                          'url' => '/client/list',
+                        ),
+                    array('title' => 'Create Contact',
+                          'url' => '/client/edit',
+                        ),
+                    array('title' => 'Create Company',
+                          'url' => '/company/edit',
+                        )
+                )
             ),
             array(
                 'title' => 'Breach Management',
@@ -291,8 +331,19 @@ class MenuTop extends AbstractHelper
             ),
             array(
                 'title' => 'Clients',
-                'url' => '/client/list'
-            ),
+                'url' => '/client/list',
+                'items' => array(
+                    array('title' => 'All Clients',
+                          'url' => '/client/list',
+                        ),
+                    array('title' => 'Create Contact',
+                          'url' => '/client/edit',
+                        ),
+                    array('title' => 'Create Company',
+                          'url' => '/company/edit',
+                        )
+                )
+            )
         );
     }
 
