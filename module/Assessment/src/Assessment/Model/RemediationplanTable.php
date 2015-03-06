@@ -311,12 +311,9 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
         return $id;
     }
 
-    public function setFieldValue($id, $field, $value)
+    public function setFieldValues($id, $data)
     {
-        $data = array(
-            'rp_id' => $id,
-            $field => $value,
-        );
+        $data['rp_id'] = $id;
 
         if ($this->getRemediationplan($id)) {
             $this->tableGateway->update($data, array('rp_id' => $id));

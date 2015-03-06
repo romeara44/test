@@ -178,18 +178,18 @@ class RemediationplanController extends AbstractActionController
                     $this->flashMessenger()->addSuccessMessage('Request Review sent');
                     return $this->redirect()->toRoute('remediationplan', array('controller' => 'remediationplan', 'action' => 'list'));
                 }
-                if ($post['signedoff'] != 1) {
+                if ($post['save_and_copy_button']) {
                     $id = $this->getRemediationplanTable()->clonePlan($id, $post);
-                } else {
+                } else if($post['signedoff'] == 1){
                     $this->getRemediationplanTable()->clonePlan($id, $post, true);
                 }
 
-                $this->getRemediationplanTable()->setFieldValue($id, 'rp_initials', $post['rp_initials']);
-                $this->getRemediationplanTable()->setFieldValue($id, 'rp_initials_approver', $post['rp_initials_approver']);
-
-                $this->getRemediationplanTable()->setFieldValue($id, 'rp_performed_u_id', $post['rp_performed_u_id']);
-                $this->getRemediationplanTable()->setFieldValue($id, 'rp_approver_u_id', $post['rp_approver_u_id']);
-                $this->getRemediationplanTable()->setFieldValue($id, 'rp_accepter_u_id', $post['rp_accepter_u_id']);
+                $fieldValues = array( 'rp_initials'          => $post['rp_initials']
+                                    , 'rp_initials_approver' => $post['rp_initials_approver']
+                                    , 'rp_performed_u_id'    => $post['rp_performed_u_id']
+                                    , 'rp_approver_u_id'     => $post['rp_approver_u_id']
+                                    , 'rp_accepter_u_id'     => $post['rp_accepter_u_id']
+                                    );
 
                 $ymd1 = \DateTime::createFromFormat('m/d/Y', $post['rp_approved_date']);
                 if (is_object($ymd1)) {
@@ -200,7 +200,8 @@ class RemediationplanController extends AbstractActionController
                 } else {
                     $ymd1 = '';
                 }
-                $this->getRemediationplanTable()->setFieldValue($id, 'rp_approved_date', $ymd1);
+
+                $fieldValues['rp_approved_date'] = $ymd1;
 
                 $ymd2 = \DateTime::createFromFormat('m/d/Y', $post['rp_accepted_date']);
                 if (is_object($ymd2)) {
@@ -211,8 +212,9 @@ class RemediationplanController extends AbstractActionController
                 } else {
                     $ymd2 = '';
                 }
-                $this->getRemediationplanTable()->setFieldValue($id, 'rp_accepted_date', $ymd2);
-                
+
+                $fieldValues['rp_accepted_date'] = $ymd2;
+
                 $ymd1 = \DateTime::createFromFormat('m/d/Y', $post['rp_incident_date']);
                 if (is_object($ymd1)) {
                     if ($ymd1->format('Y') > date("Y")) {
@@ -222,7 +224,8 @@ class RemediationplanController extends AbstractActionController
                 } else {
                     $ymd1 = '';
                 }
-                $this->getRemediationplanTable()->setFieldValue($id, 'rp_incident_date', $ymd1);
+
+                $fieldValues['rp_incident_date'] = $ymd1;
 
                 $ymd2 = \DateTime::createFromFormat('m/d/Y', $post['rp_remediation_date']);
                 if (is_object($ymd2)) {
@@ -233,11 +236,16 @@ class RemediationplanController extends AbstractActionController
                 } else {
                     $ymd2 = '';
                 }
-                $this->getRemediationplanTable()->setFieldValue($id, 'rp_remediation_date', $ymd2);
+
+                $fieldValues['rp_remediation_date'] = $ymd2;
+
+                $this->getRemediationplanTable()->setFieldValues($id, $fieldValues);
 
                 if ($post['signedoff'] == 1) {
                     $this->getRemediationplanTable()->setStatus($id, \Assessment\Model\Remediationplan::STATUS_SIGNED_OFF);
                     $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_SIGNEDOFF, \Application\Model\LogsTable::ITEM_TYPE_RP, $id);
+                } else if($post['save_button']) {
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_EDIT, \Application\Model\LogsTable::ITEM_TYPE_RP, $id);
                 }
 
                 $note = new Note();

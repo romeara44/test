@@ -388,7 +388,8 @@
 
     <div class="form-buttons">
         <?php if ($this->writable && !$this->isPdf): ?>
-            <input type="submit" id="save_button" value="Save" class="form-button" />
+            <input type="submit" name="save_button" id="save_button" value="Save" class="form-button" />
+            <input type="submit" name="save_and_copy_button" id="save_and_copy_button" value="Save & Copy" class="form-button" />
             <?php if ($rpObj->rp_approver_u_id): ?>
                 <input type="button" id="requestreview_button" value="Request Review" class="form-button" />
             <?php endif; ?>
@@ -506,7 +507,7 @@
             
         });
         
-        $('#save_button').click(function() {
+        $('#save_button, #save_and_copy_button').click(function() {
             $('#signedoff, #requestreview').val('');
             $('.valid_input').removeClass('required');
             $('#formNote').submit();
