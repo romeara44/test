@@ -79,14 +79,6 @@ class Traininglog
                 ),
             )));
 
-            $inputFilter->add($factory->createInput(array(
-                'name'     => '_regulation[]',
-                'filters'  => array(
-                    array('name' => 'StripTags'),
-                    array('name' => 'StringTrim'),
-                ),
-            )));
-
             $this->inputFilter = $inputFilter;
         }
 

@@ -56,7 +56,7 @@ class TraininglogTable implements ServiceLocatorAwareInterface
             if ($searchValue !== null) {
                 $select->where('(tl_attendees LIKE "%' . $searchValue . '%" OR rg.rg_pp_name LIKE "%' . $searchValue . '%" OR rg.rg_pp_number LIKE "%' . $searchValue . '%" OR rg.rg_number LIKE "%' . $searchValue . '%")');
             }
-            $select->columns(array('tl_id', 'tl_active', '_tl_trainer_name' => new \Zend\Db\Sql\Expression('IF(tr.tr_name IS NULL, CONCAT(u.u_firstname, " ", u.u_lastname), tr.tr_name)')));
+            $select->columns(array('*', '_tl_trainer_name' => new \Zend\Db\Sql\Expression('IF(tr.tr_name IS NULL, CONCAT(u.u_firstname, " ", u.u_lastname), tr.tr_name)')));
             $select->join(array('tlt' => 'training_log_types'), 'tl_tlt_id = tlt_id', array('_tlt_name' => 'tlt_name'), 'inner');
             $select->join(array('n' => 'notes'), new \Zend\Db\Sql\Expression('tl_id = n.note_item_id'), array('_tl_comment' => new \Zend\Db\Sql\Expression('n.note_text')), 'left');
             $select->join(array('n2' => 'notes'), new \Zend\Db\Sql\Expression('tl_id = n2.note_item_id AND n2.note_text =""'), array('_tl_attachment' => new \Zend\Db\Sql\Expression('n2.note_id')), 'left');

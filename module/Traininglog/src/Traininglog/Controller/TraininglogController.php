@@ -202,7 +202,6 @@ class TraininglogController extends AbstractActionController
                 $attendeesFile = $request->getFiles('attendees');
                 if($attendeesFile) {
                     if (($handle = fopen($attendeesFile[0]['tmp_name'], "r")) !== FALSE) {
-                        $tl->tl_attendees = '';
                         while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
                            $tl->tl_attendees .= implode(', ', $data) . "\r\n";
                         }
