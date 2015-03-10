@@ -35,6 +35,10 @@ class TraininglogTable implements ServiceLocatorAwareInterface
 
     public function getTraininglogs($paginated = false, $orderBy = null, $order = null, $identity = null, $searchValue = null, $roleFilter = null)
     {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
         if ($paginated) {
             $select = $this->tableGateway->getSql()->select();
             if ($identity['u_role_id'] != User::ROLE_ADMIN) {
@@ -64,12 +68,17 @@ class TraininglogTable implements ServiceLocatorAwareInterface
             $select->join(array('rg' => 'regulations'), new \Zend\Db\Sql\Expression('tlrg.tlrg_rg_id = rg.rg_id'), array('_tl_regulation' => new \Zend\Db\Sql\Expression('rg.rg_pp_name')), 'left');
             $select->join(array('tr' => 'trainers'), new \Zend\Db\Sql\Expression('CONCAT(tl_trainer_type, "_", tl_trainer_id) = CONCAT("trainer", "_", tr.tr_id)'), array(), 'left');
             $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('CONCAT(tl_trainer_type, "_", tl_trainer_id) = CONCAT("user", "_", u.u_id)'), array(), 'left');
+            $select->join(array('u2' => 'users'), new \Zend\Db\Sql\Expression('tl_create_u_id = u2.u_id'), array(), 'left');
 
             if ($orderBy) {
                 $order = $order ? $order : 'ASC';
                 $select->order($orderBy . ' ' . $order);
             }
-
+            if($identity['u_company_id']) {
+                $select->where("u2.u_company_id = " . $identity['u_company_id']);
+            } else {
+                $select->where("u2.u_company_id IS NULL ");
+            }
             $select->where("(n.note_text !='' OR n.note_text IS NULL)");
             $select->group('tl_id');
 
@@ -170,6 +179,8 @@ class TraininglogTable implements ServiceLocatorAwareInterface
         $id = (int) $traininglog->tl_id;
 
         if ($id == 0) {
+            $data['tl_create_u_id'] = $identity['u_id'];
+
             $this->tableGateway->insert($data);
             $id = $this->tableGateway->lastInsertValue;
 

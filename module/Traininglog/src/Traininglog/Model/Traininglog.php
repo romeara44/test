@@ -10,6 +10,7 @@ class Traininglog
 {
     public $tl_id;
     public $tl_tlt_id;
+    public $tl_create_u_id;
     public $tl_conducted_date;
     public $tl_hire_date;
     public $tl_trainer_id;
@@ -34,6 +35,7 @@ class Traininglog
     {
         $this->tl_id               = (isset($data['tl_id']))               ? $data['tl_id']               : null;
         $this->tl_tlt_id           = (isset($data['tl_tlt_id']))           ? $data['tl_tlt_id']           : null;
+        $this->tl_create_u_id      = (isset($data['tl_create_u_id']))      ? $data['tl_create_u_id']      : null;
         $this->tl_conducted_date   = (isset($data['tl_conducted_date']))   ? $data['tl_conducted_date']   : null;
         $this->tl_hire_date        = (isset($data['tl_hire_date']))        ? $data['tl_hire_date']        : null;
         $this->tl_trainer_id       = (isset($data['tl_trainer_id']))       ? $data['tl_trainer_id']       : null;

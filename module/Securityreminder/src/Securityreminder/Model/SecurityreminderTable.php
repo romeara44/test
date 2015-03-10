@@ -35,6 +35,10 @@ class SecurityreminderTable implements ServiceLocatorAwareInterface
 
     public function getSecurityreminders($paginated = false, $orderBy = null, $order = null, $identity = null, $searchValue = null, $roleFilter = null)
     {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+        
         if ($paginated) {
             $select = new Select('security_reminders');
             if ($identity['u_role_id'] != User::ROLE_ADMIN) {
@@ -60,11 +64,16 @@ class SecurityreminderTable implements ServiceLocatorAwareInterface
             $select->join(array('dt' => 'distribution_types'), 'sr_dt_id = dt_id', array('_dt_type' => 'dt_type'), 'inner');
             $select->join(array('n' => 'notes'), new \Zend\Db\Sql\Expression('sr_id = n.note_item_id'), array('_sr_comment' => new \Zend\Db\Sql\Expression('n.note_text')), 'left');
             $select->join(array('n2' => 'notes'), new \Zend\Db\Sql\Expression('sr_id = n2.note_item_id AND n2.note_text =""'), array('_sr_attachment' => new \Zend\Db\Sql\Expression('n2.note_id')), 'left');
-
+            $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('sr_create_u_id = u.u_id'), array(), 'left');
 
             if ($orderBy) {
                 $order = $order ? $order : 'ASC';
                 $select->order($orderBy . ' ' . $order);
+            }
+            if($identity['u_company_id']) {
+                $select->where("u.u_company_id = " . $identity['u_company_id']);
+            } else {
+                $select->where("u.u_company_id IS NULL ");
             }
 
             $select->where("(n.note_text !='' OR n.note_text IS NULL)");
@@ -94,6 +103,7 @@ class SecurityreminderTable implements ServiceLocatorAwareInterface
     {
         $authService = new \Zend\Authentication\AuthenticationService();
         $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
 
         $data = array(
             'sr_dt_id'         => $securityreminder->sr_dt_id,
@@ -105,6 +115,8 @@ class SecurityreminderTable implements ServiceLocatorAwareInterface
         $id = (int) $securityreminder->sr_id;
 
         if ($id == 0) {
+            $data['sr_create_u_id'] = $identity['u_id'];
+
             $this->tableGateway->insert($data);
             $id = $this->tableGateway->lastInsertValue;
 

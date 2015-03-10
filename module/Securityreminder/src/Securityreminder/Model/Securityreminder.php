@@ -10,6 +10,7 @@ class Securityreminder
 {
     public $sr_id;
     public $sr_dt_id;
+    public $sr_create_u_id;
     public $sr_launched_date;
     public $sr_developed_by;
     public $sr_regulation;
@@ -25,6 +26,7 @@ class Securityreminder
     {
         $this->sr_id            = (isset($data['sr_id']))             ? $data['sr_id']             : null;
         $this->sr_dt_id         = (isset($data['sr_dt_id']))          ? $data['sr_dt_id']          : null;
+        $this->sr_create_u_id   = (isset($data['sr_create_u_id']))    ? $data['sr_create_u_id']    : null;
         $this->sr_launched_date = (isset($data['sr_launched_date']))  ? $data['sr_launched_date']  : null;
         $this->sr_developed_by  = (isset($data['sr_developed_by']))   ? $data['sr_developed_by']   : null;
         $this->sr_regulation    = (isset($data['sr_regulation']))     ? $data['sr_regulation']     : null;
