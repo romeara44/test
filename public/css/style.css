@@ -989,7 +989,17 @@ textarea.double { width: 586px; }
 	text-decoration: none;
 }
 .form-buttons a.cancel:hover { text-decoration: underline; }
-
+.msg-successful {
+    color: #258e8f;
+}
+.msg-failure {
+    color: red;
+    clear: left;
+    display: block;
+}
+#activatePartialUsers {
+    margin-bottom: 5px;
+}
 
 /* Tables */
 

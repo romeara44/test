@@ -539,5 +539,25 @@ class UserTable implements ServiceLocatorAwareInterface
         return $users;
     }
 
+    public function checkHasPartial($cId)
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('u_company_id = ' . $cId);
+        $select->where('u_role_id = ' . User::ROLE_PARTIAL);
+
+        return $this->tableGateway->selectWith($select)->count();
+    }
+
+    public function activatePartialsByCompany($cId)
+    {
+        $data = array();
+        $data['u_role_id'] = User::ROLE_CLIENT;
+
+        if($this->tableGateway->update($data, array('u_company_id' => $cId, 'u_role_id' => User::ROLE_PARTIAL))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 }

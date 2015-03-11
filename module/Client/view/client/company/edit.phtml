@@ -47,6 +47,11 @@ $form->setAttribute('method', 'post');
                     echo $this->formElementErrors($fn);
                     ?>
                 </p>
+                <?php if($this->roleId == \Admin\Model\User::ROLE_ADMIN && $checkHasPartial):?>
+                    <p style="border: 0" id="activatePartialUsersWrap">
+                        <a id="activatePartialUsers" href="javascript:" class="button"><i class="fa"></i>Activate Partial Users</a>
+                    </p>
+                <?php endif;?>
                 <h2>Company Information</h2>
             <?php endif; ?>
 
@@ -352,5 +357,23 @@ $form->setAttribute('method', 'post');
         $('#company').validate();
         //jQuery("#phone, #otherphone, #fax").mask("(999) 999-9999");
         $("input[name=c_phone], input[name=c_other_phone], input[name=c_fax]").mask("(999) 999-9999");
+
+        $(document).ready(function() {
+            jQuery('#activatePartialUsers').click(function(){
+                $.ajax({
+                    type:"POST",
+                    url:"/company/activatepartialusers",
+                    data: {'id': <?php echo $this->cId?>},
+                    success: function(data){
+                        if(data.result === true) {
+                            $('#activatePartialUsersWrap').html('<span class="msg-successful">Users activated successfull!</span>');
+                            setTimeout("$('#activatePartialUsersWrap').fadeOut(1000)", 2000);
+                        } else {
+                            $('#activatePartialUsersWrap').append('<span class="msg-failure">Cannot activate users!</span>');
+                        }
+                    }
+                });
+            });
+        });
     });
 </script>

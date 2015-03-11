@@ -16,6 +16,7 @@ use Zend\View\Model\ViewModel;
 use Client\Model\Company;
 use Note\Model\Note;
 use Zend\Session\Container;
+use Zend\View\Model\JsonModel;
 
 class CompanyController extends AbstractActionController
 {
@@ -209,7 +210,8 @@ class CompanyController extends AbstractActionController
             'notes' => $notes,
             'primaryContactId'=> $primaryContactId,
             'roleId' => $identity['u_role_id'],
-            'checkClientLimitCompany' => $checkClientLimitCompany
+            'checkClientLimitCompany' => $checkClientLimitCompany,
+            'checkHasPartial' => $this->getUserTable()->checkHasPartial($id)
         );
     }
 
@@ -257,6 +259,25 @@ class CompanyController extends AbstractActionController
         $this->flashMessenger()->addSuccessMessage('Address has been deleted');
 
         return $this->redirect()->toRoute('company', array('controller' => 'company', 'action' => 'edit', 'id' => $id));
+    }
+
+    public function activatepartialusersAction()
+    {
+        $request = $this->getRequest();
+        $id      = null;
+
+        if ($request->isPost()) {
+            $post = $request->getPost();
+            if(isset($post['id'])) $id = (int)$post['id'];
+        }
+
+        if(!$id) {
+            return false;
+        }
+
+        $activate = $this->getUserTable()->activatePartialsByCompany($id);
+
+        return new JsonModel(array('result' => (boolean)$activate));
     }
 
 }

@@ -59,6 +59,9 @@ return array(
             'client' => __DIR__ . '/../view',
             'company' => __DIR__ . '/../view',
         ),
+        'strategies' => array (
+            'ViewJsonStrategy'
+        )
     ),
 
 );
