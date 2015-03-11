@@ -1,0 +1,1 @@
+UPDATE  `hipaacar_app`.`site_settings` SET  `ss_value` =  '3' WHERE  `site_settings`.`ss_id` =1;

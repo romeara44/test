@@ -13,7 +13,7 @@
                 <?php if($ssObj->ss_name == \Sitesetting\Model\Sitesetting::NUMBER_USERS_OF_COMPANY): ?>
                     <input type="hidden" name="<?php echo $ssObj->ss_name?>[ss_id]" value="<?php echo $ssObj->ss_id?>">
                     <select name="<?php echo $ssObj->ss_name?>[ss_value]" id="<?php echo $ssObj->ss_name?>">
-                        <?php for($i = 5; $i < 35; $i += 5): ?>
+                        <?php for($i = 3; $i < 12; $i += 3): ?>
                             <option value="<?php echo $i?>" <?php if($i == $ssObj->ss_value):?>selected <?php endif;?>><?php echo $i?></option>
                         <?php endfor; ?>
                         <option value="0" <?php if(!$ssObj->ss_value):?>selected <?php endif;?>>unlimited</option>
