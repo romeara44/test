@@ -119,6 +119,10 @@ body {
 	text-transform: uppercase
 }
 
+#header #logo img {
+    width: 200px;
+}
+
 
 /* Top Links & Search */
 
