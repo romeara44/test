@@ -376,40 +376,40 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
 
         $changed = false;
         // check if some changes
-        if ($rp->rp_initials != $post['rp_initials']) {
-            $changed = true;
-        }
-        if ($rp->rp_initials_approver != $post['rp_initials_approver']) {
-            $changed = true;
-        }
-        if ($rp->rp_performed_u_id != $post['rp_performed_u_id']) {
-            $changed = true;
-        }
-        if ($rp->rp_approver_u_id != $post['rp_approver_u_id']) {
-            $changed = true;
-        }
+        // if ($rp->rp_initials != $post['rp_initials']) {
+        //     $changed = true;
+        // }
+        // if ($rp->rp_initials_approver != $post['rp_initials_approver']) {
+        //     $changed = true;
+        // }
+        // if ($rp->rp_performed_u_id != $post['rp_performed_u_id']) {
+        //     $changed = true;
+        // }
+        // if ($rp->rp_approver_u_id != $post['rp_approver_u_id']) {
+        //     $changed = true;
+        // }
 
-        $ymd1 = \DateTime::createFromFormat('m/d/Y', $post['rp_incident_date']);
-        if (is_object($ymd1)) {
-            if ($ymd1->format('Y') > date("Y")) {
-                $ymd1->setDate('2014', $ymd1->format('m'), $ymd1->format('d'));
-            }
-            if ($rp->rp_incident_date != $ymd1->format('Y-m-d')) {
-                $changed = true;
-            }
-        }
-        $ymd2 = \DateTime::createFromFormat('m/d/Y', $post['rp_remediation_date']);
-        if (is_object($ymd2)) {
-            if ($ymd2->format('Y') > date("Y")) {
-                $ymd2->setDate('2014', $ymd2->format('m'), $ymd2->format('d'));
-            }
-            if ($rp->rp_remediation_date != $ymd2->format('Y-m-d')) {
-                $changed = true;
-            }
-        }
-        if (!$changed && !$signedOffCopy) {
-            return $id;
-        }
+        // $ymd1 = \DateTime::createFromFormat('m/d/Y', $post['rp_incident_date']);
+        // if (is_object($ymd1)) {
+        //     if ($ymd1->format('Y') > date("Y")) {
+        //         $ymd1->setDate('2014', $ymd1->format('m'), $ymd1->format('d'));
+        //     }
+        //     if ($rp->rp_incident_date != $ymd1->format('Y-m-d')) {
+        //         $changed = true;
+        //     }
+        // }
+        // $ymd2 = \DateTime::createFromFormat('m/d/Y', $post['rp_remediation_date']);
+        // if (is_object($ymd2)) {
+        //     if ($ymd2->format('Y') > date("Y")) {
+        //         $ymd2->setDate('2014', $ymd2->format('m'), $ymd2->format('d'));
+        //     }
+        //     if ($rp->rp_remediation_date != $ymd2->format('Y-m-d')) {
+        //         $changed = true;
+        //     }
+        // }
+        // if (!$changed && !$signedOffCopy) {
+        //     return $id;
+        // }
         
         if(!$signedOffCopy) {
             // writable to false

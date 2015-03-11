@@ -178,11 +178,6 @@ class RemediationplanController extends AbstractActionController
                     $this->flashMessenger()->addSuccessMessage('Request Review sent');
                     return $this->redirect()->toRoute('remediationplan', array('controller' => 'remediationplan', 'action' => 'list'));
                 }
-                if ($post['save_and_copy_button']) {
-                    $id = $this->getRemediationplanTable()->clonePlan($id, $post);
-                } else if($post['signedoff'] == 1){
-                    $this->getRemediationplanTable()->clonePlan($id, $post, true);
-                }
 
                 $fieldValues = array( 'rp_initials'          => $post['rp_initials']
                                     , 'rp_initials_approver' => $post['rp_initials_approver']
@@ -241,6 +236,12 @@ class RemediationplanController extends AbstractActionController
 
                 $this->getRemediationplanTable()->setFieldValues($id, $fieldValues);
 
+                if ($post['save_and_copy_button']) {
+                    $id = $this->getRemediationplanTable()->clonePlan($id, $post);
+                } else if($post['signedoff'] == 1){
+                    $this->getRemediationplanTable()->clonePlan($id, $post, true);
+                }
+                
                 if ($post['signedoff'] == 1) {
                     $this->getRemediationplanTable()->setStatus($id, \Assessment\Model\Remediationplan::STATUS_SIGNED_OFF);
                     $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_SIGNEDOFF, \Application\Model\LogsTable::ITEM_TYPE_RP, $id);
