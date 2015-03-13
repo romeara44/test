@@ -224,6 +224,7 @@ class UserTable implements ServiceLocatorAwareInterface
         $id = (int) $user->u_id;
 
         if ($id == 0) {
+            $data['u_first_login'] = 1;
             $data['u_hash'] = sha1($user->u_email . time());
             if (isset($user->u_sent_password) && ($user->u_sent_password == 0)) {
                 $data['u_sent_password'] = 0;
@@ -560,4 +561,12 @@ class UserTable implements ServiceLocatorAwareInterface
         }
     }
 
+    public function agreeTermsUser($id)
+    {
+        $data['u_id'] = $id;
+        $data['u_first_login'] = 0;
+        $this->tableGateway->update($data, array('u_id' => $id));
+
+        return true;
+    }
 }

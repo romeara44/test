@@ -729,6 +729,26 @@ h1.security_reminders {
     display: block;
     margin: 3px 0;
 }
+
+.iframe-wrap {
+    border-bottom: 1px solid #e1ebf0;
+    padding-bottom: 10px;
+    overflow: hidden;
+}
+
+.iframe-title h4,
+.iframe-title a {
+    float: left;
+}
+.iframe-title a {
+    padding: 13px 0 12px 0;
+    display: block;
+    margin-left: 10px;
+    float: left;
+}
+.agreeterms-label {
+    width: 300px;
+}
 /* Tabs */
 
 ul#tabs-nav {

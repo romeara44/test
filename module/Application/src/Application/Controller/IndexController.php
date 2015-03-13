@@ -56,7 +56,9 @@ class IndexController extends AbstractActionController
             
             if ($identity['u_role_id'] == 1) {
                 return $this->redirect()->toRoute('dashboard', array('controller' => 'dashboard', 'action' => 'admin'));
-            } elseif (in_array($identity['u_role_id'], array(2, 3))) {
+            } elseif ($identity['u_first_login'] == 1) {
+                return $this->redirect()->toRoute('user', array('controller' => 'user', 'action' => 'acceptprivacyterms'));
+            }  elseif (in_array($identity['u_role_id'], array(2, 3))) {
                 return $this->redirect()->toRoute('dashboard', array('controller' => 'dashboard', 'action' => 'consultant'));
             } elseif (in_array($identity['u_role_id'], array(6))) {
                 return $this->redirect()->toRoute('businessassociateuser', array('controller' => 'businessassociateuser', 'action' => 'questionsform'));
@@ -65,11 +67,7 @@ class IndexController extends AbstractActionController
             } elseif (in_array($identity['u_role_id'], array(4))) {
                 return $this->redirect()->toRoute('dashboard', array('controller' => 'dashboard', 'action' => 'salesrep'));
             } elseif (in_array($identity['u_role_id'], array(7))) {
-                if($identity['u_register'] == 1 && $identity['u_first_login'] == 1) {
-                    $this->redirect()->toRoute('client', array('controller' => 'client', 'action' => 'edit', 'id' => $identity['u_id']));
-                } else {
-                     return $this->redirect()->toRoute('dashboard', array('controller' => 'dashboard', 'action' => 'client'));
-                }
+                return $this->redirect()->toRoute('dashboard', array('controller' => 'dashboard', 'action' => 'client'));
             }
 
         } else {

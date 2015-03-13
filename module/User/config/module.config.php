@@ -13,7 +13,7 @@ return array(
             'user' => array(
                 'type'    => 'segment',
                 'options' => array(
-                    'route'    => '/user[/:action][/:id][/page/:page][/order_by/:order_by][/:order][/:hash]',
+                    'route'    => '/user[/:action][/:id][/page/:page][/order_by/:order_by][/:order][/:hash][/:file]',
                     'constraints' => array(
                         'action' => '(?!\bpage\b)(?!\border_by\b)[a-zA-Z][a-zA-Z0-9_-]*',
                         'id'     => '[0-9]+',
@@ -21,6 +21,7 @@ return array(
                         'order_by' => '[a-zA-Z][a-zA-Z0-9_-]*',
                         'order' => 'ASC|DESC',
                         'hash'     => '[a-zA-Z0-9_-]*',
+                        'file'     => '[a-zA-Z0-9_-]+',
                     ),
                     'defaults' => array(
                         'controller' => 'User\Controller\User',

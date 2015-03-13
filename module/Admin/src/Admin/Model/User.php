@@ -6,6 +6,7 @@ use Zend\InputFilter\InputFilter;
 use Zend\InputFilter\InputFilterAwareInterface;
 use Zend\InputFilter\InputFilterInterface;
 use Zend\Validator\EmailExists;
+use Zend\Validator\Digits;
 
 class User
 {
@@ -474,6 +475,34 @@ class User
                         )
                     ),
                     $ee
+                ),
+            )));
+
+            $this->inputFilter = $inputFilter;
+        }
+
+        return $this->inputFilter;
+    }
+
+    public function getAcceptPrivacyTermsInputFilter($sl)
+    {
+        if (!$this->inputFilter) {
+            $inputFilter = new InputFilter();
+            $factory     = new InputFactory();
+
+
+            $inputFilter->add($factory->createInput(array(
+                'name'       => 'agreeterms',
+                'validators' => array(
+                    array(
+                        'name' => 'Digits',
+                        'break_chain_on_failure' => true,
+                        'options' => array(
+                            'messages' => array(
+                                Digits::NOT_DIGITS => 'You must agree to the privacy and terms of use.',
+                            ),
+                        ),
+                    ),
                 ),
             )));
 

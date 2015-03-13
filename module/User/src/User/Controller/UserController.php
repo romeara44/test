@@ -14,6 +14,7 @@ use Zend\View\Model\ViewModel;
 use Admin\Model\User;
 use Admin\Form\UserForm;
 use User\Form\RegistrationForm;
+use User\Form\AcceptPrivacyTermsForm;
 use Zend\Session\Container;
 use Client\Model\CompanyTable;
 use Client\Model\Company;
@@ -212,5 +213,71 @@ class UserController extends AbstractActionController
         }
 
         return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+    }
+
+    public function acceptprivacytermsAction()
+    {
+        if (!$this->hasIdentity()) {
+            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+        }
+
+        $identity = $this->getIdentity();
+
+        $form = new AcceptPrivacyTermsForm($this->getServiceLocator());
+
+        $request = $this->getRequest();
+
+        if ($request->isPost()) {
+            $post = $request->getPost();
+            $user = new User();
+            $form->setInputFilter($user->getAcceptPrivacyTermsInputFilter($this->getServiceLocator()));
+            $form->setData($request->getPost());
+            if ($form->isValid()) {
+            // print_r($post->agreeterms);exit;
+                $this->getUserTable()->agreeTermsUser($identity['u_id']);
+                $identity['u_first_login'] = 0;
+                $this->getServiceLocator()->get('AuthService')->getStorage()->write($identity);
+                if($identity['u_register'] == 1) {
+                    return $this->redirect()->toRoute('client', array('controller' => 'client', 'action' => 'edit', 'id' => $identity['u_id']));
+                } else {
+                    return $this->redirect()->toRoute('dashboard', array('controller' => 'dashboard', 'action' => 'admin'));
+                }
+            }
+        }
+
+        return array(
+            'form' => $form
+        );
+    }
+
+    public function downloadAction() {
+        $file     = $this->params('file');
+        $fileName = '';
+
+
+        if($file == 'privacy') {
+            $fileName = $_SERVER['DOCUMENT_ROOT'] . '/Privacy_Policy.pdf';
+        } elseif($file == 'terms_of_use') {
+            $fileName = $_SERVER['DOCUMENT_ROOT'] . '/Terms_of_Use.pdf';
+        } else {
+            return false;
+        }
+
+        if(!is_file($fileName)) {
+            return false;
+        }
+        $fileContents = file_get_contents($fileName);
+
+        $response = $this->getResponse();
+        $response->setContent($fileContents);
+
+        $headers = $response->getHeaders();
+        $headers->clearHeaders()
+            ->addHeaderLine('Content-Type', 'whatever your content type is')
+            ->addHeaderLine('Content-Disposition', 'attachment; filename="Hippa_Carosh_' . $file . '.pdf"')
+            ->addHeaderLine('Content-Length', strlen($fileContents));
+
+
+        return $this->response;
     }
 }

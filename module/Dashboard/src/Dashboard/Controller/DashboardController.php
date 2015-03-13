@@ -39,6 +39,8 @@ class DashboardController extends AbstractActionController
         $this->layout()->flashMessagesErrors = $this->flashMessenger()->getErrorMessages();
         if (!$this->hasIdentity()) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+        } else if ($identity['u_first_login'] == 1) {
+            return $this->redirect()->toRoute('user', array('controller' => 'user', 'action' => 'acceptprivacyterms'));
         }
 
         return parent::onDispatch($e);

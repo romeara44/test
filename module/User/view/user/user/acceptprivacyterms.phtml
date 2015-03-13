@@ -1,0 +1,53 @@
+<?php
+
+// within a view script
+$form = $this->form;
+$form->prepare();
+
+// Assuming the "contact/process" route exists...
+$form->setAttribute('action', '/user/acceptprivacyterms');
+
+// Set the method attribute for the form
+$form->setAttribute('method', 'post');
+
+// Render the opening tag
+?>
+
+<div class="page-title">
+    <h1 class="fleft">Accept the Privacy and Terms of Use</h1>
+    <div class="cboth"></div>
+</div>
+
+<div class="col-left">
+
+    <form action="/user/acceptprivacyterms" method="post" name="user" id="acceptprivacyterms">
+        <div class="iframe-wrap">
+            <div class="iframe-title">
+                <h4>Privacy Police</h4>
+                <a href="/user/download/file/privacy" class="copy">Download</a>
+            </div>
+            <iframe src="http://hipaa.carosh.com/Privacy_Policy.pdf" width="600px" height="300px" ></iframe>
+        </div>
+        <div class="iframe-wrap">
+            <div class="iframe-title">
+                <h4>Terms of Use</h4>
+                <a href="/user/download/file/terms_of_use" class="copy">Download</a>
+            </div>
+            <iframe src="http://hipaa.carosh.com/Terms_of_Use.pdf" width="600px" height="300px" ></iframe>
+        </div>
+        <p style="border-top: 0;">
+            <?php
+                $fn = $form->get('agreeterms');
+                echo $this->formCheckbox($fn->setAttributes(array('id'=>'agreeterms', 'class'=>'form-control required', 'style' => 'width: 14px; margin: 10px 10px 0 0;')));
+                echo $this->formLabel($fn->setAttributes(array('for'=>'agreeterms')));
+                echo $this->formElementErrors($fn);
+            ?>
+        </p>
+        <div class="cboth"></div>
+        <div class="form-buttons">
+            <input type="submit" value="Submit" class="form-button" />
+        </div>
+
+        <?php echo $this->form()->closeTag() ?>
+
+</div>
