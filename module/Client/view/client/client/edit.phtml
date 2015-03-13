@@ -76,12 +76,20 @@ $form->setAttribute('method', 'post');
 
             <p style="padding: 2px 0 12px 0; line-height: 14px; border-top: 0;">
                 <label>&nbsp;</label>
+                <input type="hidden" name="def_u_company_id" id="def_u_company_id" value="<?php echo $userObj->u_company_id ?>" disabled="true" />
                 <input type="checkbox" name="is_primary_contact" id="primaryContact" class="checkbox" value="1" />
                 <label for="primaryContact" class="checkbox">Primary Contact</label>
+                <input type="checkbox" name="is_training_manager" <?php if($clientObj->c_training_manager_u_id && $clientObj->c_training_manager_u_id == $userObj->u_id):?>checked <?php endif; ?> id="trainingManager" class="checkbox" value="1" />
+                <label for="trainingManager" class="checkbox">Training Manager</label>
+            </p>
+            <p style="padding: 0;border-top: 0;">
+                <?php if($setTrainingManagerMsg) :?>
+                    <label style="padding:0" for="trainingManager" generated="true" class="error"><?php echo $setTrainingManagerMsg ?></label>
+                <?php endif; ?>
             </p>
             <p style="padding: 0;border-top: 0;">
                 <?php if($clientLimitMsg) :?>
-                    <label style="padding:0" for="u_company_id" generated="true" class="error"><?php echo $clientLimitMsg ?></label>
+                    <label style="padding:0" for="u_company_id" generated="true"class="error"><?php echo $clientLimitMsg ?></label>
                 <?php endif; ?>
             </p>
             <p>
@@ -359,6 +367,11 @@ $form->setAttribute('method', 'post');
 
 
         $('#u_company_id').change(function() {
+            if($('#def_u_company_id').val() == $('#u_company_id').val()) {
+                $('#trainingManager').attr('checked', true);
+            } else {
+                $('#trainingManager').attr('checked', false);
+            }
             $.getJSON("/company/getprimaryaddress/" + $('#u_company_id').val(), {  }, function(data) {
                 if ($('#u_company_id').val()) {
                     if (data.adr_id) {

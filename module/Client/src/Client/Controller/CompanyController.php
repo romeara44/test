@@ -125,6 +125,7 @@ class CompanyController extends AbstractActionController
         $companyObj = null;
         $contacts = null;
         $primaryContactId = null;
+        $trainingManagerId = null;
         $notes = null;
 
         if ($id) {
@@ -137,6 +138,7 @@ class CompanyController extends AbstractActionController
             $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_COMPANY);
 
             $primaryContactId = $companyObj->c_primary_contact_u_id;
+            $trainingManagerId = $companyObj->c_training_manager_u_id;
         }
 
         $addresses = array();
@@ -209,6 +211,7 @@ class CompanyController extends AbstractActionController
             'contacts' => $contacts,
             'notes' => $notes,
             'primaryContactId'=> $primaryContactId,
+            'trainingManagerId'=> $trainingManagerId,
             'roleId' => $identity['u_role_id'],
             'checkClientLimitCompany' => $checkClientLimitCompany,
             'checkHasPartial' => $this->getUserTable()->checkHasPartial($id)

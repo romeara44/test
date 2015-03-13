@@ -19,6 +19,7 @@ class Company
     public $c_primary_adr_id;
     public $c_active;
     public $c_primary_contact_u_id;
+    public $c_training_manager_u_id;
     public $c_consultant_u_id;
     public $c_owner_u_id;
     public $c_update_u_id;
@@ -46,6 +47,7 @@ class Company
         $this->c_website     = (isset($data['c_website'])) ? $data['c_website'] : null;
         $this->c_primary_adr_id     = (isset($data['c_primary_adr_id'])) ? $data['c_primary_adr_id'] : null;
         $this->c_primary_contact_u_id     = (isset($data['c_primary_contact_u_id'])) ? $data['c_primary_contact_u_id'] : null;
+        $this->c_training_manager_u_id     = (isset($data['c_training_manager_u_id'])) ? $data['c_training_manager_u_id'] : null;
         $this->u_id     = (isset($data['u_id'])) ? $data['u_id'] : null;
         $this->u_firstname     = (isset($data['u_firstname'])) ? $data['u_firstname'] : null;
         $this->u_lastname     = (isset($data['u_lastname'])) ? $data['u_lastname'] : null;
