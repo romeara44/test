@@ -36,6 +36,8 @@ class BusinessassociateuserController extends AbstractActionController
         $identity = $this->getIdentity();
         if (!in_array($identity['u_role_id'], array(6))) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+        } else if ($identity['u_first_login'] == 1) {
+            return $this->redirect()->toRoute('user', array('controller' => 'user', 'action' => 'acceptprivacyterms'));
         }
 
         return parent::onDispatch($e);

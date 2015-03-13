@@ -78,9 +78,12 @@ class UserController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
 
-        $form = new UserForm($this->getServiceLocator());
-
         $identity = $this->getIdentity();
+        if ($identity['u_first_login'] == 1) {
+            return $this->redirect()->toRoute('user', array('controller' => 'user', 'action' => 'acceptprivacyterms'));
+        }
+
+        $form = new UserForm($this->getServiceLocator());
 
         $id = $identity['u_id'];
         $userObj = null;
