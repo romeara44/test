@@ -161,6 +161,8 @@ class ClientController extends AbstractActionController
         $notes = null;
         $clienLimit = true;
         $clientLimitMsg = '';
+        $setTrainingManager = true;
+        $setTrainingManagerMsg = '';
 
         if ((int) $id) {
             $userObj = $this->getUserTable()->getUser($id);
@@ -182,48 +184,57 @@ class ClientController extends AbstractActionController
                 $form->setData($request->getPost());
 
                 $post = $request->getPost();
+                if($form->isValid()) {
+                    if(!$id && $post['u_company_id'] && !$this->getUserTable()->checkCompanyLimitClient($post['u_company_id'])) {
+                        $clientLimitMsg = 'You cannot create more than ' . $this->getServiceLocator()->get('Sitesetting\Model\SitesettingTable')->getValueByName(\Sitesetting\Model\Sitesetting::NUMBER_USERS_OF_COMPANY) . ' user for company.';
+                        $clienLimit = false;
+                    }
 
-                if($form->isValid() && (!$id && $post['u_company_id'] && !$this->getUserTable()->checkCompanyLimitClient($post['u_company_id']))) {
-                    $clientLimitMsg = 'You cannot create more than ' . $this->getServiceLocator()->get('Sitesetting\Model\SitesettingTable')->getValueByName(\Sitesetting\Model\Sitesetting::NUMBER_USERS_OF_COMPANY) . ' user for company.';
-                    $clienLimit = false;
-                }
+                    $iisTrainingManager = isset($post['is_training_manager']) ? 1 : 0;
+                    if($iisTrainingManager && $post['u_company_id'] && !$this->getCompanyTable()->checkTrainingManager($post['u_company_id'])) {
+                        $setTrainingManagerMsg = 'Company already has training manager!';
+                        $setTrainingManager = false;
+                    }
 
-                if ($form->isValid() && $clienLimit) {
+                    if ($clienLimit && $setTrainingManager) {
+                        $post['u_role_id'] = $identity['u_role_id'] == \Admin\Model\User::ROLE_PARTIAL ? \Admin\Model\User::ROLE_PARTIAL : \Admin\Model\User::ROLE_CLIENT;
+                        $post['u_senior_consultant_u_id'] = $identity['u_id'];
+                        $user->exchangeArray($post);
+                        $user->u_sent_password = 0;
+                        $uId = $this->getUserTable()->saveUser($user);
 
-                    $post['u_role_id'] = $identity['u_role_id'] == \Admin\Model\User::ROLE_PARTIAL ? \Admin\Model\User::ROLE_PARTIAL : \Admin\Model\User::ROLE_CLIENT;
-                    $post['u_senior_consultant_u_id'] = $identity['u_id'];
-                    $user->exchangeArray($post);
-                    $user->u_sent_password = 0;
-                    $uId = $this->getUserTable()->saveUser($user);
+                        if ($id) {
+                            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_EDIT, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $id);
+                        } else {
+                            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_ADD, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $uId);
+                        }
 
-                    if ($id) {
-                        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_EDIT, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $id);
+                        $users = $this->getUserTable()->getContactsByCompanyId($post['u_company_id']);
+                        $iisPrimaryContact = isset($post['is_primary_contact']) ? 1 : 0;
+                        if ($iisPrimaryContact || (count($users) == 1)) {
+                            $this->getCompanyTable()->setPrimaryContactId($post['u_company_id'], $uId);
+                        }
+
+                        if ($iisTrainingManager || (count($users) == 1)) {
+                            !$this->getCompanyTable()->setTrainingManagerId($post['u_company_id'], $uId);
+                        }
+                        
+                        if($request->getPost('save_send_email')) {
+                            $password = sha1($user->u_email . time());
+                            $password = substr($password, 0, 6);
+                            $this->getServiceLocator()->get('Admin\Model\UserTable')->setNewPassword($uId, $password);
+
+                            $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'createuser', 'uId' => $uId, 'password' => $password));
+                            $this->flashMessenger()->addSuccessMessage('Client saved and invitation has been sent');
+                        } else {
+                            $this->flashMessenger()->addSuccessMessage('Client saved');
+                        }
+                        
+                        return $this->redirect()->toRoute('client', array('controller' => 'client', 'action' => 'list'));
                     } else {
-                        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_ADD, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $uId);
-                    }
-
-                    $users = $this->getUserTable()->getContactsByCompanyId($post['u_company_id']);
-                    $iisPrimaryContact = isset($post['is_primary_contact']) ? 1 : 0;
-                    if ($iisPrimaryContact || (count($users) == 1)) {
-                        $this->getCompanyTable()->setPrimaryContactId($post['u_company_id'], $uId);
-                    }
-                    
-                    if($request->getPost('save_send_email')) {
-                        $password = sha1($user->u_email . time());
-                        $password = substr($password, 0, 6);
-                        $this->getServiceLocator()->get('Admin\Model\UserTable')->setNewPassword($uId, $password);
-
-                        $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'createuser', 'uId' => $uId, 'password' => $password));
-                        $this->flashMessenger()->addSuccessMessage('Client saved and invitation has been sent');
-                    } else {
-                        $this->flashMessenger()->addSuccessMessage('Client saved');
-                    }
-                    
-                    return $this->redirect()->toRoute('client', array('controller' => 'client', 'action' => 'list'));
-
-                } else {
-                    foreach ($form->getMessages() as $messageId => $message) {
-                        //echo "Validation failure '$messageId': $message\n";
+                        foreach ($form->getMessages() as $messageId => $message) {
+                            //echo "Validation failure '$messageId': $message\n";
+                        }
                     }
                 }
             } else {
@@ -256,6 +267,7 @@ class ClientController extends AbstractActionController
         return array(
             'form' => $form,
             'uId' => $id,
+            'userObj' => $userObj,
             'username' => is_object($userObj) ? $userObj->u_firstname . ' ' . $userObj->u_lastname : '',
             'clientObj' => $clientObj,
             'primaryAddressObj' => $primaryAddressObj,
@@ -263,6 +275,7 @@ class ClientController extends AbstractActionController
             'notes' => $notes,
             'cId' => (int) $this->params('company'),
             'clientLimitMsg' => $clientLimitMsg,
+            'setTrainingManagerMsg' => $setTrainingManagerMsg,
             'checkClientLimitCompany' => $this->getCompanyTable()->checkClientLimitCompany()
         );
     }

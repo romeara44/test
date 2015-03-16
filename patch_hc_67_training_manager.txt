@@ -1,0 +1,1 @@
+ALTER TABLE  `companies` ADD  `c_training_manager_u_id` INT( 11 ) NULL AFTER  `c_primary_contact_u_id` ;

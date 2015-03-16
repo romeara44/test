@@ -345,6 +345,26 @@ class CompanyTable implements ServiceLocatorAwareInterface
         $this->tableGateway->update($data, array('c_id' => $companyId));
     }
 
+    public function checkTrainingManager($companyId)
+    {
+        $select = $this->tableGateway->getSql()->select();
+
+        $select->where('c_training_manager_u_id IS NOT NULL');
+        $select->where('c_id =' . $companyId);
+
+        $resultSet = $this->tableGateway->selectWith($select)->count();
+        
+        return !(boolean)$resultSet;
+    }
+
+    public function setTrainingManagerId($companyId, $uId)
+    {
+        $data['c_training_manager_u_id'] = $uId;
+        $this->tableGateway->update($data, array('c_id' => $companyId));
+
+        return true;
+    }
+
     public function saveAddresses($companyId, $post)
     {
         // save new addresses
