@@ -14,6 +14,7 @@ use Note\Form\NoteForm;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Client\Model\Company;
+use Client\Model\CompanyRoles;
 use Note\Model\Note;
 use Zend\Session\Container;
 use Zend\View\Model\JsonModel;
@@ -104,6 +105,7 @@ class CompanyController extends AbstractActionController
 
         $id = (int) $this->params('id');
         $noteform = $request->isPost() && (int) $request->getPost('noteform');
+        $rolesform = $request->isPost() && (int) $request->getPost('rolesform');
         $roleFilter = $this->params()->fromRoute('roleFilter') ? (int) $this->params()->fromRoute('roleFilter') : 0;
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_COMPANY, $id);
@@ -147,7 +149,45 @@ class CompanyController extends AbstractActionController
         $identity = $this->getIdentity();
 
         if ($request->isPost()) {
-            if (!$noteform) {
+            if ($noteform) {
+                $note = new Note();
+                $formNote->setInputFilter($note->getInputFilter($this->getServiceLocator(), $id));
+                $formNote->setData($request->getPost());
+
+                if ($formNote->isValid()) {
+                    $post = $request->getPost();
+
+                    $note->exchangeArray($request->getPost());
+                    $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
+                    $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
+
+                    $this->flashMessenger()->addSuccessMessage('Note saved');
+
+                    return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
+                } else {
+                    if ($id) {
+                        $form->bind($companyObj);
+                        $addresses = $this->getAddressTable()->getAddresses($id, \Client\Model\AddressItem::COMPANY_TYPE);
+                    }
+                }
+            } else if($rolesform) {
+                $post = $request->getPost();
+
+                if (isset($post['rolesform'])) {
+                    foreach ($post['rolesform'] as $roleId => $uRId) {
+                        $cr = new CompanyRoles();
+
+                        $dataCr['cr_c_id']  = $id;
+                        $dataCr['cr_ar_id'] = $roleId;
+                        $dataCr['cr_u_id']  = $uRId;
+
+                        $cr->exchangeArray($dataCr);
+                        $this->getServiceLocator()->get('Client\Model\CompanyRolesTable')->saveCompanyRole($cr);
+                    }
+                }
+                return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
+            } else {
+
                 $company = new Company();
                 $form->setInputFilter($company->getInputFilter($this->getServiceLocator(), $id));
                 $form->setData($request->getPost());
@@ -175,27 +215,6 @@ class CompanyController extends AbstractActionController
                         $addresses = $this->getAddressTable()->getAddresses($id, \Client\Model\AddressItem::COMPANY_TYPE);
                     }
                 }
-            } else {
-                $note = new Note();
-                $formNote->setInputFilter($note->getInputFilter($this->getServiceLocator(), $id));
-                $formNote->setData($request->getPost());
-
-                if ($formNote->isValid()) {
-                    $post = $request->getPost();
-
-                    $note->exchangeArray($request->getPost());
-                    $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-                    $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
-
-                    $this->flashMessenger()->addSuccessMessage('Note saved');
-
-                    return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
-                } else {
-                    if ($id) {
-                        $form->bind($companyObj);
-                        $addresses = $this->getAddressTable()->getAddresses($id, \Client\Model\AddressItem::COMPANY_TYPE);
-                    }
-                }
             }
 
         } else {
@@ -212,11 +231,15 @@ class CompanyController extends AbstractActionController
             'addresses' => $addresses,
             'contacts' => $contacts,
             'notes' => $notes,
+            'companyObj' => $companyObj,
+            'assessmentsRoles' => $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles(),
+            'contacts' => $contacts = $this->getUserTable()->getUsersByCompany($id),
             'primaryContactId'=> $primaryContactId,
             'trainingManagerId'=> $trainingManagerId,
             'roleId' => $identity['u_role_id'],
             'checkClientLimitCompany' => $checkClientLimitCompany,
-            'checkHasPartial' => $this->getUserTable()->checkHasPartial($id)
+            'checkHasPartial' => $this->getUserTable()->checkHasPartial($id),
+            'existsCompanyRoles' => $this->getServiceLocator()->get('Client\Model\CompanyRolesTable')->getExistsCompanyRoles($id)
         );
     }
 

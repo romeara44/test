@@ -73,6 +73,18 @@ class Module
                     $resultSetPrototype->setArrayObjectPrototype(new \Note\Model\Note());
                     return new TableGateway('notes', $dbAdapter, null, $resultSetPrototype);
                 },
+
+                'Client\Model\CompanyRolesTable' =>  function($sm) {
+                    $tableGateway = $sm->get('CompanyRolesTableGateway');
+                    $table = new \Client\Model\CompanyRolesTable($tableGateway);
+                    return $table;
+                },
+                'CompanyRolesTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new \Client\Model\CompanyRoles());
+                    return new TableGateway('company_roles', $dbAdapter, null, $resultSetPrototype);
+                },
             ),
         );
     }

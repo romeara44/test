@@ -21,6 +21,7 @@ $form->setAttribute('method', 'post');
         <ul id="tabs-nav">
             <li><a href="#tab1">Details</a></li>
             <li><a href="#tab2">Notes</a></li>
+            <li><a href="#tab3">Roles</a></li>
         </ul>
         <div class="cboth"></div>
     <?php endif; ?>
@@ -288,6 +289,47 @@ $form->setAttribute('method', 'post');
                     </div>
                 <?php endforeach; ?>
             <?php endif; ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($this->cId): ?>
+        <div id="tab3">
+            <h3><?php echo $companyObj->c_name ?> Default Roles</h3>
+
+            <form action="/company/edit/<?php echo $this->cId ?>" name="rolesform" id="" method="POST">
+                <?php $counterRoles = 1; ?>
+                <?php foreach ($this->assessmentsRoles as $ar): ?>
+                <div class="col4  <?php echo ($counterRoles && $counterRoles % 2 == 0 ? 'last' : 'company-role-first') ?>"><br />
+                    <p>
+                        <strong style="line-height: 32px;"><?php echo $ar['ar_name'] ?></strong><br />
+                        <select name="rolesform[<?php echo $ar['ar_id'] ?>]" id="" class="contactSelect w225">
+                            <option value="">Select Contact</option>
+                            <option value="">---</option>
+
+                            <?php foreach ($this->contacts as $u): ?>
+                                <?php $selected = ''; ?>
+                                <?php if (isset($this->existsCompanyRoles) && isset($this->existsCompanyRoles[$ar['ar_id']]) && ($this->existsCompanyRoles[$ar['ar_id']] == $u->u_id)):
+                                    $selected = ' SELECTED ';
+                                endif; ?>
+
+                                <option <?php echo $selected ?> value="<?php echo $u->u_id ?>"><?php echo $u->u_firstname . ' ' . $u->u_lastname ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </p>
+                </div>
+
+                <?php $counterRoles++; endforeach; ?>
+
+                <div class="cboth"><br /></div>
+
+                <div class="form-buttons">
+                    <input type="submit" value="Save" class="form-button" />
+                    <div class="fleft">or</div>
+                    <a href="/company/list" class="cancel">Cancel</a>
+                </div>
+
+                <div class="cboth"><br /></div>
+            </form>
         </div>
     <?php endif; ?>
 </div>

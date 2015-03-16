@@ -86,10 +86,10 @@ $form->setAttribute('method', 'post');
                                 <?php $selected = ''; ?>
                                 <?php if (isset($this->arlcContacts) && isset($this->arlcContacts[$ar['ar_id']]) && ($this->arlcContacts[$ar['ar_id']] == $u->u_id)):
                                     $selected = ' SELECTED ';
-                                else:
-                                    if (isset($this->rolesAdr1[$ar['ar_id']]) && ($this->rolesAdr1[$ar['ar_id']] == $u->u_id)):
-                                        $selected = ' SELECTED ';
-                                    endif;
+                                elseif (isset($this->rolesAdr1[$ar['ar_id']]) && ($this->rolesAdr1[$ar['ar_id']] == $u->u_id)):
+                                     $selected = ' SELECTED ';
+                                elseif (isset($this->companyRoles) && isset($this->companyRoles[$ar['ar_id']]) && ($this->companyRoles[$ar['ar_id']] == $u->u_id)):
+                                    $selected = ' SELECTED ';
                                 endif; ?>
 
                                 <option <?php echo $selected ?> value="<?php echo $u->u_id ?>"><?php echo $u->u_firstname . ' ' . $u->u_lastname ?></option>

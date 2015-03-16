@@ -494,18 +494,56 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
 
     public function getApproverAccepter($id)
     {
-        $id  = (int) $id;
-        
+        $id     = (int) $id;
+        $result = array();
+
         $select = $this->tableGateway->getSql()->select();
+        $select->columns(array(new \Zend\Db\Sql\Expression('DISTINCT(u1.u_id) as u_id')));
         $select->where('rp_id = ' . $id);
         $select->join(array('arlc' => 'assessments_roles_locations_contacts'), 'arlc.arlc_a_id = rp_a_id', array(), 'inner');
-        $select->join(array('ar' => 'assessments_roles'), 'arlc.arlc_ar_id = ar.ar_id', array(), 'inner');
+        $select->join(array('ar' => 'assessments_roles'), 'arlc.arlc_ar_id = ar.ar_id', array('_ar_id' => 'ar_id'), 'inner');
         $select->join(array('u1' => 'users'), 'arlc.arlc_u_id = u1.u_id', array('_u_id' => 'u_id', '_u_name' => new \Zend\Db\Sql\Expression('CONCAT(u1.u_firstname, " ", u1.u_lastname)')), 'inner');
         $select->where('ar.ar_id IN(8,9,10)');
         
         $resultSet = $this->tableGateway->selectWith($select);
+
+        if(!$resultSet->count()) {
+            $select = $this->tableGateway->getSql()->select();
+            $select->where('rp_id = ' . $id);
+            $select->join(array('cr' => 'company_roles'), 'cr.cr_c_id = rp_c_id', array('_ar_id' => 'cr_ar_id'), 'inner');
+            $select->join(array('u1' => 'users'), 'cr.cr_u_id = u1.u_id', array('_u_id' => 'u_id', '_u_name' => new \Zend\Db\Sql\Expression('CONCAT(u1.u_firstname, " ", u1.u_lastname)')), 'inner');
+            $select->where('cr.cr_ar_id IN(8,9,10)');
+
+            $resultSet = $this->tableGateway->selectWith($select);
+        }
         
-        return $resultSet;
+        if($resultSet->count()) {
+            foreach ($resultSet as $key => $rs) {
+                if(!isset($result[$rs->_u_id])) {
+                    $result[$rs->_u_id] = $rs;
+                    $result[$rs->_u_id]->_ar_id = array($rs->_ar_id);
+                } else {
+                    $result[$rs->_u_id]->_ar_id[] = $rs->_ar_id;
+                }
+            }
+        }
+
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('rp_id = ' . $id);
+        $select->join(array('c' => 'companies'), 'c.c_id = rp_c_id', array(), 'inner');
+        $select->join(array('u1' => 'users'), 'c.c_consultant_u_id = u1.u_id', array('_u_id' => 'u_id', '_u_name' => new \Zend\Db\Sql\Expression('CONCAT(u1.u_firstname, " ", u1.u_lastname)')), 'inner');
+        $select->where('c.c_consultant_u_id IS NOT NULL');
+
+        $resultSet = $this->tableGateway->selectWith($select)->current();
+
+        if($resultSet->_u_id) {
+            if(!isset($result[$resultSet->_u_id])) {
+                $result[$resultSet->_u_id] = $resultSet;
+                $result[$resultSet->_u_id]->_ar_id = array();
+            }
+        }
+        
+        return $result;
     }
 
 }

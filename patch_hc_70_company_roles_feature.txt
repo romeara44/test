@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS `company_roles` (
+  `cr_id` int(11) NOT NULL AUTO_INCREMENT,
+  `cr_c_id` int(11) NOT NULL,
+  `cr_ar_id` int(11) NOT NULL,
+  `cr_u_id` int(11) NOT NULL,
+  PRIMARY KEY (`cr_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;

@@ -329,9 +329,8 @@
             <select name="rp_approver_u_id" id="rp_approver_u_id" id="" class="w175 valid_input form-control required">
                 <option value="">Please Select</option>
                 <option value="">---</option>
-                <?php $this->approverAccepter->buffer() ?>
                 <?php foreach ($this->approverAccepter as $contact): ?>
-                    <option <?php echo ($contact->_u_id == $this->rpObj->rp_approver_u_id) ? ' SELECTED ' : '' ?> value="<?php echo $contact->_u_id ?>"><?php echo $contact->_u_name ?></option>
+                    <option <?php echo ($contact->_u_id == $this->rpObj->rp_approver_u_id || (!$this->rpObj->rp_approver_u_id && in_array(9, $contact->_ar_id))) ? ' SELECTED ' : '' ?> value="<?php echo $contact->_u_id ?>"><?php echo $contact->_u_name ?></option>
                 <?php endforeach; ?>
             </select>
         </p>
@@ -361,7 +360,7 @@
                 <option value="">Please Select</option>
                 <option value="">---</option>
                 <?php foreach ($this->approverAccepter as $contact): ?>
-                    <option <?php echo ($contact->_u_id == $this->rpObj->rp_accepter_u_id) ? ' SELECTED ' : '' ?> value="<?php echo $contact->_u_id ?>"><?php echo $contact->_u_name ?></option>
+                    <option <?php echo ($contact->_u_id == $this->rpObj->rp_accepter_u_id || (!$this->rpObj->rp_accepter_u_id && in_array(10, $contact->_ar_id))) ? ' SELECTED ' : '' ?> value="<?php echo $contact->_u_id ?>"><?php echo $contact->_u_name ?></option>
                 <?php endforeach; ?>
             </select>
         </p>

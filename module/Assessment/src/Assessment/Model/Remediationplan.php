@@ -47,6 +47,7 @@ class Remediationplan
     public $_performed_name;
     public $_u_id;
     public $_u_name;
+    public $_ar_id;
 
     protected $inputFilter;
 
@@ -88,6 +89,7 @@ class Remediationplan
         $this->_rp_accepted_date_formatted     = (isset($data['_rp_accepted_date_formatted'])) ? $data['_rp_accepted_date_formatted'] : null;
         $this->_u_id     = (isset($data['_u_id'])) ? $data['_u_id'] : null;
         $this->_u_name     = (isset($data['_u_name'])) ? $data['_u_name'] : null;
+        $this->_ar_id     = (isset($data['_ar_id'])) ? $data['_ar_id'] : null;
 
     }
 

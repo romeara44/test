@@ -190,6 +190,19 @@ class Module
                         $resultSetPrototype = new ResultSet();
                         return new TableGateway('corporate_users', $dbAdapter, null, $resultSetPrototype);
                     },
+
+                    
+                'Client\Model\CompanyRolesTable' =>  function($sm) {
+                    $tableGateway = $sm->get('CompanyRolesTableGateway');
+                    $table = new \Client\Model\CompanyRolesTable($tableGateway);
+                    return $table;
+                },
+                'CompanyRolesTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new \Client\Model\CompanyRoles());
+                    return new TableGateway('company_roles', $dbAdapter, null, $resultSetPrototype);
+                },
             ),
         );
     }

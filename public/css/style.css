@@ -1020,7 +1020,9 @@ textarea.double { width: 586px; }
 #activatePartialUsers {
     margin-bottom: 5px;
 }
-
+.company-role-first {
+    margin-right: 50px;
+}
 /* Tables */
 
 table {
