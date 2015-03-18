@@ -327,6 +327,7 @@ class CompanyTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
 
         $select->where('c_owner_u_id = ' . $identity['u_id']);
+        $select->where('c_active = 1');
 
         $resultSet = $this->tableGateway->selectWith($select)->count();
         
