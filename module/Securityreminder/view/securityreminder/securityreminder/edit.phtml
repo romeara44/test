@@ -37,14 +37,6 @@ $form->setAttribute('method', 'post');
             $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
             $identity = $authService->getIdentity();
         ?>
-        
-        <p>
-            <?php $fn = $form->get('sr_dt_id');
-            echo $this->formLabel($fn);
-            echo $this->formSelect($fn->setAttributes(array('id'=>'type', 'class'=>'form-control required')));
-            echo $this->formElementErrors($fn);
-            ?>
-        </p>
 
         <p>
             <?php
@@ -57,7 +49,16 @@ $form->setAttribute('method', 'post');
             echo $this->formElementErrors($fn);
             ?>
         </p>
-        
+                
+        <p>
+            <?php
+            $fn = $form->get('sr_developed_by');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id'=>'sr_developed_by')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
         <p>
             <?php
             $fn = $form->get('sr_regulation');
@@ -68,10 +69,9 @@ $form->setAttribute('method', 'post');
         </p>
         
         <p>
-            <?php
-            $fn = $form->get('sr_developed_by');
+            <?php $fn = $form->get('sr_dt_id');
             echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id'=>'sr_developed_by')));
+            echo $this->formSelect($fn->setAttributes(array('id'=>'type', 'class'=>'form-control required')));
             echo $this->formElementErrors($fn);
             ?>
         </p>

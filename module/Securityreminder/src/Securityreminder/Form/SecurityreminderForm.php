@@ -34,7 +34,7 @@ class SecurityreminderForm extends Form
             'name' => 'sr_dt_id',
             'type' => 'Zend\Form\Element\Select',
             'options' => array(
-                'label' => 'Type',
+                'label' => 'Distribution Type',
                 'value_options' => $types
             ),
         ));
