@@ -145,6 +145,10 @@ class UserController extends AbstractActionController
 
     public function registrationAction()
     {
+        if ($this->hasIdentity()) {
+            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+        }
+
         $form = new RegistrationForm($this->getServiceLocator(), $this->getRequest()->getBaseUrl().'/data/captcha/');
 
         $request = $this->getRequest();
