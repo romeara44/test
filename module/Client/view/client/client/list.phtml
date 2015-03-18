@@ -83,7 +83,7 @@ $identity = $authService->getIdentity();
                             <?php $unarchiveUrl = '/' . (($isUser) ? 'client' : 'company') . '/unarchive/' . (($isUser) ? $company->u_id : $company->c_id); ?>
                             <a href="<?php echo $unarchiveUrl ?>" class="confirmation-modal i-delete">Unarchive</a>
                         <?php endif; ?>
-                    <?php else: ?>
+                    <?php elseif($identity['u_company_id'] != $company->c_id):?>
                         <?php $deleteUrl = '/' . (($isUser) ? 'client' : 'company') . '/delete/' . (($isUser) ? $company->u_id : $company->c_id); ?>
                         <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
                     <?php endif; ?>

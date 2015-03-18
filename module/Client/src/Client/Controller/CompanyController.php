@@ -245,11 +245,14 @@ class CompanyController extends AbstractActionController
 
     public function deleteAction()
     {
-        $id = $this->params('id');
+        $identity = $this->getIdentity();
+        $id       = $this->params('id');
 
-        $this->getCompanyTable()->deleteCompany($id);
-        $this->flashMessenger()->addSuccessMessage('Company has been deleted');
-
+        if($identity['u_company_id'] != $id) {
+            $this->getCompanyTable()->deleteCompany($id);
+            $this->flashMessenger()->addSuccessMessage('Company has been deleted');
+        }
+        
         return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
     }
 
