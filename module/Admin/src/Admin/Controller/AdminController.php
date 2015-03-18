@@ -133,7 +133,7 @@ class AdminController extends AbstractActionController
             if ($form->isValid()) {
                 $post = $request->getPost();
                 $post['u_confirmed'] = $uId ? $userObj->u_confirmed : null;
-                $post['u_company_id'] = $post['u_company_id'] ? $post['u_company_id'] : $userObj->u_company_id;
+                $post['u_company_id'] = $post['u_company_id'] ? $post['u_company_id'] : (is_object($userObj) ? $userObj->u_company_id : null);
                 
                 $user->exchangeArray($post);
                 $this->getUserTable()->saveUser($user);
