@@ -10,6 +10,10 @@ class TraininglogForm extends Form
         parent::__construct('user');
         $this->setAttribute('method', 'post');
 
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
         $this->add(array(
             'name' => 'tl_id',
             'attributes' => array(
@@ -26,9 +30,10 @@ class TraininglogForm extends Form
 
         $traininglogtypeTable = $sl->get('Traininglog\Model\TraininglogtypeTable');
         $types[''] = 'Please Select';
-        foreach ($traininglogtypeTable->getTraininglogtypes() as $key => $r) {
+        foreach ($traininglogtypeTable->getTraininglogtypesByCompany($identity['u_company_id']) as $key => $r) {
             $types[$key] = $r;
         }
+        $types['-1'] = 'Other';
 
         $this->add(array(
             'name' => 'tl_tlt_id',

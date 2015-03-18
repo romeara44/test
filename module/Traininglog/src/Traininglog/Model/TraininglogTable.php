@@ -208,7 +208,7 @@ class TraininglogTable implements ServiceLocatorAwareInterface
                                            , 'rg_description' => $traininglog->_regulation[-1]['rg_description']
                                            , 'rg_u_owner_id'  => $identity['u_id']
                                            );
-// print_r($regulationData);exit;
+
                     $rgId = $this->getServiceLocator()->get('Traininglog\Model\RegulationTable')->saveRegulation($regulationData);
 
                     $traininglogRegulationTable->saveTraininglogRegulation(array('tlrg_tl_id' => $id, 'tlrg_rg_id' => $rgId));
@@ -223,6 +223,13 @@ class TraininglogTable implements ServiceLocatorAwareInterface
             $trainerId = $trainerTable->saveTrainer(array('tr_company_id' => $identity['u_company_id'], 'tr_name' => $traininglog->_tl_trainer_name));
             if($trainerId) {
                  $this->tableGateway->update(array('tl_trainer_id' => $trainerId, 'tl_trainer_type' => 'trainer'), array('tl_id' => $id));
+            }
+        }
+
+        if($traininglog->tl_tlt_id == '-1' && $traininglog->_tl_type_name) {
+            $typeId = $this->getServiceLocator()->get('Traininglog\Model\TraininglogtypeTable')->saveTraininglogtype(array('tlt_company_id' => $identity['u_company_id'], 'tlt_name' => $traininglog->_tl_type_name));
+            if($typeId) {
+                 $this->tableGateway->update(array('tl_tlt_id' => $typeId), array('tl_id' => $id));
             }
         }
 

@@ -1,0 +1,1 @@
+ALTER TABLE  `training_log_types` ADD  `tlt_company_id` INT( 11 ) NULL AFTER  `tlt_name` ;

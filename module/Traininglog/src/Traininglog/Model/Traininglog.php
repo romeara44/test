@@ -28,6 +28,7 @@ class Traininglog
     public $_regulation;
     public $_tl_trainer;
     public $_tl_trainer_name;
+    public $_tl_type_name;
 
     protected $inputFilter;
 
@@ -52,6 +53,7 @@ class Traininglog
         $this->_regulation         = (isset($data['_regulation']))         ? $data['_regulation']         : null;
         $this->_tl_trainer         = (isset($data['_tl_trainer']))         ? $data['_tl_trainer']         : null;
         $this->_tl_trainer_name    = (isset($data['_tl_trainer_name']))    ? $data['_tl_trainer_name']    : null;
+        $this->_tl_type_name       = (isset($data['_tl_type_name']))       ? $data['_tl_type_name']       : null;
     }
 
     public function getArrayCopy()
@@ -78,6 +80,25 @@ class Traininglog
                 'required' => true,
                 'filters'  => array(
                     array('name' => 'Int'),
+                ),
+            )));
+
+            $inputFilter->add($factory->createInput(array(
+                'name'     => '_tl_type_name',
+                'required' => false,
+                'filters'  => array(
+                    array('name' => 'StripTags'),
+                    array('name' => 'StringTrim'),
+                ),
+                'validators' => array(
+                    array(
+                        'name'    => 'StringLength',
+                        'options' => array(
+                            'encoding' => 'UTF-8',
+                            'min'      => 1,
+                            'max'      => 100,
+                        ),
+                    ),
                 ),
             )));
 

@@ -15,7 +15,7 @@ $form->setAttribute('method', 'post');
 
 
     <div class="page-title">
-        <h1 class="fleft"><?php if($this->tlId) {?>Edit<?php } else {?>Add New <?php }?>Training Log</h1>
+        <h1 class="fleft"><?php if($this->tlId) {?>Edit <?php } else {?>Add New <?php }?>Training Log</h1>
         <div class="cboth"></div>
     </div>
 
@@ -44,6 +44,11 @@ $form->setAttribute('method', 'post');
             echo $this->formSelect($fn->setAttributes(array('id'=>'type', 'class'=>'form-control required')));
             echo $this->formElementErrors($fn);
             ?>
+        </p>
+
+        <p id="_tl_type_name_wrap" style="border: 0;display: none">
+            <label for="_tl_type_name">Type Name</label>
+            <input type="text" name="_tl_type_name" id="_tl_type_name" value="<?php echo $tlObj->_tl_type_name?>" required disabled="disabled">
         </p>
 
         <p>
@@ -341,6 +346,16 @@ $form->setAttribute('method', 'post');
             } else {
                 $('#_tl_trainer_name_wrap').css('display', 'none');
                 $('#_tl_trainer_name').attr('disabled', true);
+            }
+        });
+
+        $('#type').change(function(){
+            if($('#type option:selected').val() == '-1') {
+                $('#_tl_type_name_wrap').css('display', 'block');
+                $('#_tl_type_name').attr('disabled', false);
+            } else {
+                $('#_tl_type_name_wrap').css('display', 'none');
+                $('#_tl_type_name').attr('disabled', true);
             }
         });
 

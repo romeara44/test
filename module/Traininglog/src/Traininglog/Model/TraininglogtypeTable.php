@@ -48,4 +48,31 @@ class TraininglogtypeTable implements ServiceLocatorAwareInterface
         return $types;
     }
 
+    public function getTraininglogtypesByCompany($companyId = null)
+    {
+        $select = $this->tableGateway->getSql()->select();
+
+        if($companyId) {
+            $select->where('tlt_company_id = ' . $companyId . ' OR tlt_company_id IS NULL');
+        } else {
+            $select->where('tlt_company_id IS NULL');
+        }
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        $types = array();
+        foreach ($resultSet as $rs) {
+            $types[$rs->tlt_id] = $rs->tlt_name;
+        }
+
+        return $types;
+    }
+
+    public function saveTraininglogtype($data)
+    {
+        $this->tableGateway->insert($data);
+
+        return $this->tableGateway->lastInsertValue;;
+    }
+
 }

@@ -10,13 +10,15 @@ class Traininglogtype
 {
     public $tlt_id;
     public $tlt_name;
+    public $tlt_company_id;
 
     protected $inputFilter;
 
     public function exchangeArray($data)
     {
-        $this->tlt_id   = (isset($data['tlt_id']))   ? $data['tlt_id']   : null;
-        $this->tlt_name = (isset($data['tlt_name'])) ? $data['tlt_name'] : null;
+        $this->tlt_id         = (isset($data['tlt_id']))   ? $data['tlt_id']   : null;
+        $this->tlt_name       = (isset($data['tlt_name'])) ? $data['tlt_name'] : null;
+        $this->tlt_company_id = (isset($data['tlt_company_id'])) ? $data['tlt_company_id'] : null;
     }
 
     public function getArrayCopy()
@@ -44,6 +46,14 @@ class Traininglogtype
                 'filters'  => array(
                     array('name' => 'StripTags'),
                     array('name' => 'StringTrim'),
+                ),
+            )));
+
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'tlt_company_id',
+                'required' => true,
+                'filters'  => array(
+                    array('name' => 'Int'),
                 ),
             )));
 
