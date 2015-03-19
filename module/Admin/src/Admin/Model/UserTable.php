@@ -500,7 +500,10 @@ class UserTable implements ServiceLocatorAwareInterface
     {
         $data['u_id'] = $id;
         $data['u_active'] = 0;
+        
         $this->tableGateway->update($data, array('u_id' => $id));
+
+        $this->getServiceLocator()->get('Client\Model\CompanyTable')->unsetTrainingManager($id);
 
         return true;
     }

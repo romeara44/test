@@ -191,7 +191,9 @@ class ClientController extends AbstractActionController
                     }
 
                     $iisTrainingManager = isset($post['is_training_manager']) ? 1 : 0;
-                    if($iisTrainingManager && $post['u_company_id'] && !$this->getCompanyTable()->checkTrainingManager($post['u_company_id'])) {
+                    $curTrainingManager = $this->getCompanyTable()->getTrainingManager($post['u_company_id']);
+
+                    if($iisTrainingManager && $post['u_company_id'] && $curTrainingManager) {
                         $setTrainingManagerMsg = 'Company already has training manager!';
                         $setTrainingManager = false;
                     }
@@ -210,13 +212,16 @@ class ClientController extends AbstractActionController
                         }
 
                         $users = $this->getUserTable()->getContactsByCompanyId($post['u_company_id']);
+                        
                         $iisPrimaryContact = isset($post['is_primary_contact']) ? 1 : 0;
                         if ($iisPrimaryContact || (count($users) == 1)) {
                             $this->getCompanyTable()->setPrimaryContactId($post['u_company_id'], $uId);
                         }
 
-                        if ($iisTrainingManager || (count($users) == 1)) {
-                            !$this->getCompanyTable()->setTrainingManagerId($post['u_company_id'], $uId);
+                        if ($iisTrainingManager) {
+                            $this->getCompanyTable()->setTrainingManager($post['u_company_id'], $uId);
+                        } else if(!$iisTrainingManager) {
+                            $this->getCompanyTable()->unsetTrainingManager($uId);
                         }
                         
                         if($request->getPost('save_send_email')) {
