@@ -75,7 +75,7 @@ UPDATE `users` SET `u_confirmed`=1;
 
 INSERT INTO `training_log_types` (`tlt_id`, `tlt_name`) VALUES
 (1, 'Initial'),
-(2, 'Recurrent'),
+(2, 'Recurring'),
 (3, 'Post breach');
 
 INSERT INTO `regulations` (`rg_id`, `rg_pp_name`, `rg_pp_number`, `rg_number`, `rg_description`, `rg_u_owner_id`) VALUES
