@@ -724,6 +724,20 @@ h1.security_reminders {
     display: block;
     margin: 10px 0;
 }
+
+.span-required {
+    color: red;
+}
+
+#phoneRequired {
+    padding: 0;
+}
+
+#phoneRequired label {
+    width: 100%;
+    font-size: 11px;
+}
+
 .tl_attendees_description {
     clear: left;
     display: block;

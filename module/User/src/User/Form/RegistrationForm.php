@@ -19,7 +19,7 @@ class RegistrationForm extends Form
                 'type'  => 'text',
             ),
             'options' => array(
-                'label' => 'First name',
+                'label' => 'First name <span class="span-required">*</span>',
             )
         ));
 
@@ -29,7 +29,7 @@ class RegistrationForm extends Form
                 'type'  => 'text',
             ),
             'options' => array(
-                'label' => 'Last Name',
+                'label' => 'Last Name <span class="span-required">*</span>',
             ),
         ));
 
@@ -39,7 +39,7 @@ class RegistrationForm extends Form
                 'type'  => 'text',
             ),
             'options' => array(
-                'label' => 'Company',
+                'label' => 'Company <span class="span-required">*</span>',
             ),
         ));
 
@@ -110,7 +110,7 @@ class RegistrationForm extends Form
                 'type'  => 'text',
             ),
             'options' => array(
-                'label' => 'E-mail',
+                'label' => 'E-mail <span class="span-required">*</span>',
             ),
         ));
 
@@ -120,7 +120,7 @@ class RegistrationForm extends Form
                 'type'  => 'text',
             ),
             'options' => array(
-                'label' => 'Confirm E-mail',
+                'label' => 'Confirm E-mail <span class="span-required">*</span>',
             ),
         ));
 

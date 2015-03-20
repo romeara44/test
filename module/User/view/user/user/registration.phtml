@@ -18,7 +18,7 @@ $form->setAttribute('method', 'post');
     <div class="cboth"></div>
 </div>
 
-<div>Here will be some marketing information...</div>
+<div style="display:none">Here will be some marketing information...</div>
 
 <div class="col-left">
 
@@ -61,7 +61,7 @@ $form->setAttribute('method', 'post');
             echo $this->formElementErrors($fn);
             ?>
         </p>
-        <p>
+        <p style="border: 0;">
             <?php
             $fn = $form->get('u_direct_phone');
             echo $this->formLabel($fn);
@@ -74,7 +74,7 @@ $form->setAttribute('method', 'post');
             echo $this->formElementErrors($fn);
             ?>
         </p>
-        <p>
+        <p style="border: 0;">
             <?php
             $fn = $form->get('u_cell_phone');
             echo $this->formLabel($fn);
@@ -82,7 +82,7 @@ $form->setAttribute('method', 'post');
             echo $this->formElementErrors($fn);
             ?>
         </p>
-        <p>
+        <p style="border: 0;">
             <?php
             $fn = $form->get('u_other_phone');
             echo $this->formLabel($fn);
@@ -96,8 +96,8 @@ $form->setAttribute('method', 'post');
             ?>
         </p>
 
-        <p id="phoneRequired" style="display: none">
-            <label for="" generated="true" class="error">At least 1 phone number is required</label>
+        <p style="border: 0;" id="phoneRequired">
+            <label for="" generated="true"><span class="span-required">*</span> At least 1 phone number is required</label>
         </p>
 
         <p>
@@ -148,7 +148,7 @@ $form->setAttribute('method', 'post');
     jQuery(document).ready(function() {
         $('#registration').validate();
 
-        $('input[name="u_office_phone"], input[name="u_direct_phone"], input[name="u_other_phone"], input[name="u_fax"]').mask("(999) 999-9999");
+        $('input[name="u_office_phone"], input[name="u_direct_phone"], input[name="u_cell_phone"], input[name="u_other_phone"], input[name="u_fax"]').mask("(999) 999-9999");
 
         $('#registration').submit(function() {
             var isPhoneValid = false;
@@ -160,9 +160,9 @@ $form->setAttribute('method', 'post');
             });
             var isValid = $('#registration').valid();
             if (isPhoneValid) {
-                $('#phoneRequired, #phoneRequired label').hide();
+                $('#phoneRequired, #phoneRequired label').removeClass('error');
             } else {
-                $('#phoneRequired, #phoneRequired label').show();
+                $('#phoneRequired, #phoneRequired label').addClass('error');
             }
 
             if (isPhoneValid && isValid) {
