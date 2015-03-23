@@ -9,6 +9,7 @@ use Zend\InputFilter\InputFilterInterface;
 class Traininglog
 {
     public $tl_id;
+    public $tl_title;
     public $tl_tlt_id;
     public $tl_create_u_id;
     public $tl_conducted_date;
@@ -35,6 +36,7 @@ class Traininglog
     public function exchangeArray($data)
     {
         $this->tl_id               = (isset($data['tl_id']))               ? $data['tl_id']               : null;
+        $this->tl_title            = (isset($data['tl_title']))            ? $data['tl_title']            : null;
         $this->tl_tlt_id           = (isset($data['tl_tlt_id']))           ? $data['tl_tlt_id']           : null;
         $this->tl_create_u_id      = (isset($data['tl_create_u_id']))      ? $data['tl_create_u_id']      : null;
         $this->tl_conducted_date   = (isset($data['tl_conducted_date']))   ? $data['tl_conducted_date']   : null;
@@ -72,6 +74,25 @@ class Traininglog
                 'required' => true,
                 'filters'  => array(
                     array('name' => 'Int'),
+                ),
+            )));
+
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'tl_title',
+                'required' => true,
+                'filters'  => array(
+                    array('name' => 'StripTags'),
+                    array('name' => 'StringTrim'),
+                ),
+                'validators' => array(
+                    array(
+                        'name'    => 'StringLength',
+                        'options' => array(
+                            'encoding' => 'UTF-8',
+                            'min'      => 1,
+                            'max'      => 100,
+                        ),
+                    ),
                 ),
             )));
 

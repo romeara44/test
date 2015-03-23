@@ -15,6 +15,16 @@ class TraininglogForm extends Form
         $identity = $authService->getIdentity();
 
         $this->add(array(
+            'name' => 'tl_title',
+            'attributes' => array(
+                'type'  => 'text',
+            ),
+            'options' => array(
+                'label' => 'Title',
+            ),
+        ));
+
+        $this->add(array(
             'name' => 'tl_id',
             'attributes' => array(
                 'type'  => 'hidden',

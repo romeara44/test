@@ -58,7 +58,7 @@ class TraininglogTable implements ServiceLocatorAwareInterface
             }
 
             if ($searchValue !== null) {
-                $select->where('(tl_attendees LIKE "%' . $searchValue . '%" OR rg.rg_pp_name LIKE "%' . $searchValue . '%" OR rg.rg_pp_number LIKE "%' . $searchValue . '%" OR rg.rg_number LIKE "%' . $searchValue . '%")');
+                $select->where('(tl_attendees LIKE "%' . $searchValue . '%" OR rg.rg_pp_name LIKE "%' . $searchValue . '%" OR rg.rg_pp_number LIKE "%' . $searchValue . '%" OR rg.rg_number LIKE "%' . $searchValue . '%" OR tl_title LIKE "%' . $searchValue . '%")');
             }
             $select->columns(array('*', '_tl_trainer_name' => new \Zend\Db\Sql\Expression('IF(tr.tr_name IS NULL, CONCAT(u.u_firstname, " ", u.u_lastname), tr.tr_name)')));
             $select->join(array('tlt' => 'training_log_types'), 'tl_tlt_id = tlt_id', array('_tlt_name' => 'tlt_name'), 'inner');
@@ -83,7 +83,7 @@ class TraininglogTable implements ServiceLocatorAwareInterface
             $select->group('tl_id');
 
             $paginator = new Paginator($paginatorAdapter);
-
+// print_r($select->getSqlString());exit;
             return $paginator;
         }
         $resultSet = $this->tableGateway->select();
@@ -165,6 +165,7 @@ class TraininglogTable implements ServiceLocatorAwareInterface
         $identity = $authService->getIdentity();
 
         $data = array(
+            'tl_title'          => $traininglog->tl_title,
             'tl_tlt_id'         => $traininglog->tl_tlt_id,
             'tl_conducted_date' => $traininglog->tl_conducted_date,
             'tl_hire_date'      => $traininglog->tl_hire_date,

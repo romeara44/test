@@ -18,9 +18,12 @@ class ClientForm extends Form
         ));
 
         $companyTable = $sl->get('Client\Model\CompanyTable');
-        $companies[''] = 'Please Select';
         foreach ($companyTable->getCompaniesPairs() as $key => $r) {
             $companies[$key] = $r;
+        }
+
+        if(count($companies) != 1) {
+            $companies = array('' => 'Please select') + $companies;
         }
 
         $this->add(array(

@@ -23,7 +23,13 @@ $identity = $authService->getIdentity();
 <table class="traininglogs" cellpadding="0" cellspacing="0">
     <thead>
         <tr>
-            <?php $classSort = ($order_by == 'id') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <?php $classSort = ($order_by == 'title') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('traininglog', array('action' => 'list', 'page' => $page, 'order_by' => 'title', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Title <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+            <?php $classSort = ($order_by == 'type') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
                 <a href="<?php echo $this->url('traininglog', array('action' => 'list', 'page' => $page, 'order_by' => 'type', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
                     Type <i class="fa <?php echo $classSort ?>"></i>
@@ -60,6 +66,7 @@ $identity = $authService->getIdentity();
     <tbody>
         <?php foreach ($this->paginator as $tl): ?>
             <tr>
+                <td><?php echo $tl->tl_title ?></td>
                 <td><?php echo $tl->_tlt_name ?></td>
                 <td><?php echo ($tl->tl_conducted_date != '0000-00-00') ? $this->formatDateA($tl->tl_conducted_date) : '' ?></td>
                 <td><?php echo ($tl->tl_hire_date != '0000-00-00') ? $this->formatDateA($tl->tl_hire_date) : '-' ?></td>

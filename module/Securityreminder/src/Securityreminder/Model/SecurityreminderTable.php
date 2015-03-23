@@ -57,19 +57,25 @@ class SecurityreminderTable implements ServiceLocatorAwareInterface
                 $select->where('sr_active = ' . $roleFilter);
             }
 
-            if ($searchValue !== null) {
-                $select->where('(sr_regulation LIKE "%' . $searchValue . '%" OR  sr_developed_by LIKE "%' . $searchValue . '%")');
-            }
-
             $select->join(array('dt' => 'distribution_types'), 'sr_dt_id = dt_id', array('_dt_type' => 'dt_type'), 'inner');
             $select->join(array('n' => 'notes'), new \Zend\Db\Sql\Expression('sr_id = n.note_item_id'), array('_sr_comment' => new \Zend\Db\Sql\Expression('n.note_text')), 'left');
             $select->join(array('n2' => 'notes'), new \Zend\Db\Sql\Expression('sr_id = n2.note_item_id AND n2.note_text =""'), array('_sr_attachment' => new \Zend\Db\Sql\Expression('n2.note_id')), 'left');
             $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('sr_create_u_id = u.u_id'), array(), 'left');
+            $select->join(array('u2' => 'users'), new \Zend\Db\Sql\Expression('sr_developed_by_u_id = u2.u_id'), array('_developed_by_name' => new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)')), 'left');
+
+            if ($searchValue !== null) {
+                $select->where('(u2.u_firstname LIKE "%' . $searchValue . '%" OR u2.u_lastname LIKE "%' . $searchValue . '%" OR sr_title LIKE "%' . $searchValue . '%")');
+            }
 
             if ($orderBy) {
                 $order = $order ? $order : 'ASC';
-                $select->order($orderBy . ' ' . $order);
+                if($orderBy == 'sr_developed_by_u_id') {
+                    $select->order('_developed_by_name ' . $order);
+                } else {
+                    $select->order($orderBy . ' ' . $order);
+                }
             }
+
             if($identity['u_company_id']) {
                 $select->where("u.u_company_id = " . $identity['u_company_id']);
             } else {
@@ -106,10 +112,10 @@ class SecurityreminderTable implements ServiceLocatorAwareInterface
         $identity = $authService->getIdentity();
 
         $data = array(
-            'sr_dt_id'         => $securityreminder->sr_dt_id,
-            'sr_launched_date' => $securityreminder->sr_launched_date,
-            'sr_developed_by'  => $securityreminder->sr_developed_by,
-            'sr_regulation'    => $securityreminder->sr_regulation,
+            'sr_title'             => $securityreminder->sr_title,
+            'sr_dt_id'             => $securityreminder->sr_dt_id,
+            'sr_launched_date'     => $securityreminder->sr_launched_date,
+            'sr_developed_by_u_id' => $securityreminder->sr_developed_by_u_id,
         );
 
         $id = (int) $securityreminder->sr_id;

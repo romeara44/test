@@ -742,8 +742,11 @@ h1.security_reminders {
     clear: left;
     display: block;
     margin: 3px 0;
+    font-size: 13px;
 }
-
+#tl_attendees_help {
+    color: red;
+}
 .iframe-wrap {
     border-bottom: 1px solid #e1ebf0;
     padding-bottom: 10px;
@@ -763,6 +766,7 @@ h1.security_reminders {
 .agreeterms-label {
     width: 300px;
 }
+
 /* Tabs */
 
 ul#tabs-nav {

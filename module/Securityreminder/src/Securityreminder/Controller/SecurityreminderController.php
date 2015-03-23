@@ -108,9 +108,9 @@ class SecurityreminderController extends AbstractActionController
         $search     = $this->params()->fromRoute('search')     ? $this->params()->fromRoute('search')           : null;
 
         $mappingSortCol = array(
+            'title'         => 'sr_title',
             'launched_date' => 'sr_launched_date',
-            'developed_by'  => 'sr_developed_by',
-            'regulation'    => 'sr_regulation'
+            'developed_by'  => 'sr_developed_by_u_id'
         );
 
         $mappingTypeItem = array(

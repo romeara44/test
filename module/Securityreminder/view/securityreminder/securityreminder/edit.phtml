@@ -40,6 +40,15 @@ $form->setAttribute('method', 'post');
 
         <p>
             <?php
+            $fn = $form->get('sr_title');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
+            <?php
             $fn = $form->get('sr_launched_date');
             if ($this->srObj):
                 $fn->setValue($this->formatDateA($this->srObj->sr_launched_date, false, true));
@@ -52,18 +61,9 @@ $form->setAttribute('method', 'post');
                 
         <p>
             <?php
-            $fn = $form->get('sr_developed_by');
+            $fn = $form->get('sr_developed_by_u_id');
             echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id'=>'sr_developed_by')));
-            echo $this->formElementErrors($fn);
-            ?>
-        </p>
-
-        <p>
-            <?php
-            $fn = $form->get('sr_regulation');
-            echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id'=>'sr_regulation')));
+            echo $this->formSelect($fn->setAttributes(array('class'=>'form-control', 'id'=>'sr_developed_by_u_id')));
             echo $this->formElementErrors($fn);
             ?>
         </p>

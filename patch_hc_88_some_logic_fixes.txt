@@ -1,0 +1,4 @@
+ALTER TABLE  `training_logs` ADD  `tl_title` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL AFTER  `tl_id` ;
+ALTER TABLE  `security_reminders` DROP  `sr_regulation` ;
+ALTER TABLE  `security_reminders` CHANGE  `sr_developed_by`  `sr_developed_by_u_id` INT( 11 ) NOT NULL ;
+ALTER TABLE  `security_reminders` ADD  `sr_title` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL AFTER  `sr_id` ;

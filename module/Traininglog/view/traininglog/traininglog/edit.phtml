@@ -39,6 +39,14 @@ $form->setAttribute('method', 'post');
         ?>
         
         <p>
+            <?php $fn = $form->get('tl_title');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
             <?php $fn = $form->get('tl_tlt_id');
             echo $this->formLabel($fn);
             echo $this->formSelect($fn->setAttributes(array('id'=>'type', 'class'=>'form-control required')));
@@ -150,13 +158,14 @@ $form->setAttribute('method', 'post');
 
             </div>
             <?php
-            $fn = $form->get('tl_attendees');
+                $fn = $form->get('tl_attendees');
+            ?>
+            <span class="tl_attendees_description" id="tl_attendees_help" style="display: none">To view the attendees added, please save your changes. You can then make any edits you might need to make to this page</span>
+            <?php
+                echo $this->formTextarea($fn->setAttributes(array('class'=>'', 'style' => 'width: 450px; height: 85px;')));
+                echo $this->formElementErrors($fn);
             ?>
             <span class="tl_attendees_description">"CSV file format: First name, Last name, title, email address"</span>
-            <?php
-            echo $this->formTextarea($fn->setAttributes(array('class'=>'', 'style' => 'width: 450px; height: 85px;')));
-            echo $this->formElementErrors($fn);
-            ?>
         </p>
 
         <p style="border: 0;">
@@ -268,6 +277,8 @@ $form->setAttribute('method', 'post');
                 var type  = $(this).attr('id').split('_');
                 var count = 0;
 
+                $('#tl_attendees_help').show();
+                
                 switch(type[1]) {
                     case 'attendees':
                         count = browseFilesCounter.attendees;

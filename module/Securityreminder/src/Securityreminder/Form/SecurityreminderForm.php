@@ -17,10 +17,24 @@ class SecurityreminderForm extends Form
             ),
         ));
 
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
         $this->add(array(
             'name' => 'sr_active',
             'attributes' => array(
                 'type'  => 'hidden',
+            ),
+        ));
+
+        $this->add(array(
+            'name' => 'sr_title',
+            'attributes' => array(
+                'type'  => 'text',
+            ),
+            'options' => array(
+                'label' => 'Title',
             ),
         ));
 
@@ -49,23 +63,21 @@ class SecurityreminderForm extends Form
             ),
         ));
 
-        $this->add(array(
-            'name' => 'sr_developed_by',
-            'attributes' => array(
-                'type'  => 'text',
-            ),
-            'options' => array(
-                'label' => 'Developed By',
-            ),
-        ));
+        $UserTable = $sl->get('Admin\Model\UserTable');
+        foreach ($UserTable->getUsersByCompany($identity['u_company_id']) as $key => $r) {
+            $users[$r->u_id] = $r->u_firstname . ' ' . $r->u_lastname;
+        }
+
+        if(count($users) != 1) {
+            $users = array('' => 'Please select') + $users;
+        }
 
         $this->add(array(
-            'name' => 'sr_regulation',
-            'attributes' => array(
-                'type'  => 'text',
-            ),
+            'name' => 'sr_developed_by_u_id',
+            'type' => 'Zend\Form\Element\Select',
             'options' => array(
-                'label' => 'Regulation',
+                'label' => 'Developed By',
+                'value_options' => $users
             ),
         ));
 

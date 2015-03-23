@@ -119,6 +119,7 @@ class TraininglogController extends AbstractActionController
         $search     = $this->params()->fromRoute('search')     ? $this->params()->fromRoute('search')           : null;
 
         $mappingSortCol = array(
+            'title'          => 'tl_title',
             'type'           => 'tl_tlt_id',
             'conducted_date' => 'tl_conducted_date',
             'hire_date'      => 'tl_hire_date',

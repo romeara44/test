@@ -29,7 +29,7 @@ class UserController extends AbstractActionController
         $container->activity = time();
         $this->layout()->flashMessagesSuccess = $this->flashMessenger()->getSuccessMessages();
         $this->layout()->flashMessagesErrors = $this->flashMessenger()->getErrorMessages();
-        if (!$this->hasIdentity() && !in_array($this->params('action'), array('registration', 'confirm'))) {
+        if (!$this->hasIdentity() && !in_array($this->params('action'), array('registration', 'registrationthanks', 'confirm'))) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
 
@@ -196,16 +196,22 @@ class UserController extends AbstractActionController
                     }
                 }
 
-                $this->flashMessenger()->addSuccessMessage('Email with confirmation link was sent');
-
-                $this->redirect()->toRoute('user', array('controller' => 'user', 'action' => 'registration'));
-
+                $this->redirect()->toRoute('user', array('controller' => 'user', 'action' => 'registrationthanks'));
             }
         }
 
         return array(
             'form' => $form
         );
+    }
+
+    public function registrationthanksAction()
+    {
+        if ($this->hasIdentity()) {
+            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+        }
+
+        return;
     }
 
     public function confirmAction()
@@ -245,7 +251,7 @@ class UserController extends AbstractActionController
                 $identity['u_first_login'] = 0;
                 $this->getServiceLocator()->get('AuthService')->getStorage()->write($identity);
                 if($identity['u_register'] == 1) {
-                    return $this->redirect()->toRoute('client', array('controller' => 'client', 'action' => 'edit', 'id' => $identity['u_id']));
+                    return $this->redirect()->toRoute('company', array('controller' => 'company', 'action' => 'edit', 'id' => $identity['u_company_id']));
                 } else {
                     return $this->redirect()->toRoute('dashboard', array('controller' => 'dashboard', 'action' => 'admin'));
                 }

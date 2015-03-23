@@ -21,7 +21,7 @@ $form->setAttribute('method', 'post');
         <ul id="tabs-nav">
             <li><a href="#tab1">Details</a></li>
             <li><a href="#tab2">Notes</a></li>
-            <li><a href="#tab3">Roles</a></li>
+            <li><a <?php if($roleId == \Admin\Model\User::ROLE_PARTIAL){ ?>class="disabled"<?php }?> href="#tab3">Roles</a></li>
         </ul>
         <div class="cboth"></div>
     <?php endif; ?>
@@ -292,7 +292,7 @@ $form->setAttribute('method', 'post');
         </div>
     <?php endif; ?>
 
-    <?php if ($this->cId): ?>
+    <?php if ($this->cId && $roleId != \Admin\Model\User::ROLE_PARTIAL): ?>
         <div id="tab3">
             <h3><?php echo $companyObj->c_name ?> Default Roles</h3>
 
@@ -371,6 +371,13 @@ $form->setAttribute('method', 'post');
             $('#file' + browseFilesCounter).click();
             browseFilesCounter++;
         });
+
+        $( "#tabs-nav a.disabled" ).click(function(e){
+            e.preventDefault();
+            $('.need-activation-box').show().animate({opacity: 1.0}, 3000).fadeOut(1000);
+            return false;
+        });
+
     });
 
     var counterLocation = <?php if ($this->cId): ?><?php echo $this->addresses->count() + 1 ?><?php else: ?>2<?php endif;?>;
