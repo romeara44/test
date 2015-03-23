@@ -62,8 +62,8 @@ class TraininglogTable implements ServiceLocatorAwareInterface
             }
             $select->columns(array('*', '_tl_trainer_name' => new \Zend\Db\Sql\Expression('IF(tr.tr_name IS NULL, CONCAT(u.u_firstname, " ", u.u_lastname), tr.tr_name)')));
             $select->join(array('tlt' => 'training_log_types'), 'tl_tlt_id = tlt_id', array('_tlt_name' => 'tlt_name'), 'inner');
-            $select->join(array('n' => 'notes'), new \Zend\Db\Sql\Expression('tl_id = n.note_item_id'), array('_tl_comment' => new \Zend\Db\Sql\Expression('n.note_text')), 'left');
-            $select->join(array('n2' => 'notes'), new \Zend\Db\Sql\Expression('tl_id = n2.note_item_id AND n2.note_text =""'), array('_tl_attachment' => new \Zend\Db\Sql\Expression('n2.note_id')), 'left');
+            $select->join(array('n' => 'notes'), new \Zend\Db\Sql\Expression('tl_id = n.note_item_id AND n.note_item_type = ' . \Note\Model\Note::NOTE_TLC), array('_tl_comment' => new \Zend\Db\Sql\Expression('n.note_text')), 'left');
+            $select->join(array('n2' => 'notes'), new \Zend\Db\Sql\Expression('tl_id = n2.note_item_id AND n2.note_item_type = ' . \Note\Model\Note::NOTE_TLT), array('_tl_attachment' => new \Zend\Db\Sql\Expression('n2.note_id')), 'left');
             $select->join(array('tlrg' => 'training_logs_regulations'), new \Zend\Db\Sql\Expression('tl_id = tlrg.tlrg_tl_id'), array('_tl_tlrg_rg_id' => new \Zend\Db\Sql\Expression('tlrg.tlrg_rg_id')), 'left');
             $select->join(array('rg' => 'regulations'), new \Zend\Db\Sql\Expression('tlrg.tlrg_rg_id = rg.rg_id'), array('_tl_regulation' => new \Zend\Db\Sql\Expression('rg.rg_pp_name')), 'left');
             $select->join(array('tr' => 'trainers'), new \Zend\Db\Sql\Expression('CONCAT(tl_trainer_type, "_", tl_trainer_id) = CONCAT("trainer", "_", tr.tr_id)'), array(), 'left');
@@ -79,7 +79,6 @@ class TraininglogTable implements ServiceLocatorAwareInterface
             } else {
                 $select->where("u2.u_company_id IS NULL ");
             }
-            $select->where("(n.note_text !='' OR n.note_text IS NULL)");
             $select->group('tl_id');
 
             $paginator = new Paginator($paginatorAdapter);

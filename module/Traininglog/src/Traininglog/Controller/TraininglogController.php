@@ -203,7 +203,7 @@ class TraininglogController extends AbstractActionController
                 $tl->exchangeArray($post);
                 $this->getTraininglogTable()->setServiceLocator($this->getServiceLocator());
                 $attendeesFile = $request->getFiles('attendees');
-                if($attendeesFile) {
+                if(isset($attendeesFile[0]['tmp_name']) && $attendeesFile[0]['tmp_name']) {
                     if (($handle = fopen($attendeesFile[0]['tmp_name'], "r")) !== FALSE) {
                         while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
                            $tl->tl_attendees .= implode(', ', $data) . "\r\n";

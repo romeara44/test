@@ -276,11 +276,10 @@ $form->setAttribute('method', 'post');
             $('a[id^=browseFile_]').click(function() {
                 var type  = $(this).attr('id').split('_');
                 var count = 0;
-
-                $('#tl_attendees_help').show();
                 
                 switch(type[1]) {
                     case 'attendees':
+                        $('#tl_attendees_help').show();
                         count = browseFilesCounter.attendees;
                         break;
                     case 'training':

@@ -124,7 +124,7 @@ class NoteTable implements ServiceLocatorAwareInterface
         $identity = $authService->getIdentity();
 
         if (!$isCopy && $files) {
-            if ((trim($note->note_text) == '') && (!isset($files[$fileName]) || count($files[$fileName]) == 0)) {
+            if ((trim($note->note_text) == '') && (!isset($files[$fileName]) || count($files[$fileName]) == 0 || $files[$fileName][0]['tmp_name'] == '')) {
                 return;
             }
         }
