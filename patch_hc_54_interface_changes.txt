@@ -1,5 +1,5 @@
 TRUNCATE TABLE  `training_log_types`;
-INSERT INTO  `training_log_types` (`tlt_id` ,`tlt_name`) VALUES (NULL ,  'Intial'), (NULL ,  'Reoccurring'), (NULL ,  'Post breach');
+INSERT INTO  `training_log_types` (`tlt_id` ,`tlt_name`) VALUES (NULL ,  'Intial'), (NULL ,  'Recurring'), (NULL ,  'Post breach');
 
 UPDATE  `mail_templates` SET  `mt_text` =  '<div style="font-size: 24px; color: #189696"><Full Name>,</div>
 <br />
