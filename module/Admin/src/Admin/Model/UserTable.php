@@ -312,7 +312,7 @@ class UserTable implements ServiceLocatorAwareInterface
 
         $user = $this->getUserByEmail($email);
 
-        $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'forgotpassword', 'uId' => $user->u_id, 'link' => '<a href="http://' . $_SERVER['HTTP_HOST']  . '/auth/newpassword/' . $user->u_id . '/' . $user->u_hash . '">link</a>'));
+        $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'forgotpassword', 'uId' => $user->u_id, 'link' => '<a style="color: #15c" href="http://' . $_SERVER['HTTP_HOST']  . '/auth/newpassword/' . $user->u_id . '/' . $user->u_hash . '">link</a>'));
 
         return true;
 
