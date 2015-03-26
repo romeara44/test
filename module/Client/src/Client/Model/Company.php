@@ -22,6 +22,7 @@ class Company
     public $c_training_manager_u_id;
     public $c_consultant_u_id;
     public $c_owner_u_id;
+    public $c_users_limit;
     public $c_update_u_id;
 
     public $c_create_date;
@@ -54,6 +55,7 @@ class Company
         $this->u_office_phone     = (isset($data['u_office_phone'])) ? $data['u_office_phone'] : null;
         $this->c_consultant_u_id     = (isset($data['c_consultant_u_id'])) ? $data['c_consultant_u_id'] : null;
         $this->c_owner_u_id     = (isset($data['c_owner_u_id'])) ? $data['c_owner_u_id'] : null;
+        $this->c_users_limit     = (isset($data['c_users_limit'])) ? $data['c_users_limit'] : 0;
         $this->c_update_u_id     = (isset($data['c_update_u_id'])) ? $data['c_update_u_id'] : null;
         $this->_c_active     = (isset($data['_c_active'])) ? $data['_c_active'] : null;
     }
@@ -74,6 +76,14 @@ class Company
             $inputFilter->add($factory->createInput(array(
                 'name'     => 'c_id',
                 'required' => true,
+                'filters'  => array(
+                    array('name' => 'Int'),
+                ),
+            )));
+
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'c_users_limit',
+                'required' => false,
                 'filters'  => array(
                     array('name' => 'Int'),
                 ),

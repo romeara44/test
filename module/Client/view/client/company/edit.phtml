@@ -110,6 +110,16 @@ $form->setAttribute('method', 'post');
                 echo $this->formElementErrors($fn);
                 ?>
             </p>
+            <?php if ($this->roleId == \Admin\Model\User::ROLE_ADMIN && $ownerContact && in_array($ownerContact->u_role_id, array(\Admin\Model\User::ROLE_CLIENT, \Admin\Model\User::ROLE_PARTIAL))): ?>
+                <p>
+                    <?php
+                    $fn = $form->get('c_users_limit');
+                    echo $this->formLabel($fn);
+                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+            <? endif; ?>
 
             <?php if ($this->cId): ?>
                 <?php $counter = 1;

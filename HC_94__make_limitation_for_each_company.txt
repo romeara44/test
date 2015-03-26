@@ -1,0 +1,1 @@
+ALTER TABLE  `companies` ADD  `c_users_limit` INT NULL DEFAULT  '0' AFTER  `c_primary_adr_id` ;

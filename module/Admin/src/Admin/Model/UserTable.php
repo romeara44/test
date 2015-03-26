@@ -159,7 +159,7 @@ class UserTable implements ServiceLocatorAwareInterface
 
         $resultSet = $this->tableGateway->selectWith($select)->count();
 
-        $value = $this->getServiceLocator()->get('Sitesetting\Model\SitesettingTable')->getValueByName(\Sitesetting\Model\Sitesetting::NUMBER_USERS_OF_COMPANY);
+        $value = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getUsersLimit($companyId);
 
         return (bool)($value < 1 || $resultSet < $value);
     }

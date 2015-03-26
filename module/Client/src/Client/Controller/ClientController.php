@@ -186,7 +186,7 @@ class ClientController extends AbstractActionController
                 $post = $request->getPost();
                 if($form->isValid()) {
                     if(!$id && $post['u_company_id'] && !$this->getUserTable()->checkCompanyLimitClient($post['u_company_id'])) {
-                        $clientLimitMsg = 'You cannot create more than ' . $this->getServiceLocator()->get('Sitesetting\Model\SitesettingTable')->getValueByName(\Sitesetting\Model\Sitesetting::NUMBER_USERS_OF_COMPANY) . ' user for company.';
+                        $clientLimitMsg = 'You cannot create more than ' . $this->getServiceLocator()->get('Client\Model\CompanyTable')->getUsersLimit($post['u_company_id']) . ' user for company.';
                         $clienLimit = false;
                     }
 

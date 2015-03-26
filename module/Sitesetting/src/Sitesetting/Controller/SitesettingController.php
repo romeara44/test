@@ -30,7 +30,7 @@ class SitesettingController extends AbstractActionController
         $container->activity = time();
         $this->layout()->flashMessagesSuccess = $this->flashMessenger()->getSuccessMessages();
         $this->layout()->flashMessagesErrors = $this->flashMessenger()->getErrorMessages();
-        if (!$this->hasIdentity()) {
+        if (true || !$this->hasIdentity()) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
         $identity = $this->getIdentity();

@@ -102,6 +102,19 @@ class CompanyForm extends Form
             ),
         ));
 
+
+        $this->add(array(
+            'name' => 'c_users_limit',
+            'type' => 'Zend\Form\Element\Select',
+            'attributes' => array(
+                'type'  => 'text',
+            ),
+            'options' => array(
+                'label' => 'Max. number of users',
+                'value_options' => $sl->get('Client\Model\CompanyTable')->getUsersLimitsArray()
+            ),
+        ));
+
         ////////////////////////////////////
 
         $this->add(array(

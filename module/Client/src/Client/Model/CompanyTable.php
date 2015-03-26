@@ -16,6 +16,8 @@ use Zend\Db\Sql\Expression;
 
 class CompanyTable implements ServiceLocatorAwareInterface
 {
+    const DEFAULT_USERS_LIMUT = 3;
+
     protected $tableGateway;
     protected $serviceLocator;
 
@@ -266,6 +268,12 @@ class CompanyTable implements ServiceLocatorAwareInterface
 
         if (!$id) {
             $data['c_owner_u_id'] = $company->c_owner_u_id;
+            $ownerContact         = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUser($company->c_owner_u_id);
+            if(in_array($ownerContact->u_role_id, array(User::ROLE_CLIENT, User::ROLE_PARTIAL))) {
+                $data['c_users_limit'] = self::DEFAULT_USERS_LIMUT;
+            } else {
+                $data['c_users_limit'] = 0;
+            }
         }
         if ((int) $company->c_consultant_u_id) {
             $data['c_consultant_u_id'] = $company->c_consultant_u_id;
@@ -282,6 +290,9 @@ class CompanyTable implements ServiceLocatorAwareInterface
             $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_ADD, \Application\Model\LogsTable::ITEM_TYPE_COMPANY, $id);
         } else {
             if ($this->getCompany($id)) {
+                if($identity['u_role_id'] == User::ROLE_ADMIN) {
+                    $data['c_users_limit'] = $company->c_users_limit;
+                }
                 $data['c_update_date'] = new \Zend\Db\Sql\Expression('NOW()');
                 $this->tableGateway->update($data, array('c_id' => $id));
 
@@ -304,6 +315,8 @@ class CompanyTable implements ServiceLocatorAwareInterface
             'c_other_phone_inner' => $company->c_other_phone_inner,
             'c_owner_u_id' => $company->c_owner_u_id,
             'c_primary_contact_u_id' => $company->c_primary_contact_u_id,
+            'c_primary_contact_u_id' => $company->c_primary_contact_u_id,
+            'c_users_limit' => self::DEFAULT_USERS_LIMUT,
             'c_active' => 1
         );
 
@@ -356,6 +369,26 @@ class CompanyTable implements ServiceLocatorAwareInterface
         $resultSet = $this->tableGateway->selectWith($select)->current();
         
         return is_object($resultSet) ? $resultSet->c_training_manager_u_id : null;
+    }
+
+    public function getUsersLimit($companyId)
+    {
+        $select = $this->tableGateway->getSql()->select();
+        
+        $select->where('c_id =' . $companyId);
+
+        $resultSet = $this->tableGateway->selectWith($select)->current();
+        
+        return is_object($resultSet) ? $resultSet->c_users_limit : null;
+    }
+
+    public function getUsersLimitsArray()
+    {
+        return array( '3' => 3
+                    , '6' => 6
+                    , '9' => 9
+                    , '0' => 'unlimited'
+                    );
     }
 
     public function setTrainingManager($companyId, $uId)

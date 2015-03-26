@@ -130,6 +130,9 @@ class CompanyController extends AbstractActionController
         $contacts = null;
         $primaryContactId = null;
         $trainingManagerId = null;
+        $checkHasPartial = null;
+        $existsCompanyRoles = array();
+        $ownerContact = null;
         $notes = null;
 
         if ($id) {
@@ -143,6 +146,11 @@ class CompanyController extends AbstractActionController
 
             $primaryContactId = $companyObj->c_primary_contact_u_id;
             $trainingManagerId = $companyObj->c_training_manager_u_id;
+
+            $checkHasPartial = $this->getUserTable()->checkHasPartial($id);
+            $existsCompanyRoles = $this->getServiceLocator()->get('Client\Model\CompanyRolesTable')->getExistsCompanyRoles($id);
+
+            $ownerContact = $this->getUserTable()->getUser($companyObj->c_owner_u_id);
         }
 
         $addresses = array();
@@ -233,13 +241,13 @@ class CompanyController extends AbstractActionController
             'notes' => $notes,
             'companyObj' => $companyObj,
             'assessmentsRoles' => $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles(),
-            'contacts' => $contacts = $this->getUserTable()->getUsersByCompany($id),
             'primaryContactId'=> $primaryContactId,
             'trainingManagerId'=> $trainingManagerId,
             'roleId' => $identity['u_role_id'],
             'checkClientLimitCompany' => $checkClientLimitCompany,
-            'checkHasPartial' => $this->getUserTable()->checkHasPartial($id),
-            'existsCompanyRoles' => $this->getServiceLocator()->get('Client\Model\CompanyRolesTable')->getExistsCompanyRoles($id)
+            'checkHasPartial' => $checkHasPartial,
+            'existsCompanyRoles' => $existsCompanyRoles,
+            'ownerContact' => $ownerContact
         );
     }
 
