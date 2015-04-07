@@ -381,7 +381,7 @@ class RemediationplanController extends AbstractActionController
             set_time_limit(300);
             ini_set('memory_limit', '-1');
 
-            require_once '/vendor/mylib/library/mpdf60/mpdf.php';
+            require_once './vendor/mylib/library/mpdf60/mpdf.php';
 
             $mpdf = new \mPDF('utf-8', 'A4-L'); 
   
