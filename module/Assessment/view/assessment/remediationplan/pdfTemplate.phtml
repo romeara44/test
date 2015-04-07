@@ -1,0 +1,144 @@
+<div class="page-title">
+    <h1 class="fleft">Remediation Plan for <?php echo $this->rpObj->_client_name ?></h1>
+    <div class="cboth"></div>
+</div>
+
+<p></p>
+<div class="cboth"></div>
+
+<div class="col6" style="float: left;">
+    <p><strong>STATUS:</strong><br /><span class="label selected"><?php echo \Assessment\Model\Remediationplan::$statusesNames[$rpObj->rp_status]  ?></span></p>
+</div>
+<div class="col5"  style="float: left;">
+    <p>
+        <strong>PERFORMED BY:</strong><br />
+        <?php echo $this->rpObj->_performed_name ?>
+    </p>
+</div>
+<div class="col5"  style="float: left;">
+    <p>
+        <strong>APPROVED BY:</strong><br />
+        <?php echo $this->rpObj->_approver_name ?>
+    </p>
+</div>
+<div class="col5"  style="float: left;">
+    <p><strong>ASSESSMENT DATE:</strong><br />
+        <?php echo ($this->rpObj->rp_incident_date != '0000-00-00') ? $this->rpObj->_rp_incident_date_formatted : '' ?>
+    </p>
+</div>
+<div class="col4 last" style="float: left;">
+    <p><strong>REMEDIATION PLAN DATE:</strong><br />
+    <?php echo ($this->rpObj->rp_remediation_date != '0000-00-00') ? $this->rpObj->_rp_remediation_date_formatted : '' ?>
+</div>
+<div class="cboth"></div>
+
+<p></p>
+
+<table cellpadding="0" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Risk score</th>
+            <th>Threat</th>
+            <th>Action plan</th>
+            <th>Policy number</th>
+            <th>Status</th>
+            <th>Assignee</th>
+            <th>Approver</th>
+            <th>Target Date</th>
+        </tr>
+    </thead>
+    <tbody>
+    <?php $adrId = 0; $adrChange = false; ?>
+    <?php foreach ($this->actions as $rpa): ?>
+        <?php if ($adrId != $rpa->rpa_adr_id):
+            $adrChange = true;
+            if($rpa->rpa_adr_id === null){
+                $adrId = 0;
+                $rpa->_location_name = 'Additional Tasks';
+            } else {
+                $adrId = $rpa->rpa_adr_id;
+            }
+        else:
+            $adrChange = false;
+        endif; ?>
+
+        <?php if ($adrChange): ?>
+            <tr>
+                <td colspan="20">
+                    <h2><?php if ($this->isPdf): ?><span style="font-size: 13px; font-weight: normal">Location:<?php endif; ?></span><br/><?php echo $rpa->_location_name ?></h2>
+                </td>
+            </tr>
+        <?php endif; ?>
+        <?php $notesTaskAtt = $this->noteTable->getNotes($rpa->rpa_id, \Note\Model\Note::NOTE_RPA, 0, 'file'); ?>
+        <?php $notesTaskAssessments = $this->noteTable->getNotesForRemedTask($rpa->rpa_id, $adrId, 'file'); ?>
+        <?php $notesTaskAttText = $this->noteTable->getNotes($rpa->rpa_id, \Note\Model\Note::NOTE_RPA, 0, 'text'); ?>
+        <?php $notesTaskAssessmentsText = $this->noteTable->getNotesForRemedTask($rpa->rpa_id, $adrId, 'text'); ?>
+
+        <tr>
+            <td class="tdSmall"><?php echo \Assessment\Model\Remediationplanaction::$levelsNames[$rpa->rpa_risk_level] ?></td>
+            <td class="tdSmall">
+                <?php $rpaThreat = str_replace('Â', '', $rpa->rpa_threat); ?>
+                <?php echo str_replace('Â', '', $rpaThreat); ?>
+            </td>
+            <td class="tdSmall"><?php echo $rpa->rpa_action_plan ?></td>
+            <?php if ($this->isPdf): ?>
+                <td class="tdSmall"><?php echo $rpa->rpa_policy ?></td>
+            <?php endif; ?>
+            <td class="acenter"><?php echo \Assessment\Model\Remediationplanaction::$statusesNames[$rpa->rpa_status] ?></td>
+            <td><?php echo $rpa->_contact_name ?></td>
+            <td><?php echo $rpa->_approver_name ?></td>
+            <td><?php echo $rpa->_rpa_target_date_formatted ?></td>
+        </tr>
+
+            <tr class="expandable" id="notes<?php echo $rpa->rpa_id ?>">
+                <td>&nbsp;</td>
+                    <?php $colspan = 2; ?>
+                    <?php foreach (array('Task notes' => $notesTaskAttText, 'Questions notes' => $notesTaskAssessmentsText) as $keyAtt => $notesTask): ?>
+                        <td colspan="<?php echo $colspan ?>">
+                            <?php if (is_object($notesTask) && ($notesTask->count())): ?>
+                                <div>
+                                    <div><strong><?php echo $keyAtt ?>:</strong></div>
+                                    <div>
+                                        <?php $notesTask->buffer() ?>
+                                        <?php foreach ($notesTask as $note): ?>
+                                            <?php if ($note->note_text != ''): ?>
+                                                <div><?php echo $note->note_text ?></div>
+                                            <?php endif; ?>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        </td>
+                        <?php $colspan = 5; ?>
+                    <?php endforeach; ?>
+            </tr>
+    <?php endforeach; ?>
+    </tbody>
+</table>
+
+<div class="cboth"></div>
+
+
+<p style="border: 0;"><strong>Reviewed and approved by <?php echo $this->rpObj->_approver_name?></strong></p>
+<p style="border: 0;">
+    <label>Initials: <?php echo $this->rpObj->rp_initials_approver ?></label>
+</p>
+<p style="border: 0;">
+    <label>Date: <?php echo $this->rpObj->rp_approved_date ? $this->rpObj->_rp_approved_date_formatted : ''?></label>
+</p>
+
+
+<div class="cboth"></div>
+
+
+<p style="border: 0;"><strong>Agreed to and accepted by <?php echo $this->rpObj->_accepter_name?></strong></p>
+<p style="border: 0;">
+    <label>Initials: <?php echo $this->rpObj->rp_initials ?></label>
+</p>
+<p style="border: 0;">
+    <label>Date: <?php echo $this->rpObj->rp_accepted_date ? $this->rpObj->_rp_accepted_date_formatted : '' ?></label>
+</p>
+
+
+<div class="cboth"></div>
+

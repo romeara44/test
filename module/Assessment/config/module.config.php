@@ -68,7 +68,7 @@ return array(
             'remediationplan' => __DIR__ . '/../view',
         ),
         'template_map' => array(
-            'remediationplan/pdftemplate' => __DIR__ . '/../../../module/Assessment/view/assessment/remediationplan/edit.phtml',
+            'remediationplan/pdfTemplate' => __DIR__ . '/../../../module/Assessment/view/assessment/remediationplan/pdfTemplate.phtml',
         ),
     ),
 

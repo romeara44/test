@@ -372,22 +372,21 @@ class RemediationplanController extends AbstractActionController
                 'noteTable' => $noteTable,
                 'isPdf' => true
             ));
-            $model->setTemplate('remediationplan/pdftemplate');
+            $model->setTemplate('remediationplan/pdfTemplate');
 
             $html = $renderer->render($model);
 
-            //$html = utf8_encode($html);
             $html = str_replace('§', '&#167;', $html);
 
             set_time_limit(300);
             ini_set('memory_limit', '-1');
 
-            $dompdf = new \DOMPDF();
-            $dompdf->set_paper('a4', 'landscape');
-            $dompdf->load_html($html);
-            //$dompdf->set_paper( 'letter' , 'portrait' );
-            $dompdf->render();
-            $dompdf->stream('remediationplan_ ' . date('Y_m_d_h_i_s', time()) . '.pdf');
+            require_once '/vendor/mylib/library/mpdf60/mpdf.php';
+
+            $mpdf = new \mPDF('utf-8', 'A4-L'); 
+  
+            $mpdf->WriteHTML($html);
+            $mpdf->Output('remediationplan_ ' . date('Y_m_d_h_i_s', time()) . '.pdf', 'D');
 
             exit();
         } elseif ($type == 'csv') {
