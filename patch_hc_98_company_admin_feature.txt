@@ -1,0 +1,1 @@
+ALTER TABLE `users` ADD  `u_company_id_admin` INT(11) DEFAULT NULL `u_company_id` ;

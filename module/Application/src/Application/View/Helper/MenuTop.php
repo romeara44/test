@@ -59,7 +59,11 @@ class MenuTop extends AbstractHelper
         } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_CONSULTANT) {
             $this->_prepareItemsForConsultant();
         } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_CLIENT) {
-            $this->_prepareItemsForClient();
+            if($identity['u_company_id_admin']) {
+                $this->_prepareItemsForClientCompanyAdmin();
+            } else {
+                $this->_prepareItemsForClient();
+            }
         } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_SALES_REP) {
             $this->_prepareItemsForSalesRep();
         } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_BUSINESS_ASSOCIATE) {
@@ -197,6 +201,57 @@ class MenuTop extends AbstractHelper
     }
 
     private function _prepareItemsForClient()
+    {
+        $this->items = array(
+            array(
+                'title' => 'Dashboard',
+                'url' => '/dashboard/client',
+            ),
+            array(
+                'title' => 'Clients',
+                'url' => '/client/list',
+                'items' => array(
+                    array('title' => 'Business Associates',
+                          'url' => '/businessassociate/list',
+                    )
+                )
+            ),
+            array(
+                'title' => 'Breach Management',
+                'url' => '/breachlog/list',
+                'items' => array(
+                    array('title' => 'Breach Logs',
+                          'url' => '/breachlog/list',
+                        ),
+                    array('title' => 'Breach Remediation Plans',
+                          'url' => '/breachremediationplan/list',
+                        )
+                )
+            ),
+            array(
+                'title' => 'Assessments',
+                'url' => '/assessment/list',
+            ),
+            array(
+                'title' => 'Remediation Plans',
+                'url' => '/remediationplan/list',
+            ),
+            array(
+                'title' => 'Trainings',
+                'url' => '/traininglog/list',
+                'items' => array(
+                    array('title' => 'Training Logs',
+                          'url' => '/traininglog/list'
+                        ),
+                    array('title' => 'Security Reminder',
+                          'url' => '/securityreminder/list',
+                        )
+                )
+            )
+        );
+    }
+
+    private function _prepareItemsForClientCompanyAdmin()
     {
         $this->items = array(
             array(

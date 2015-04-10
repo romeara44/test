@@ -46,7 +46,7 @@ class AssessmentController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
         $identity = $this->getIdentity();
-        if (!in_array($identity['u_role_id'], array(1, 2, 3, 5))) {
+        if (!in_array($identity['u_role_id'], array(1, 2, 3, 5)) || ($identity['u_role_id'] == 5 && !$identity['u_company_id_admin'])) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         } else if ($identity['u_first_login'] == 1) {
             return $this->redirect()->toRoute('user', array('controller' => 'user', 'action' => 'acceptprivacyterms'));
@@ -257,8 +257,8 @@ class AssessmentController extends AbstractActionController
                 if(!$checkFillCompanyRoles = $this->getCompanyRolesTable()->checkFillCompanyRoles($post['a_c_id'])) {
                     $companyRolesMsg = 'Please, fill all roles for this company';
                 }
-
-                if ($form->isValid()) {
+                
+                if ($form->isValid() && $checkFillCompanyRoles) {
                     $isPrivacy = $post['a_type'] == 2;
                     if ($isNew && $isPrivacy) {
                         $isPossible = $this->getAssessmentTable()->isPrivacyCreatePossible($post['a_c_id']);

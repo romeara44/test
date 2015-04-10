@@ -246,7 +246,6 @@ class UserController extends AbstractActionController
             $form->setInputFilter($user->getAcceptPrivacyTermsInputFilter($this->getServiceLocator()));
             $form->setData($request->getPost());
             if ($form->isValid()) {
-            // print_r($post->agreeterms);exit;
                 $this->getUserTable()->agreeTermsUser($identity['u_id']);
                 $identity['u_first_login'] = 0;
                 $this->getServiceLocator()->get('AuthService')->getStorage()->write($identity);

@@ -39,6 +39,8 @@ class ClientController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         } else if ($identity['u_first_login'] == 1) {
             return $this->redirect()->toRoute('user', array('controller' => 'user', 'action' => 'acceptprivacyterms'));
+        } else if($identity['u_role_id'] == 7 || ($identity['u_role_id'] == 5 && !$identity['u_company_id_admin'])) {
+            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
 
         return parent::onDispatch($e);
@@ -165,7 +167,7 @@ class ClientController extends AbstractActionController
         $setTrainingManagerMsg = '';
 
         if ((int) $id) {
-            $userObj = $this->getUserTable()->getUser($id);
+            $userObj = $this->getUserTable()->getUser($id); //print_r($userObj);
             if($userObj->u_first_login == 1) {
                 $this->getUserTable()->unSetFirstLogin($id);
             }
@@ -188,6 +190,10 @@ class ClientController extends AbstractActionController
                     if(!$id && $post['u_company_id'] && !$this->getUserTable()->checkCompanyLimitClient($post['u_company_id'])) {
                         $clientLimitMsg = 'You cannot create more than ' . $this->getServiceLocator()->get('Client\Model\CompanyTable')->getUsersLimit($post['u_company_id']) . ' user for company.';
                         $clienLimit = false;
+                    }
+
+                    if(!isset($post['u_company_id_admin']) && $post['u_company_id'] == $userObj->u_company_id) {
+                        $post['u_company_id_admin'] = $userObj->u_company_id_admin;
                     }
 
                     $iisTrainingManager = isset($post['is_training_manager']) ? 1 : 0;
@@ -278,6 +284,7 @@ class ClientController extends AbstractActionController
             'primaryAddressObj' => $primaryAddressObj,
             'formNote' => $formNote,
             'notes' => $notes,
+            'identity' => $identity,
             'cId' => (int) $this->params('company'),
             'clientLimitMsg' => $clientLimitMsg,
             'setTrainingManagerMsg' => $setTrainingManagerMsg,

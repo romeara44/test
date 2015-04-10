@@ -54,7 +54,7 @@ class BreachlogTable implements ServiceLocatorAwareInterface
                     $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
                     $ids[] = $identity['u_id'];
                     $select->where('bl_consultant_u_id IN (' . implode(',', $ids) . ')');
-                } elseif ($identity['u_role_id'] == User::ROLE_CLIENT) {
+                } elseif ($identity['u_role_id'] == User::ROLE_CLIENT && $identity['u_company_id']) {
                     $select->where('bl_c_id = ' . $identity['u_company_id']);
                 }
             }

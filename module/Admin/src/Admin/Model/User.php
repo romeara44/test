@@ -55,6 +55,7 @@ class User
     public $u_register;
     public $u_first_login;
     public $u_confirmed;
+    public $u_company_id_admin;
 
     public $_rolename;
 
@@ -94,6 +95,7 @@ class User
         $this->u_register     = (isset($data['u_register'])) ? $data['u_register'] : null;
         $this->u_first_login     = (isset($data['u_first_login'])) ? $data['u_first_login'] : null;
         $this->u_confirmed     = (isset($data['u_confirmed'])) ? $data['u_confirmed'] : null;
+        $this->u_company_id_admin     = (isset($data['u_company_id_admin'])) ? $data['u_company_id_admin'] : null;
     }
 
     public function getArrayCopy()

@@ -224,11 +224,9 @@ class AuthController extends AbstractActionController
                     $dataStorage['u_office_phone'] = $user->u_office_phone;
                     $dataStorage['u_register'] = $user->u_register;
                     $dataStorage['u_first_login'] = $user->u_first_login;
+                    $dataStorage['u_company_id_admin'] = $user->u_company_id_admin;
 
                     $this->getAuthService()->getStorage()->write($dataStorage);
-                    //$this->getAuthService()->getStorage()->write($request->getPost('u_name'));
-                    //$this->getAuthService()->getStorage()->write($request->getPost('u_role_id'));
-
 
                     if (!$user->u_active) {
                         $this->getSessionStorage()->forgetMe();

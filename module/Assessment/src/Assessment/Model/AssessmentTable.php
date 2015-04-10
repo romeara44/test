@@ -59,13 +59,12 @@ class AssessmentTable implements ServiceLocatorAwareInterface
                     $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
                     $ids[] = $identity['u_id'];
                     $select->where('a_consultant_u_id IN (' . implode(',', $ids) . ')');
-                } elseif ($identity['u_role_id'] == User::ROLE_CLIENT) {
+                } elseif ($identity['u_role_id'] == User::ROLE_CLIENT && $identity['u_company_id']) {
                     $select->where('a_c_id = ' . $identity['u_company_id']);
                 }
             }
 
             $select->join(array('c' => 'companies'), 'a_c_id = c_id', array('_client_name' => 'c_name'), 'left');
-            ///////////////
 
             $order = $order ? $order : 'ASC';
 

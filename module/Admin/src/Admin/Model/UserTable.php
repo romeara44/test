@@ -192,6 +192,7 @@ class UserTable implements ServiceLocatorAwareInterface
             'u_role_id' => $user->u_role_id,
             'u_senior_consultant_u_id' => $user->u_senior_consultant_u_id,
             'u_company_id' => $user->u_company_id,
+            'u_company_id_admin' => $user->u_company_id_admin,
             'u_firstname' => $user->u_firstname,
             'u_lastname' => $user->u_lastname,
             'u_email' => $user->u_email,
@@ -343,7 +344,6 @@ class UserTable implements ServiceLocatorAwareInterface
 
     public function checkIfUserExists($email, $uId = 0)
     {
-        //$rowset = $this->tableGateway->select(array('u_email' => $email));
         $select = $this->tableGateway->getSql()->select();
         $select->where('u_email = "' . $email . '"');
         $select->where('u_active = 1');

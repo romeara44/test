@@ -76,9 +76,16 @@ $form->setAttribute('method', 'post');
 
             <p style="padding: 2px 0 12px 0; line-height: 14px; border-top: 0;">
                 <label>&nbsp;</label>
+                <?php if(in_array($identity['u_role_id'], array(1, 2))) :?>
+                    <input type="checkbox" name="is_primary_contact" id="primaryContact" class="checkbox" value="1" />
+                    <label for="primaryContact" class="checkbox">Primary Contact</label>
+                <?php endif; ?>
+                <?php if(in_array($identity['u_role_id'], array(1, 2)) || ($clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $userObj->u_id)) :?>
+                    <input type="checkbox" name="u_company_id_admin" <?php if($userObj->u_company_id_admin && $userObj->u_company_id_admin == $userObj->u_company_id):?>checked <?php endif; ?> id="companyIdAdmin" class="checkbox" value="<?php echo $userObj->u_company_id_admin ?>" />
+                    <label for="companyIdAdmin" class="checkbox">Company Admin</label>
+                <?php endif; ?>
                 <input type="hidden" name="def_u_company_id" id="def_u_company_id" value="<?php echo $userObj->u_company_id ?>" disabled="true" />
-                <input type="checkbox" name="is_primary_contact" id="primaryContact" class="checkbox" value="1" />
-                <label for="primaryContact" class="checkbox">Primary Contact</label>
+                <input type="hidden" name="def_u_company_id_admin" id="def_u_company_id_admin" value="<?php echo $userObj->u_company_id_admin ?>" disabled="true" />
                 <input type="checkbox" name="is_training_manager" <?php if($clientObj->c_training_manager_u_id && $clientObj->c_training_manager_u_id == $userObj->u_id):?>checked <?php endif; ?> id="trainingManager" class="checkbox" value="1" />
                 <label for="trainingManager" class="checkbox">Training Manager</label>
             </p>
@@ -367,13 +374,23 @@ $form->setAttribute('method', 'post');
 
 
         $('#u_company_id').change(function() {
-            if($('#def_u_company_id').val() == $('#u_company_id').val()) {
+
+            var companyVal = $('#u_company_id').val();
+
+            if($('#def_u_company_id').val() == companyVal) {
                 $('#trainingManager').attr('checked', true);
             } else {
                 $('#trainingManager').attr('checked', false);
             }
-            $.getJSON("/company/getprimaryaddress/" + $('#u_company_id').val(), {  }, function(data) {
-                if ($('#u_company_id').val()) {
+
+            if($('#def_u_company_id_admin').val() == companyVal) {
+                 $('#companyIdAdmin').attr({'value': companyVal, 'checked': true});
+            } else {
+                $('#companyIdAdmin').attr({'value': 0, 'checked': false});
+            }
+
+            $.getJSON("/company/getprimaryaddress/" + companyVal, {  }, function(data) {
+                if (companyVal) {
                     if (data.adr_id) {
                         primaryAddress1 = data.adr_address1;
                         primaryAddress2 = data.adr_address2;
@@ -419,5 +436,10 @@ $form->setAttribute('method', 'post');
             }
             return false;
         });
+        $('#companyIdAdmin').change(function(){
+            if($(this).is(':checked')) {
+                $(this).val($('#u_company_id option:selected').val());
+            }
+        })
     });
 </script>
