@@ -90,6 +90,15 @@ class SecurityreminderController extends AbstractActionController
         return $this->distributiontypeTable;
     }
 
+    public function getCompanyRolesTable()
+    {
+        if (!$this->companyRolesTable) {
+            $sm = $this->getServiceLocator();
+            $this->companyRolesTable = $sm->get('Client\Model\CompanyRolesTable');
+        }
+        return $this->companyRolesTable;
+    }
+    
     public function hasIdentity()
     {
         $authService = new \Zend\Authentication\AuthenticationService();
@@ -149,20 +158,26 @@ class SecurityreminderController extends AbstractActionController
             $this->flashMessenger()->addErrorMessage('You must log in');
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
-
+        
+        $identity = $this->getIdentity();
+        
+        if(!$this->getCompanyRolesTable()->checkFillCompanyRoles($identity['u_company_id'])){
+            $this->flashMessenger()->addErrorMessage('Please, fill all roles for you company');
+            return $this->redirect()->toRoute('securityreminder', array('controller' => 'securityreminder', 'action' => 'list'));
+        }
+        
         $form     = new SecurityreminderForm($this->getServiceLocator());
         $formNote = new NoteForm($this->getServiceLocator());
 
         $notes = null;
         $srObj = null;
-        
+
         if ((int) $id) {
             $srObj           = $this->getSecurityreminderTable()->getSecurityreminder($id);
             $copyOfMaterials = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_SRM);
             $comments        = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_SRC);
         }
-        
-        $identity = $this->getIdentity();
+
         $request = $this->getRequest();
         if ($request->isPost()) {
             $sr = new Securityreminder();

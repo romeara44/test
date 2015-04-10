@@ -56,6 +56,11 @@ $form->setAttribute('method', 'post');
                 echo $this->formElementErrors($fn);
                 ?>
             </p>
+            <p style="padding: 0;border-top: 0;">
+                <?php if($companyRolesMsg) :?>
+                    <label style="padding:0" for="a_c_id" generated="true" class="error"><?php echo $companyRolesMsg ?></label>
+                <?php endif; ?>
+            </p>
             <ul style="display: none" id="s1"><li>Value is required and can't be empty</li></ul>
 
             <h2>Select Assessment Type</h2>
@@ -344,12 +349,6 @@ $form->setAttribute('method', 'post');
 
         jQuery('#a_c_id').change(function() {
             window.location.href='/assessment/edit/0/step/1/companyId/' + $(this).val();
-
-            /*if (jQuery('#a_c_id').val() > 0) {
-                jQuery('#inviteClientLink').attr('href', '/assessment/invitetoassessment/' + jQuery(this).val());
-            } else {
-                jQuery('#inviteClientLink').attr('href', '/assessment/invitetoassessment/0');
-            }*/
         });
 
         if (jQuery('#a_c_id').val() > 0) {
@@ -403,7 +402,6 @@ $form->setAttribute('method', 'post');
             $(this).attr('name', newName);
         });
 
-        //$("'#location' + counterLocation + ' input[name=ba_office_phone], input[name=ba_direct_phone], input[name=ba_other_phone], input[name=c_fax]").mask("(999) 999-9999");
         $('#location input[name="adr_phone[]"]').mask("(999) 999-9999");
         $('#location input[name="adr_other_phone[]"]').mask("(999) 999-9999");
         $('#location input[name="adr_fax[]"]').mask("(999) 999-9999");

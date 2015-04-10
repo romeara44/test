@@ -88,8 +88,8 @@
                     <?php elseif($uRoleId != \Admin\Model\User::ROLE_PARTIAL): ?>
                         <div id="top-contact">
                             <?php $uConsultant = $this->getConsultant($sl); ?>
-                            <strong>Your Consultant</strong> &mdash; <?php echo $uConsultant->u_firstname ?> <?php echo $uConsultant->u_lastname ?><br />
-                            <span><?php echo $uConsultant->u_office_phone ?> &nbsp; | &nbsp; <a href="mailto:<?php echo $uConsultant->u_email ?>"><?php echo $uConsultant->u_email ?></a></span>
+                            <strong>Your Consultant</strong> &mdash; <?php echo is_object($uConsultant) ? $uConsultant->u_firstname : '' ?> <?php echo is_object($uConsultant) ? $uConsultant->u_lastname : ''?><br />
+                            <span><?php echo is_object($uConsultant) ? $uConsultant->u_office_phone : '' ?> &nbsp; | &nbsp; <a href="mailto:<?php echo is_object($uConsultant) ? $uConsultant->u_email : ''?>"><?php echo is_object($uConsultant) ? $uConsultant->u_email : '' ?></a></span>
                         </div>
                     <?php endif; ?>
                     <?php if ($uRoleId != 6): ?>

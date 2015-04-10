@@ -216,7 +216,12 @@ class CompanyController extends AbstractActionController
 
                     $this->flashMessenger()->addSuccessMessage('Company saved');
 
-                    return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
+                    if(isset($post['save_continue'])) {
+                        return $this->redirect()->toRoute('company', array('controller' => 'company', 'action' => 'edit', 'id' => $companyId , '#' => 'tab3'));
+                    } else {
+                        return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
+                    }
+
                 } else {
                     if ($id) {
                         $form->bind($companyObj);

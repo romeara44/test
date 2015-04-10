@@ -101,6 +101,15 @@ class TraininglogController extends AbstractActionController
         return $this->regulationTable;
     }
 
+    public function getCompanyRolesTable()
+    {
+        if (!$this->companyRolesTable) {
+            $sm = $this->getServiceLocator();
+            $this->companyRolesTable = $sm->get('Client\Model\CompanyRolesTable');
+        }
+        return $this->companyRolesTable;
+    }
+
     public function hasIdentity()
     {
         $authService = new \Zend\Authentication\AuthenticationService();
@@ -163,6 +172,14 @@ class TraininglogController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
 
+        $identity = $this->getIdentity();
+
+
+        if(!$this->getCompanyRolesTable()->checkFillCompanyRoles($identity['u_company_id'])){
+            $this->flashMessenger()->addErrorMessage('Please, fill all roles for you company');
+            return $this->redirect()->toRoute('traininglog', array('controller' => 'traininglog', 'action' => 'list'));
+        }
+
         $form     = new TraininglogForm($this->getServiceLocator());
         $formNote = new NoteForm($this->getServiceLocator());
 
@@ -175,7 +192,6 @@ class TraininglogController extends AbstractActionController
             $comments          = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_TLC);
         }
         
-        $identity = $this->getIdentity();
         $request = $this->getRequest();
         if ($request->isPost()) {
             $tl = new Traininglog();
@@ -246,9 +262,6 @@ class TraininglogController extends AbstractActionController
                 
                 return $this->redirect()->toRoute('traininglog', array('controller' => 'traininglog', 'action' => 'list'));
             } else {
-                foreach ($form->getMessages() as $messageId => $message) {
-                   // echo "Validation failure '$messageId': $message<br/>";
-                }
 
                 if ((int) $id) {
                     $form->bind($tlObj);
@@ -272,7 +285,8 @@ class TraininglogController extends AbstractActionController
             'formNote' => $formNote,
             'tlId' => $id,
             'tlObj' => $tlObj,
-            'regulations' => $this->getRegulationTable()->getRegulations()
+            'regulations' => $this->getRegulationTable()->getRegulations(),
+            'companyRolesMsg' => $companyRolesMsg
         );
     }
 

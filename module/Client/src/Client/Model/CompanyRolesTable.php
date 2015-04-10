@@ -16,6 +16,8 @@ use Zend\Db\Sql\Expression;
 
 class CompanyRolesTable implements ServiceLocatorAwareInterface
 {
+    const ROLES_COUNT = 9;
+
     protected $tableGateway;
     protected $serviceLocator;
 
@@ -64,6 +66,22 @@ class CompanyRolesTable implements ServiceLocatorAwareInterface
         }
 
         return $roles;
+    }
+
+    public function checkFillCompanyRoles($cId = null)
+    {
+        if(!$cId) {
+            return true;
+        }
+
+        $select = $this->tableGateway->getSql()->select();
+
+        $select->where('cr_c_id = ' . $cId);
+        $select->where('cr_u_id != 0');
+
+        $resultSet = $this->tableGateway->selectWith($select)->count();
+
+        return $resultSet == self::ROLES_COUNT;
     }
 
     public function saveCompanyRole(CompanyRoles $cr)

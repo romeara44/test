@@ -168,7 +168,7 @@ class MailtemplateTable
 
         $body->addPart($html);
         
-        if($params['post']['attachments']) {
+        if(isset($params['post']) && $params['post']['attachments']) {
             foreach($params['post']['attachments'] as $attachment) {
                 $attachmentContent = fopen($attachment['file_path'], 'r');
                 $attach = new \Zend\Mime\Part($attachmentContent);
@@ -273,9 +273,16 @@ class MailtemplateTable
         $identity = $authService->getIdentity();
 
         $consultant = $sl->get('Admin\Model\UserTable')->getUser($identity['u_id']);
-        $consultantName = $consultant->u_firstname . ' ' . $consultant->u_lastname;
-        $consultantEmail = $consultant->u_email;
-        $consultantPhone = $consultant->u_office_phone;
+
+        if($consultant) {
+            $consultantName = $consultant->u_firstname . ' ' . $consultant->u_lastname;
+            $consultantEmail = $consultant->u_email;
+            $consultantPhone = $consultant->u_office_phone;
+        } else {
+            $consultantName = '';
+            $consultantEmail = '';
+            $consultantPhone = '';
+        }
 
         $model = new ViewModel(array(
             'content' => $content,

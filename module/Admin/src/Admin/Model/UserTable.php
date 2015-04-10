@@ -379,7 +379,6 @@ class UserTable implements ServiceLocatorAwareInterface
         $this->tableGateway->update($data, array('u_id' => $uid));
 
         return true;
-
     }
 
     public function getAll($paginated = false, $orderBy = null, $order = null, $params = array())

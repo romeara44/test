@@ -47,7 +47,7 @@ class UserController extends AbstractActionController
 
     public function getCompanyTable()
     {
-        if (!$this->companyTable) {
+        if (!isset($this->companyTable) || !$this->companyTable) {
             $sm = $this->getServiceLocator();
             $this->companyTable = $sm->get('Client\Model\CompanyTable');
         }

@@ -118,6 +118,15 @@ class AssessmentController extends AbstractActionController
         return $this->mailtemplateTable;
     }
 
+    public function getCompanyRolesTable()
+    {
+        if (!$this->companyRolesTable) {
+            $sm = $this->getServiceLocator();
+            $this->companyRolesTable = $sm->get('Client\Model\CompanyRolesTable');
+        }
+        return $this->companyRolesTable;
+    }
+    
     public function getIdentity()
     {
         $authService = new \Zend\Authentication\AuthenticationService();
@@ -200,6 +209,7 @@ class AssessmentController extends AbstractActionController
         $step = $step == 0 ? 1 : $step;
         $location = (int) $this->params('location');
         $assessmentRole = 0;
+        $companyRolesMsg = '';
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_ASSESSMENT, $id);
 
@@ -243,9 +253,14 @@ class AssessmentController extends AbstractActionController
                 $form->setData($request->getPost());
 
                 $isNew = (int) $id ? false : true;
+
+                if(!$checkFillCompanyRoles = $this->getCompanyRolesTable()->checkFillCompanyRoles($post['a_c_id'])) {
+                    $companyRolesMsg = 'Please, fill all roles for this company';
+                }
+
                 if ($form->isValid()) {
                     $isPrivacy = $post['a_type'] == 2;
-                    if ($isNew && $isPrivacy) { // if privacy
+                    if ($isNew && $isPrivacy) {
                         $isPossible = $this->getAssessmentTable()->isPrivacyCreatePossible($post['a_c_id']);
                         if (!$isPossible) {
                             $this->flashMessenger()->addErrorMessage('You can\'t add privacy assessment for this company');
@@ -275,6 +290,7 @@ class AssessmentController extends AbstractActionController
 
 
                     $this->getAssessmentTable()->checkStepFinished($id, 1, $isNew);
+
                 }
             } elseif ($step == 2) {
                 $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_UPLOADED_ROLES, \Application\Model\LogsTable::ITEM_TYPE_ASSESSMENT, $id);
@@ -306,31 +322,13 @@ class AssessmentController extends AbstractActionController
                 if (isset($post['aili_ai_id'])) {
                     $aili = new AssessmentInventoryLocationItem();
 
-                    /*if ($post['isNew']) {
-
-                        $aiId = $post['aili_ai_id'];
-                        if ($post['aili_name' . $aiId] != '') {
-                            $dataAili['aili_a_id'] = $id;
-                            $dataAili['aili_adr_id'] = $post['aili_adr_id'];//!(int) $post['setStep'] ? $cloneObj[1][$post['aili_adr_id']] : $post['aili_adr_id'];
-                            $dataAili['aili_ai_id'] = $aiId;
-
-                            $dataAili['aili_name'] = $post['aili_name' . $aiId];
-                            $dataAili['aili_model'] = $post['aili_model' . $aiId];
-                            $dataAili['aili_description'] = $post['aili_description' . $aiId];
-
-                            $aili->exchangeArray($dataAili);
-                            $idAili = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationItemTable')->saveAili($aili);
-                        }
-                        return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => 3, 'location' =>$post['aili_adr_id']));
-                    }*/
-
                     for ($i = 1; $i <= 4; $i++) {
                         $aiId = $i;
                         $dataAili = array();
                         if (isset($post['aili_name' . $aiId])) {
                             if ($post['aili_name' . $aiId] != '') {
                                 $dataAili['aili_a_id'] = $id;
-                                $dataAili['aili_adr_id'] = $post['aili_adr_id'];//!(int) $post['setStep'] ? $cloneObj[1][$post['aili_adr_id']] : $post['aili_adr_id'];
+                                $dataAili['aili_adr_id'] = $post['aili_adr_id'];
                                 $dataAili['aili_ai_id'] = $aiId;
 
                                 $dataAili['aili_name'] = $post['aili_name' . $aiId];
@@ -405,10 +403,7 @@ class AssessmentController extends AbstractActionController
                 $abal = new AssessmentBusinessAssociateLocation();
 
                 if ($post['isNew']) {
-                    /*if (!(int) $post['setStep']) {
-                        $cloneObj = $this->getAssessmentTable()->cloneAssessment($id, 4, $post['locationHidden'], true);
-                        $id = $cloneObj[0];
-                    }*/
+
                     if (is_numeric($post['abal_ba_id'])) {
                         $dataAbal['abal_a_id'] = $id;
                         $dataAbal['abal_adr_id'] = $post['abal_adr_id'];//!(int) $post['setStep'] ? $cloneObj[1][$post['abal_adr_id']] : $post['abal_adr_id'];
@@ -586,7 +581,8 @@ class AssessmentController extends AbstractActionController
             'company' => $company,
             'isClosed' => (is_object($aObj) && ($aObj->a_status == 100)) ? true : false,
             'companyAddresses' => array(),
-            'lastAdrId' => isset($lastAdrId) ? $lastAdrId : 0
+            'lastAdrId' => isset($lastAdrId) ? $lastAdrId : 0,
+            'companyRolesMsg' => $companyRolesMsg
         );
 
         if ($companyId) {

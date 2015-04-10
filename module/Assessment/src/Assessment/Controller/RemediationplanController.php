@@ -97,6 +97,15 @@ class RemediationplanController extends AbstractActionController
         return $this->noteFilesTable;
     }
 
+    public function getCompanyRolesTable()
+    {
+        if (!$this->companyRolesTable) {
+            $sm = $this->getServiceLocator();
+            $this->companyRolesTable = $sm->get('Client\Model\CompanyRolesTable');
+        }
+        return $this->companyRolesTable;
+    }
+
     public function getIdentity()
     {
         $authService = new \Zend\Authentication\AuthenticationService();
@@ -187,54 +196,20 @@ class RemediationplanController extends AbstractActionController
                                     , 'rp_approver_u_id'     => $post['rp_approver_u_id']
                                     , 'rp_accepter_u_id'     => $post['rp_accepter_u_id']
                                     );
-
-                $ymd1 = \DateTime::createFromFormat('m/d/Y', $post['rp_approved_date']);
-                if (is_object($ymd1)) {
-                    if ($ymd1->format('Y') > date("Y")) {
-                        $ymd1->setDate('2014', $ymd1->format('m'), $ymd1->format('d'));
+                
+                foreach ($fieldValues as $key => $value) {
+                    $ymd1 = \DateTime::createFromFormat('m/d/Y', $value);
+                    if (is_object($ymd1)) {
+                        if ($ymd1->format('Y') > date("Y")) {
+                            $ymd1->setDate('2014', $ymd1->format('m'), $ymd1->format('d'));
+                        }
+                        $ymd1 = $ymd1->format('Y-m-d');
+                    } else {
+                        $ymd1 = '';
                     }
-                    $ymd1 = $ymd1->format('Y-m-d');
-                } else {
-                    $ymd1 = '';
+
+                    $fieldValues[$key] = $ymd1;
                 }
-
-                $fieldValues['rp_approved_date'] = $ymd1;
-
-                $ymd2 = \DateTime::createFromFormat('m/d/Y', $post['rp_accepted_date']);
-                if (is_object($ymd2)) {
-                    if ($ymd2->format('Y') > date("Y")) {
-                        $ymd2->setDate('2014', $ymd2->format('m'), $ymd2->format('d'));
-                    }
-                    $ymd2 = $ymd2->format('Y-m-d');
-                } else {
-                    $ymd2 = '';
-                }
-
-                $fieldValues['rp_accepted_date'] = $ymd2;
-
-                $ymd1 = \DateTime::createFromFormat('m/d/Y', $post['rp_incident_date']);
-                if (is_object($ymd1)) {
-                    if ($ymd1->format('Y') > date("Y")) {
-                        $ymd1->setDate('2014', $ymd1->format('m'), $ymd1->format('d'));
-                    }
-                    $ymd1 = $ymd1->format('Y-m-d');
-                } else {
-                    $ymd1 = '';
-                }
-
-                $fieldValues['rp_incident_date'] = $ymd1;
-
-                $ymd2 = \DateTime::createFromFormat('m/d/Y', $post['rp_remediation_date']);
-                if (is_object($ymd2)) {
-                    if ($ymd2->format('Y') > date("Y")) {
-                        $ymd2->setDate('2014', $ymd2->format('m'), $ymd2->format('d'));
-                    }
-                    $ymd2 = $ymd2->format('Y-m-d');
-                } else {
-                    $ymd2 = '';
-                }
-
-                $fieldValues['rp_remediation_date'] = $ymd2;
 
                 $this->getRemediationplanTable()->setFieldValues($id, $fieldValues);
 
@@ -313,23 +288,6 @@ class RemediationplanController extends AbstractActionController
                 $contactsApr[$key] = $r;
             }
         }
-
-        /*foreach ($userTable->getContactsByCompanyId($rpObj->rp_c_id, false) as $key => $r) {
-            $contacts[$key] = $r;
-        }
-        foreach ($userTable->getUsersByRole(array(\Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT)) as $key => $r) {
-           $contacts[$key] = $r;
-        }*/
-
-        /*
-        foreach ($userTable->getContactsByCompanyId($rpObj->rp_c_id, false) as $key => $r) {
-            $contactsApr[$key] = $r;
-        }
-        foreach ($userTable->getUsersByRole(array(\Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT)) as $key => $r) {
-            $contactsApr[$key] = $r;
-        }
-        */
-
         $view = new ViewModel(array(
             'id' => $id,
             'formNote' => $formNote,
@@ -355,12 +313,6 @@ class RemediationplanController extends AbstractActionController
             require_once $domLibPath;
 
             $renderer = $this->getServiceLocator()->get('Zend\View\Renderer\RendererInterface');
-
-            // $map = new Resolver\TemplateMapResolver(array(
-                // 'remediationplan/pdftemplate' => $_SERVER['DOCUMENT_ROOT'] . '/../module/Assessment/view/assessment/remediationplan/edit.phtml',
-            // ));
-
-            // $renderer->setResolver($map);
 
             $model = new ViewModel(array(
                 'id' => $id,

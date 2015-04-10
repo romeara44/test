@@ -33,12 +33,13 @@ return array(
             'company' => array(
                 'type'    => 'segment',
                 'options' => array(
-                    'route'    => '/company[/:action][/:id][/page/:page][/order_by/:order_by][/:order][/roleFilter/:roleFilter][/adrId/:adrId]',
+                    'route'    => '/company[/:action][/:id][#:#][/page/:page][/order_by/:order_by][/:order][/roleFilter/:roleFilter][/adrId/:adrId]',
                     'constraints' => array(
                         'action' => '(?!\bpage\b)(?!\border_by\b)[a-zA-Z][a-zA-Z0-9_-]*',
                         'id'     => '[0-9]+',
                         'page' => '[0-9]+',
                         'order_by' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        '#' => '[a-zA-Z][a-zA-Z0-9_-]*',
                         'order' => 'ASC|DESC',
                         'roleFilter' => '[0-9]+',
                         'adrId' => '[0-9]+',

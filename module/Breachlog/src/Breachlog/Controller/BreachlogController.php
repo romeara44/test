@@ -103,6 +103,15 @@ class BreachlogController extends AbstractActionController
         return $this->noteTable;
     }
     
+    public function getCompanyRolesTable()
+    {
+        if (!$this->companyRolesTable) {
+            $sm = $this->getServiceLocator();
+            $this->companyRolesTable = $sm->get('Client\Model\CompanyRolesTable');
+        }
+        return $this->companyRolesTable;
+    }
+
     public function getIdentity()
     {
         $authService = new \Zend\Authentication\AuthenticationService();
@@ -172,6 +181,7 @@ class BreachlogController extends AbstractActionController
         $blObj = null;
         $userObj = null;
         $companyUsers[''] = 'Please Select';
+        $companyRolesMsg = '';
         
         if ((int) $id) {
             $blObj = $this->getBreachlogTable()->getBreachlog($id);
@@ -223,7 +233,11 @@ class BreachlogController extends AbstractActionController
                 }
             }
 
-            if ($form->isValid() && !$questionsErrors) {
+            if(!$checkFillCompanyRoles = $this->getCompanyRolesTable()->checkFillCompanyRoles($post['bl_c_id'])) {
+                $companyRolesMsg = 'Please, fill all roles for this company';
+            }
+
+            if ($form->isValid() && !$checkFillCompanyRoles && !$questionsErrors) {
                 $post['bl_consultant_u_id'] = $identity['u_id'];
                 if(isset($post['questions'][11]) && $post['questions'][11] == 2) $post['bl_date_of_occurrence'] = '';
                 $bl->exchangeArray($post);
@@ -312,7 +326,8 @@ class BreachlogController extends AbstractActionController
             'companyUsers' => $companyUsers,
             'questions' => $questions,
             'questionsFormAnswers' => $questionsFormAnswers,
-            'questionsErrors' => $questionsErrors
+            'questionsErrors' => $questionsErrors,
+            'companyRolesMsg' => $companyRolesMsg
         );
     }
 

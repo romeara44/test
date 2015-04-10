@@ -41,6 +41,11 @@ $form->setAttribute('method', 'post');
                 echo $this->formElementErrors($fn);
                 ?>
             </p>
+            <p style="padding: 0;border-top: 0;">
+                <?php if($companyRolesMsg) :?>
+                    <label style="padding:0" for="a_c_id" generated="true" class="error"><?php echo $companyRolesMsg ?></label>
+                <?php endif; ?>
+            </p>
         <?php endif; ?>
 
         <p>
