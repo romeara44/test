@@ -293,7 +293,7 @@ class CompanyController extends AbstractActionController
         $companyObj = $this->getCompanyTable()->getCompany($id);
         $primaryAddressObj = $this->getAddressTable()->getAddress($companyObj->c_primary_adr_id);
 
-        return $this->getResponse()->setContent(json_encode($primaryAddressObj));
+        return $this->getResponse()->setContent(json_encode(array('company' => $companyObj, 'address' => $primaryAddressObj)));
     }
 
     public function deleteaddressAction()

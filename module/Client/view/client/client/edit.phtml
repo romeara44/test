@@ -80,10 +80,15 @@ $form->setAttribute('method', 'post');
                     <input type="checkbox" name="is_primary_contact" id="primaryContact" class="checkbox" value="1" />
                     <label for="primaryContact" class="checkbox">Primary Contact</label>
                 <?php endif; ?>
-                <?php if(in_array($identity['u_role_id'], array(1, 2)) || ($clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $userObj->u_id)) :?>
-                    <input type="checkbox" name="u_company_id_admin" <?php if($userObj->u_company_id_admin && $userObj->u_company_id_admin == $userObj->u_company_id):?>checked <?php endif; ?> id="companyIdAdmin" class="checkbox" value="<?php echo $userObj->u_company_id_admin ?>" />
-                    <label for="companyIdAdmin" class="checkbox">Company Admin</label>
-                <?php endif; ?>
+                
+                    <span id="companyIdAdminWrap" <?php if(!(in_array($identity['u_role_id'], array(1, 2)) || ($clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $identity['u_id']))) :?>style="display:none"<?php endif; ?>>
+                        <input type="checkbox" name="u_company_id_admin" <?php if($userObj->u_company_id_admin && $userObj->u_company_id_admin == $userObj->u_company_id):?>checked <?php endif; ?> id="companyIdAdmin" class="checkbox" value="<?php echo $userObj->u_company_id_admin ?>"
+                        <?php if(!(in_array($identity['u_role_id'], array(1, 2)) || ($clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $identity['u_id']))) :?> disabled="true"<?php endif; ?> />
+                        <label for="companyIdAdmin" class="checkbox">Company Admin</label>
+                    </span>
+                
+                <input type="hidden" name="identity_u_role_id" id="identity_u_role_id" value="<?php echo $identity['u_role_id'] ?>" disabled="true" />
+                <input type="hidden" name="identity_u_id" id="identity_u_id" value="<?php echo $identity['u_id']?>" disabled="true" />
                 <input type="hidden" name="def_u_company_id" id="def_u_company_id" value="<?php echo $userObj->u_company_id ?>" disabled="true" />
                 <input type="hidden" name="def_u_company_id_admin" id="def_u_company_id_admin" value="<?php echo $userObj->u_company_id_admin ?>" disabled="true" />
                 <input type="checkbox" name="is_training_manager" <?php if($clientObj->c_training_manager_u_id && $clientObj->c_training_manager_u_id == $userObj->u_id):?>checked <?php endif; ?> id="trainingManager" class="checkbox" value="1" />
@@ -391,12 +396,21 @@ $form->setAttribute('method', 'post');
 
             $.getJSON("/company/getprimaryaddress/" + companyVal, {  }, function(data) {
                 if (companyVal) {
-                    if (data.adr_id) {
-                        primaryAddress1 = data.adr_address1;
-                        primaryAddress2 = data.adr_address2;
-                        primaryCity = data.adr_city;
-                        primaryState = data.adr_state_id;
-                        primaryZip = data.adr_zip;
+                    if (data.address.adr_id) {
+                        primaryAddress1 = data.address.adr_address1;
+                        primaryAddress2 = data.address.adr_address2;
+                        primaryCity = data.address.adr_city;
+                        primaryState = data.address.adr_state_id;
+                        primaryZip = data.address.adr_zip;
+                        var identityRoleId = parseInt($('#identity_u_role_id').val());
+                        var identityUId = parseInt($('#identity_u_id').val());
+                        if(identityRoleId == 1 || identityRoleId == 2 || (identityRoleId == 5 && identityUId == data.company.c_primary_contact_u_id)) {
+                            $('#companyIdAdminWrap').css('display', 'block');
+                            $('#companyIdAdmin').attr('disabled', false);
+                        } else {
+                            $('#companyIdAdminWrap').css('display', 'none');
+                            $('#companyIdAdmin').attr('disabled', true);
+                        }
                     }
                 }
             });
