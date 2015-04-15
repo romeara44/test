@@ -157,6 +157,8 @@ class TraininglogController extends AbstractActionController
             'search'      => $search
         ));
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open traininglog list page');
+
         return $view;
     }
 
@@ -230,6 +232,12 @@ class TraininglogController extends AbstractActionController
 
                 $tlId = $this->getTraininglogTable()->saveTraininglog($tl);
 
+                if((int)$id) {
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update trainiglog "' . $tlId . '"');
+                } else {
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Add new trainiglog "' . $tlId . '"');
+                }
+
                 // save files
                 $note = new Note();
                 $noteData['note_text'] = '';
@@ -265,6 +273,9 @@ class TraininglogController extends AbstractActionController
 
                 if ((int) $id) {
                     $form->bind($tlObj);
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open edit trainiglog "' . $id . '" page');
+                } else {
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open add new trainiglog page');
                 }
             }
 
@@ -298,7 +309,9 @@ class TraininglogController extends AbstractActionController
         $this->flashMessenger()->addSuccessMessage('Training log has been deleted');
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_DELETE, \Application\Model\LogsTable::ITEM_TYPE_TL, $id);
-
+        
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete trainiglog "' . $id . '"');
+        
         return $this->redirect()->toRoute('traininglog', array('controller' => 'traininglog', 'action' => 'list'));
     }
 
@@ -309,7 +322,12 @@ class TraininglogController extends AbstractActionController
             $post = $request->getPost();
         }
 
-        $this->getTraininglogTable()->setTraininglogStatus($post['id'], $post['archived']);
+        $id = $this->params('id');
+        $archived = $this->params('archived');
+
+        $this->getTraininglogTable()->setTraininglogStatus($id, $archived);
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Set status "' . $archived . '" for traininglog "' . $id . '" page');
 
         return new JsonModel(array('result' => 'true'));
     }
@@ -320,6 +338,8 @@ class TraininglogController extends AbstractActionController
 
         $this->getTraininglogTable()->unarchiveTraininglog($id);
         $this->flashMessenger()->addSuccessMessage('Training log has been unarchived');
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Unarchive traininglog "' . $id . '"');
 
         return $this->redirect()->toRoute('traininglog', array('controller' => 'traininglog', 'action' => 'list'));
 

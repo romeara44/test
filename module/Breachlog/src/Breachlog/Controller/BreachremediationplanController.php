@@ -130,6 +130,8 @@ class BreachremediationplanController extends AbstractActionController
             'roleFilter' => $roleFilter
         ));
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open breachlog action list page');
+
         return $view;
     }
 
@@ -196,6 +198,7 @@ class BreachremediationplanController extends AbstractActionController
                 }
 
                 if ($post['signedoff'] == 1) {
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Sign off breachlog action "' . $id . '"');
                     $this->getBreachremediationplanTable()->setStatus($id, \Breachlog\Model\Breachremediationplan::STATUS_SIGNED_OFF);
                     $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_SIGNEDOFF, \Application\Model\LogsTable::ITEM_TYPE_BRP, $id);
                 }
@@ -214,6 +217,12 @@ class BreachremediationplanController extends AbstractActionController
                 }
 
                 return $this->redirect()->toRoute('breachremediationplan', array('controller' => 'breachremediationplan', 'action' => 'list'));
+            }
+        } else if ($type != 'pdf') {
+            if((int)$id) {
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open edit breachlog action "' . $id . '" page');
+            } else {
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open add new breachlog action page');
             }
         }
 
@@ -256,6 +265,8 @@ class BreachremediationplanController extends AbstractActionController
             $domLibPath = $domLibPath . "/dompdf/dompdf_config.inc.php";
 
             require_once $domLibPath;
+
+            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Get pdf for breachlog plan "' . $id . '"');
 
             $renderer = new PhpRenderer();
 
@@ -318,6 +329,8 @@ class BreachremediationplanController extends AbstractActionController
             $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
             $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
         }
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Save files for breachlog action "' . $id . '" for breachlog "' . $brpId . '"');
 
         return $this->redirect()->toRoute('breachremediationplan', array('controller' => 'breachremediationplan', 'action' => 'edit', 'id' => $brpId));
     }
@@ -403,6 +416,8 @@ class BreachremediationplanController extends AbstractActionController
             }
         }
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Get csv for breachlog plan "' . $brpObj->brp_id . '"');
+
         header('Content-Description: File Transfer');
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="breachremediationplan_ ' . date('Y_m_d_h_i_s', time()) . '.csv"');
@@ -427,6 +442,8 @@ class BreachremediationplanController extends AbstractActionController
         $this->getBreachremediationplanTable()->deleteBreachremediationplan($id);
         $this->flashMessenger()->addSuccessMessage('Breach remediation plan has been deleted');
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete breachlog plan "' . $id . '"');
+
         return $this->redirect()->toRoute('breachremediationplan', array('controller' => 'breachremediationplan', 'action' => 'list'));
     }
 
@@ -436,6 +453,8 @@ class BreachremediationplanController extends AbstractActionController
 
         $this->getBreachremediationplanTable()->unarchiveBreachremediationplan($id);
         $this->flashMessenger()->addSuccessMessage('Breach remediation plan has been unarchived');
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Unarchive breachlog plan "' . $id . '"');
 
         return $this->redirect()->toRoute('breachremediationplan', array('controller' => 'breachremediationplan', 'action' => 'list'));
     }
@@ -452,6 +471,8 @@ class BreachremediationplanController extends AbstractActionController
 
         $this->getBreachremediationplanTable()->reopenBreachremediationplan($id);
         $this->flashMessenger()->addSuccessMessage('Breach Remediation plan has been opened');
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Reopen breachlog plan "' . $id . '"');
 
         return $this->redirect()->toRoute('breachremediationplan', array('controller' => 'breachremediationplan', 'action' => 'list'));
     }
@@ -498,6 +519,11 @@ class BreachremediationplanController extends AbstractActionController
                 $this->getBreachremediationplanactionTable()->setServiceLocator($this->getServiceLocator());
                 $brpaId = $this->getBreachremediationplanactionTable()->saveBreachremediationplanaction($brpa);
 
+                if ($id) {
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update breachlog plan action "' . $brpaId . '" for breachlog plan "' . $brpId . '"');
+                } else {
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Add breachlog plan action "' . $brpaId . '" for breachlog plan "' . $brpId . '"');
+                }
                 // save files
                 $note = new Note();
 
@@ -517,6 +543,9 @@ class BreachremediationplanController extends AbstractActionController
                 }
             }
         } else {
+
+            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open breachlog plan task edit page "' . $id . '" for breachlog plan "' . $brpId . '"');
+
             if ((int) $id) {
                 $brpaObj->brpa_target_date = ($brpaObj->brpa_target_date != '0000-00-00') ? substr($brpaObj->brpa_target_date, 0, 10) : '';
                 $formTask->bind($brpaObj);
@@ -549,6 +578,8 @@ class BreachremediationplanController extends AbstractActionController
         $this->getBreachremediationplanactionTable()->deleteBreachremediationplanaction($id);
         $this->flashMessenger()->addSuccessMessage('Task has been deleted');
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete breachlog plan action "' . $id . '" for breachlog plan "' . $brpId . '"');
+        
         return $this->redirect()->toRoute('breachremediationplan', array('controller' => 'breachremediationplan', 'action' => 'edit', 'id' => $brpId));
     }
 
@@ -585,6 +616,8 @@ class BreachremediationplanController extends AbstractActionController
 
         $viewModel->setTerminal(true);
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Send email breach remediation plan action "' . $id . '" for breach remediation plan "' . $brpObj->brp_id . '"');
+
         return $viewModel;
     }
 
@@ -620,6 +653,9 @@ class BreachremediationplanController extends AbstractActionController
 
         $viewModel->setTerminal(true);
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Send email remediation plan action "' . $id . '" for breach remediation plan "' . $brpObj->brp_id . '"');
+
+
         return $viewModel;
     }
 
@@ -654,6 +690,8 @@ class BreachremediationplanController extends AbstractActionController
         $viewModel->setTemplate('businessassociate/businessassociate/modaltemplate.phtml');
 
         $viewModel->setTerminal(true);
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Send approver email for breach remediation plan action "' . $id . '" for breach remediation plan "' . $brpObj->brp_id . '"');
 
         return $viewModel;
     }

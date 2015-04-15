@@ -154,6 +154,8 @@ class RemediationplanController extends AbstractActionController
             'roleFilter' => $roleFilter
         ));
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open remediationplan list page');
+
         return $view;
     }
 
@@ -187,6 +189,7 @@ class RemediationplanController extends AbstractActionController
                 if ($post['requestreview'] == 1) {
                     $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'requestreview', 'rpId' => $id, 'uId' => $post['rp_approver_u_id']));
                     $this->flashMessenger()->addSuccessMessage('Request Review sent');
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Request review sent, remediationplan "' . $id . '"');
                     return $this->redirect()->toRoute('remediationplan', array('controller' => 'remediationplan', 'action' => 'list'));
                 }
 
@@ -220,9 +223,11 @@ class RemediationplanController extends AbstractActionController
                 }
                 
                 if ($post['signedoff'] == 1) {
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Sign off remediationplan "' . $id . '"');
                     $this->getRemediationplanTable()->setStatus($id, \Assessment\Model\Remediationplan::STATUS_SIGNED_OFF);
                     $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_SIGNEDOFF, \Application\Model\LogsTable::ITEM_TYPE_RP, $id);
                 } else if($post['save_button']) {
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Save remediationplan "' . $id . '"');
                     $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_EDIT, \Application\Model\LogsTable::ITEM_TYPE_RP, $id);
                 }
 
@@ -236,10 +241,15 @@ class RemediationplanController extends AbstractActionController
                     $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
                     $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
 
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Save remediationplan "' . $id . '"');
                     $this->flashMessenger()->addSuccessMessage('Plan saved');
                 }
 
                 return $this->redirect()->toRoute('remediationplan', array('controller' => 'remediationplan', 'action' => 'list'));
+            }
+        } else {
+            if ((int) $id) {
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open edit remediationplan "' . $id . '" page');
             }
         }
         
@@ -312,6 +322,8 @@ class RemediationplanController extends AbstractActionController
             $domLibPath = $domLibPath . "/dompdf/dompdf_config.inc.php";
             require_once $domLibPath;
 
+            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Get pdf for remediationplan "' . $id . '"');
+
             $renderer = $this->getServiceLocator()->get('Zend\View\Renderer\RendererInterface');
 
             $model = new ViewModel(array(
@@ -370,6 +382,8 @@ class RemediationplanController extends AbstractActionController
             $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
             $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
         }
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Save files for remediationplan "' . $rpId . '"');
 
         return $this->redirect()->toRoute('remediationplan', array('controller' => 'remediationplan', 'action' => 'edit', 'id' => $rpId));
     }
@@ -467,6 +481,8 @@ class RemediationplanController extends AbstractActionController
             }
         }
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Get csv for remediationplan "' . $rpObj->rp_id . '"');
+
         header('Content-Description: File Transfer');
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="remediationplan_ ' . date('Y_m_d_h_i_s', time()) . '.csv"');
@@ -491,6 +507,8 @@ class RemediationplanController extends AbstractActionController
         $this->getRemediationplanTable()->deleteRemediationplan($id);
         $this->flashMessenger()->addSuccessMessage('Remediation plan has been deleted');
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete remediationplan "' . $id . '"');
+
         return $this->redirect()->toRoute('remediationplan', array('controller' => 'remediationplan', 'action' => 'list'));
     }
 
@@ -500,6 +518,8 @@ class RemediationplanController extends AbstractActionController
 
         $this->getRemediationplanTable()->unarchiveRemediationplan($id);
         $this->flashMessenger()->addSuccessMessage('Remediation plan has been unarchived');
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Unarchive remediationplan "' . $id . '"');
 
         return $this->redirect()->toRoute('remediationplan', array('controller' => 'remediationplan', 'action' => 'list'));
     }
@@ -517,6 +537,8 @@ class RemediationplanController extends AbstractActionController
         $this->getRemediationplanTable()->reopenRemediationplan($id);
         $this->flashMessenger()->addSuccessMessage('Remediation plan has been opened');
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Reopen remediationplan "' . $id . '"');
+
         return $this->redirect()->toRoute('remediationplan', array('controller' => 'remediationplan', 'action' => 'list'));
     }
 
@@ -532,6 +554,8 @@ class RemediationplanController extends AbstractActionController
             $rpaObj = $this->getRemediationplanactionTable()->getRemediationplanaction($id);
             $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_RPA);
         }
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open remediationplan "' . $rpId . '" task edit page "' . $id . '"');
 
         $formNote = new NoteForm($this->getServiceLocator());
         $formTask = new TaskForm($this->getServiceLocator(), $rpObj);
@@ -582,7 +606,8 @@ class RemediationplanController extends AbstractActionController
                 $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
                 $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
 
-                /////////////////
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Add remediationplan action "' . $rpaId . '" for remediationplan "' . $rpId . '"');
+                
                 $added = true;
                 //return $this->redirect()->toRoute('breachremediationplan', array('controller' => 'breachremediationplan', 'action' => 'edit', 'id' => $brpId));
             } else {
@@ -631,6 +656,8 @@ class RemediationplanController extends AbstractActionController
         $this->getRemediationplanactionTable()->deleteRemediationplanaction($id);
         $this->flashMessenger()->addSuccessMessage('Task has been deleted');
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete remediationplan task "' . $id . '" for remediationplan "' . $rpId . '"');
+        
         return $this->redirect()->toRoute('remediationplan', array('controller' => 'remediationplan', 'action' => 'edit', 'id' => $rpId));
     }
 
@@ -666,6 +693,8 @@ class RemediationplanController extends AbstractActionController
         $viewModel->setTemplate('businessassociate/businessassociate/modaltemplate.phtml');
 
         $viewModel->setTerminal(true);
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Send email for remediationplan action "' . $rpaObj->rpa_id . '" for remediationplan "' . $rpObj->rp_id . '"');
 
         return $viewModel;
     }
@@ -751,6 +780,8 @@ class RemediationplanController extends AbstractActionController
 
         $viewModel->setTerminal(true);
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Send email for remediationplan "' . $rpObj->rp_id . '"');
+
         return $viewModel;
     }
 
@@ -830,6 +861,8 @@ class RemediationplanController extends AbstractActionController
 
         $viewModel->setTerminal(true);
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Send approver email for remediationplan action "' . $rpaObj->rpa_id . '" for remediationplan "' . $rpObj->rp_id . '"');
+
         return $viewModel;
     }
 
@@ -848,6 +881,8 @@ class RemediationplanController extends AbstractActionController
         $rpa->exchangeArray($output);
         $this->getRemediationplanactionTable()->setServiceLocator($this->getServiceLocator());
         $rpaId = $this->getRemediationplanactionTable()->saveRemediationplanaction($rpa, 1);
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Save task for remediationplan action "' . $rpa->rpa_id . '" for remediationplan "' . $rpa->rpa_rp_id . '"');
 
         return 1;
     }

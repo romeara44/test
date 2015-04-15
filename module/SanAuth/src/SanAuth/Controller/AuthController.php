@@ -80,6 +80,9 @@ class AuthController extends AbstractActionController
                 $userTable = $this->getServiceLocator()->get('Admin\Model\UserTable');
 
                 $ret = $userTable->sendPasswordReminder($email);
+
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Send forgot password email');
+
                 if ($ret) {
                     $this->flashMessenger()->addSuccessMessage('Instruction on your email');
                 } else {
@@ -138,6 +141,9 @@ class AuthController extends AbstractActionController
                 $userTable = $this->getServiceLocator()->get('Admin\Model\UserTable');
 
                 $ret = $userTable->setNewPassword($uid, $password);
+
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Send new password email');
+
                 if ($ret) {
                     $this->flashMessenger()->addSuccessMessage('Passoword changed.');
                 }
@@ -235,6 +241,9 @@ class AuthController extends AbstractActionController
                         $this->flashmessenger()->addErrorMessage('Wrong email or password. Please try again.');
                     }
 
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Authenticate');
+
+
                     $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
                 } else {
                     $this->flashmessenger()->addErrorMessage('Wrong email or password. Please try again.');
@@ -252,6 +261,9 @@ class AuthController extends AbstractActionController
     public function logoutAction()
     {
         if ($this->getAuthService()->hasIdentity()) {
+
+            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Logout');
+
             $this->getSessionStorage()->forgetMe();
             $this->getAuthService()->clearIdentity();
             $this->flashmessenger()->addSuccessMessage("Log out");

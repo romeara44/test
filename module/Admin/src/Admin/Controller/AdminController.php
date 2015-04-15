@@ -96,6 +96,8 @@ class AdminController extends AbstractActionController
             'roleFilter' => $roleFilter
         ));
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open users list page');
+
         return $view;
     }
 
@@ -136,7 +138,12 @@ class AdminController extends AbstractActionController
                 $post['u_company_id'] = $post['u_company_id'] ? $post['u_company_id'] : (is_object($userObj) ? $userObj->u_company_id : null);
                 
                 $user->exchangeArray($post);
-                $this->getUserTable()->saveUser($user);
+                $saveUserId = $this->getUserTable()->saveUser($user);
+                if((int) $id) {
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update user "' . $saveUserId . '"');
+                } else {
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Add new user "' . $saveUserId . '"');
+                }
 
                 $this->flashMessenger()->addSuccessMessage('User has been added');
 
@@ -150,6 +157,9 @@ class AdminController extends AbstractActionController
         } else {
             if ((int) $id) {
                 $form->bind($userObj);
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open edit user "' . $id . '" page');
+            } else {
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open add new user page');
             }
         }
 
@@ -200,6 +210,8 @@ class AdminController extends AbstractActionController
         $this->getUserTable()->deleteUser($id);
         $this->flashMessenger()->addSuccessMessage('User has been deleted');
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete client "' . $id . '"');
+
         return $this->redirect()->toRoute('admin', array('controller' => 'admin', 'action' => 'users'));
     }
 
@@ -209,6 +221,8 @@ class AdminController extends AbstractActionController
 
         $this->getUserTable()->unarchiveUser($id);
         $this->flashMessenger()->addSuccessMessage('User has been unarchived');
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Unarchive client "' . $id . '"');
 
         return $this->redirect()->toRoute('admin', array('controller' => 'admin', 'action' => 'users'));
     }

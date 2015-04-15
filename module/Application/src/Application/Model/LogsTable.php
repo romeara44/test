@@ -10,6 +10,7 @@ use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\Db\ResultSet\ResultSet;
 use Zend\Db\Sql\Select;
 use Zend\Paginator\Adapter\DbSelect;
+use Zend\View\Helper\ServerUrl;
 
 class LogsTable
 {
@@ -37,10 +38,12 @@ class LogsTable
 
     protected $tableGateway;
     protected $serviceLocator;
+    protected $logDir;
 
     public function __construct(TableGateway $tableGateway)
     {
         $this->tableGateway = $tableGateway;
+        $this->logDir = ROOT_PATH . '/public/data/logs/';
     }
 
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
@@ -174,5 +177,37 @@ class LogsTable
         return $row;
     }
 
+    public function saveUserFileLog($msg)
+    {
+        $file = $this->getUserLogFile();
 
+        if($file) {
+            $helper = new ServerUrl;
+            file_put_contents($file, date('Y-m-d:h:i:s') . "  -----  " . $msg . '; URL: ' . $helper->__invoke(true) . "\r\n", FILE_APPEND);
+        }
+
+        return true;
+    }
+
+    public function getUserLogFile()
+    {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+
+        if(!$authService->hasIdentity()) {
+            return null;
+        }
+
+        $identity = $authService->getIdentity();
+
+        if(!is_dir($this->logDir)) {
+            mkdir($this->logDir, 0755);
+        }
+
+        $bad = array_merge(
+                array_map('chr', range(0,31)),
+                array("<", ">", ":", '"', "/", "\\", "|", "?", "*"));
+
+        return $this->logDir . 'logs_' . implode('_', array(str_replace($bad, "", $identity['u_firstname']), str_replace($bad, "", $identity['u_lastname']), $identity['u_id'], date('Y_m_d'))) . '.txt';
+    }
 }

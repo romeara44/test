@@ -54,6 +54,8 @@ class IndexController extends AbstractActionController
                 $container->storage = $config['application_vars'];
             }
             
+            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open index page');
+
             if ($identity['u_role_id'] == 1) {
                 return $this->redirect()->toRoute('dashboard', array('controller' => 'dashboard', 'action' => 'admin'));
             } elseif ($identity['u_first_login'] == 1) {

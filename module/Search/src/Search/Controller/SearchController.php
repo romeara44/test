@@ -105,6 +105,8 @@ class SearchController extends AbstractActionController
             'searchValue' => $query
         ));
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Search "' . $query . '"');
+
         return $view;
 
     }

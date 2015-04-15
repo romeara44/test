@@ -174,6 +174,8 @@ class AssessmentController extends AbstractActionController
             'roleFilter' => $roleFilter
         ));
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open assessments list page');
+
         return $view;
     }
 
@@ -195,6 +197,8 @@ class AssessmentController extends AbstractActionController
         $viewParams['checkSteps'] = $this->getAssessmentTable()->checkSteps($id, $addresses, $assessmentsRoles);
 
         $viewModel = new ViewModel($viewParams);
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open assessments edit list page "' . $id . '"');
 
         return $viewModel;
 
@@ -280,11 +284,14 @@ class AssessmentController extends AbstractActionController
                         $aId = $this->getAssessmentTable()->saveAssessment($a);
                         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_ADD, \Application\Model\LogsTable::ITEM_TYPE_ASSESSMENT, $aId);
                         $id = $aId;
+                        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Add new assessment "' . $id . '" step 1');
                     }
 
                     if ($isNew && $isPrivacy) {
                         //$this->getAssessmentTable()->copyAdressesToPrivacy($isPossible->a_id, $aId);
                     } else {
+
+                        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update assessment "' . $id . '" step 1');
                         $newAdressesKeys = $this->getAssessmentTable()->saveAddresses($id, $request->getPost());
                     }
 
@@ -293,6 +300,7 @@ class AssessmentController extends AbstractActionController
 
                 }
             } elseif ($step == 2) {
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update assessment "' . $id . '" step 2');
                 $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_UPLOADED_ROLES, \Application\Model\LogsTable::ITEM_TYPE_ASSESSMENT, $id);
 
                 $valid = true;
@@ -315,6 +323,7 @@ class AssessmentController extends AbstractActionController
                 }
                 $this->getAssessmentTable()->checkStepFinished($id, 2);
             } elseif ($step == 3) {
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update assessment "' . $id . '" step 3');
                 $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_UPLOADED_INVENTORY, \Application\Model\LogsTable::ITEM_TYPE_ASSESSMENT, $id);
                 $valid = true;
                 $post = $request->getPost();
@@ -397,6 +406,7 @@ class AssessmentController extends AbstractActionController
                 }
                 $this->getAssessmentTable()->checkStepFinished($id, 3);
             } elseif ($step == 4) {
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update assessment "' . $id . '" step 4');
                 $valid = true;
                 $post = $request->getPost();
 
@@ -468,6 +478,7 @@ class AssessmentController extends AbstractActionController
                 $this->getAssessmentTable()->checkStepFinished($id, 4);
                 //return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => 4, 'location' => $post['aili_adr_id']));
             } elseif ($step == 5) {
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update assessment "' . $id . '" step 5');
                 //$id = $this->getAssessmentTable()->cloneAssessment($id);
 
                 $valid = true;
@@ -562,6 +573,9 @@ class AssessmentController extends AbstractActionController
                         $lastAdrId = $address->adr_id;
                     }
                 }
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open assessments edit page "' . $id . '" step "' . $step . '"');
+            } else {
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open add new assessments page');
             }
         }
 
@@ -676,6 +690,8 @@ class AssessmentController extends AbstractActionController
 
         $viewModel->setTerminal(true);
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Send invive to assessment "' . $id . '"');
+
         return $viewModel;
     }
 
@@ -687,6 +703,8 @@ class AssessmentController extends AbstractActionController
         $this->flashMessenger()->addSuccessMessage('Assessment has been deleted');
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_DELETE, \Application\Model\LogsTable::ITEM_TYPE_ASSESSMENT, $id);
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete assessment "' . $id . '"');
 
         return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'list'));
     }
@@ -700,6 +718,8 @@ class AssessmentController extends AbstractActionController
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_DELETE, \Application\Model\LogsTable::ITEM_TYPE_ASSESSMENT, $id);
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Unarchive assessment "' . $id . '"');
+
         return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'list'));
     }
 
@@ -710,7 +730,7 @@ class AssessmentController extends AbstractActionController
         $this->getAssessmentTable()->duplicateAssessment($id);
         $this->flashMessenger()->addSuccessMessage('Assessment has been duplicated');
 
-        //$this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_DELETE, \Application\Model\LogsTable::ITEM_TYPE_ASSESSMENT, $id);
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Dublicate assessment "' . $id . '"');
 
         return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'list'));
     }
@@ -722,6 +742,8 @@ class AssessmentController extends AbstractActionController
 
         $this->getServiceLocator()->get('Client\Model\AddressTable')->deleteAddress($adrId);
         $this->flashMessenger()->addSuccessMessage('Address has been deleted');
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete assessment "' . $id . '" adrress "' . $adrId . '"');
 
         return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id));
     }
@@ -735,6 +757,8 @@ class AssessmentController extends AbstractActionController
         $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationItemTable')->deleteAili($ailiId);
         $this->flashMessenger()->addSuccessMessage('Assessment has been deleted');
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete assessment "' . $id . '" inventory location "' . $ailiId . '"');
+
         return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => 3, 'location' => $adrId));
     }
 
@@ -746,6 +770,8 @@ class AssessmentController extends AbstractActionController
 
         $this->getServiceLocator()->get('Assessment\Model\AssessmentBusinessAssociateLocationTable')->deleteAbal($abalId);
         $this->flashMessenger()->addSuccessMessage('Assessment has been deleted');
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete assessment "' . $id . '" business associate location "' . $abalId . '"');
 
         return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => 4, 'location' => $adrId));
     }
@@ -794,6 +820,7 @@ class AssessmentController extends AbstractActionController
 
                 $this->flashMessenger()->addSuccessMessage('Client saved');
 
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Add new assessment "' . $aId . '" contact "' . $uId . '"');
                 $added = true;
                 //return $this->redirect()->toRoute('assessment', array('assessment' => 'client', 'action' => 'edit', 'id' => $aId, 'step' => $step, 'companyId' => $companyId));
 
@@ -874,7 +901,7 @@ class AssessmentController extends AbstractActionController
 
                 $this->flashMessenger()->addSuccessMessage('Business associate saved');
 
-
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Add new assessment "' . $aId . '" business associate "' . $uId . '"');
                 $added = true;
                 //return $this->redirect()->toRoute('assessment', array('assessment' => 'client', 'action' => 'edit', 'id' => $aId, 'step' => $step, 'companyId' => $companyId));
 
@@ -926,6 +953,9 @@ class AssessmentController extends AbstractActionController
                 $order++;
             }
         }
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Add assessment answers');
+
         die;
     }
 
@@ -933,6 +963,8 @@ class AssessmentController extends AbstractActionController
     {
         $container = new Container('activity');
         $container->activity = time();
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Reset assessment activity');
 
         return $this->getResponse()->setContent(1);
     }

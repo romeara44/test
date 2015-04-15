@@ -218,6 +218,12 @@ class CompanyController extends AbstractActionController
 
                     $this->flashMessenger()->addSuccessMessage('Company saved');
 
+                    if ($id) {
+                        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update company "' . $companyId . '"');
+                    } else {
+                        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Add new company "' . $companyId . '"');
+                    }
+
                     if(isset($post['save_continue'])) {
                         return $this->redirect()->toRoute('company', array('controller' => 'company', 'action' => 'edit', 'id' => $companyId , '#' => 'tab3'));
                     } else {
@@ -236,6 +242,9 @@ class CompanyController extends AbstractActionController
             if ($id) {
                 $form->bind($companyObj);
                 $addresses = $this->getAddressTable()->getAddresses($id, \Client\Model\AddressItem::COMPANY_TYPE);
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open edit company "' . $id . '" page');
+            } else {
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open add new company page');
             }
         }
 
@@ -267,7 +276,9 @@ class CompanyController extends AbstractActionController
             $this->getCompanyTable()->deleteCompany($id);
             $this->flashMessenger()->addSuccessMessage('Company has been deleted');
         }
-        
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete company "' . $id . '"');
+
         return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
     }
 
@@ -277,6 +288,8 @@ class CompanyController extends AbstractActionController
 
         $this->getCompanyTable()->unarchiveCompany($id);
         $this->flashMessenger()->addSuccessMessage('Company has been unarchived');
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Unarchive company "' . $id . '"');
 
         return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
     }
@@ -293,6 +306,8 @@ class CompanyController extends AbstractActionController
         $companyObj = $this->getCompanyTable()->getCompany($id);
         $primaryAddressObj = $this->getAddressTable()->getAddress($companyObj->c_primary_adr_id);
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Get primary address for company "' . $id . '"');
+
         return $this->getResponse()->setContent(json_encode(array('company' => $companyObj, 'address' => $primaryAddressObj)));
     }
 
@@ -303,6 +318,8 @@ class CompanyController extends AbstractActionController
 
         $this->getServiceLocator()->get('Client\Model\AddressTable')->deleteAddress($adrId);
         $this->flashMessenger()->addSuccessMessage('Address has been deleted');
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete address "' . $adrId . '"" for company "' . $id . '"');
 
         return $this->redirect()->toRoute('company', array('controller' => 'company', 'action' => 'edit', 'id' => $id));
     }
@@ -322,6 +339,8 @@ class CompanyController extends AbstractActionController
         }
 
         $activate = $this->getUserTable()->activatePartialsByCompany($id);
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Active partial users company "' . $id . '"');
 
         return new JsonModel(array('result' => (boolean)$activate));
     }

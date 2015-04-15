@@ -4,6 +4,8 @@
  * to the application root now.
  */
 
+define('ROOT_PATH', dirname(__DIR__));
+
 if(function_exists('get_magic_quotes_runtime') && get_magic_quotes_runtime())
     set_magic_quotes_runtime(false);
 

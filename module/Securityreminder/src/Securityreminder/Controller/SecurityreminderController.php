@@ -144,6 +144,8 @@ class SecurityreminderController extends AbstractActionController
             'search'      => $search
         ));
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open security reminder list page');
+
         return $view;
     }
 
@@ -202,6 +204,12 @@ class SecurityreminderController extends AbstractActionController
 
                 $srId = $this->getSecurityreminderTable()->saveSecurityreminder($sr);
 
+                if((int)$id) {
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update security reminder "' . $srId . '"');
+                } else {
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Add new security reminder "' . $srId . '"');
+                }
+
                 // save files
                 $note = new Note();
                 $noteData['note_text'] = '';
@@ -249,6 +257,9 @@ class SecurityreminderController extends AbstractActionController
             if ((int) $id) {
                 $srObj->sr_launched_date = ($srObj->sr_launched_date != '0000-00-00') ? $srObj->sr_launched_date : '';
                 $form->bind($srObj);
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open edit security reminder "' . $id . '" page');
+            } else {
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open add new security reminder page');
             }
         }
 
@@ -271,6 +282,8 @@ class SecurityreminderController extends AbstractActionController
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_DELETE, \Application\Model\LogsTable::ITEM_TYPE_SR, $id);
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete security reminder "' . $id . '" page');
+
         return $this->redirect()->toRoute('securityreminder', array('controller' => 'securityreminder', 'action' => 'list'));
     }
 
@@ -281,7 +294,12 @@ class SecurityreminderController extends AbstractActionController
             $post = $request->getPost();
         }
 
-        $this->getSecurityreminderTable()->setSecurityreminderStatus($post['id'], $post['archived']);
+        $id = $this->params('id');
+        $archived = $this->params('archived');
+
+        $this->getSecurityreminderTable()->setSecurityreminderStatus($id, $archived);
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Set status "' . $archived . '" for security reminder "' . $id . '" page');
 
         return new JsonModel(array('result' => 'true'));
     }
@@ -292,6 +310,8 @@ class SecurityreminderController extends AbstractActionController
 
         $this->getSecurityreminderTable()->unarchiveSecurityreminder($id);
         $this->flashMessenger()->addSuccessMessage('Security reminder has been unarchived');
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Unarchive for security reminder "' . $id . '" page');
 
         return $this->redirect()->toRoute('securityreminder', array('controller' => 'securityreminder', 'action' => 'list'));
 

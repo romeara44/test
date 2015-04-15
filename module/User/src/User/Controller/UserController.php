@@ -132,6 +132,9 @@ class UserController extends AbstractActionController
         } else {
             if ((int) $id) {
                 $form->bind($userObj);
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open edit user account "' . $id . '" page');
+            } else {
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open add new user account page');
             }
         }
 
@@ -249,12 +252,15 @@ class UserController extends AbstractActionController
                 $this->getUserTable()->agreeTermsUser($identity['u_id']);
                 $identity['u_first_login'] = 0;
                 $this->getServiceLocator()->get('AuthService')->getStorage()->write($identity);
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Accepte privacy and terms');
                 if($identity['u_register'] == 1) {
                     return $this->redirect()->toRoute('company', array('controller' => 'company', 'action' => 'edit', 'id' => $identity['u_company_id']));
                 } else {
                     return $this->redirect()->toRoute('dashboard', array('controller' => 'dashboard', 'action' => 'admin'));
                 }
             }
+        } else {
+            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open accept privacy and term  page');
         }
 
         return array(

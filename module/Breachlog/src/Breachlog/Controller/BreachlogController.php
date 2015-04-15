@@ -159,6 +159,8 @@ class BreachlogController extends AbstractActionController
             'roleFilter' => $roleFilter
         ));
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open breachlog list page');
+
         return $view;
     }
 
@@ -293,6 +295,12 @@ class BreachlogController extends AbstractActionController
                 $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
                 $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
                 
+                if((int)$id) {
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update breachlog "' . $blId . '"');
+                } else {
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Add new breachlog "' . $blId . '"');
+                }
+
                 return $this->redirect()->toRoute('breachlog', array('controller' => 'breachlog', 'action' => 'list'));
             } else {
                 foreach ($form->getMessages() as $messageId => $message) {
@@ -305,6 +313,11 @@ class BreachlogController extends AbstractActionController
             }
 
         } else {
+            if((int)$id) {
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open edit breachlog "' . $id . '" page');
+            } else {
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open add new breachlog page');
+            }
             $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_BREACHLOG, $id);
 
             if ((int) $id) {
@@ -338,6 +351,8 @@ class BreachlogController extends AbstractActionController
         $this->getBreachlogTable()->deleteBreachlog($id);
         $this->flashMessenger()->addSuccessMessage('Breach log has been deleted');
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete breachlog "' . $id . '"');
+
         return $this->redirect()->toRoute('breachlog', array('controller' => 'breachlog', 'action' => 'list'));
     }
 
@@ -347,6 +362,8 @@ class BreachlogController extends AbstractActionController
 
         $this->getBreachlogTable()->unarchiveBreachlog($id);
         $this->flashMessenger()->addSuccessMessage('Breach log has been deleted');
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Unarchive breachlog "' . $id . '"');
 
         return $this->redirect()->toRoute('breachlog', array('controller' => 'breachlog', 'action' => 'list'));
 

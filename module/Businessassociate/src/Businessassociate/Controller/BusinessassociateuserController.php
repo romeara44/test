@@ -169,6 +169,8 @@ class BusinessassociateuserController extends AbstractActionController
             $viewModel->setTemplate('businessassociate/businessassociateuser/questionsanswers.phtml');
         }*/
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Questions form for business associate "' . $ba->ba_id . '"');
+
         $viewModel->setVariables(array(
             'questions' => $questions,
             'answers' => $answers,

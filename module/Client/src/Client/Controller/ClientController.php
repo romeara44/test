@@ -135,6 +135,8 @@ class ClientController extends AbstractActionController
             'checkClientLimitCompany' => $this->getCompanyTable()->checkClientLimitCompany()
         ));
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open client list page');
+
         return $view;
     }
 
@@ -167,7 +169,7 @@ class ClientController extends AbstractActionController
         $setTrainingManagerMsg = '';
 
         if ((int) $id) {
-            $userObj = $this->getUserTable()->getUser($id); //print_r($userObj);
+            $userObj = $this->getUserTable()->getUser($id);
             if($userObj->u_first_login == 1) {
                 $this->getUserTable()->unSetFirstLogin($id);
             }
@@ -212,8 +214,10 @@ class ClientController extends AbstractActionController
                         $uId = $this->getUserTable()->saveUser($user);
 
                         if ($id) {
+                            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update Client "' . $uId . '"');
                             $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_EDIT, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $id);
                         } else {
+                            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Add new Client "' . $uId . '"');
                             $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_ADD, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $uId);
                         }
 
@@ -272,6 +276,9 @@ class ClientController extends AbstractActionController
         } else {
             if ((int) $id) {
                 $form->bind($userObj);
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open edit client "' . $id . '" page');
+            } else {
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open add new client page');
             }
         }
 
@@ -304,6 +311,8 @@ class ClientController extends AbstractActionController
         $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'createuser', 'uId' => $id, 'password' => $password));
         $this->flashMessenger()->addSuccessMessage('Invitation has been sent');
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Send client invite "' . $id . '"');
+
         return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
     }
 
@@ -316,6 +325,8 @@ class ClientController extends AbstractActionController
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_DELETE, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $id);
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete client "' . $id . '"');
+        
         return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
     }
 
@@ -325,6 +336,8 @@ class ClientController extends AbstractActionController
 
         $this->getUserTable()->unarchiveUser($id);
         $this->flashMessenger()->addSuccessMessage('User has been unarchived');
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Unarchive client "' . $id . '"');
 
         return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
     }

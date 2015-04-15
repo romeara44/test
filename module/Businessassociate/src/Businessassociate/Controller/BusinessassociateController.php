@@ -140,6 +140,8 @@ class BusinessassociateController extends AbstractActionController
             'roleFilter' => $roleFilter
         ));
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open business associate list page');
+        
         return $view;
     }
 
@@ -202,6 +204,12 @@ class BusinessassociateController extends AbstractActionController
 
                     $this->flashMessenger()->addSuccessMessage('Business associate saved');
 
+                    if ((int) $id) {
+                        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update business associate edit page "' . $baId . '"');
+                    } else {
+                        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Add new business associate edit page "' . $baId . '"');
+                    }
+
                     return $this->redirect()->toRoute('businessassociate', array('controller' => 'businessassociate', 'action' => 'list'));
                 } else {
                     foreach ($form->getMessages() as $messageId => $message) {
@@ -236,6 +244,8 @@ class BusinessassociateController extends AbstractActionController
 
         } else {
             $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_BA, $id);
+
+            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open business associate edit page "' . $id . '"');
 
             if ((int) $id) {
                 if ($baObj->ba_contact_u_id) {
@@ -325,6 +335,8 @@ class BusinessassociateController extends AbstractActionController
 
         $baId = $this->getBusinessassociateTable()->setCallDate($id);
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Get shedule call for business associate "' . $id . '"');
+
         return $viewModel;
     }
 
@@ -375,6 +387,8 @@ class BusinessassociateController extends AbstractActionController
 
         $baId = $this->getBusinessassociateTable()->setInviteDate($id);
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Send invite email for business associate edit page "' . $id . '"');
+
         return $viewModel;
     }
 
@@ -419,7 +433,10 @@ class BusinessassociateController extends AbstractActionController
                 }
             }
 
+            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Question page for business associate "' . $post['baId'] . '"');
         }
+
+
         return $this->redirect()->toRoute('businessassociate', array('controller' => 'businessassociate', 'action' => 'edit', 'id' => $post['baId']));
     }
 
@@ -429,6 +446,8 @@ class BusinessassociateController extends AbstractActionController
 
         $this->getBusinessassociateTable()->deleteBusinessassociate($id);
         $this->flashMessenger()->addSuccessMessage('Ba has been deleted');
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete business associate "' . $id . '"');
 
         return $this->redirect()->toRoute('businessassociate', array('controller' => 'businessassociate', 'action' => 'list'));
     }
@@ -440,6 +459,8 @@ class BusinessassociateController extends AbstractActionController
         $this->getBusinessassociateTable()->unarchiveBusinessassociate($id);
         $this->flashMessenger()->addSuccessMessage('Ba has been unarchived');
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Unarchive business associate "' . $id . '"');
+
         return $this->redirect()->toRoute('businessassociate', array('controller' => 'businessassociate', 'action' => 'list'));
     }
 
@@ -450,6 +471,8 @@ class BusinessassociateController extends AbstractActionController
 
         $this->getBusinessassociateTable()->signoffBusinessassociate($id);
         $this->flashMessenger()->addSuccessMessage('Ba has been closed');
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Sign off business associate "' . $id . '"');
 
         return $this->redirect()->toRoute('businessassociate', array('controller' => 'businessassociate', 'action' => 'list'));
     }

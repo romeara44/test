@@ -132,6 +132,8 @@ class DashboardController extends AbstractActionController
             'usRoleId' => $identity['u_role_id']
         ));
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open client dashboard page');
+
         return $viewModel;
     }
 
@@ -163,6 +165,8 @@ class DashboardController extends AbstractActionController
             'logsUpcoming' => $logsUpcoming,
         ));
 
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open consultant dashboard page');
+
         return $viewModel;
     }
 
@@ -187,6 +191,8 @@ class DashboardController extends AbstractActionController
         $viewModel = new ViewModel(array(
             'logsActivities' => $logsActivities,
         ));
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open salesrep dashboard page');
 
         return $viewModel;
     }
@@ -238,6 +244,8 @@ class DashboardController extends AbstractActionController
             'rpReportInProgress' => $rpReportInProgress,
             'rpReportCompleted' => $rpReportCompleted,
         ));
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open admin dashboard page');
 
         return $viewModel;
     }
