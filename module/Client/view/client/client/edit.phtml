@@ -80,14 +80,15 @@ $form->setAttribute('method', 'post');
                     <input type="checkbox" name="is_primary_contact" id="primaryContact" class="checkbox" value="1" />
                     <label for="primaryContact" class="checkbox">Primary Contact</label>
                 <?php endif; ?>
-                
+                <?php if (!$uId || $userObj->u_role_id == 5): ?>
                     <span id="companyIdAdminWrap" <?php if(!(in_array($identity['u_role_id'], array(1, 2)) || ($clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $identity['u_id']))) :?>style="display:none"<?php endif; ?>>
                         <input type="checkbox" name="u_company_id_admin" <?php if($userObj->u_company_id_admin && $userObj->u_company_id_admin == $userObj->u_company_id):?>checked <?php endif; ?> id="companyIdAdmin" class="checkbox" value="<?php echo $userObj->u_company_id_admin ?>"
                         <?php if(!(in_array($identity['u_role_id'], array(1, 2)) || ($clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $identity['u_id']))) :?> disabled="true"<?php endif; ?> />
                         <label for="companyIdAdmin" class="checkbox">Company Admin</label>
                     </span>
-                
+                <?php endif; ?>
                 <input type="hidden" name="identity_u_role_id" id="identity_u_role_id" value="<?php echo $identity['u_role_id'] ?>" disabled="true" />
+                <input type="hidden" name="u_role_id" id="u_role_id" value="<?php echo $userObj ? $userObj->u_role_id :''?>" />
                 <input type="hidden" name="identity_u_id" id="identity_u_id" value="<?php echo $identity['u_id']?>" disabled="true" />
                 <input type="hidden" name="def_u_company_id" id="def_u_company_id" value="<?php echo $userObj->u_company_id ?>" disabled="true" />
                 <input type="hidden" name="def_u_company_id_admin" id="def_u_company_id_admin" value="<?php echo $userObj->u_company_id_admin ?>" disabled="true" />
