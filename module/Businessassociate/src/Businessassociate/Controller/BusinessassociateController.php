@@ -94,6 +94,15 @@ class BusinessassociateController extends AbstractActionController
         return $this->mailtemplateTable;
     }
 
+    public function getCompanyRolesTable()
+    {
+        if (!$this->companyRolesTable) {
+            $sm = $this->getServiceLocator();
+            $this->companyRolesTable = $sm->get('Client\Model\CompanyRolesTable');
+        }
+        return $this->companyRolesTable;
+    }
+
     public function getIdentity()
     {
         $authService = new \Zend\Authentication\AuthenticationService();
@@ -163,6 +172,7 @@ class BusinessassociateController extends AbstractActionController
         $baObj = null;
         $userObj = null;
         $notes = null;
+        $companyRolesMsg = '';
 
         if ((int) $id) {
             $baObj = $this->getBusinessassociateTable()->getBusinessassociate($id);
@@ -176,14 +186,17 @@ class BusinessassociateController extends AbstractActionController
         if ($request->isPost()) {
             if (!$noteform) {
                 $ba = new Businessassociate();
-
+                $post = $request->getPost();
                 $uId = is_object($baObj) ? $baObj->ba_contact_u_id : 0;
 
                 $form->setInputFilter($ba->getInputFilter($this->getServiceLocator(), $id, $uId));
                 $form->setData($request->getPost());
 
-                if ($form->isValid()) {
-                    $post = $request->getPost();
+                if(!$checkFillCompanyRoles = $this->getCompanyRolesTable()->checkFillCompanyRoles($post['ba_c_id'])) {
+                    $companyRolesMsg = 'Please, fill all roles for this company';
+                }
+
+                if ($form->isValid() && $checkFillCompanyRoles) {
 
                     $post['ba_consultant_u_id'] = $identity['u_id'];
 
@@ -288,7 +301,8 @@ class BusinessassociateController extends AbstractActionController
             'questions' => $questions,
             'signoff' => isset($baObj->ba_status) && ($baObj->ba_status == 1) ? 1 : 0,
             'signoffDate' => isset($baObj->ba_sign_off_date) ? $baObj->ba_sign_off_date : '',
-            'checkIfUserAnswered' => $checkIfUserAnswered
+            'checkIfUserAnswered' => $checkIfUserAnswered,
+            'companyRolesMsg' => $companyRolesMsg
         );
     }
 

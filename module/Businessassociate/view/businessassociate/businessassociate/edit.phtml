@@ -63,6 +63,12 @@ $form->setAttribute('method', 'post');
                     ?>
                 </p>
 
+                <p style="padding: 0;border-top: 0;">
+                    <?php if($companyRolesMsg) :?>
+                        <label style="padding:0" for="ba_c_id" generated="true" class="error"><?php echo $companyRolesMsg ?></label>
+                    <?php endif; ?>
+                </p>
+                
                 <p>
                     <?php
                     $fn = $form->get('ba_name');
