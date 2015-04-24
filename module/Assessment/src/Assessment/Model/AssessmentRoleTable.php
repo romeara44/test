@@ -49,15 +49,17 @@ class AssessmentRoleTable implements ServiceLocatorAwareInterface
         return $row->ar_name;
     }
 
-    public function getAssessmentsRoles($aType = 1)
+    public function getAssessmentsRoles($aType = 1, $interview = false)
     {
         $select = $this->tableGateway->getSql()->select();
         $select->where('ar_active = 1');
 
         if ($aType == 2) {
             $select->where('ar_id = 7');
-        } else {
+        } else if($interview) {
             $select->where('ar_id < 7');
+        } else {
+            $select->where('ar_id <> 7');
         }
         $select->order('ar_order ASC');
 

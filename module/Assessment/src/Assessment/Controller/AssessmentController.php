@@ -189,7 +189,7 @@ class AssessmentController extends AbstractActionController
 
         $aObj = $this->getAssessmentTable()->getAssessment($id);
         $addresses = $this->getAddressTable()->getAddresses($id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
-        $assessmentsRoles = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type);
+        $assessmentsRoles = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type, true);
 
         $viewParams['aObj'] = $aObj;
         $viewParams['addresses'] = $addresses;
@@ -627,7 +627,7 @@ class AssessmentController extends AbstractActionController
             $viewParams['abals'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentBusinessAssociateLocationTable')->getAbalsByLocation($id, $location);
             $viewParams['reportFiles'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationReportTable')->getReportsFiles($id, $location, 5);
         } elseif ($step == 5) {
-            $viewParams['assessmentsRoles'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type);
+            $viewParams['assessmentsRoles'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type, true);
             $viewParams['assessmentRole'] = $assessmentRole;
             $viewParams['locationName'] = $this->getAddressTable()->getLocationNameById($location);
             $viewParams['assessmentRoleName'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getRoleNameById($assessmentRole);
