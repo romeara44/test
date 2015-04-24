@@ -199,15 +199,14 @@ class CompanyTable implements ServiceLocatorAwareInterface
 
         $select = $this->tableGateway->getSql()->select();
         $select->where('c_active = 1');
-        //$select->where('c_consultant_u_id = ' . $identity['u_id']);
         if ($identity['u_role_id'] == \Admin\Model\User::ROLE_SALES_REP) {
             $select->where('c_owner_u_id = ' . $identity['u_id']);
         } elseif (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_CONSULTANT))) {
-            $select->where('c_owner_u_id = ' . $identity['u_id'] . ' OR c_consultant_u_id = ' . $identity['u_id']);
+            $select->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR c_consultant_u_id = ' . $identity['u_id'] . ')');
         } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
             $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
             $ids[] = $identity['u_id'];
-            $select->where('c_owner_u_id IN (' . implode(',', $ids) . ') OR c_consultant_u_id IN (' . implode(',', $ids) . ')');
+            $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR c_consultant_u_id IN (' . implode(',', $ids) . '))');
         } else if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
             $select->where('c_owner_u_id = ' . $identity['u_id']);
         }
