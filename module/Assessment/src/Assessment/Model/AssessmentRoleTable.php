@@ -57,7 +57,7 @@ class AssessmentRoleTable implements ServiceLocatorAwareInterface
         if ($aType == 2) {
             $select->where('ar_id = 7');
         } else {
-            $select->where('ar_id <> 7');
+            $select->where('ar_id < 7');
         }
         $select->order('ar_order ASC');
 
