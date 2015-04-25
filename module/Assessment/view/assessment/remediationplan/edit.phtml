@@ -171,10 +171,10 @@
                 <?php if ($this->writable): ?>
                     <a href="/remediationplan/deletetask/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>" class="i-delete" title="Delete"><i class="fa fa-trash-o"></i></a>
                 <?php endif; ?>
-                <?php if ($notesTaskAtt->count() || $notesTaskAssessments->count()): ?>
+                <?php if ($notesTaskAtt->count() || ($notesTaskAssessments && $notesTaskAssessments->count())): ?>
                     <a style="margin-left: 10px;" href="" class="attachments" rel="<?php echo $rpa->rpa_id ?>" title="View Attachments"><i class="fa fa-paperclip"></i></a>
                 <?php endif; ?>
-                <?php if ($notesTaskAttText->count() || $notesTaskAssessmentsText->count()): ?>
+                <?php if ($notesTaskAttText->count() || ($notesTaskAssessments && $notesTaskAssessmentsText->count())): ?>
                     <a style="margin-left: 10px;" href="" class="notes" rel="<?php echo $rpa->rpa_id ?>" title="View Notes"><i class="fa fa-file-text-o fa-1"></i></a>
                 <?php endif; ?>
             </td>

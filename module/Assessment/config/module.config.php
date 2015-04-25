@@ -70,6 +70,9 @@ return array(
         'template_map' => array(
             'remediationplan/pdfTemplate' => __DIR__ . '/../../../module/Assessment/view/assessment/remediationplan/pdfTemplate.phtml',
         ),
+        'strategies' => array (
+            'ViewJsonStrategy'
+        )
     ),
 
 );

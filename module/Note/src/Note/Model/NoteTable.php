@@ -64,6 +64,9 @@ class NoteTable implements ServiceLocatorAwareInterface
     {
         $rpa = $this->getServiceLocator()->get('Assessment\Model\RemediationplanactionTable')->getRemediationplanaction($rpaId);
         $rp = $this->getServiceLocator()->get('Assessment\Model\RemediationplanTable')->getRemediationplan($rpa->rpa_rp_id);
+        if(!$rp->rp_a_id) {
+            return array();
+        }
         $ids = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionTable')->getQuestionsIdsByCategory($rpa->rpa_aqc_id);
         $answersIds = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionAnswerTable')->getAnswersIdsByQuestion($rp->rp_a_id, $subItemId, $ids);
         $answersIds[] = 0;

@@ -766,7 +766,12 @@ h1.security_reminders {
 .agreeterms-label {
     width: 300px;
 }
-
+.importRemediationBtn {
+    margin: 0;
+}
+.remediationCsvFile {
+    margin-top: 10px;
+}
 /* Tabs */
 
 ul#tabs-nav {

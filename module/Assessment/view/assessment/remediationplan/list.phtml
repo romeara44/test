@@ -8,6 +8,10 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
 
 <div class="page-title">
     <h1 class="fleft">Remediation Plans</h1>
+
+    <?php if (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT)) || ($identity['u_role_id'] == \Admin\Model\User::ROLE_CLIENT && $identity['u_company_id_admin'])): ?>
+        <a href="/remediationplan/import" class="button"><i class="fa fa-clipboard"></i> Import Remediation Plan</a>
+    <?php endif; ?>
     <div class="cboth"></div>
 </div>
 

@@ -19,10 +19,13 @@ use Note\Model\Note;
 use Assessment\Model\Remediationplanaction;
 use Mail\Model\Mailtemplate;
 use Zend\Session\Container;
+use Assessment\Form\ImportForm;
+use Assessment\Model\Remediationplan;
 
 use Zend\Mail;
 use Zend\Mail\Transport\Smtp as SmtpTransport;
 use Zend\Mail\Transport\SmtpOptions;
+use Zend\View\Model\JsonModel;
 
 
 class RemediationplanController extends AbstractActionController
@@ -104,6 +107,15 @@ class RemediationplanController extends AbstractActionController
             $this->companyRolesTable = $sm->get('Client\Model\CompanyRolesTable');
         }
         return $this->companyRolesTable;
+    }
+
+    public function getUserTable()
+    {
+        if (!$this->userTable) {
+            $sm = $this->getServiceLocator();
+            $this->userTable = $sm->get('Admin\Model\UserTable');
+        }
+        return $this->userTable;
     }
 
     public function getIdentity()
@@ -199,20 +211,9 @@ class RemediationplanController extends AbstractActionController
                                     , 'rp_approver_u_id'     => $post['rp_approver_u_id']
                                     , 'rp_accepter_u_id'     => $post['rp_accepter_u_id']
                                     );
-                
-                foreach ($fieldValues as $key => $value) {
-                    $ymd1 = \DateTime::createFromFormat('m/d/Y', $value);
-                    if (is_object($ymd1)) {
-                        if ($ymd1->format('Y') > date("Y")) {
-                            $ymd1->setDate('2014', $ymd1->format('m'), $ymd1->format('d'));
-                        }
-                        $ymd1 = $ymd1->format('Y-m-d');
-                    } else {
-                        $ymd1 = '';
-                    }
 
-                    $fieldValues[$key] = $ymd1;
-                }
+                $fieldValues['rp_approved_date'] = \DateTime::createFromFormat('m/d/Y', $post['rp_approved_date'])->format('Y-m-d');
+                $fieldValues['rp_accepted_date'] = \DateTime::createFromFormat('m/d/Y', $post['rp_accepted_date'])->format('Y-m-d');
 
                 $this->getRemediationplanTable()->setFieldValues($id, $fieldValues);
 
@@ -904,44 +905,6 @@ class RemediationplanController extends AbstractActionController
 
         $mail->setSubject('test subject');
 
-        /*$options = new SmtpOptions();
-        $options
-            ->setHost('ip-173-201-177-160.ip.secureserver.net')
-            ->setConnectionClass('login')
-            ->setName('ip-173-201-177-160.ip.secureserver.net')
-            ->setConnectionConfig(array(
-                'auth' => 'login',
-                'username' => 'hipaa@hipaa.carosh.com',
-                'password' => 'y5c97tYv8pQm',
-                'ssl' => 'tls',
-                'port' => 465
-            ));*/
-
-        // GMAIL options
-        /*$options = new SmtpOptions();
-        $options
-            ->setHost('smtp.gmail.com')
-            ->setName('smtp.gmail.com')
-            ->setConnectionClass('login')
-            ->setConnectionConfig(array(
-                'auth' => 'login',
-                'username' => 'hipaacarosh@gmail.com',
-                'password' => 'qv#cgAwev',
-                'ssl' => 'tls',
-                'port' => 465
-            ));*/
-        // GMAIL options
-        /*$options = new SmtpOptions();
-        $options
-            ->setHost('smtp.mailgun.org')
-            ->setName('smtp.mailgun.org')
-            ->setConnectionClass('login')
-            ->setConnectionConfig(array(
-                'auth' => 'login',
-                'username' => 'postmaster@click5dev7.com',
-                'password' => '8uru08k1qpb7',
-            ));*/
-
         // GMAIL options
         $options = new SmtpOptions();
         $options
@@ -963,5 +926,91 @@ class RemediationplanController extends AbstractActionController
         die;
     }
 
+    public function importAction()
+    {
+        $identity = $this->getIdentity();
 
+        if(!(in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT))
+             || ($identity['u_role_id'] == \Admin\Model\User::ROLE_CLIENT && $identity['u_company_id_admin']))) {
+            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+        }
+
+        $request  = $this->getRequest();
+        $errorMsg = '';
+
+        $importForm = new ImportForm($this->getServiceLocator(), $request->getPost());
+
+        if ($request->isPost()) {
+
+            $remediationplan = new Remediationplan();
+
+            $importForm->prepare();
+            $importForm->setInputFilter($remediationplan->getInputFilter($this->getServiceLocator()));
+            $importForm->setData($request->getPost());
+
+            if ($importForm->isValid()) {
+
+                $post = $request->getPost();
+
+                $post['rp_remediation_date'] = \DateTime::createFromFormat('m/d/Y', $post['rp_remediation_date'])->format('Y-m-d');
+
+                $csvFile = $request->getFiles('files');
+
+                if($csvFile && $csvFile[0]['tmp_name']) {
+
+                    if (($handle = fopen($csvFile[0]['tmp_name'], "r")) !== FALSE) {
+                        $startRead = false;
+                        while (($data = fgetcsv($handle, 2000, ",")) !== FALSE) {
+                            if($startRead && $data[0] && array_search(trim($data[0]), Remediationplanaction::$levelsNames) !== false) {
+                                $rpa = new Remediationplanaction();
+                                $rpa->exchangeArray(
+                                                    array( 'rpa_risk_level'  => array_search(trim($data[0]), Remediationplanaction::$levelsNames),
+                                                           'rpa_threat'      => trim($data[1]),
+                                                           'rpa_status'      => array_search(trim($data[4]), Remediationplanaction::$statusesNames),
+                                                           'rpa_target_date' => trim($data[6]),
+                                                        )
+                                                    );
+                                $remediationPlanActions[] = $rpa;
+                            }
+                            if(isset($data[0]) && $data[0] == 'Risk level') {
+                                $startRead = true;
+                            }
+                        }
+                        fclose($handle);
+                    }
+
+                    $data['rp_c_id']             = $post['rp_c_id'];
+                    $data['rp_performed_u_id']   = $post['rp_performed_u_id'];
+                    $data['rp_remediation_date'] = $post['rp_remediation_date'];
+                    $data['actions']             = $remediationPlanActions;
+
+                    $rpId = $this->getRemediationplanTable()->importRemediationplan($data);
+
+                    if($rpId) {
+                        return $this->redirect()->toRoute('remediationplan', array('controller' => 'remediationplan', 'action' => 'edit', 'id' => $rpId));
+                    }
+                } else {
+                    $errorMsg = 'Please, load correct csv file';
+                }
+            }
+        }
+
+        $view = new ViewModel(array(
+            'errorMsg' => $errorMsg,
+            'form' => $importForm,
+        ));
+
+        return $view;
+    }
+
+
+    public function getCompanyUsersAction()
+    {
+        $cId = $this->params('id');
+
+        $users = $this->getUserTable()->getUsersByCompany($cId);
+        
+        return new JsonModel($users);
+
+    }
 }

@@ -1,6 +1,11 @@
 <?php
 namespace Assessment\Model;
 
+use Zend\InputFilter\Factory as InputFactory;
+use Zend\InputFilter\InputFilter;
+use Zend\InputFilter\InputFilterAwareInterface;
+use Zend\InputFilter\InputFilterInterface;
+
 class Remediationplan
 {
     const STATUS_NEW = 10;
@@ -98,4 +103,66 @@ class Remediationplan
         return get_object_vars($this);
     }
 
+    public function getInputFilter($sl)
+    {
+        if (!$this->inputFilter) {
+            $inputFilter = new InputFilter();
+            $factory     = new InputFactory();
+
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'rp_c_id',
+                'required' => true,
+                'filters'  => array(
+                    array('name' => 'Int'),
+                ),
+                'validators' => array(
+                    array(
+                        'name'    => 'NotEmpty',
+                        'options' => array(
+                            'integer',
+                        ),
+                    ),
+                ),
+            )));
+
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'rp_performed_u_id',
+                'required' => true,
+                'filters'  => array(
+                    array('name' => 'Int'),
+                ),
+                'validators' => array(
+                    array(
+                        'name'    => 'NotEmpty',
+                        'options' => array(
+                            'integer',
+                        ),
+                    ),
+                ),
+            )));
+
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'rp_remediation_date',
+                'required' => true,
+                'filters'  => array(
+                    array('name' => 'StripTags'),
+                    array('name' => 'StringTrim'),
+                ),
+                'validators' => array(
+                    array(
+                        'name'    => 'StringLength',
+                        'options' => array(
+                            'encoding' => 'UTF-8',
+                            'min'      => 1,
+                            'max'      => 20,
+                        ),
+                    ),
+                ),
+            )));
+
+            $this->inputFilter = $inputFilter;
+        }
+
+        return $this->inputFilter;
+    }
 }

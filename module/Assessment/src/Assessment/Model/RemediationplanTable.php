@@ -264,6 +264,47 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
         return $id;
     }
 
+    public function importRemediationplan($data)
+    {
+        $rpData = array(
+            'rp_c_id' => $data['rp_c_id'],
+            'rp_type' => 1,
+            'rp_performed_u_id' => $data['rp_performed_u_id'],
+            'rp_remediation_date' => $data['rp_remediation_date'],
+            'rp_status' => Remediationplan::STATUS_OPEN,
+        );
+
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
+        if (in_array($identity['u_role_id'], array(User::ROLE_CONSULTANT, User::ROLE_SENIOR_CONSULTANT))) {
+            $rpData['rp_consultant_u_id'] = $identity['u_id'];
+        } else if ($identity['u_role_id'] == User::ROLE_CLIENT) {
+            $data['rp_consultant_u_id'] = $identity['u_senior_consultant_u_id'];
+            // $data['rp_c_id'] = $identity['u_company_id'];
+        }
+
+        $data['rp_create_u_id'] = $identity['u_id'];
+
+        $this->tableGateway->insert($rpData);
+        $rpId = $this->tableGateway->lastInsertValue;
+
+        if($rpId) {
+            $this->tableGateway->update(array('rp_version_index' => $rpId), array('rp_id' => $rpId));
+            if(isset($data['actions']) && !empty($data['actions'])) {
+                $rpaDb = $this->getServiceLocator()->get('Assessment\Model\RemediationplanactionTable');
+                foreach ($data['actions'] as $action) {
+                    $action->rpa_threat = utf8_encode($action->rpa_threat);
+                    $action->rpa_rp_id = $rpId; 
+                    $rpaDb->saveRemediationplanaction($action);
+                }
+            }
+        }
+
+        return $rpId;
+    }
+
     public function reindexVersion($versionIndex)
     {
         $versionIndex  = (int) $versionIndex;
@@ -314,7 +355,7 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
     public function setFieldValues($id, $data)
     {
         $data['rp_id'] = $id;
-
+        
         if ($this->getRemediationplan($id)) {
             $this->tableGateway->update($data, array('rp_id' => $id));
         }
@@ -375,41 +416,6 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
         $rp = $this->getRemediationplan($id);
 
         $changed = false;
-        // check if some changes
-        // if ($rp->rp_initials != $post['rp_initials']) {
-        //     $changed = true;
-        // }
-        // if ($rp->rp_initials_approver != $post['rp_initials_approver']) {
-        //     $changed = true;
-        // }
-        // if ($rp->rp_performed_u_id != $post['rp_performed_u_id']) {
-        //     $changed = true;
-        // }
-        // if ($rp->rp_approver_u_id != $post['rp_approver_u_id']) {
-        //     $changed = true;
-        // }
-
-        // $ymd1 = \DateTime::createFromFormat('m/d/Y', $post['rp_incident_date']);
-        // if (is_object($ymd1)) {
-        //     if ($ymd1->format('Y') > date("Y")) {
-        //         $ymd1->setDate('2014', $ymd1->format('m'), $ymd1->format('d'));
-        //     }
-        //     if ($rp->rp_incident_date != $ymd1->format('Y-m-d')) {
-        //         $changed = true;
-        //     }
-        // }
-        // $ymd2 = \DateTime::createFromFormat('m/d/Y', $post['rp_remediation_date']);
-        // if (is_object($ymd2)) {
-        //     if ($ymd2->format('Y') > date("Y")) {
-        //         $ymd2->setDate('2014', $ymd2->format('m'), $ymd2->format('d'));
-        //     }
-        //     if ($rp->rp_remediation_date != $ymd2->format('Y-m-d')) {
-        //         $changed = true;
-        //     }
-        // }
-        // if (!$changed && !$signedOffCopy) {
-        //     return $id;
-        // }
         
         if(!$signedOffCopy) {
             // writable to false
