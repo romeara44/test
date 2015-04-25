@@ -92,7 +92,7 @@ class TraininglogTable implements ServiceLocatorAwareInterface
                 $trainer = $this->getServiceLocator()->get('Traininglog\Model\TrainerTable')->getTrainer($trainingLog->tl_trainer_id);
                 $resultSet[$key]->_trainer_name = $trainer->tr_name;
             } else {
-                $user = $this->getServiceLocator()->get('Traininglog\Model\UserTable')->getTrainer($trainingLog->tl_trainer_id);
+                $user = $this->getServiceLocator()->get('Traininglog\Model\TrainerTable')->getTrainer($trainingLog->tl_trainer_id);
                 $resultSet[$key]->_trainer_name = $user->u_firstname . ' ' . $user->u_lastname;
             }
         }
@@ -242,6 +242,20 @@ class TraininglogTable implements ServiceLocatorAwareInterface
         $data['tl_active'] = 0;
         $this->tableGateway->update($data, array('tl_id' => $id));
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_DELETE, \Application\Model\LogsTable::ITEM_TYPE_TL, $id);
+        return true;
+    }
+
+    public function deleteTraininglogsByCompanyId($cId, $value = 0)
+    {
+        $users = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUsersByCompany($cId);
+        
+        if($users) {
+            foreach ($users as $user) {
+                $data['tl_active'] = $value;
+                $this->tableGateway->update($data, array('tl_create_u_id' => $user->u_id));
+            }
+        }
+
         return true;
     }
 

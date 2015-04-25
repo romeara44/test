@@ -505,6 +505,8 @@ class CompanyTable implements ServiceLocatorAwareInterface
         $this->getServiceLocator()->get('Assessment\Model\AssessmentTable')->deleteAssessmentsByCompanyId($id);
         $this->getServiceLocator()->get('Breachlog\Model\BreachremediationplanTable')->deleteBreachremediationplansByCompanyId($id);
         $this->getServiceLocator()->get('Assessment\Model\RemediationplanTable')->deleteRemediationplansByCompanyId($id);
+        $this->getServiceLocator()->get('Traininglog\Model\TraininglogTable')->deleteTraininglogsByCompanyId($id);
+        $this->getServiceLocator()->get('Securityreminder\Model\SecurityreminderTable')->deleteSecurityremindersByCompanyId($id);
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_DELETE, \Application\Model\LogsTable::ITEM_TYPE_COMPANY, $id);
 
@@ -524,6 +526,8 @@ class CompanyTable implements ServiceLocatorAwareInterface
         $this->getServiceLocator()->get('Assessment\Model\AssessmentTable')->deleteAssessmentsByCompanyId($id, 1);
         $this->getServiceLocator()->get('Breachlog\Model\BreachremediationplanTable')->deleteBreachremediationplansByCompanyId($id, 1);
         $this->getServiceLocator()->get('Assessment\Model\RemediationplanTable')->deleteRemediationplansByCompanyId($id, 1);
+        $this->getServiceLocator()->get('Traininglog\Model\TraininglogTable')->deleteTraininglogsByCompanyId($id, 1);
+        $this->getServiceLocator()->get('Securityreminder\Model\SecurityreminderTable')->deleteSecurityremindersByCompanyId($id, 1);
 
         return true;
     }
