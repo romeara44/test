@@ -24,6 +24,7 @@ class AssessmentQuestion
     public $aqc_citation;
     public $aqc_specification;
     public $aqc_description;
+    public $aqc_policy;
 
     public $_options;
 
@@ -47,6 +48,7 @@ class AssessmentQuestion
         $this->aqc_citation     = (isset($data['aqc_citation'])) ? $data['aqc_citation'] : null;
         $this->aqc_specification     = (isset($data['aqc_specification'])) ? $data['aqc_specification'] : null;
         $this->aqc_description     = (isset($data['aqc_description'])) ? $data['aqc_description'] : null;
+        $this->aqc_policy     = (isset($data['aqc_policy'])) ? $data['aqc_policy'] : null;
 
         $this->_options     = (isset($data['_options'])) ? $data['_options'] : null;
     }

@@ -99,6 +99,7 @@ class AssessmentQuestionTable implements ServiceLocatorAwareInterface
                 $catDesc['aqc_citation'] = $rs->aqc_citation;
                 $catDesc['aqc_specification'] = $rs->aqc_specification;
                 $catDesc['aqc_description'] = $rs->aqc_description;
+                $catDesc['aqc_policy'] = $rs->aqc_policy;
 
                 if (!isset($qCats[$rs->aq_aqc_id]['cat'])) {
                     $catDesc['aqc_citation'] = str_replace('Â', '', $catDesc['aqc_citation']);

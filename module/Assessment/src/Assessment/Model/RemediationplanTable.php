@@ -282,7 +282,6 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
             $rpData['rp_consultant_u_id'] = $identity['u_id'];
         } else if ($identity['u_role_id'] == User::ROLE_CLIENT) {
             $data['rp_consultant_u_id'] = $identity['u_senior_consultant_u_id'];
-            // $data['rp_c_id'] = $identity['u_company_id'];
         }
 
         $data['rp_create_u_id'] = $identity['u_id'];
@@ -542,7 +541,7 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
 
         $resultSet = $this->tableGateway->selectWith($select)->current();
 
-        if($resultSet->_u_id) {
+        if($resultSet && $resultSet->_u_id) {
             if(!isset($result[$resultSet->_u_id])) {
                 $result[$resultSet->_u_id] = $resultSet;
                 $result[$resultSet->_u_id]->_ar_id = array();
