@@ -149,6 +149,20 @@ class SecurityreminderTable implements ServiceLocatorAwareInterface
         return true;
     }
 
+    public function deleteSecurityremindersByCompanyId($cId, $value = 0)
+    {
+        $users = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUsersByCompany($cId);
+        
+        if($users) {
+            foreach ($users as $user) {
+                $data['sr_active'] = $value;
+                $this->tableGateway->update($data, array('sr_create_u_id' => $user->u_id));
+            }
+        }
+
+        return true;
+    }
+
     public function unarchiveSecurityreminder($id)
     {
         $data['sr_id'] = $id;
