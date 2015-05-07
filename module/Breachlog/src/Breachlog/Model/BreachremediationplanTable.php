@@ -62,7 +62,7 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
             }
 
             $select->join(array('c' => 'companies'), 'brp_c_id = c_id', array('_client_name' => 'c_name'), 'left');
-            $select->join(array('u' => 'users'), 'brp_approver_u_id = u_id', array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)')), 'left');
+            $select->join(array('u' => 'users'), 'brp_approver_u_id = u.u_id', array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)')), 'left');
             ///////////////
 
             $order = $order ? $order : 'ASC';
@@ -136,6 +136,7 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         $select->join(array('u' => 'users'), 'brp_approver_u_id = u_id', array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)'), '_brp_incident_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(brp_incident_date, "%m/%d/%Y")'), '_brp_remediation_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(brp_remediation_date, "%m/%d/%Y")')), 'left');
         $select->join(array('u2' => 'users'), 'brp_consultant_u_id = u2.u_id', array('_consultant_name' => new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)')), 'left');
         $select->join(array('u3' => 'users'), 'brp_performed_u_id = u3.u_id', array('_performed_name' => new \Zend\Db\Sql\Expression('CONCAT(u3.u_firstname, " ", u3.u_lastname)')), 'left');
+        $select->join(array('u4' => 'users'), 'brp_approver_u_id = u4.u_id', array('_accepter_name' => new \Zend\Db\Sql\Expression('CONCAT(u4.u_firstname, " ", u4.u_lastname)')), 'left');
 
         $resultSet = $this->tableGateway->selectWith($select);
 
@@ -155,6 +156,7 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
             'brp_consultant_u_id' => $brp->brp_consultant_u_id,
             'brp_approver_u_id' => $brp->brp_approver_u_id,
             'brp_performed_u_id' => $brp->brp_performed_u_id,
+            'brp_accepter_u_id' => $brp->brp_accepter_u_id,
             'brp_parent_brp_id' => $brp->brp_parent_brp_id,
             'brp_version_index' => $brp->brp_version_index,
             'brp_initials' => $brp->brp_initials,

@@ -1,7 +1,9 @@
 
 
 <div class="page-title">
-    <h1 class="fleft">Remediation Plan for <?php echo (!$this->isPdf) ? '<br/>' : '' ?><?php echo $this->rpObj->_client_name ?></h1>
+    <h1 class="fleft">Remediation Plan for <?php echo (!$this->isPdf) ? '<br/>' : '' ?><?php echo $this->rpObj->_client_name ?>
+    <?php echo !$this->rpObj->rp_a_id ? ' <span class="remediationplan_imported_edit">(imported)</span>' : ''?>
+    </h1>
     <?php if (!$this->isPdf): ?>
         <a href="/remediationplan/edit/<?php echo $rpObj->rp_id ?>/type/pdf" class="button" title="Download as PDF"><i class="fa fa-download"></i> PDF</a>
         <a href="/remediationplan/edit/<?php echo $rpObj->rp_id ?>/type/csv" class="button" title="Download as CSV"><i class="fa fa-download"></i> CSV</a>
@@ -57,12 +59,16 @@
 <div class="col5"  style="float: left;">
     <p><strong>ASSESSMENT DATE:</strong><br />
         <?php if ($this->writable): ?>
+            <?php if($this->rpObj->rp_a_id): ?>
             <span id="toggle-edit-show-2">
                 <?php echo ($this->rpObj->rp_incident_date != '0000-00-00') ? $this->rpObj->_rp_incident_date_formatted : '' ?> &nbsp;<a href="" title="Edit"><i class="fa fa-pencil"></i></a>
             </span>
             <span id="toggle-edit-2">
                 <input type="text" id="rp_incident_date" readonly="readonly" class="w175" value="<?php echo ($this->rpObj->rp_incident_date != '0000-00-00') ? $this->rpObj->_rp_incident_date_formatted : '' ?>" />
             </span>
+        <?php else :?>
+            -
+        <?php endif;?>
         <?php else: ?>
             <?php echo ($this->rpObj->rp_incident_date != '0000-00-00') ? $this->rpObj->_rp_incident_date_formatted : '' ?>
         <?php endif; ?>
@@ -103,21 +109,21 @@
 
             <?php $classSort = ($order_by == 'assignee') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
-                <a href="<?php echo $this->url('remediationplan', array('action' => 'edit', 'id' => $this->id, 'page' => $page, 'order_by' => 'assignee', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'edit', 'id' => $this->id, 'order_by' => 'assignee', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
                     Assignee <i class="fa <?php echo $classSort ?>"></i>
                 </a>
             </th>
             
             <?php $classSort = ($order_by == 'approver') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
-                <a href="<?php echo $this->url('remediationplan', array('action' => 'edit', 'id' => $this->id, 'page' => $page, 'order_by' => 'approver', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'edit', 'id' => $this->id, 'order_by' => 'approver', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
                     Approver <i class="fa <?php echo $classSort ?>"></i>
                 </a>
             </th>
 
             <?php $classSort = ($order_by == 'date') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
-                <a href="<?php echo $this->url('remediationplan', array('action' => 'edit', 'id' => $this->id, 'page' => $page, 'order_by' => 'date', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'edit', 'id' => $this->id, 'order_by' => 'date', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
                     Target Date <i class="fa <?php echo $classSort ?>"></i>
                 </a>
             </th>

@@ -73,14 +73,6 @@ class TaskForm extends Form
             ),
         ));
 
-        $userTable = $sl->get('Admin\Model\UserTable');
-        $contacts = array();
-        $contacts[''] = 'Please Select';
-        $contacts[0] = '---';
-        foreach ($userTable->getUsersByRole(array(\Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT)) as $key => $r) {
-            $contacts[$key] = $r;
-        }
-
         $this->add(array(
             'name' => 'brpa_approver_u_id',
             'type' => 'Zend\Form\Element\Select',

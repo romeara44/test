@@ -772,6 +772,14 @@ h1.security_reminders {
 .remediationCsvFile {
     margin-top: 10px;
 }
+.remediationplan_imported_edit {
+  font-size: 35px;
+  font-style: italic;
+}
+.remediationplan_imported_list {
+  font-size: 14px;
+  font-style: italic;
+}
 /* Tabs */
 
 ul#tabs-nav {

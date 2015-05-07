@@ -57,6 +57,9 @@ return array(
             'breachlog' => __DIR__ . '/../view',
             'breachremediationplan' => __DIR__ . '/../view',
         ),
+        'template_map' => array(
+            'breachremediationplan/pdfTemplate' => __DIR__ . '/../../../module/Breachlog/view/breachlog/breachremediationplan/edit.phtml',
+        ),
         'strategies' => array (
             'ViewJsonStrategy'
         )

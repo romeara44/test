@@ -391,6 +391,7 @@ class RemediationplanController extends AbstractActionController
 
     public function _generateCsv($notes, $rpObj, $actions)
     {
+        ob_start();
         $csvList[] = 'sep=,';
         $csvList[] = 'Remediation Plan for ' . $rpObj->_client_name;
         $csvList[] = '';
@@ -937,6 +938,7 @@ class RemediationplanController extends AbstractActionController
 
         $request  = $this->getRequest();
         $errorMsg = '';
+        $rpId     = null;
 
         $importForm = new ImportForm($this->getServiceLocator(), $request->getPost());
 
@@ -960,31 +962,71 @@ class RemediationplanController extends AbstractActionController
 
                     if (($handle = fopen($csvFile[0]['tmp_name'], "r")) !== FALSE) {
                         $startRead = false;
+                        $columns   = array();
+
                         while (($data = fgetcsv($handle, 2000, ",")) !== FALSE) {
                             if($startRead && $data[0] && array_search(trim($data[0]), Remediationplanaction::$levelsNames) !== false) {
                                 $rpa = new Remediationplanaction();
                                 $rpa->exchangeArray(
-                                                    array( 'rpa_risk_level'  => array_search(trim($data[0]), Remediationplanaction::$levelsNames),
-                                                           'rpa_threat'      => trim($data[1]),
-                                                           'rpa_status'      => array_search(trim($data[4]), Remediationplanaction::$statusesNames),
-                                                           'rpa_target_date' => trim($data[6]),
+                                                    array( 'rpa_risk_level'  => array_search(trim($data[$columns['rik_level']]), Remediationplanaction::$levelsNames),
+                                                           'rpa_threat'      => trim($data[$columns['threat']]),
+                                                           'rpa_action_plan' => trim($data[$columns['action_plan']]),
+                                                           'rpa_policy'      => trim($data[$columns['policy']]),
+                                                           'rpa_status'      => array_search(trim($data[$columns['status']]), Remediationplanaction::$statusesNames),
+                                                           'rpa_target_date' => trim($data[$columns['target_date']]),
                                                         )
                                                     );
                                 $remediationPlanActions[] = $rpa;
                             }
-                            if(isset($data[0]) && $data[0] == 'Risk level') {
-                                $startRead = true;
+                            if(!$startRead && isset($data[0])) {
+                                $findedFilds = 0;
+                                foreach ($data as $key => $item) {
+                                    switch(trim($item)) {
+                                        case 'Risk level':
+                                            $columns['rik_level'] = $key;
+                                            ++$findedFilds;
+                                            break;
+                                        case 'Threat':
+                                            $columns['threat'] = $key;
+                                            ++$findedFilds;
+                                            break;
+                                        case 'Action Plan':
+                                            $columns['action_plan'] = $key;
+                                            ++$findedFilds;
+                                            break;
+                                        case 'Status':
+                                            $columns['status'] = $key;
+                                            ++$findedFilds;
+                                            break;
+                                        case 'Target Date':
+                                            $columns['target_date'] = $key;
+                                            ++$findedFilds;
+                                            break;
+                                        case 'Policy number':
+                                            $columns['policy'] = $key;
+                                            ++$findedFilds;
+                                            break;
+                                    }
+                                }
+
+                                if($findedFilds == 6) {
+                                    $startRead = true;
+                                }
                             }
                         }
                         fclose($handle);
                     }
 
-                    $data['rp_c_id']             = $post['rp_c_id'];
-                    $data['rp_performed_u_id']   = $post['rp_performed_u_id'];
-                    $data['rp_remediation_date'] = $post['rp_remediation_date'];
-                    $data['actions']             = $remediationPlanActions;
+                    if($startRead) {
+                        $data['rp_c_id']             = $post['rp_c_id'];
+                        $data['rp_performed_u_id']   = $post['rp_performed_u_id'];
+                        $data['rp_remediation_date'] = $post['rp_remediation_date'];
+                        $data['actions']             = $remediationPlanActions;
 
-                    $rpId = $this->getRemediationplanTable()->importRemediationplan($data);
+                        $rpId = $this->getRemediationplanTable()->importRemediationplan($data);
+                    } else {
+                        $errorMsg = 'Please, load correct csv file';
+                    }
 
                     if($rpId) {
                         return $this->redirect()->toRoute('remediationplan', array('controller' => 'remediationplan', 'action' => 'edit', 'id' => $rpId));
@@ -997,7 +1039,7 @@ class RemediationplanController extends AbstractActionController
 
         $view = new ViewModel(array(
             'errorMsg' => $errorMsg,
-            'form' => $importForm,
+            'form'     => $importForm,
         ));
 
         return $view;

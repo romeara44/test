@@ -19,6 +19,7 @@ class Breachremediationplan
     public $brp_consultant_u_id;
     public $brp_performed_u_id;
     public $brp_approver_u_id;
+    public $brp_accepter_u_id;
     public $brp_create_u_id;
     public $brp_update_u_id;
     public $brp_parent_brp_id;
@@ -35,6 +36,7 @@ class Breachremediationplan
     public $brp_create_date;
     public $_client_name;
     public $_approver_name;
+    public $_accepter_name;
     public $_consultant_name;
     public $_performed_name;
 
@@ -51,6 +53,7 @@ class Breachremediationplan
         $this->brp_consultant_u_id     = (isset($data['brp_consultant_u_id'])) ? $data['brp_consultant_u_id'] : null;
         $this->brp_performed_u_id     = (isset($data['brp_performed_u_id'])) ? $data['brp_performed_u_id'] : null;
         $this->brp_approver_u_id     = (isset($data['brp_approver_u_id'])) ? $data['brp_approver_u_id'] : null;
+        $this->brp_accepter_u_id     = (isset($data['brp_accepter_u_id'])) ? $data['brp_accepter_u_id'] : null;
         $this->brp_create_u_id     = (isset($data['brp_create_u_id'])) ? $data['brp_create_u_id'] : null;
         $this->brp_update_u_id     = (isset($data['brp_update_u_id'])) ? $data['brp_update_u_id'] : null;
         $this->brp_parent_brp_id     = (isset($data['brp_parent_brp_id'])) ? $data['brp_parent_brp_id'] : null;
@@ -64,6 +67,7 @@ class Breachremediationplan
         $this->brp_create_date     = (isset($data['brp_create_date'])) ? $data['brp_create_date'] : null;
         $this->_client_name     = (isset($data['_client_name'])) ? $data['_client_name'] : null;
         $this->_approver_name     = (isset($data['_approver_name'])) ? $data['_approver_name'] : null;
+        $this->_accepter_name     = (isset($data['_accepter_name'])) ? $data['_accepter_name'] : null;
         $this->_consultant_name     = (isset($data['_consultant_name'])) ? $data['_consultant_name'] : null;
         $this->_performed_name     = (isset($data['_performed_name'])) ? $data['_performed_name'] : null;
         $this->_brp_incident_date_formatted     = (isset($data['_brp_incident_date_formatted'])) ? $data['_brp_incident_date_formatted'] : null;

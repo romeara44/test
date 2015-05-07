@@ -240,14 +240,22 @@
 
     <div class="cboth"></div>
 
-    <p style="border: 0;"><strong>Reviewed and approved by <?php echo $this->brpObj->_approver_name ?><!-- on March 10th, 2014 --></strong></p>
-    <?php if ($this->writable): ?>
+    <?php if ($this->writable && !$this->isPdf): ?>
+        <p style="border: 0;"><label style="width:195px"><strong>Reviewed and approved by </strong></label>
+            <select name="brp_approver_u_id" id="brp_approver_u_id" id="" class="w175 valid_input form-control required">
+                <option value="">Please Select</option>
+                <option value="">---</option>
+                <?php foreach ($this->approverAccepter as $cId => $contact): ?>
+                    <option <?php echo ($cId == $this->brpObj->brp_approver_u_id) ? ' SELECTED ' : '' ?> value="<?php echo $cId ?>"><?php echo $contact ?></option>
+                <?php endforeach; ?>
+            </select>
+        </p>
         <p style="border: 0;">
             <label>Initials</label>
-            <input type="text" name="brp_initials_approver" id="brp_initials_approver" value="<?php echo $this->brpObj->brp_initials_approver ?>" />
-            <ul style="display: none" id="brp_initials_approver_val"><li>Value is required and can't be empty</li></ul>
+            <input type="text" name="brp_initials_approver" class="valid_input form-control required" id="brp_initials_approver" value="<?php echo $this->brpObj->brp_initials_approver ?>" />
         </p>
     <?php else: ?>
+        <p style="border: 0;"><strong>Reviewed and approved by <?php echo $this->brpObj->_approver_name?></strong></p>
         <p style="border: 0;">
             <label>Initials: <?php echo $this->brpObj->brp_initials_approver ?></label>
         </p>
@@ -255,13 +263,22 @@
 
     <div class="cboth"></div>
 
-    <p style="border: 0;"><strong>Agreed to and accepted by <?php echo $this->brpObj->_client_name ?><!-- on March 10th, 2014 --></strong></p>
-    <?php if ($this->writable): ?>
+    <?php if ($this->writable && !$this->isPdf): ?>
+        <p style="border: 0;"><label style="width:195px"><strong>Agreed to and accepted by</strong></label>
+            <select name="brp_accepter_u_id" id="brp_accepter_u_id" id="" class="w175 valid_input form-control required">
+                <option value="">Please Select</option>
+                <option value="">---</option>
+                <?php foreach ($this->approverAccepter as $cId => $contact): ?>
+                    <option <?php echo ($cId == $this->brpObj->brp_accepter_u_id) ? ' SELECTED ' : '' ?> value="<?php echo $cId ?>"><?php echo $contact ?></option>
+                <?php endforeach; ?>
+            </select>
+        </p>
         <p style="border: 0;">
             <label>Initials</label>
-            <input type="text" name="brp_initials" id="" value="<?php echo $this->brpObj->brp_initials ?>" />
+            <input type="text" name="brp_initials" id="" class="valid_input form-control required" value="<?php echo $this->brpObj->brp_initials ?>" />
         </p>
     <?php else: ?>
+        <p style="border: 0;"><strong>Agreed to and accepted by <?php echo $this->brpObj->_accepter_name?></strong></p>
         <p style="border: 0;">
             <label>Initials: <?php echo $this->brpObj->brp_initials ?></label>
         </p>

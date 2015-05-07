@@ -172,6 +172,7 @@ class BreachremediationplanController extends AbstractActionController
 
                 $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_performed_u_id', $post['brp_performed_u_id']);
                 $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_approver_u_id', $post['brp_approver_u_id']);
+                $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_accepter_u_id', $post['brp_accepter_u_id']);
 
                 if (!$post['signedoff']) {
                     $ymd1 = \DateTime::createFromFormat('m/d/Y', $post['brp_incident_date']);
@@ -238,7 +239,6 @@ class BreachremediationplanController extends AbstractActionController
             $contacts[$key] = $r;
         }
 
-        $userTable = $this->getServiceLocator()->get('Admin\Model\UserTable');
         $contactsApr = array();
         foreach ($userTable->getUsersByRole(array(\Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT)) as $key => $r) {
             $contactsApr[$key] = $r;
@@ -254,27 +254,19 @@ class BreachremediationplanController extends AbstractActionController
             'noteTable' => $noteTable,
             'isAdmin' => $identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN ? true : false,
             'contacts' => $contacts,
-            'contactsApr' => $contactsApr
+            'contactsApr' => $contactsApr,
+            'approverAccepter' => $userTable->getContactsByCompanyId($brpObj->brp_c_id),
         ));
 
         if ($type == 'pdf') {
-            //error_reporting(255);
-            //ini_set('display_errors', 1);
-            $domLibPath = ($_SERVER['SERVER_ADDR'] == '127.0.0.1') ? $_SERVER['DOCUMENT_ROOT'] . '/../vendor' : $_SERVER['DOCUMENT_ROOT'] . '/vendor';
+            $domLibPath =  $_SERVER['DOCUMENT_ROOT'] . '/../vendor';
 
             $domLibPath = $domLibPath . "/dompdf/dompdf_config.inc.php";
-
             require_once $domLibPath;
 
             $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Get pdf for breachlog plan "' . $id . '"');
 
-            $renderer = new PhpRenderer();
-
-            $map = new Resolver\TemplateMapResolver(array(
-                'breachremediationplan/pdftemplate' =>  ($_SERVER['SERVER_ADDR'] == '127.0.0.1') ? $_SERVER['DOCUMENT_ROOT'] . '/../module/Breachlog/view/breachlog/breachremediationplan/edit.phtml' : $_SERVER['DOCUMENT_ROOT'] . '/module/Breachlog/view/breachlog/breachremediationplan/edit.phtml',
-            ));
-
-            $renderer->setResolver($map);
+            $renderer = $this->getServiceLocator()->get('Zend\View\Renderer\RendererInterface');
 
             $model = new ViewModel(array(
                 'id' => $id,
@@ -286,18 +278,21 @@ class BreachremediationplanController extends AbstractActionController
                 'noteTable' => $noteTable,
                 'isPdf' => true
             ));
-            $model->setTemplate('breachremediationplan/pdftemplate');
+            $model->setTemplate('breachremediationplan/pdfTemplate');
 
             $html = $renderer->render($model);
+
+            $html = str_replace('§', '&#167;', $html);
 
             set_time_limit(300);
             ini_set('memory_limit', '-1');
 
-            $dompdf = new \DOMPDF();
-            $dompdf->load_html($html);
-            $dompdf->set_paper( 'letter' , 'portrait' );
-            $dompdf->render();
-            $dompdf->stream('breachremediationplan_ ' . date('Y_m_d_h_i_s', time()) . '.pdf');
+            require_once './vendor/mylib/library/mpdf60/mpdf.php';
+
+            $mpdf = new \mPDF('utf-8', 'A4-L'); 
+  
+            $mpdf->WriteHTML($html);
+            $mpdf->Output('breachremediationplan_ ' . date('Y_m_d_h_i_s', time()) . '.pdf', 'D');
 
             exit();
         } elseif ($type == 'csv') {
@@ -337,6 +332,7 @@ class BreachremediationplanController extends AbstractActionController
 
     public function _generateCsv($notes, $brpObj, $actions)
     {
+        ob_start();
         $csvList[] = 'sep=,';
         $csvList[] = 'Breach Remediation Plan for ' . $brpObj->_client_name;
         $csvList[] = '';
@@ -410,14 +406,14 @@ class BreachremediationplanController extends AbstractActionController
         $csvContent = '';
         foreach ($csvList as $row) {
             if (is_array($row)) {
-                $csvContent .= implode(',', $row) . "\n";
+                $csvContent .= '"' . implode('","', $row) . '"' . "\n";
             } else {
                 $csvContent .= $row . "\n";
             }
         }
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Get csv for breachlog plan "' . $brpObj->brp_id . '"');
-
+// print_r($csvContent);exit;
         header('Content-Description: File Transfer');
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="breachremediationplan_ ' . date('Y_m_d_h_i_s', time()) . '.csv"');

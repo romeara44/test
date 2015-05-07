@@ -118,11 +118,11 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
             <tr>
                 <td><?php echo $rowId ?><?php echo $postFix ?></td>
                 <?php if (!$isClientRole): ?>
-                    <td class="<?php echo $classBold ?>" style="padding-left: <?php echo $paddingVersion ?>px"><?php if ($isVersion): ?><i class="fa fa-code-fork"></i> &nbsp; <?php endif ?><a href="/remediationplan/edit/<?php echo $rp->rp_id ?>"><?php echo stripslashes($rp->_client_name) ?></a></td>
+                    <td class="<?php echo $classBold ?>" style="padding-left: <?php echo $paddingVersion ?>px"><?php if ($isVersion): ?><i class="fa fa-code-fork"></i> &nbsp; <?php endif ?><a href="/remediationplan/edit/<?php echo $rp->rp_id ?>"><?php echo stripslashes($rp->_client_name) ?><?php echo !$rp->rp_a_id ? ' <span class="remediationplan_imported_list">(imported)</span>' : ''?></a></td>
                 <?php endif; ?>
                 <td class="<?php echo $classBold ?>"><?php echo \Assessment\Model\Remediationplan::$statusesNames[$rp->rp_status]  ?></td>
                 <td class="<?php echo $classBold ?>"><?php echo \Assessment\Model\Assessment::$typesNames[$rp->rp_type] ?></td>
-                <td class="<?php echo $classBold ?>"><?php echo ($rp->rp_incident_date != '0000-00-00') ? $this->formatDateA($rp->rp_incident_date) : '' ?></td>
+                <td class="<?php echo $classBold ?>"><?php echo $rp->rp_a_id ? (($rp->rp_incident_date != '0000-00-00') ? $this->formatDateA($rp->rp_incident_date) : '') : '-'?></td>
                 <td style="white-space: nowrap;" class="aright <?php echo $classBold ?>">
                     <a class="<?php echo $classBold ?>" href="/remediationplan/edit/<?php echo $rp->rp_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
                     <?php if (!$isClientRole): ?>
