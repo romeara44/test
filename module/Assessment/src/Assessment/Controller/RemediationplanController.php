@@ -936,13 +936,16 @@ class RemediationplanController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
 
-        $request  = $this->getRequest();
-        $errorMsg = '';
-        $rpId     = null;
+        $request         = $this->getRequest();
+        $errorMsg        = '';
+        $companyRolesMsg = '';
+        $rpId            = null;
 
         $importForm = new ImportForm($this->getServiceLocator(), $request->getPost());
 
         if ($request->isPost()) {
+
+            $post = $request->getPost();
 
             $remediationplan = new Remediationplan();
 
@@ -950,9 +953,11 @@ class RemediationplanController extends AbstractActionController
             $importForm->setInputFilter($remediationplan->getInputFilter($this->getServiceLocator()));
             $importForm->setData($request->getPost());
 
-            if ($importForm->isValid()) {
+            if(!$checkFillCompanyRoles = $this->getCompanyRolesTable()->checkFillCompanyRoles($post['rp_c_id'])) {
+               $companyRolesMsg = 'Please, fill all roles for this company';
+            }
 
-                $post = $request->getPost();
+            if ($importForm->isValid() && $checkFillCompanyRoles) {
 
                 $post['rp_remediation_date'] = \DateTime::createFromFormat('m/d/Y', $post['rp_remediation_date'])->format('Y-m-d');
 
@@ -1038,8 +1043,9 @@ class RemediationplanController extends AbstractActionController
         }
 
         $view = new ViewModel(array(
-            'errorMsg' => $errorMsg,
-            'form'     => $importForm,
+            'errorMsg'        => $errorMsg,
+            'companyRolesMsg' => $companyRolesMsg,
+            'form'            => $importForm,
         ));
 
         return $view;
