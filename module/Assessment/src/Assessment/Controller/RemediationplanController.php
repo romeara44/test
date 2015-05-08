@@ -409,6 +409,7 @@ class RemediationplanController extends AbstractActionController
             'Policy number',
             'Status',
             'Assignee',
+            'Approver',
             'Target Date',
         );
         $csvList[] = '';
@@ -428,6 +429,7 @@ class RemediationplanController extends AbstractActionController
                 $rpa->rpa_policy,
                 \Assessment\Model\Remediationplanaction::$statusesNames[$rpa->rpa_status],
                 $rpa->_contact_name,
+                $rpa->_approver_name,
                 ($rpa->rpa_target_date != '0000-00-00') ? substr($rpa->rpa_target_date, 0, 10) : '',
             );
 
@@ -973,12 +975,14 @@ class RemediationplanController extends AbstractActionController
                             if($startRead && $data[0] && array_search(trim($data[0]), Remediationplanaction::$levelsNames) !== false) {
                                 $rpa = new Remediationplanaction();
                                 $rpa->exchangeArray(
-                                                    array( 'rpa_risk_level'  => array_search(trim($data[$columns['rik_level']]), Remediationplanaction::$levelsNames),
-                                                           'rpa_threat'      => trim($data[$columns['threat']]),
-                                                           'rpa_action_plan' => trim($data[$columns['action_plan']]),
-                                                           'rpa_policy'      => trim($data[$columns['policy']]),
-                                                           'rpa_status'      => array_search(trim($data[$columns['status']]), Remediationplanaction::$statusesNames),
-                                                           'rpa_target_date' => trim($data[$columns['target_date']]),
+                                                    array( 'rpa_risk_level'    => array_search(trim($data[$columns['rik_level']]), Remediationplanaction::$levelsNames),
+                                                           'rpa_threat'        => trim($data[$columns['threat']]),
+                                                           'rpa_action_plan'   => trim($data[$columns['action_plan']]),
+                                                           'rpa_policy'        => trim($data[$columns['policy']]),
+                                                           'rpa_contact_u_id'  => trim($post['rp_accepter_u_id']),
+                                                           'rpa_approver_u_id' => trim($post['rp_approver_u_id']),
+                                                           'rpa_status'        => array_search(trim($data[$columns['status']]), Remediationplanaction::$statusesNames),
+                                                           'rpa_target_date'   => trim($data[$columns['target_date']]),
                                                         )
                                                     );
                                 $remediationPlanActions[] = $rpa;

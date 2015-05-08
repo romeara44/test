@@ -30,6 +30,24 @@
         </p>
 
         <p>
+            <?php 
+                $fn = $form->get('rp_accepter_u_id');
+                echo $this->formLabel($fn);
+                echo $this->formSelect($fn->setAttributes(array('id' => 'rp_accepter_u_id', 'class'=>'form-control required')));
+                echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
+            <?php 
+                $fn = $form->get('rp_approver_u_id');
+                echo $this->formLabel($fn);
+                echo $this->formSelect($fn->setAttributes(array('id' => 'rp_approver_u_id', 'class'=>'form-control required')));
+                echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
             <?php
                 $fn = $form->get('rp_remediation_date');
                 echo $this->formLabel($fn);
@@ -101,14 +119,10 @@ $(document).ready(function() {
                     $.each(data, function(index, value) {
                         html += '<option value="' + value.u_id + '">' + value.u_firstname + ' ' + value.u_lastname + '</option>';
                     });
-                    $('#rp_performed_u_id').html(html);
+                    $('#rp_performed_u_id, #rp_accepter_u_id, #rp_approver_u_id').html(html);
                 }
             });
         }
-    }
-
-    if($("#rp_performed_u_id option:selected").val() == '') {
-        // getCompanyUsers();
     }
 });
 </script>

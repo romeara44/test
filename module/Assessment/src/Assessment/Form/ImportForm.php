@@ -43,6 +43,24 @@ class ImportForm extends Form
                 'value_options' => $clients
             ),
         ));
+        
+        $this->add(array(
+            'name' => 'rp_accepter_u_id',
+            'type' => 'Zend\Form\Element\Select',
+            'options' => array(
+                'label' => 'Assignee',
+                'value_options' => $clients
+            ),
+        ));
+
+        $this->add(array(
+            'name' => 'rp_approver_u_id',
+            'type' => 'Zend\Form\Element\Select',
+            'options' => array(
+                'label' => 'Approver',
+                'value_options' => $clients
+            ),
+        ));
 
         $this->add(array(
             'name' => 'rp_remediation_date',
