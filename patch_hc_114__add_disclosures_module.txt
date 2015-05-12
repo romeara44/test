@@ -1,0 +1,31 @@
+CREATE TABLE IF NOT EXISTS `disclosure_requests` (
+  `dr_id` int(11) NOT NULL AUTO_INCREMENT,
+  `dr_reference_number` varchar(50) NOT NULL,
+  `dr_requested_by` varchar(255) NOT NULL,
+  `dr_date_requested` date NOT NULL,
+  `dr_date_range_requested` date NOT NULL,
+  `dr_staff_member` varchar(255) NOT NULL,
+  `dr_completing_request` varchar(255) NOT NULL,
+  `dr_date_provided` date NOT NULL,
+  `dr_active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`dr_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `disclosure_tracking_logs` (
+  `dtl_id` int(11) NOT NULL AUTO_INCREMENT,
+  `dtl_reference_number` varchar(50) NOT NULL,
+  `dtl_patient_name` varchar(255) NOT NULL,
+  `dtl_medical_record_number` varchar(50) NOT NULL,
+  `dtl_date_received` date NOT NULL,
+  `dtl_name_of_requestor` varchar(255) NOT NULL,
+  `dtl_address` varchar(255) NOT NULL,
+  `dtl_auth_type` varchar(50) NOT NULL,
+  `dtl_purpose_of_disclosure` varchar(255) NOT NULL,
+  `dtl_phi_Information_disclosed` varchar(255) NOT NULL,
+  `dtl_date_disclosed` date NOT NULL,
+  `dtl_disclosed_by` varchar(255) NOT NULL,
+  `dtl_extension_notification` text NOT NULL,
+  `dtl_copy_of_request` varchar(255) NOT NULL,
+  `dtl_active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`dtl_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;

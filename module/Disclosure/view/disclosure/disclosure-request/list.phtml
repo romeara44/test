@@ -1,0 +1,111 @@
+<?php
+$urlOrder = $order == 'ASC' ? 'DESC' : 'ASC';
+$authService = new \Zend\Authentication\AuthenticationService();
+$authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+$identity = $authService->getIdentity();
+?>
+
+<div class="page-title">
+    <h1 class="fleft" style="width: 220px">Disclosures Requests</h1>
+    <a href="<?php echo $this->url('disclosurerequest', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 0)); ?>" class="label <?php echo $roleFilter == 0 ? ' selected ' : '' ?>">All</a>
+    <a href="<?php echo $this->url('disclosurerequest', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 1)); ?>" class="label <?php echo $roleFilter == 1 ? ' selected ' : '' ?>">Active</a>
+    <a href="<?php echo $this->url('disclosurerequest', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 2)); ?>" class="label <?php echo $roleFilter == 2 ? ' selected ' : '' ?>">Archived</a>
+    <form id="list_search_form" method="GET" onsubmit="encodeInput(this)" action="<?php echo $this->url('disclosurerequest', array('action' => 'list', 'roleFilter' => $roleFilter)); ?>">
+        <a href="javascript:" onclick="$('#list_search_form').submit()" id="list_search-button"><i class="fa fa-search"></i></a>
+        <input type="text" name="search" id="list_search" placeholder="Search" value="<?php echo $search?>">
+    </form>
+    <a href="/disclosurerequest/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Disclosure Request</a>
+    <div class="cboth"></div>
+</div>
+
+<p></p>
+
+<table class="disclosurerequests" cellpadding="0" cellspacing="0">
+    <thead>
+        <tr>
+            <?php $classSort = ($order_by == 'reference_number') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('disclosurerequest', array('action' => 'list', 'page' => $page, 'order_by' => 'reference_number', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Reference Number <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+            <?php $classSort = ($order_by == 'requested_by') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('disclosurerequest', array('action' => 'list', 'page' => $page, 'requested_by' => 'type', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Requested By <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'date_requested') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('disclosurerequest', array('action' => 'list', 'page' => $page, 'order_by' => 'date_requested', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Date Requested <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'date_range_requested') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('disclosurerequest', array('action' => 'list', 'page' => $page, 'order_by' => 'date_range_requested', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Date Range Requested <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'staff_member') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('disclosurerequest', array('action' => 'list', 'page' => $page, 'order_by' => 'staff_member', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Staff Member <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->paginator as $dr): ?>
+            <tr>
+                <td><?php echo $dr->dr_reference_number ?></td>
+                <td><?php echo $dr->dr_requested_by ?></td>
+                <td><?php echo ($dr->dr_date_requested != '0000-00-00') ? $this->formatDateA($dr->dr_date_requested) : '' ?></td>
+                <td><?php echo ($dr->dr_date_range_requested != '0000-00-00') ? $this->formatDateA($dr->dr_date_range_requested) : '-' ?></td>
+                <td><?php echo $dr->dr_staff_member ?></td>
+                <td style="white-space: nowrap;" class="aright">
+                    <a href="/disclosurerequest/edit/<?php echo $dr->dr_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+                    <?php if ($dr->dr_active == 0): ?>
+                        <a href="/disclosurerequest/unarchive/<?php echo $dr->dr_id  ?>" class="">Unarchive</a>
+                    <?php else: ?>
+                        <?php $deleteUrl = '/disclosurerequest/delete/' . $dr->dr_id; ?>
+                        <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
+                    <?php endif; ?>
+                </td>
+            </tr>
+
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+<?php echo $this->paginationControl(
+    $this->paginator,
+    'sliding',
+    array('partial/paginator.phtml', 'DisclosureRequest'),
+    array('route' => 'list', 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'roleFilter' => $roleFilter, 'role' => 1, 'controller' => 'disclosurerequest', 'action' => 'list')
+);
+?>
+
+<div class="cboth"><br /></div>
+
+<script type="text/javascript">
+    jQuery(function() {
+        $(document).ready(function() {
+
+            $('#list_search_form').submit(function(e){
+                e.preventDefault();
+                var search = $('#list_search').val();
+                if(search === '') {
+                    window.location.href = $(this).attr('action');
+                } else if(search !== undefined) {
+                    window.location.href = $(this).attr('action') + '/search/' + search;
+                }
+            });
+        });
+    });
+</script>

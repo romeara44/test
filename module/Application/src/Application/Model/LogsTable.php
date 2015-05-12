@@ -35,6 +35,8 @@ class LogsTable
     const ITEM_TYPE_TL = 8;
     const ITEM_TYPE_SR = 9;
     const ITEM_TYPE_ST = 10;
+    const ITEM_TYPE_DR = 11;
+    const ITEM_TYPE_DTL = 12;
 
     protected $tableGateway;
     protected $serviceLocator;

@@ -71,7 +71,7 @@ class Traininglog
 
             $inputFilter->add($factory->createInput(array(
                 'name'     => 'tl_id',
-                'required' => true,
+                'required' => false,
                 'filters'  => array(
                     array('name' => 'Int'),
                 ),

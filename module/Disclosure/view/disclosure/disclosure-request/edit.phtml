@@ -1,0 +1,127 @@
+<?php
+
+// within a view script
+$form = $this->form;
+$form->prepare();
+
+// Assuming the "contact/process" route exists...
+$form->setAttribute('action', '/disclosurerequest/edit');
+
+// Set the method attribute for the form
+$form->setAttribute('method', 'post');
+
+// Render the opening tag
+?>
+
+
+    <div class="page-title">
+        <h1 class="fleft"><?php if($this->drId) {?>Edit <?php } else {?>Add New <?php }?>Disclosure Request</h1>
+        <div class="cboth"></div>
+    </div>
+
+    <p></p>
+
+<div class="col-left">
+    <form action="/disclosurerequest/edit/<?php echo $this->drId ?>" method="post" enctype="multipart/form-data" name="disclosurerequest" id="disclosurerequest">
+        <?php
+            $fn = $form->get('dr_id');
+            echo $this->formHidden($fn);
+        ?>
+        <?php
+            $fn = $form->get('dr_active');
+            echo $this->formHidden($fn);
+        ?>
+
+        <p>
+            <?php $fn = $form->get('dr_reference_number');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
+            <?php $fn = $form->get('dr_requested_by');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
+            <?php
+            $fn = $form->get('dr_date_requested');
+            if ($this->tlObj):
+                $fn->setValue($this->formatDateA($this->tlObj->dr_date_requested, false, true));
+            endif;
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'dr_date_requested', 'readonly' => 'readonly')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+        
+        <p>
+            <?php
+            $fn = $form->get('dr_date_range_requested');
+            if ($this->tlObj && $this->tlObj->dr_date_range_requested):
+                $fn->setValue($this->formatDateA($this->tlObj->dr_date_range_requested, false, true));
+            endif;
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'dr_date_range_requested', 'readonly' => 'readonly')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
+            <?php
+            $fn = $form->get('dr_staff_member');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+        
+        <p>
+            <?php
+            $fn = $form->get('dr_completing_request');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
+            <?php
+            $fn = $form->get('dr_date_provided');
+            if ($this->tlObj && $this->tlObj->dr_date_provided):
+                $fn->setValue($this->formatDateA($this->tlObj->dr_date_provided, false, true));
+            endif;
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'dr_date_provided', 'readonly' => 'readonly')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+
+        <div class="cboth"></div>
+        
+        <div class="form-buttons">
+            <input type="submit" value="Save" class="form-button" />
+            <div class="fleft">or</div>
+            <a href="/disclosurerequest/list" class="cancel">Cancel</a>
+        </div>
+
+    <?php echo $this->form()->closeTag() ?>
+</div>
+
+<div class="cboth"><br /></div>
+
+
+<script type="text/javascript">
+    jQuery(function() {
+        $('#disclosurerequest').validate();
+
+        $("#dr_date_requested, #dr_date_range_requested, #dr_date_provided").datepicker({dateFormat: 'mm/dd/yy'});
+
+    });
+</script>

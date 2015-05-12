@@ -196,6 +196,18 @@ class MenuTop extends AbstractHelper
                          'url' => '/securityreminder/list',
                         )
                 )
+            ),
+            array(
+                'title' => 'Disclosures',
+                'url' => '/disclosurerequest/list',
+                'items' => array(
+                    array('title' => 'Requests',
+                            'url' => '/disclosurerequest/list'
+                        ),
+                    array('title' => 'Disclosure Tracking Logs',
+                         'url' => '/disclosuretrackinglog/list',
+                        )
+                )
             )
         );
     }

@@ -1,0 +1,111 @@
+<?php
+$urlOrder = $order == 'ASC' ? 'DESC' : 'ASC';
+$authService = new \Zend\Authentication\AuthenticationService();
+$authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+$identity = $authService->getIdentity();
+?>
+
+<div class="page-title">
+    <h1 class="fleft" style="width: 220px;font-size: 35px;">Disclosures Tracking Logs</h1>
+    <a href="<?php echo $this->url('disclosuretrackinglog', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 0)); ?>" class="label <?php echo $roleFilter == 0 ? ' selected ' : '' ?>">All</a>
+    <a href="<?php echo $this->url('disclosuretrackinglog', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 1)); ?>" class="label <?php echo $roleFilter == 1 ? ' selected ' : '' ?>">Active</a>
+    <a href="<?php echo $this->url('disclosuretrackinglog', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 2)); ?>" class="label <?php echo $roleFilter == 2 ? ' selected ' : '' ?>">Archived</a>
+    <form id="list_search_form" method="GET" onsubmit="encodeInput(this)" action="<?php echo $this->url('disclosuretrackinglog', array('action' => 'list', 'roleFilter' => $roleFilter)); ?>">
+        <a href="javascript:" onclick="$('#list_search_form').submit()" id="list_search-button"><i class="fa fa-search"></i></a>
+        <input type="text" name="search" id="list_search" placeholder="Search" value="<?php echo $search?>">
+    </form>
+    <a href="/disclosuretrackinglog/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Disclosure Request</a>
+    <div class="cboth"></div>
+</div>
+
+<p></p>
+
+<table class="disclosuretrackinglogs" cellpadding="0" cellspacing="0">
+    <thead>
+        <tr>
+            <?php $classSort = ($order_by == 'reference_number') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('disclosuretrackinglog', array('action' => 'list', 'page' => $page, 'order_by' => 'reference_number', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Reference Number <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+            <?php $classSort = ($order_by == 'patient_name') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('disclosuretrackinglog', array('action' => 'list', 'page' => $page, 'patient_name' => 'type', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Patient Name <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'medical_record_number') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('disclosuretrackinglog', array('action' => 'list', 'page' => $page, 'order_by' => 'medical_record_number', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Medical Record Number <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'date_received') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('disclosuretrackinglog', array('action' => 'list', 'page' => $page, 'order_by' => 'date_received', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Date Received <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'name_of_requestor') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('disclosuretrackinglog', array('action' => 'list', 'page' => $page, 'order_by' => 'name_of_requestor', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Name Of Requestor <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->paginator as $dtl): ?>
+            <tr>
+                <td><?php echo $dtl->dtl_reference_number ?></td>
+                <td><?php echo $dtl->dtl_patient_name ?></td>
+                <td><?php echo $dtl->dtl_medical_record_number ?></td>
+                <td><?php echo ($dtl->dtl_date_received != '0000-00-00') ? $this->formatDateA($dtl->dtl_date_received) : '-' ?></td>
+                <td><?php echo $dtl->dtl_name_of_requestor ?></td>
+                <td style="white-space: nowrap;" class="aright">
+                    <a href="/disclosuretrackinglog/edit/<?php echo $dtl->dtl_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+                    <?php if ($dtl->dtl_active == 0): ?>
+                        <a href="/disclosuretrackinglog/unarchive/<?php echo $dtl->dtl_id  ?>" class="">Unarchive</a>
+                    <?php else: ?>
+                        <?php $deleteUrl = '/disclosuretrackinglog/delete/' . $dtl->dtl_id; ?>
+                        <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
+                    <?php endif; ?>
+                </td>
+            </tr>
+
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+<?php echo $this->paginationControl(
+    $this->paginator,
+    'sliding',
+    array('partial/paginator.phtml', 'DisclosureRequest'),
+    array('route' => 'list', 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'roleFilter' => $roleFilter, 'role' => 1, 'controller' => 'disclosuretrackinglog', 'action' => 'list')
+);
+?>
+
+<div class="cboth"><br /></div>
+
+<script type="text/javascript">
+    jQuery(function() {
+        $(document).ready(function() {
+
+            $('#list_search_form').submit(function(e){
+                e.preventDefault();
+                var search = $('#list_search').val();
+                if(search === '') {
+                    window.location.href = $(this).attr('action');
+                } else if(search !== undefined) {
+                    window.location.href = $(this).attr('action') + '/search/' + search;
+                }
+            });
+        });
+    });
+</script>

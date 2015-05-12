@@ -75,7 +75,7 @@ class TraininglogController extends AbstractActionController
 
     public function getTraininglogTable()
     {
-        if (!$this->traininglogTable) {
+        if (!isset($this->traininglogTable)) {
             $sm = $this->getServiceLocator();
             $this->traininglogTable = $sm->get('Traininglog\Model\TraininglogTable');
         }
@@ -93,7 +93,7 @@ class TraininglogController extends AbstractActionController
 
     public function getRegulationTable()
     {
-        if (!$this->regulationTable) {
+        if (!isset($this->regulationTable)) {
             $sm = $this->getServiceLocator();
             $this->regulationTable = $sm->get('Traininglog\Model\RegulationTable');
             $this->regulationTable = $sm->get('Traininglog\Model\RegulationTable');
@@ -103,7 +103,7 @@ class TraininglogController extends AbstractActionController
 
     public function getCompanyRolesTable()
     {
-        if (!$this->companyRolesTable) {
+        if (!isset($this->companyRolesTable)) {
             $sm = $this->getServiceLocator();
             $this->companyRolesTable = $sm->get('Client\Model\CompanyRolesTable');
         }
@@ -176,7 +176,6 @@ class TraininglogController extends AbstractActionController
 
         $identity = $this->getIdentity();
 
-
         if(!$this->getCompanyRolesTable()->checkFillCompanyRoles($identity['u_company_id'])){
             $this->flashMessenger()->addErrorMessage('Please, fill all roles for you company');
             return $this->redirect()->toRoute('traininglog', array('controller' => 'traininglog', 'action' => 'list'));
@@ -187,6 +186,10 @@ class TraininglogController extends AbstractActionController
 
         $notes = null;
         $tlObj = null;
+
+        $comments          = null;
+        $trainingMaterials = null;
+        $companyRolesMsg   = null;
         
         if ((int) $id) {
             $tlObj             = $this->getTraininglogTable()->getTraininglog($id);

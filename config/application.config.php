@@ -21,7 +21,8 @@ return array(
         'Search',
         'Traininglog',
         'Securityreminder',
-        'Sitesetting'
+        'Sitesetting',
+        'Disclosure'
         ),
     'module_listener_options' => array(
         'module_paths' => array(
