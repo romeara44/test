@@ -193,6 +193,7 @@ class UserTable implements ServiceLocatorAwareInterface
             'u_senior_consultant_u_id' => $user->u_senior_consultant_u_id,
             'u_company_id' => $user->u_company_id,
             'u_company_id_admin' => $user->u_company_id_admin,
+            'u_grant_to_disclosures' => $user->u_grant_to_disclosures,
             'u_firstname' => $user->u_firstname,
             'u_lastname' => $user->u_lastname,
             'u_email' => $user->u_email,

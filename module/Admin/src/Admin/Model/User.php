@@ -56,6 +56,7 @@ class User
     public $u_first_login;
     public $u_confirmed;
     public $u_company_id_admin;
+    public $u_grant_to_disclosures;
 
     public $_rolename;
 
@@ -96,6 +97,7 @@ class User
         $this->u_first_login     = (isset($data['u_first_login'])) ? $data['u_first_login'] : null;
         $this->u_confirmed     = (isset($data['u_confirmed'])) ? $data['u_confirmed'] : null;
         $this->u_company_id_admin     = (isset($data['u_company_id_admin'])) ? $data['u_company_id_admin'] : null;
+        $this->u_grant_to_disclosures     = (isset($data['u_grant_to_disclosures'])) ? $data['u_grant_to_disclosures'] : null;
     }
 
     public function getArrayCopy()

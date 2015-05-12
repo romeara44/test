@@ -60,9 +60,9 @@ class MenuTop extends AbstractHelper
             $this->_prepareItemsForConsultant();
         } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_CLIENT) {
             if($identity['u_company_id_admin']) {
-                $this->_prepareItemsForClientCompanyAdmin();
+                $this->_prepareItemsForClientCompanyAdmin($identity);
             } else {
-                $this->_prepareItemsForClient();
+                $this->_prepareItemsForClient($identity);
             }
         } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_SALES_REP) {
             $this->_prepareItemsForSalesRep();
@@ -127,6 +127,18 @@ class MenuTop extends AbstractHelper
                         ),
                     array('title' => 'Security Reminder',
                          'url' => '/securityreminder/list',
+                        )
+                )
+            ),
+            array(
+                'title' => 'Disclosures',
+                'url' => '/disclosurerequest/list',
+                'items' => array(
+                    array('title' => 'Requests',
+                            'url' => '/disclosurerequest/list'
+                        ),
+                    array('title' => 'Disclosure Tracking Logs',
+                         'url' => '/disclosuretrackinglog/list',
                         )
                 )
             ),
@@ -196,23 +208,11 @@ class MenuTop extends AbstractHelper
                          'url' => '/securityreminder/list',
                         )
                 )
-            ),
-            array(
-                'title' => 'Disclosures',
-                'url' => '/disclosurerequest/list',
-                'items' => array(
-                    array('title' => 'Requests',
-                            'url' => '/disclosurerequest/list'
-                        ),
-                    array('title' => 'Disclosure Tracking Logs',
-                         'url' => '/disclosuretrackinglog/list',
-                        )
-                )
             )
         );
     }
 
-    private function _prepareItemsForClient()
+    private function _prepareItemsForClient($identity)
     {
         $this->items = array(
             array(
@@ -261,9 +261,24 @@ class MenuTop extends AbstractHelper
                 )
             )
         );
+
+        if($identity['u_grant_to_disclosures']) {
+            $this->items[] = array(
+                                'title' => 'Disclosures',
+                                'url' => '/disclosurerequest/list',
+                                'items' => array(
+                                    array('title' => 'Requests',
+                                            'url' => '/disclosurerequest/list'
+                                        ),
+                                    array('title' => 'Disclosure Tracking Logs',
+                                         'url' => '/disclosuretrackinglog/list',
+                                        )
+                                )
+                            );
+        }
     }
 
-    private function _prepareItemsForClientCompanyAdmin()
+    private function _prepareItemsForClientCompanyAdmin($identity)
     {
         $this->items = array(
             array(
@@ -321,6 +336,21 @@ class MenuTop extends AbstractHelper
                 )
             )
         );
+
+        if($identity['u_grant_to_disclosures']) {
+            $this->items[] = array(
+                                'title' => 'Disclosures',
+                                'url' => '/disclosurerequest/list',
+                                'items' => array(
+                                    array('title' => 'Requests',
+                                            'url' => '/disclosurerequest/list'
+                                        ),
+                                    array('title' => 'Disclosure Tracking Logs',
+                                         'url' => '/disclosuretrackinglog/list',
+                                        )
+                                )
+                            );
+        }
     }
 
     private function _prepareItemsForPartial()

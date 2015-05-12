@@ -85,6 +85,10 @@ $form->setAttribute('method', 'post');
                         <input type="checkbox" name="u_company_id_admin" <?php if($userObj->u_company_id_admin && $userObj->u_company_id_admin == $userObj->u_company_id):?>checked <?php endif; ?> id="companyIdAdmin" class="checkbox" value="<?php echo $userObj->u_company_id_admin ?>"
                         <?php if(!(in_array($identity['u_role_id'], array(1, 2)) || ($clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $identity['u_id']))) :?> disabled="true"<?php endif; ?> />
                         <label for="companyIdAdmin" class="checkbox">Company Admin</label>
+                        <input <?php if($identity['u_role_id'] == 1) :?>type="checkbox"<?php else: ?>type="hidden"<?php endif; ?> name="u_grant_to_disclosures" <?php if($userObj->u_grant_to_disclosures):?>checked <?php endif; ?> id="grantToDisclosures"  class="checkbox" value="<?php echo $userObj->u_grant_to_disclosures?>"/>
+                        <?php if($identity['u_role_id'] == 1) :?>
+                            <label for="grantToDisclosures" class="checkbox">Grant To Disclosures</label>
+                        <?php endif; ?>
                     </span>
                 <?php endif; ?>
                 <input type="hidden" name="identity_u_role_id" id="identity_u_role_id" value="<?php echo $identity['u_role_id'] ?>" disabled="true" />

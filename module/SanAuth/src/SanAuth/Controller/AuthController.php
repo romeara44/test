@@ -231,6 +231,7 @@ class AuthController extends AbstractActionController
                     $dataStorage['u_register'] = $user->u_register;
                     $dataStorage['u_first_login'] = $user->u_first_login;
                     $dataStorage['u_company_id_admin'] = $user->u_company_id_admin;
+                    $dataStorage['u_grant_to_disclosures'] = $user->u_grant_to_disclosures;
 
                     $this->getAuthService()->getStorage()->write($dataStorage);
 

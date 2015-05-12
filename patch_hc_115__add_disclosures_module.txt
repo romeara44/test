@@ -1,0 +1,1 @@
+ALTER TABLE  `users` ADD  `u_grant_to_disclosures` TINYINT( 1 ) NOT NULL DEFAULT  '0' AFTER  `u_company_id_admin` ;
