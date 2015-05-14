@@ -56,7 +56,10 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
                     $ids[] = $identity['u_id'];
                     $select->where('rp_consultant_u_id IN (' . implode(',', $ids) . ')');
                 } elseif ($identity['u_role_id'] == User::ROLE_CLIENT && $identity['u_company_id']) {
-                    $select->where('rp_c_id = ' . $identity['u_company_id']);
+                    $companies = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getClientCompanies($identity['u_id']);
+                    $companies[] = $identity['u_company_id'];
+
+                    $select->where('rp_c_id IN (' . implode(',', $companies) . ') ');
                 }
             }
 
@@ -100,7 +103,10 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
             $ids[] = $identity['u_id'];
             $select->where('rp_consultant_u_id IN (' . implode(',', $ids) . ')');
         } elseif ($identity['u_role_id'] == User::ROLE_CLIENT) {
-            $select->where('rp_c_id = ' . $identity['u_company_id']);
+            $companies = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getClientCompanies($identity['u_id']);
+            $companies[] = $identity['u_company_id'];
+
+            $select->where('rp_c_id IN ' . implode(',', $companies));
         }
 
         return $select;

@@ -114,7 +114,7 @@ class DisclosureTrackingLogForm extends Form
                 'type'  => 'text',
             ),
             'options' => array(
-                'label' => 'Purpose Of Disclosure',
+                'label' => 'PHI/Information Disclosed',
             ),
         ));
 

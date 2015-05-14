@@ -208,7 +208,7 @@ class CompanyTable implements ServiceLocatorAwareInterface
             $ids[] = $identity['u_id'];
             $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR c_consultant_u_id IN (' . implode(',', $ids) . '))');
         } else if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
-            $select->where('c_owner_u_id = ' . $identity['u_id']);
+            $select->where('c_owner_u_id = ' . $identity['u_id'] . ' OR c_id = ' . $identity['u_company_id']);
         }
 
         $resultSet = $this->tableGateway->selectWith($select);
@@ -219,6 +219,23 @@ class CompanyTable implements ServiceLocatorAwareInterface
         }
 
         return $companies;
+    }
+
+    public function getClientCompanies($cId)
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('c_active = 1');
+        $select->where('c_owner_u_id = ' . $cId);
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        $result = array();
+
+        foreach ($resultSet as $rs) {
+            $result[] = $rs->c_id;
+        }
+
+        return $result;
     }
 
     public function getCompany($id)

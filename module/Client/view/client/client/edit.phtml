@@ -85,20 +85,27 @@ $form->setAttribute('method', 'post');
                         <input type="checkbox" name="u_company_id_admin" <?php if($userObj->u_company_id_admin && $userObj->u_company_id_admin == $userObj->u_company_id):?>checked <?php endif; ?> id="companyIdAdmin" class="checkbox" value="<?php echo $userObj->u_company_id_admin ?>"
                         <?php if(!(in_array($identity['u_role_id'], array(1, 2)) || ($clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $identity['u_id']))) :?> disabled="true"<?php endif; ?> />
                         <label for="companyIdAdmin" class="checkbox">Company Admin</label>
-                        <input <?php if($identity['u_role_id'] == 1) :?>type="checkbox"<?php else: ?>type="hidden"<?php endif; ?> name="u_grant_to_disclosures" <?php if($userObj->u_grant_to_disclosures):?>checked <?php endif; ?> id="grantToDisclosures"  class="checkbox" value="<?php echo $userObj->u_grant_to_disclosures?>"/>
-                        <?php if($identity['u_role_id'] == 1) :?>
-                            <label for="grantToDisclosures" class="checkbox">Grant To Disclosures</label>
-                        <?php endif; ?>
                     </span>
                 <?php endif; ?>
-                <input type="hidden" name="identity_u_role_id" id="identity_u_role_id" value="<?php echo $identity['u_role_id'] ?>" disabled="true" />
-                <input type="hidden" name="u_role_id" id="u_role_id" value="<?php echo $userObj ? $userObj->u_role_id :''?>" />
-                <input type="hidden" name="identity_u_id" id="identity_u_id" value="<?php echo $identity['u_id']?>" disabled="true" />
-                <input type="hidden" name="def_u_company_id" id="def_u_company_id" value="<?php echo $userObj->u_company_id ?>" disabled="true" />
-                <input type="hidden" name="def_u_company_id_admin" id="def_u_company_id_admin" value="<?php echo $userObj->u_company_id_admin ?>" disabled="true" />
+            </p>
+            <p style="padding: 2px 0 12px 0; line-height: 14px; border-top: 0;">
+                <label>&nbsp;</label>
+                <?php if (!$uId || $userObj->u_role_id == 5 && $identity['u_role_id'] == 1): ?>
+                    <input type="checkbox" name="u_grant_to_disclosures" <?php if($userObj->u_grant_to_disclosures):?>checked <?php endif; ?> id="grantToDisclosures"  class="checkbox" value="1"/>
+                    <?php if($identity['u_role_id'] == 1) :?>
+                        <label for="grantToDisclosures" class="checkbox">Grant To Disclosures</label>
+                    <?php endif; ?>
+                <?php endif; ?>
                 <input type="checkbox" name="is_training_manager" <?php if($clientObj->c_training_manager_u_id && $clientObj->c_training_manager_u_id == $userObj->u_id):?>checked <?php endif; ?> id="trainingManager" class="checkbox" value="1" />
                 <label for="trainingManager" class="checkbox">Training Manager</label>
             </p>
+
+            <input type="hidden" name="identity_u_role_id" id="identity_u_role_id" value="<?php echo $identity['u_role_id'] ?>" disabled="true" />
+            <input type="hidden" name="u_role_id" id="u_role_id" value="<?php echo $userObj ? $userObj->u_role_id :''?>" />
+            <input type="hidden" name="identity_u_id" id="identity_u_id" value="<?php echo $identity['u_id']?>" disabled="true" />
+            <input type="hidden" name="def_u_company_id" id="def_u_company_id" value="<?php echo $userObj->u_company_id ?>" disabled="true" />
+            <input type="hidden" name="def_u_company_id_admin" id="def_u_company_id_admin" value="<?php echo $userObj->u_company_id_admin ?>" disabled="true" />
+
             <p style="padding: 0;border-top: 0;">
                 <?php if($setTrainingManagerMsg) :?>
                     <label style="padding:0" for="trainingManager" generated="true" class="error"><?php echo $setTrainingManagerMsg ?></label>

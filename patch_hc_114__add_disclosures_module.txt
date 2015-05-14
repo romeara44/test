@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS `disclosure_requests` (
   `dr_completing_request` varchar(255) NOT NULL,
   `dr_date_provided` date NOT NULL,
   `dr_active` tinyint(1) NOT NULL DEFAULT '1',
+  `dr_create_id` int(11) NOT NULL,
   PRIMARY KEY (`dr_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
@@ -27,5 +28,6 @@ CREATE TABLE IF NOT EXISTS `disclosure_tracking_logs` (
   `dtl_extension_notification` text NOT NULL,
   `dtl_copy_of_request` varchar(255) NOT NULL,
   `dtl_active` tinyint(1) NOT NULL DEFAULT '1',
+  `dtl_create_id` int(11) NOT NULL,
   PRIMARY KEY (`dtl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;

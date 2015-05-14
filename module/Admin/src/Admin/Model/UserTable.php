@@ -188,12 +188,15 @@ class UserTable implements ServiceLocatorAwareInterface
 
     public function saveUser(User $user)
     {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
         $data = array(
             'u_role_id' => $user->u_role_id,
             'u_senior_consultant_u_id' => $user->u_senior_consultant_u_id,
             'u_company_id' => $user->u_company_id,
             'u_company_id_admin' => $user->u_company_id_admin,
-            'u_grant_to_disclosures' => $user->u_grant_to_disclosures,
             'u_firstname' => $user->u_firstname,
             'u_lastname' => $user->u_lastname,
             'u_email' => $user->u_email,
@@ -217,6 +220,10 @@ class UserTable implements ServiceLocatorAwareInterface
 
         if (!(int) $user->u_senior_consultant_u_id) {
             unset($data['u_senior_consultant_u_id']);
+        }
+
+        if($identity['u_role_id'] == User::ROLE_ADMIN) {
+            $data['u_grant_to_disclosures'] = $user->u_grant_to_disclosures;
         }
 
         if (!(int) $user->u_state_id) {
