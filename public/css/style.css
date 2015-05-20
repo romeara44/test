@@ -1054,6 +1054,15 @@ textarea.double { width: 586px; }
 .company-role-first {
     margin-right: 50px;
 }
+.radio-button-wrap {
+    margin-top: 10px;
+    float: left;
+    margin-bottom: 6px;
+}
+.m10 {
+    margin-top: 10px;
+}
+
 /* Tables */
 
 table {

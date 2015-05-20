@@ -199,7 +199,7 @@ class DisclosureTrackingLogController extends AbstractActionController
                     $form->bind($dtlObj);
                     $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open edit disclosure tracking log "' . $id . '" page');
                 } else {
-                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open add new aisclosure request page');
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open add new disclosure tracking log page');
                 }
             }
 
@@ -226,7 +226,7 @@ class DisclosureTrackingLogController extends AbstractActionController
         $id = $this->params('id');
 
         $this->getDisclosureTrackingLogTable()->deleteDisclosureTrackingLog($id);
-        $this->flashMessenger()->addSuccessMessage('Disclosure Request has been deleted');
+        $this->flashMessenger()->addSuccessMessage('Disclosure tracking log has been deleted');
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_DELETE, \Application\Model\LogsTable::ITEM_TYPE_DTL, $id);
         
@@ -240,7 +240,7 @@ class DisclosureTrackingLogController extends AbstractActionController
         $id = $this->params('id');
 
         $this->getDisclosureTrackingLogTable()->unarchiveDisclosureTrackingLog($id);
-        $this->flashMessenger()->addSuccessMessage('Disclosure request has been unarchived');
+        $this->flashMessenger()->addSuccessMessage('Disclosure tracking log has been unarchived');
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Unarchive disclosure tracking log "' . $id . '"');
 

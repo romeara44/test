@@ -12,13 +12,13 @@ namespace Disclosure\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
-use Disclosure\Model\DisclosureRequest;
-use Disclosure\Form\DisclosureRequestForm;
+use Disclosure\Model\VerbalLog;
+use Disclosure\Form\VerbalLogForm;
 use Admin\Model\User;
 use Zend\Session\Container;
 use Zend\View\Model\JsonModel;
 
-class DisclosureRequestController extends AbstractActionController
+class VerbalLogController extends AbstractActionController
 {
     protected $userTable;
     protected $noteTable;
@@ -60,13 +60,13 @@ class DisclosureRequestController extends AbstractActionController
         return $identity;
     }
 
-    public function getDisclosureRequestTable()
+    public function getVerbalLogTable()
     {
-        if (!isset($this->disclosureRequestTable)) {
+        if (!isset($this->VerbalLogTable)) {
             $sm = $this->getServiceLocator();
-            $this->disclosureRequestTable = $sm->get('Disclosure\Model\DisclosureRequestTable');
+            $this->VerbalLogTable = $sm->get('Disclosure\Model\VerbalLogTable');
         }
-        return $this->disclosureRequestTable;
+        return $this->VerbalLogTable;
     }
 
     public function getCompanyRolesTable()
@@ -96,13 +96,10 @@ class DisclosureRequestController extends AbstractActionController
         $search     = $this->params()->fromRoute('search')     ? $this->params()->fromRoute('search')           : null;
 
         $mappingSortCol = array(
-            'reference_number'     => 'dr_reference_number',
-            'requested_by'         => 'dr_requested_by',
-            'date_requested'       => 'dr_date_requested',
-            'date_range_requested' => 'dr_date_range_requested',
-            'staff_member'         => 'dr_staff_member',
-            'completing_request'   => 'dr_completing_request',
-            'date_provided'        => 'dr_date_provided',
+            'medical_record_number' => 'vl_medical_record_number',
+            'name'                  => 'vl_name',
+            'date_of_birth'         => 'vl_date_of_birth',
+            'address'               => 'vl_address',
         );
 
         $mappingTypeItem = array(
@@ -111,8 +108,8 @@ class DisclosureRequestController extends AbstractActionController
             2 => 0
         );
 
-        $sortCol   = isset($mappingSortCol[$orderBy]) ? $mappingSortCol[$orderBy] : 'dr_id';
-        $paginator = $this->getDisclosureRequestTable()->getDisclosureRequests(true, $sortCol, $order, $this->getIdentity(), $search, $mappingTypeItem[$roleFilter]);
+        $sortCol   = isset($mappingSortCol[$orderBy]) ? $mappingSortCol[$orderBy] : 'vl_id';
+        $paginator = $this->getVerbalLogTable()->getVerbalLogs(true, $sortCol, $order, $this->getIdentity(), $search, $mappingTypeItem[$roleFilter]);
       
         $paginator->setCurrentPageNumber($page);
         $paginator->setItemCountPerPage(10);
@@ -127,7 +124,7 @@ class DisclosureRequestController extends AbstractActionController
             'search'      => $search
         ));
 
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open disclosure request list page');
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open verbal log list page');
 
         return $view;
     }
@@ -145,30 +142,29 @@ class DisclosureRequestController extends AbstractActionController
 
         $identity = $this->getIdentity();
 
-        // if(!$this->getCompanyRolesTable()->checkFillCompanyRoles($identity['u_company_id'])){
-        //     $this->flashMessenger()->addErrorMessage('Please, fill all roles for you company');
-        //     return $this->redirect()->toRoute('disclosurerequest', array('controller' => 'disclosurerequest', 'action' => 'list'));
-        // }
+        $form = new VerbalLogForm($this->getServiceLocator());
 
-        $form = new DisclosureRequestForm($this->getServiceLocator());
-
-        $drObj = null;
+        $vlObj = null;
         
         $companyRolesMsg = null;
 
         if ((int) $id) {
-            $drObj = $this->getDisclosureRequestTable()->getDisclosureRequest($id);
+            $vlObj = $this->getVerbalLogTable()->getVerbalLog($id);
         }
         
         $request = $this->getRequest();
 
         if ($request->isPost()) {
-            $dr = new DisclosureRequest();
+            $dr = new VerbalLog();
             $post = $request->getPost();
 
-            $ymds['dr_date_requested']       = \DateTime::createFromFormat('m/d/Y', $post['dr_date_requested']);
-            $ymds['dr_date_range_requested'] = \DateTime::createFromFormat('m/d/Y', $post['dr_date_range_requested']);
-            $ymds['dr_date_provided']        = \DateTime::createFromFormat('m/d/Y', $post['dr_date_provided']);
+            $ymds['vl_date_of_request']  = \DateTime::createFromFormat('m/d/Y', $post['vl_date_of_request']);
+            $ymds['vl_date_of_birth'] = \DateTime::createFromFormat('m/d/Y', $post['vl_date_of_birth']);
+            $ymds['vl_date_requested_from'] = \DateTime::createFromFormat('m/d/Y', $post['vl_date_requested_from']);
+            $ymds['vl_date_requested_to'] = \DateTime::createFromFormat('m/d/Y', $post['vl_date_requested_to']);
+            $ymds['vl_date_request_received'] = \DateTime::createFromFormat('m/d/Y', $post['vl_date_request_received']);
+            $ymds['vl_date_account_sent'] = \DateTime::createFromFormat('m/d/Y', $post['vl_date_account_sent']);
+            $ymds['vl_date_patient_notified'] = \DateTime::createFromFormat('m/d/Y', $post['vl_date_patient_notified']);
             
             foreach($ymds as $ymdKey => $ymd) {
                 if (is_object($ymd)) {
@@ -183,42 +179,46 @@ class DisclosureRequestController extends AbstractActionController
 
             if ($form->isValid()) {
                 $dr->exchangeArray($post);
-                $this->getDisclosureRequestTable()->setServiceLocator($this->getServiceLocator());
+                $this->getVerbalLogTable()->setServiceLocator($this->getServiceLocator());
 
-                $drId = $this->getDisclosureRequestTable()->saveDisclosureRequest($dr);
+                $drId = $this->getVerbalLogTable()->saveVerbalLog($dr);
 
                 if((int)$id) {
-                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update disclosure request "' . $drId . '"');
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update verbal log "' . $drId . '"');
                 } else {
-                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Add new disclosure request "' . $drId . '"');
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Add new verbal log "' . $drId . '"');
                 }
                 
-                return $this->redirect()->toRoute('disclosurerequest', array('controller' => 'disclosurerequest', 'action' => 'list'));
+                return $this->redirect()->toRoute('verballog', array('controller' => 'verballog', 'action' => 'list'));
             } else {
 
                 if ((int) $id) {
-                    $form->bind($drObj);
-                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open edit disclosure request "' . $id . '" page');
+                    $form->bind($vlObj);
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open edit verbal log "' . $id . '" page');
                 } else {
-                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open add new disclosure request page');
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open add new verbal log page');
                 }
             }
 
         } else {
-            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_DR, $id);
+            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_VL, $id);
 
             if ((int) $id) {
-                $drObj->dr_date_requested       = ($drObj->dr_date_requested != '0000-00-00')       ? $drObj->dr_date_requested       : '';
-                $drObj->dr_date_range_requested = ($drObj->dr_date_range_requested != '0000-00-00') ? $drObj->dr_date_range_requested : '';
-                $drObj->dr_date_provided        = ($drObj->dr_date_provided != '0000-00-00')        ? $drObj->dr_date_provided        : '';
-                $form->bind($drObj);
+                $vlObj->vl_date_of_request  = ($vlObj->vl_date_of_request != '0000-00-00')  ? $vlObj->vl_date_of_request  : '';
+                $vlObj->vl_date_of_birth = ($vlObj->vl_date_of_birth != '0000-00-00') ? $vlObj->vl_date_of_birth : '';
+                $vlObj->vl_date_requested_from = ($vlObj->vl_date_requested_from != '0000-00-00') ? $vlObj->vl_date_requested_from : '';
+                $vlObj->vl_date_requested_to = ($vlObj->vl_date_requested_to != '0000-00-00') ? $vlObj->vl_date_requested_to : '';
+                $vlObj->vl_date_request_received = ($vlObj->vl_date_request_received != '0000-00-00') ? $vlObj->vl_date_request_received : '';
+                $vlObj->vl_date_account_sent = ($vlObj->vl_date_account_sent != '0000-00-00') ? $vlObj->vl_date_account_sent : '';
+                $vlObj->vl_date_patient_notified = ($vlObj->vl_date_patient_notified != '0000-00-00') ? $vlObj->vl_date_patient_notified : '';
+                $form->bind($vlObj);
             }
         }
 
         return array(
             'form' => $form,
-            'drId' => $id,
-            'drObj' => $drObj,
+            'vlId' => $id,
+            'vlObj' => $vlObj,
             'companyRolesMsg' => $companyRolesMsg
         );
     }
@@ -227,26 +227,26 @@ class DisclosureRequestController extends AbstractActionController
     {
         $id = $this->params('id');
 
-        $this->getDisclosureRequestTable()->deleteDisclosureRequest($id);
-        $this->flashMessenger()->addSuccessMessage('Disclosure request has been deleted');
+        $this->getVerbalLogTable()->deleteVerbalLog($id);
+        $this->flashMessenger()->addSuccessMessage('Verbal log has been deleted');
 
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_DELETE, \Application\Model\LogsTable::ITEM_TYPE_DR, $id);
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_DELETE, \Application\Model\LogsTable::ITEM_TYPE_VL, $id);
         
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete disclosure request "' . $id . '"');
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete verbal log "' . $id . '"');
         
-        return $this->redirect()->toRoute('disclosurerequest', array('controller' => 'disclosurerequest', 'action' => 'list'));
+        return $this->redirect()->toRoute('verballog', array('controller' => 'verballog', 'action' => 'list'));
     }
 
     public function unarchiveAction()
     {
         $id = $this->params('id');
 
-        $this->getDisclosureRequestTable()->unarchiveDisclosureRequest($id);
-        $this->flashMessenger()->addSuccessMessage('Disclosure request has been unarchived');
+        $this->getVerbalLogTable()->unarchiveVerbalLog($id);
+        $this->flashMessenger()->addSuccessMessage('Verbal log has been unarchived');
 
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Unarchive disclosure request "' . $id . '"');
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Unarchive verbal log "' . $id . '"');
 
-        return $this->redirect()->toRoute('disclosurerequest', array('controller' => 'disclosurerequest', 'action' => 'list'));
+        return $this->redirect()->toRoute('verballog', array('controller' => 'verballog', 'action' => 'list'));
 
     }
 

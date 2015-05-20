@@ -3,7 +3,6 @@ namespace Disclosure\Model;
 
 use Admin\Model\User;
 use Zend\Db\TableGateway\TableGateway;
-use Zend\Mail;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 

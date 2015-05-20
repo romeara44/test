@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS `verbal_logs` (
+  `vl_id` int(11) NOT NULL AUTO_INCREMENT,
+  `vl_create_u_id` int(11) NOT NULL,
+  `vl_date_of_request` date DEFAULT NULL,
+  `vl_medical_record_number` varchar(50) DEFAULT NULL,
+  `vl_name` varchar(255) DEFAULT NULL,
+  `vl_date_of_birth` date DEFAULT NULL,
+  `vl_address` varchar(255) DEFAULT NULL,
+  `vl_disclosure_address` varchar(255) DEFAULT NULL,
+  `vl_date_requested_from` date DEFAULT NULL,
+  `vl_date_requested_to` date DEFAULT NULL,
+  `vl_is_fees` tinyint(1) DEFAULT NULL,
+  `vl_date_request_received` datetime DEFAULT NULL,
+  `vl_date_account_sent` datetime DEFAULT NULL,
+  `vl_is_extensions` tinyint(1) DEFAULT NULL,
+  `vl_date_patient_notified` date DEFAULT NULL,
+  `vl_staff_member` varchar(255) DEFAULT NULL,
+  `vl_active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`vl_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+ALTER TABLE  `verbal_logs` ADD  `vl_fees_charge` DECIMAL( 10, 2 ) NULL AFTER  `vl_is_fees` ;

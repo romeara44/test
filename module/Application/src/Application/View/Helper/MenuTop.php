@@ -139,6 +139,9 @@ class MenuTop extends AbstractHelper
                         ),
                     array('title' => 'Disclosure Tracking Logs',
                          'url' => '/disclosuretrackinglog/list',
+                        ),
+                    array('title' => 'Verbal Logs',
+                         'url' => '/verballog/list',
                         )
                 )
             ),
@@ -272,6 +275,9 @@ class MenuTop extends AbstractHelper
                                         ),
                                     array('title' => 'Disclosure Tracking Logs',
                                          'url' => '/disclosuretrackinglog/list',
+                                        ),
+                                    array('title' => 'Verbal Logs',
+                                         'url' => '/verballog/list',
                                         )
                                 )
                             );
@@ -347,6 +353,9 @@ class MenuTop extends AbstractHelper
                                         ),
                                     array('title' => 'Disclosure Tracking Logs',
                                          'url' => '/disclosuretrackinglog/list',
+                                        ),
+                                    array('title' => 'Verbal Logs',
+                                         'url' => '/verballog/list',
                                         )
                                 )
                             );

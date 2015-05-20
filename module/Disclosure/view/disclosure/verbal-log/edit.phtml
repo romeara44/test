@@ -1,0 +1,212 @@
+<?php
+
+// within a view script
+$form = $this->form;
+$form->prepare();
+
+// Assuming the "contact/process" route exists...
+$form->setAttribute('action', '/verballog/edit');
+
+// Set the method attribute for the form
+$form->setAttribute('method', 'post');
+
+// Render the opening tag
+?>
+
+
+<div class="page-title">
+    <h1 class="fleft"><?php if($this->vlId) {?>Edit <?php } else {?>Add New <?php }?>Verbal Log</h1>
+    <div class="cboth"></div>
+</div>
+
+<div class="col-left">
+    <form action="/verballog/edit/<?php echo $this->vlId ?>" method="post" enctype="multipart/form-data" name="verballog" id="verballog">
+        <?php
+            $fn = $form->get('vl_id');
+            echo $this->formHidden($fn);
+        ?>
+        <?php
+            $fn = $form->get('vl_active');
+            echo $this->formHidden($fn);
+        ?>
+        <h5 class="fleft">PATIENT INFORMATION</h5>
+        <p>
+            <?php $fn = $form->get('vl_date_of_request');
+            if ($this->vlObj):
+                $fn->setValue($this->formatDateA($this->vlObj->vl_date_of_request, false, true));
+            endif;
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'vl_date_of_request', 'readonly' => 'readonly')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
+            <?php $fn = $form->get('vl_medical_record_number');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+        
+        <p>
+            <?php $fn = $form->get('vl_name');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+        
+        <p>
+            <?php $fn = $form->get('vl_date_of_birth');
+            if ($this->vlObj):
+                $fn->setValue($this->formatDateA($this->vlObj->vl_date_of_birth, false, true));
+            endif;
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'vl_date_of_birth', 'readonly' => 'readonly')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
+            <?php $fn = $form->get('vl_address');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
+            <?php $fn = $form->get('vl_disclosure_address');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <h5 class="fleft m10">DATES REQUESTED</h5>
+
+        <p>
+            <?php $fn = $form->get('vl_date_requested_from');
+            if ($this->vlObj):
+                $fn->setValue($this->formatDateA($this->vlObj->vl_date_requested_from, false, true));
+            endif;
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'vl_date_requested_from', 'readonly' => 'readonly')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
+            <?php $fn = $form->get('vl_date_requested_to');
+            if ($this->vlObj):
+                $fn->setValue($this->formatDateA($this->vlObj->vl_date_requested_to, false, true));
+            endif;
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'vl_date_requested_to', 'readonly' => 'readonly')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <h5 class="fleft m10">FEES</h5>
+
+        <p>
+            <?php $fn = $form->get('vl_fees_charge');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
+            <label>Fees</label>
+            <span class="radio-button-wrap">
+                <input type="radio" name="vl_is_fees" id="vl_is_fees1" <?php if(!$vlObj || $vlObj->vl_is_fees){?>checked<?php }?> class="radio" value="1" />
+                    <label for="vl_is_fees1" class="checkbox">Yes</label>
+                <input type="radio" name="vl_is_fees" id="vl_is_fees0" <?php if($vlObj && !$vlObj->vl_is_fees){?>checked<?php }?> class="radio" value="0" />
+                    <label for="vl_is_fees0" class="checkbox">No</label>
+            </span>
+        </p>
+        <h5 class="fleft m10">FOR HEALTH CARE ORGANIZATION USE ONLY</h5>
+        <p>
+            <?php $fn = $form->get('vl_date_request_received');
+            if ($this->vlObj):
+                $fn->setValue($this->formatDateA($this->vlObj->vl_date_request_received, false, true));
+            endif;
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'vl_date_request_received', 'readonly' => 'readonly')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+        
+        <p>
+            <?php $fn = $form->get('vl_date_account_sent');
+            if ($this->vlObj):
+                $fn->setValue($this->formatDateA($this->vlObj->vl_date_account_sent, false, true));
+            endif;
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'vl_date_account_sent', 'readonly' => 'readonly')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
+            <label>Extension requested</label>
+            <span class="radio-button-wrap">
+                <input type="radio" name="vl_is_extensions" id="vl_is_extensions1" <?php if(!$vlObj || $vlObj->vl_is_extensions){?>checked<?php }?> class="radio" value="1" />
+                    <label for="vl_is_extensions1" class="checkbox">Yes</label>
+                <input type="radio" name="vl_is_extensions" id="vl_is_extensions0" <?php if($vlObj && !$vlObj->vl_is_extensions){?>checked<?php }?> class="radio" value="0" />
+                    <label for="vl_is_extensions0" class="checkbox">No</label>
+            </span>
+        </p>
+
+        <div id="extension-block" <?php if($vlObj && !$vlObj->vl_is_extensions) {?>style="display: none"<?php }?>>
+            <p>
+                <?php $fn = $form->get('vl_date_patient_notified');
+                if ($this->vlObj && $this->vlObj->vl_date_patient_notified):
+                    $fn->setValue($this->formatDateA($this->vlObj->vl_date_patient_notified, false, true));
+                endif;
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id' => 'vl_date_patient_notified', 'readonly' => 'readonly')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+
+            <p>
+                <?php $fn = $form->get('vl_staff_member');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+        </div>
+
+        <div class="cboth"></div>
+        
+        <div class="form-buttons">
+            <input type="submit" value="Save" class="form-button" />
+            <div class="fleft">or</div>
+            <a href="/verballog/list" class="cancel">Cancel</a>
+        </div>
+
+    <?php echo $this->form()->closeTag() ?>
+</div>
+
+<div class="cboth"><br /></div>
+
+
+<script type="text/javascript">
+    jQuery(function() {
+        $('#verballog').validate();
+
+        $("#vl_date_of_request, #vl_date_of_birth, #vl_date_requested_from, #vl_date_requested_to, #vl_date_request_received, #vl_date_account_sent, #vl_date_patient_notified").datepicker({dateFormat: 'mm/dd/yy'});
+
+        $("input:radio[name=vl_is_extensions]").click(function() {
+            if($(this).val() == 1) {
+                $('#extension-block').show();
+            } else {
+                $('#extension-block').hide();
+            }
+        });
+    });
+</script>

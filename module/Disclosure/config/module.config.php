@@ -4,7 +4,8 @@ return array(
     'controllers' => array(
         'invokables' => array(
             'Disclosure\Controller\DisclosureRequest' => 'Disclosure\Controller\DisclosureRequestController',
-            'Disclosure\Controller\DisclosureTrackingLog' => 'Disclosure\Controller\DisclosureTrackingLogController'
+            'Disclosure\Controller\DisclosureTrackingLog' => 'Disclosure\Controller\DisclosureTrackingLogController',
+            'Disclosure\Controller\VerbalLog' => 'Disclosure\Controller\VerbalLogController'
         ),
     ),
 
@@ -50,6 +51,26 @@ return array(
                         'action'     => 'index',
                     ),
                 ),
+            ),
+            'verballog' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/verballog[/:action][/:id][/page/:page][/order_by/:order_by][/:order][/roleFilter/:roleFilter][/search/:search]',
+                    'constraints' => array(
+                        'action' => '(?!\bpage\b)(?!\border_by\b)[a-zA-Z][a-zA-Z0-9_-]*',
+                        'id'     => '[0-9]+',
+                        'page' => '[0-9]+',
+                        'company' => '[0-9]+',
+                        'order_by' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'order' => 'ASC|DESC',
+                        'roleFilter' => '[0-9]+',
+                        'search' => '.*',
+                    ),
+                    'defaults' => array(
+                        'controller' => 'Disclosure\Controller\VerbalLog',
+                        'action'     => 'index',
+                    ),
+                ),
             )
         ),
     ),
@@ -57,7 +78,8 @@ return array(
     'view_manager' => array(
         'template_path_stack' => array(
             'disclosurerequest' => __DIR__ . '/../view',
-            'disclosuretrackinglog' => __DIR__ . '/../view'
+            'disclosuretrackinglog' => __DIR__ . '/../view',
+            'verballog' => __DIR__ . '/../view'
         ),
         'strategies' => array (
             'ViewJsonStrategy'

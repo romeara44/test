@@ -47,6 +47,17 @@ class Module
                     $resultSetPrototype = new ResultSet();
                     $resultSetPrototype->setArrayObjectPrototype(new \Disclosure\Model\DisclosureTrackingLog());
                     return new TableGateway('disclosure_tracking_logs', $dbAdapter, null, $resultSetPrototype);
+                },
+                'Disclosure\Model\VerbalLogTable' =>  function($sm) {
+                    $tableGateway = $sm->get('VerbalLogTableGateway');
+                    $table = new \Disclosure\Model\VerbalLogTable($tableGateway);
+                    return $table;
+                },
+                'VerbalLogTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new \Disclosure\Model\VerbalLog());
+                    return new TableGateway('verbal_logs', $dbAdapter, null, $resultSetPrototype);
                 }
             ),
         );
