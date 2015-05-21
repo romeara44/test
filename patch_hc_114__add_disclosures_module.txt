@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `disclosure_tracking_logs` (
   `dtl_address` varchar(255) NOT NULL,
   `dtl_auth_type` varchar(50) NOT NULL,
   `dtl_purpose_of_disclosure` varchar(255) NOT NULL,
-  `dtl_phi_Information_disclosed` varchar(255) NOT NULL,
+  `dtl_phi_information_disclosed` varchar(255) NOT NULL,
   `dtl_date_disclosed` date NOT NULL,
   `dtl_disclosed_by` varchar(255) NOT NULL,
   `dtl_extension_notification` text NOT NULL,

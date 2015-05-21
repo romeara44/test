@@ -207,8 +207,8 @@ class DisclosureTrackingLogController extends AbstractActionController
             $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_DTL, $id);
 
             if ((int) $id) {
-                $dtlObj->dtl_date_received  = ($dtlObj->dtl_date_received != '0000-00-00')  ? $dtlObj->dtl_date_received  : '';
-                $dtlObj->dtl_date_disclosed = ($dtlObj->dtl_date_disclosed != '0000-00-00') ? $dtlObj->dtl_date_disclosed : '';
+                $dtlObj->dtl_date_received  = ($dtlObj->dtl_date_received != '0000-00-00')  ? \DateTime::createFromFormat('Y-m-d', $dtlObj->dtl_date_received)->format('m/d/Y') : '';
+                $dtlObj->dtl_date_disclosed = ($dtlObj->dtl_date_disclosed != '0000-00-00') ? \DateTime::createFromFormat('Y-m-d', $dtlObj->dtl_date_disclosed)->format('m/d/Y') : '';
                 $form->bind($dtlObj);
             }
         }

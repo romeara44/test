@@ -208,9 +208,9 @@ class DisclosureRequestController extends AbstractActionController
             $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_DR, $id);
 
             if ((int) $id) {
-                $drObj->dr_date_requested       = ($drObj->dr_date_requested != '0000-00-00')       ? $drObj->dr_date_requested       : '';
-                $drObj->dr_date_range_requested = ($drObj->dr_date_range_requested != '0000-00-00') ? $drObj->dr_date_range_requested : '';
-                $drObj->dr_date_provided        = ($drObj->dr_date_provided != '0000-00-00')        ? $drObj->dr_date_provided        : '';
+                $drObj->dr_date_requested       = ($drObj->dr_date_requested != '0000-00-00')       ? \DateTime::createFromFormat('Y-m-d', $drObj->dr_date_requested)->format('m/d/Y')       : '';
+                $drObj->dr_date_range_requested = ($drObj->dr_date_range_requested != '0000-00-00') ? \DateTime::createFromFormat('Y-m-d', $drObj->dr_date_range_requested)->format('m/d/Y') : '';
+                $drObj->dr_date_provided        = ($drObj->dr_date_provided != '0000-00-00')        ? \DateTime::createFromFormat('Y-m-d', $drObj->dr_date_provided)->format('m/d/Y')        : '';
                 $form->bind($drObj);
             }
         }
