@@ -204,13 +204,13 @@ class VerbalLogController extends AbstractActionController
             $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_VL, $id);
 
             if ((int) $id) {
-                $vlObj->vl_date_of_request  = ($vlObj->vl_date_of_request != '0000-00-00')  ? $vlObj->vl_date_of_request  : '';
-                $vlObj->vl_date_of_birth = ($vlObj->vl_date_of_birth != '0000-00-00') ? $vlObj->vl_date_of_birth : '';
-                $vlObj->vl_date_requested_from = ($vlObj->vl_date_requested_from != '0000-00-00') ? $vlObj->vl_date_requested_from : '';
-                $vlObj->vl_date_requested_to = ($vlObj->vl_date_requested_to != '0000-00-00') ? $vlObj->vl_date_requested_to : '';
-                $vlObj->vl_date_request_received = ($vlObj->vl_date_request_received != '0000-00-00') ? $vlObj->vl_date_request_received : '';
-                $vlObj->vl_date_account_sent = ($vlObj->vl_date_account_sent != '0000-00-00') ? $vlObj->vl_date_account_sent : '';
-                $vlObj->vl_date_patient_notified = ($vlObj->vl_date_patient_notified != '0000-00-00') ? $vlObj->vl_date_patient_notified : '';
+                $vlObj->vl_date_of_request       = ($vlObj->vl_date_of_request != '0000-00-00')       ? \DateTime::createFromFormat('Y-m-d', $vlObj->vl_date_of_request)->format('m/d/Y')       : '';
+                $vlObj->vl_date_of_birth         = ($vlObj->vl_date_of_birth != '0000-00-00')         ? \DateTime::createFromFormat('Y-m-d', $vlObj->vl_date_of_birth)->format('m/d/Y')         : '';
+                $vlObj->vl_date_requested_from   = ($vlObj->vl_date_requested_from != '0000-00-00')   ? \DateTime::createFromFormat('Y-m-d', $vlObj->vl_date_requested_from)->format('m/d/Y')   : '';
+                $vlObj->vl_date_requested_to     = ($vlObj->vl_date_requested_to != '0000-00-00')     ? \DateTime::createFromFormat('Y-m-d', $vlObj->vl_date_requested_to)->format('m/d/Y')     : '';
+                $vlObj->vl_date_request_received = ($vlObj->vl_date_request_received != '0000-00-00') ? \DateTime::createFromFormat('Y-m-d', $vlObj->vl_date_request_received)->format('m/d/Y') : '';
+                $vlObj->vl_date_account_sent     = ($vlObj->vl_date_account_sent != '0000-00-00')     ? \DateTime::createFromFormat('Y-m-d', $vlObj->vl_date_account_sent)->format('m/d/Y')     : '';
+                $vlObj->vl_date_patient_notified = ($vlObj->vl_date_patient_notified != '0000-00-00') ? \DateTime::createFromFormat('Y-m-d', $vlObj->vl_date_patient_notified)->format('m/d/Y') : '';
                 $form->bind($vlObj);
             }
         }
