@@ -160,12 +160,12 @@ $form->setAttribute('method', 'post');
             <?php
                 $fn = $form->get('tl_attendees');
             ?>
-            <span class="tl_attendees_description" id="tl_attendees_help" style="display: none">To view the attendees added, please save your changes. You can then make any edits you might need to make to this page</span>
+            <span class="description_text" id="tl_attendees_help" style="display: none">To view the attendees added, please save your changes. You can then make any edits you might need to make to this page</span>
             <?php
                 echo $this->formTextarea($fn->setAttributes(array('class'=>'', 'style' => 'width: 450px; height: 85px;')));
                 echo $this->formElementErrors($fn);
             ?>
-            <span class="tl_attendees_description">"CSV file format: First name, Last name, title, email address"</span>
+            <span class="description_text">"CSV file format: First name, Last name, title, email address"</span>
         </p>
 
         <p style="border: 0;">

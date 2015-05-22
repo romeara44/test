@@ -20,3 +20,4 @@ CREATE TABLE IF NOT EXISTS `verbal_logs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 ALTER TABLE  `verbal_logs` ADD  `vl_fees_charge` DECIMAL( 10, 2 ) NULL AFTER  `vl_is_fees` ;
+ALTER TABLE  `verbal_logs` ADD  `vl_extension_reason` varchar(255) DEFAULT NULL AFTER  `vl_is_extensions` ;

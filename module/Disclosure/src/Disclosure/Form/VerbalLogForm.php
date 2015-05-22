@@ -84,7 +84,7 @@ class VerbalLogForm extends Form
                 'type'  => 'text',
             ),
             'options' => array(
-                'label' => 'Disclosure Address',
+                'label' => 'Disclosure Accounting Address',
             ),
         ));
 
@@ -154,7 +154,17 @@ class VerbalLogForm extends Form
                 'type'  => 'text',
             ),
             'options' => array(
-                'label' => 'Charge',
+                'label' => 'Charge ($)',
+            ),
+        ));
+
+        $this->add(array(
+            'name' => 'vl_extension_reason',
+            'attributes' => array(
+                'type'  => 'text',
+            ),
+            'options' => array(
+                'label' => 'If yes, give reason',
             ),
         ));
 

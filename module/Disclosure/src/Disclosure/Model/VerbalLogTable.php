@@ -104,6 +104,7 @@ class VerbalLogTable implements ServiceLocatorAwareInterface
             'vl_date_request_received' => $verballog->vl_date_request_received,
             'vl_date_account_sent'     => $verballog->vl_date_account_sent,
             'vl_is_extensions'         => $verballog->vl_is_extensions,
+            'vl_extension_reason'      => $verballog->vl_extension_reason,
             'vl_date_patient_notified' => $verballog->vl_date_patient_notified,
             'vl_staff_member'          => $verballog->vl_staff_member
         );

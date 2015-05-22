@@ -118,6 +118,8 @@ $form->setAttribute('method', 'post');
             ?>
         </p>
 
+        <span class="description_text">"There is no charge for the first accounting request in a 12-month period. Charge is for subsequent requests in the same 12-month period"</span>
+
         <p>
             <label>Fees</label>
             <span class="radio-button-wrap">
@@ -127,7 +129,9 @@ $form->setAttribute('method', 'post');
                     <label for="vl_is_fees0" class="checkbox">No</label>
             </span>
         </p>
+
         <h5 class="fleft m10">FOR HEALTH CARE ORGANIZATION USE ONLY</h5>
+
         <p>
             <?php $fn = $form->get('vl_date_request_received');
             if ($this->vlObj):
@@ -160,26 +164,32 @@ $form->setAttribute('method', 'post');
             </span>
         </p>
 
-        <div id="extension-block" <?php if($vlObj && !$vlObj->vl_is_extensions) {?>style="display: none"<?php }?>>
-            <p>
-                <?php $fn = $form->get('vl_date_patient_notified');
-                if ($this->vlObj && $this->vlObj->vl_date_patient_notified):
-                    $fn->setValue($this->formatDateA($this->vlObj->vl_date_patient_notified, false, true));
-                endif;
-                echo $this->formLabel($fn);
-                echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id' => 'vl_date_patient_notified', 'readonly' => 'readonly')));
-                echo $this->formElementErrors($fn);
-                ?>
-            </p>
+        <p>
+            <?php $fn = $form->get('vl_extension_reason');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+        
+        <p>
+            <?php $fn = $form->get('vl_date_patient_notified');
+            if ($this->vlObj && $this->vlObj->vl_date_patient_notified):
+                $fn->setValue($this->formatDateA($this->vlObj->vl_date_patient_notified, false, true));
+            endif;
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id' => 'vl_date_patient_notified', 'readonly' => 'readonly')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
 
-            <p>
-                <?php $fn = $form->get('vl_staff_member');
-                echo $this->formLabel($fn);
-                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
-                echo $this->formElementErrors($fn);
-                ?>
-            </p>
-        </div>
+        <p>
+            <?php $fn = $form->get('vl_staff_member');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
 
         <div class="cboth"></div>
         
@@ -200,13 +210,5 @@ $form->setAttribute('method', 'post');
         $('#verballog').validate();
 
         $("#vl_date_of_request, #vl_date_of_birth, #vl_date_requested_from, #vl_date_requested_to, #vl_date_request_received, #vl_date_account_sent, #vl_date_patient_notified").datepicker({dateFormat: 'mm/dd/yy'});
-
-        $("input:radio[name=vl_is_extensions]").click(function() {
-            if($(this).val() == 1) {
-                $('#extension-block').show();
-            } else {
-                $('#extension-block').hide();
-            }
-        });
     });
 </script>
