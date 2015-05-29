@@ -176,6 +176,8 @@ class BreachlogController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
 
+        $identity = $this->getIdentity();
+
         $form = new BreachlogForm($this->getServiceLocator());
         $formNote = new NoteForm($this->getServiceLocator());
         
@@ -194,6 +196,13 @@ class BreachlogController extends AbstractActionController
                 }
             }
             $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_BL);
+        } else if($identity['u_role_id'] == \Admin\Model\User::ROLE_CLIENT) {
+            $companyUsersObj = $this->getUserTable()->getUsersByCompany($identity['u_company_id']);
+            if($companyUsersObj) {
+                foreach($companyUsersObj as $companyUserObj) {
+                    $companyUsers[$companyUserObj->u_id] = $companyUserObj->u_firstname . ' ' . $companyUserObj->u_lastname; 
+                }
+            }
         }
         
         $questionsErrors = false;
