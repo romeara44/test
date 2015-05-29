@@ -51,7 +51,7 @@ class BreachlogController extends AbstractActionController
 
     public function getBreachlogTable()
     {
-        if (!$this->breachlogTable) {
+        if (!isset($this->breachlogTable)) {
             $sm = $this->getServiceLocator();
             $this->breachlogTable = $sm->get('Breachlog\Model\BreachlogTable');
         }
@@ -60,7 +60,7 @@ class BreachlogController extends AbstractActionController
 
     public function getBreachlogquestionTable()
     {
-        if (!$this->breachlogquestionTable) {
+        if (!isset($this->breachlogquestionTable)) {
             $sm = $this->getServiceLocator();
             $this->breachlogquestionTable = $sm->get('Breachlog\Model\BreachlogquestionTable');
         }
@@ -69,7 +69,7 @@ class BreachlogController extends AbstractActionController
 
     public function getBreachloganswerTable()
     {
-        if (!$this->breachloganswerTable) {
+        if (!isset($this->breachloganswerTable)) {
             $sm = $this->getServiceLocator();
             $this->breachloganswerTable = $sm->get('Breachlog\Model\BreachloganswerTable');
         }
@@ -78,7 +78,7 @@ class BreachlogController extends AbstractActionController
 
     public function getUserTable()
     {
-        if (!$this->userTable) {
+        if (!isset($this->userTable)) {
             $sm = $this->getServiceLocator();
             $this->userTable = $sm->get('Admin\Model\UserTable');
         }
@@ -87,7 +87,7 @@ class BreachlogController extends AbstractActionController
 
     public function getMailtemplateTable()
     {
-        if (!$this->mailtemplateTable) {
+        if (!isset($this->mailtemplateTable)) {
             $sm = $this->getServiceLocator();
             $this->mailtemplateTable = $sm->get('Mail\Model\MailtemplateTable');
         }
@@ -96,7 +96,7 @@ class BreachlogController extends AbstractActionController
 
     public function getNoteTable()
     {
-        if (!$this->noteTable) {
+        if (!isset($this->noteTable)) {
             $sm = $this->getServiceLocator();
             $this->noteTable = $sm->get('Note\Model\NoteTable');
         }
@@ -105,7 +105,7 @@ class BreachlogController extends AbstractActionController
     
     public function getCompanyRolesTable()
     {
-        if (!$this->companyRolesTable) {
+        if (!isset($this->companyRolesTable)) {
             $sm = $this->getServiceLocator();
             $this->companyRolesTable = $sm->get('Client\Model\CompanyRolesTable');
         }
@@ -239,7 +239,7 @@ class BreachlogController extends AbstractActionController
                 $companyRolesMsg = 'Please, fill all roles for this company';
             }
 
-            if ($form->isValid() && !$checkFillCompanyRoles && !$questionsErrors) {
+            if ($form->isValid() && $checkFillCompanyRoles && !$questionsErrors) {
                 $post['bl_consultant_u_id'] = $identity['u_id'];
                 if(isset($post['questions'][11]) && $post['questions'][11] == 2) $post['bl_date_of_occurrence'] = '';
                 $bl->exchangeArray($post);
@@ -306,6 +306,21 @@ class BreachlogController extends AbstractActionController
                 foreach ($form->getMessages() as $messageId => $message) {
                    // echo "Validation failure '$messageId': $message<br/>";
                 }
+
+                if(!$blObj || $blObj->bl_reportable == 1) {
+                    $ymds['bl_date_of_occurrence'] = \DateTime::createFromFormat('Y-m-d', $post['bl_date_of_occurrence']);
+                }
+                $ymds['bl_date_invest_start'] = \DateTime::createFromFormat('Y-m-d', $post['bl_date_invest_start']);
+                $ymds['bl_date_invest_complete'] = \DateTime::createFromFormat('Y-m-d', $post['bl_date_invest_complete']);
+                
+                foreach($ymds as $ymdKey => $ymd) {
+                    if (is_object($ymd)) {
+                        $post[$ymdKey] = $ymd->format('m/d/Y');
+                    } else {
+                        $post[$ymdKey] = '';
+                    }
+                }
+                $form->setData($post);
 
                 if ((int) $id) {
                     $form->bind($blObj);

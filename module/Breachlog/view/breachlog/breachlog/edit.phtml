@@ -160,7 +160,7 @@ $form->setAttribute('method', 'post');
         <p style="border: 0;">
            <?php $fn = $form->get('bl_approver_u_id')->setValueOptions($companyUsers);
             echo '<strong>' . $this->formLabel($fn->setLabelAttributes(array('style'=>'width:190px'))) . '</strong>';
-            echo $this->formSelect($fn->setAttributes(array('class'=>'form-control', 'id'=>'bl_approver_u_id', 'value' => $this->blObj->bl_approver_u_id, 'selected' => true)));
+            echo $this->formSelect($fn->setAttributes(array('class'=>'form-control', 'id'=>'bl_approver_u_id', 'value' => $this->blObj ? $this->blObj->bl_approver_u_id : '', 'selected' => true)));
             echo $this->formElementErrors($fn);
             ?>
         </p>
@@ -178,7 +178,7 @@ $form->setAttribute('method', 'post');
         <p style="border: 0;">
            <?php $fn = $form->get('bl_accepter_u_id')->setValueOptions($companyUsers);
             echo '<strong>' . $this->formLabel($fn->setLabelAttributes(array('style'=>'width:190px'))) . '</strong>';
-            echo $this->formSelect($fn->setAttributes(array('class'=>'form-control', 'id'=>'bl_accepter_u_id', 'value' => $this->blObj->bl_accepter_u_id, 'selected' => true)));
+            echo $this->formSelect($fn->setAttributes(array('class'=>'form-control', 'id'=>'bl_accepter_u_id', 'value' => $this->blObj ? $this->blObj->bl_accepter_u_id : '', 'selected' => true)));
             echo $this->formElementErrors($fn);
             ?>
         </p>
