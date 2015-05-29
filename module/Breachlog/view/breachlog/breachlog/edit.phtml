@@ -33,7 +33,7 @@ $form->setAttribute('method', 'post');
             $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
             $identity = $authService->getIdentity();
         ?>
-        <?php if (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT))): ?>
+        <?php if (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT))): ?>
             <p>
                 <?php $fn = $form->get('bl_c_id');
                 echo $this->formLabel($fn);
