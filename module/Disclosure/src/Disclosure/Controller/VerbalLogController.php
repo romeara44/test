@@ -196,6 +196,22 @@ class VerbalLogController extends AbstractActionController
                     $form->bind($vlObj);
                     $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open edit verbal log "' . $id . '" page');
                 } else {
+                    $ymds['vl_date_of_request']  = \DateTime::createFromFormat('Y-m-d', $post['vl_date_of_request']);
+                    $ymds['vl_date_of_birth'] = \DateTime::createFromFormat('Y-m-d', $post['vl_date_of_birth']);
+                    $ymds['vl_date_requested_from'] = \DateTime::createFromFormat('Y-m-d', $post['vl_date_requested_from']);
+                    $ymds['vl_date_requested_to'] = \DateTime::createFromFormat('Y-m-d', $post['vl_date_requested_to']);
+                    $ymds['vl_date_request_received'] = \DateTime::createFromFormat('Y-m-d', $post['vl_date_request_received']);
+                    $ymds['vl_date_account_sent'] = \DateTime::createFromFormat('Y-m-d', $post['vl_date_account_sent']);
+                    $ymds['vl_date_patient_notified'] = \DateTime::createFromFormat('Y-m-d', $post['vl_date_patient_notified']);
+                    
+                    foreach($ymds as $ymdKey => $ymd) {
+                        if (is_object($ymd)) {
+                            $post[$ymdKey] = $ymd->format('m/d/Y');
+                        } else {
+                            $post[$ymdKey] = '';
+                        }
+                    }
+                    $form->setData($post);
                     $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open add new verbal log page');
                 }
             }
