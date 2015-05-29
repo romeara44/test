@@ -264,9 +264,9 @@ $form->setAttribute('method', 'post');
         $('#q22, #q21').change(function() {
             var isChecked = $('#q22').attr('checked');
             if (isChecked == 'checked') {
-                $('#q32').parent().hide();
+                $('#q32, #q31').parent().hide().end().prop('disabled', true);
             } else {
-                $('#q32').parent().show();
+                $('#q32, #q31').parent().show().end().prop('disabled', false);
             }
         });
 
