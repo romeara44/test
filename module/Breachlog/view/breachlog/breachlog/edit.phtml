@@ -120,6 +120,60 @@ $form->setAttribute('method', 'post');
             ?>
         </p>
 
+        <p>
+            <label style="width: 300px;">Regulation</label><br />
+            <?php
+            $fn = $form->get('_bl_cur_regulations');
+            echo $this->formSelect($fn->setAttributes(array('class'=>'', 'id' => '_bl_cur_regulations')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+        <div>
+            <?php foreach ($regulations as $value) {?>
+                <div id="_regulation_wrap_<?php echo $value->rg_id?>" style="display:none">
+                    <p>
+                        <label for="regulation_pp_name_<?php echo $value->rg_id?>">Policy&Procedure Name</label>
+                        <input type="text" name="_regulation[<?php echo $value->rg_id?>][rg_pp_name]" id="_regulation_pp_name_<?php echo $value->rg_id?>" value="<?php echo $value->rg_pp_name?>" readonly="readonly" disabled="disabled">
+                    </p>
+                    <p style="border: 0;">
+                        <label for="regulation_pp_number_<?php echo $value->rg_id?>">Policy&Procedure Number</label>
+                        <input type="text" name="_regulation[<?php echo $value->rg_id?>][rg_pp_number]" id="_regulation_pp_number_<?php echo $value->rg_id?>" value="<?php echo $value->rg_pp_number?>" readonly="readonly" disabled="disabled">
+                    </p>
+                    <p style="border: 0;">
+                        <label for="regulation_number_<?php echo $value->rg_id?>">Regulation Number</label>
+                        <input type="text" name="_regulation[<?php echo $value->rg_id?>][rg_number]" id="_regulation_number_<?php echo $value->rg_id?>" value="<?php echo $value->rg_number?>" readonly="readonly" disabled="disabled">
+                    </p>
+                    <?php if($value->rg_u_owner_id): ?>
+                        <p style="border: 0;">
+                            <label for="regulation_description_<?php echo $value->rg_id?>">Regulation Description</label>
+                            <input type="text" name="_regulation[<?php echo $value->rg_id?>][rg_description]" id="_regulation_description_<?php echo $value->rg_id?>" value="<?php echo $value->rg_description?>">
+                        </p>
+                    <?php endif; ?>
+                </div>
+            <?php }?>
+        
+            <div id="_regulation_wrap_-1" style="display:none">
+                <p>
+                    <label for="regulation_pp_name_-1">Policy&Procedure Name</label>
+                    <input type="text" name="_regulation[-1][rg_pp_name]" id="_regulation_pp_name_-1" value="">
+                </p>
+                <p style="border: 0;">
+                    <label for="regulation_pp_number_-1">Policy&Procedure Number</label>
+                    <input type="text" name="_regulation[-1][rg_pp_number]" id="_regulation_pp_number_-1" value="">
+                </p>
+                <p style="border: 0;">
+                    <label for="regulation_number_-1">Regulation Number</label>
+                    <input type="text" name="_regulation[-1][rg_number]" id="_regulation_number_-1" value="">
+                </p>
+                <p style="border: 0;">
+                    <label for="regulation_description_-1">Regulation Description</label>
+                    <input type="text" name="_regulation[-1][rg_description]" id="_regulation_description_-1" value="">
+                </p>
+            </div>
+        </div>
+
+        <div class="cboth"></div>
+
         <?php if ($this->questionsErrors): ?>
             <ul><li>Questions error</li></ul>
         <?php endif; ?>
@@ -322,6 +376,23 @@ $form->setAttribute('method', 'post');
             });
             
             $( "#bl_date_of_occurrence, #bl_date_invest_start, #bl_date_invest_complete" ).datepicker({dateFormat: 'mm/dd/yy'});
+        });
+
+        function regulationHandle()
+        {
+            $('div[id^=_regulation_wrap_]').each(function(){
+                $(this).css('display', 'none');
+            });
+
+            $('#_bl_cur_regulations option:selected').each(function(){
+                $('#_regulation_wrap_' + $(this).val()).css('display', 'block');
+            });
+        }
+
+        regulationHandle();
+
+        $('#_bl_cur_regulations').change(function(){
+            regulationHandle();
         });
     });
 </script>

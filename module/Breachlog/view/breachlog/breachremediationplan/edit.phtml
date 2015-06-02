@@ -171,6 +171,78 @@
     <input id="brp_remediation_date_hidden" name="brp_remediation_date" type="hidden" value="<?php echo ($this->brpObj->brp_remediation_date != '0000-00-00') ? $this->brpObj->_brp_remediation_date_formatted : '' ?>" />
 
     <?php if ($this->writable && !$this->isPdf): ?>
+        <p>
+            <label style="width: 300px;">Regulation</label><br />
+            <?php
+            $fn = $form->get('_brp_cur_regulations');
+            echo $this->formSelect($fn->setAttributes(array('class'=>'', 'id' => '_brp_cur_regulations')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+        <div>
+            <?php foreach ($regulations as $value) {?>
+                <div id="_regulation_wrap_<?php echo $value->rg_id?>" style="display:none">
+                    <p>
+                        <label for="regulation_pp_name_<?php echo $value->rg_id?>">Policy&Procedure Name</label>
+                        <input type="text" name="_regulation[<?php echo $value->rg_id?>][rg_pp_name]" id="_regulation_pp_name_<?php echo $value->rg_id?>" value="<?php echo $value->rg_pp_name?>" readonly="readonly" disabled="disabled">
+                    </p>
+                    <p style="border: 0;">
+                        <label for="regulation_pp_number_<?php echo $value->rg_id?>">Policy&Procedure Number</label>
+                        <input type="text" name="_regulation[<?php echo $value->rg_id?>][rg_pp_number]" id="_regulation_pp_number_<?php echo $value->rg_id?>" value="<?php echo $value->rg_pp_number?>" readonly="readonly" disabled="disabled">
+                    </p>
+                    <p style="border: 0;">
+                        <label for="regulation_number_<?php echo $value->rg_id?>">Regulation Number</label>
+                        <input type="text" name="_regulation[<?php echo $value->rg_id?>][rg_number]" id="_regulation_number_<?php echo $value->rg_id?>" value="<?php echo $value->rg_number?>" readonly="readonly" disabled="disabled">
+                    </p>
+                    <?php if($value->rg_u_owner_id): ?>
+                        <p style="border: 0;">
+                            <label for="regulation_description_<?php echo $value->rg_id?>">Regulation Description</label>
+                            <input type="text" name="_regulation[<?php echo $value->rg_id?>][rg_description]" id="_regulation_description_<?php echo $value->rg_id?>" value="<?php echo $value->rg_description?>">
+                        </p>
+                    <?php endif; ?>
+                </div>
+            <?php }?>
+        
+            <div id="_regulation_wrap_-1" style="display:none">
+                <p>
+                    <label for="regulation_pp_name_-1">Policy&Procedure Name</label>
+                    <input type="text" name="_regulation[-1][rg_pp_name]" id="_regulation_pp_name_-1" value="">
+                </p>
+                <p style="border: 0;">
+                    <label for="regulation_pp_number_-1">Policy&Procedure Number</label>
+                    <input type="text" name="_regulation[-1][rg_pp_number]" id="_regulation_pp_number_-1" value="">
+                </p>
+                <p style="border: 0;">
+                    <label for="regulation_number_-1">Regulation Number</label>
+                    <input type="text" name="_regulation[-1][rg_number]" id="_regulation_number_-1" value="">
+                </p>
+                <p style="border: 0;">
+                    <label for="regulation_description_-1">Regulation Description</label>
+                    <input type="text" name="_regulation[-1][rg_description]" id="_regulation_description_-1" value="">
+                </p>
+            </div>
+        </div>
+
+        <div class="cboth"></div>
+
+    <?php else: ?>
+        <p style="border: 0;"><strong>Regulations:</strong></p>
+        <?php foreach ($regulations as $value) {?>
+            <?php if(in_array($value->rg_id, $this->brpObj->_brp_cur_regulations) != false): ?>
+            <div>
+                <p>Policy&Procedure Name: <?php echo $value->rg_pp_name?></p>
+                <p style="border: 0;">Policy&Procedure Number: <?php echo $value->rg_pp_number?></p>
+                <p style="border: 0;">Regulation Number: <?php echo $value->rg_number?></p>
+                <?php if($value->rg_u_owner_id): ?>
+                    <p style="border: 0;">Regulation Description: <?php echo $value->rg_description?></p>
+                <?php endif; ?>
+            </div>
+            <p style="border: 0;"></p>
+        <?php endif; ?>
+        <?php }?>
+    <?php endif; ?>
+
+    <?php if ($this->writable && !$this->isPdf): ?>
         <input id="signedoff" type="hidden" name="signedoff" value="0" />
         <input id="requestreview" type="hidden" name="requestreview" value="0" />
         <input type="hidden" name="noteform" value="1" />
@@ -371,6 +443,22 @@
             }
         );
 
+        function regulationHandle()
+        {
+            $('div[id^=_regulation_wrap_]').each(function(){
+                $(this).css('display', 'none');
+            });
+
+            $('#_brp_cur_regulations option:selected').each(function(){
+                $('#_regulation_wrap_' + $(this).val()).css('display', 'block');
+            });
+        }
+
+        regulationHandle();
+
+        $('#_brp_cur_regulations').change(function(){
+            regulationHandle();
+        });
     });
 
 </script>

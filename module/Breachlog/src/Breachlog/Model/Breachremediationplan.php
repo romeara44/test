@@ -39,6 +39,11 @@ class Breachremediationplan
     public $_accepter_name;
     public $_consultant_name;
     public $_performed_name;
+    public $_brp_brprg_id;
+    public $_brp_brprg_rg_id;
+    public $_brp_regulation;
+    public $_brp_cur_regulations;
+    public $_regulation;
 
     protected $inputFilter;
 
@@ -72,6 +77,11 @@ class Breachremediationplan
         $this->_performed_name     = (isset($data['_performed_name'])) ? $data['_performed_name'] : null;
         $this->_brp_incident_date_formatted     = (isset($data['_brp_incident_date_formatted'])) ? $data['_brp_incident_date_formatted'] : null;
         $this->_brp_remediation_date_formatted     = (isset($data['_brp_remediation_date_formatted'])) ? $data['_brp_remediation_date_formatted'] : null;
+        $this->_brp_brprg_id     = (isset($data['_brp_brprg_id'])) ? $data['_brp_brprg_id'] : null;
+        $this->_brp_brprg_rg_id     = (isset($data['_brp_brprg_rg_id'])) ? $data['_brp_brprg_rg_id'] : null;
+        $this->_brp_regulation     = (isset($data['_brp_regulation'])) ? $data['_brp_regulation'] : null;
+        $this->_brp_cur_regulations     = (isset($data['_brp_cur_regulations'])) ? $data['_brp_cur_regulations'] : null;
+        $this->_brp_cur_regulations     = (isset($data['_brp_cur_regulations'])) ? $data['_brp_cur_regulations'] : null;
     }
 
     public function getArrayCopy()

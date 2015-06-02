@@ -112,6 +112,15 @@ class BreachlogController extends AbstractActionController
         return $this->companyRolesTable;
     }
 
+    public function getRegulationTable()
+    {
+        if (!isset($this->regulationTable)) {
+            $sm = $this->getServiceLocator();
+            $this->regulationTable = $sm->get('Traininglog\Model\RegulationTable');
+        }
+        return $this->regulationTable;
+    }
+
     public function getIdentity()
     {
         $authService = new \Zend\Authentication\AuthenticationService();
@@ -364,7 +373,8 @@ class BreachlogController extends AbstractActionController
             'questions' => $questions,
             'questionsFormAnswers' => $questionsFormAnswers,
             'questionsErrors' => $questionsErrors,
-            'companyRolesMsg' => $companyRolesMsg
+            'companyRolesMsg' => $companyRolesMsg,
+            'regulations' => $this->getRegulationTable()->getRegulations(),
         );
     }
 

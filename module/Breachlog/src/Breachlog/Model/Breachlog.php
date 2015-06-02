@@ -30,6 +30,12 @@ class Breachlog
     public $bl_approver_u_id;
     public $bl_accepter_u_id;
 
+    public $_bl_blrg_id;
+    public $_bl_blrg_rg_id;
+    public $_bl_regulation;
+    public $_bl_cur_regulations;
+    public $_regulation;
+
     protected $inputFilter;
 
     public function exchangeArray($data)
@@ -55,6 +61,11 @@ class Breachlog
         $this->bl_initials     = (isset($data['bl_initials'])) ? $data['bl_initials'] : null;
         $this->bl_approver_u_id     = (isset($data['bl_approver_u_id'])) ? $data['bl_approver_u_id'] : null;
         $this->bl_accepter_u_id     = (isset($data['bl_accepter_u_id'])) ? $data['bl_accepter_u_id'] : null;
+        $this->_bl_blrg_id         = (isset($data['_bl_blrg_id']))         ? $data['_bl_blrg_id']         : null;
+        $this->_bl_blrg_rg_id      = (isset($data['_bl_blrg_rg_id']))      ? $data['_bl_blrg_rg_id']      : null;
+        $this->_bl_regulation      = (isset($data['_bl_regulation']))      ? $data['_bl_regulation']      : null;
+        $this->_bl_cur_regulations = (isset($data['_bl_cur_regulations'])) ? $data['_bl_cur_regulations'] : null;
+        $this->_regulation         = (isset($data['_regulation']))         ? $data['_regulation']         : null;
     }
 
     public function getArrayCopy()

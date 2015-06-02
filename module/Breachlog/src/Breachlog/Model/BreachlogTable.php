@@ -140,11 +140,23 @@ class BreachlogTable implements ServiceLocatorAwareInterface
 
     public function getBreachlog($id)
     {
-        $id  = (int) $id;
+        $id     = (int) $id;
         $rowset = $this->tableGateway->select(array('bl_id' => $id));
-        $row = $rowset->current();
+        $row    = $rowset->current();
+
         if (!$row) {
             return false;
+        }
+
+        $select = $this->tableGateway->getSql()->select();
+        $select->join(array('blrg' => 'breach_logs_regulations'), new \Zend\Db\Sql\Expression('bl_id = blrg.blrg_bl_id'), array('_bl_blrg_id' => new \Zend\Db\Sql\Expression('blrg.blrg_id'), '_bl_blrg_rg_id' => new \Zend\Db\Sql\Expression('blrg.blrg_rg_id')), 'inner');
+        $select->join(array('rg' => 'regulations'), new \Zend\Db\Sql\Expression('blrg.blrg_rg_id = rg.rg_id'), array('_bl_regulation' => new \Zend\Db\Sql\Expression('rg.rg_pp_name')), 'inner');
+        $select->where("bl_id =" . $id);
+
+        $regulations = $this->tableGateway->selectWith($select);
+
+        foreach ($regulations as $rs) {
+            $row->_bl_cur_regulations[$rs->_bl_blrg_id] = $rs->_bl_blrg_rg_id;
         }
 
         return $row;
@@ -197,6 +209,29 @@ class BreachlogTable implements ServiceLocatorAwareInterface
                 $this->tableGateway->update($data, array('bl_id' => $id));
             } else {
                 throw new \Exception('Form id does not exist');
+            }
+        }
+
+        $breachlogRegulationTable = $this->getServiceLocator()->get('Breachlog\Model\BreachlogRegulationTable');
+
+        $breachlogRegulationTable->deleteByBreachlogId($id);
+
+        if($bl->_bl_cur_regulations) {
+            foreach ($bl->_bl_cur_regulations as $_bl_cur_regulation) {
+                if($_bl_cur_regulation == -1 && $bl->_regulation) {
+                    $regulationData = array( 'rg_pp_name'     => $bl->_regulation[-1]['rg_pp_name']
+                                           , 'rg_pp_number'   => $bl->_regulation[-1]['rg_pp_number']
+                                           , 'rg_number'      => $bl->_regulation[-1]['rg_number']
+                                           , 'rg_description' => $bl->_regulation[-1]['rg_description']
+                                           , 'rg_u_owner_id'  => $identity['u_id']
+                                           );
+
+                    $rgId = $this->getServiceLocator()->get('Traininglog\Model\RegulationTable')->saveRegulation($regulationData);
+
+                    $breachlogRegulationTable->saveBreachlogRegulation(array('blrg_bl_id' => $id, 'blrg_rg_id' => $rgId));
+                } else {
+                    $breachlogRegulationTable->saveBreachlogRegulation(array('blrg_bl_id' => $id, 'blrg_rg_id' => $_bl_cur_regulation));
+                }
             }
         }
 

@@ -145,6 +145,17 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
             return false;
         }
 
+        $select = $this->tableGateway->getSql()->select();
+        $select->join(array('brprg' => 'breach_remediation_plans_regulations'), new \Zend\Db\Sql\Expression('brp_id = brprg.brprg_brp_id'), array('_brp_brprg_id' => new \Zend\Db\Sql\Expression('brprg.brprg_id'), '_brp_brprg_rg_id' => new \Zend\Db\Sql\Expression('brprg.brprg_rg_id')), 'inner');
+        $select->join(array('rg' => 'regulations'), new \Zend\Db\Sql\Expression('brprg.brprg_rg_id = rg.rg_id'), array('_brp_regulation' => new \Zend\Db\Sql\Expression('rg.rg_pp_name')), 'inner');
+        $select->where("brp_id =" . $id);
+
+        $regulations = $this->tableGateway->selectWith($select);
+
+        foreach ($regulations as $rs) {
+            $row->_brp_cur_regulations[$rs->_brp_brprg_id] = $rs->_brp_brprg_rg_id;
+        }
+
         return $row;
     }
 
@@ -275,6 +286,36 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         }
 
         return $id;
+    }
+
+    public function setRegulations($id, $cur_regulations, $regulations = array())
+    {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
+        $breachRemediationPlanRegulationTable = $this->getServiceLocator()->get('Breachlog\Model\BreachRemediationPlanRegulationTable');
+
+        $breachRemediationPlanRegulationTable->deleteByBreachRemediationPlanId($id);
+
+        if($cur_regulations) {
+            foreach ($cur_regulations as $regulation) {
+                if($regulation == -1 && $regulations) {
+                    $regulationData = array( 'rg_pp_name'     => $regulations[-1]['rg_pp_name']
+                                           , 'rg_pp_number'   => $regulations[-1]['rg_pp_number']
+                                           , 'rg_number'      => $regulations[-1]['rg_number']
+                                           , 'rg_description' => $regulations[-1]['rg_description']
+                                           , 'rg_u_owner_id'  => $identity['u_id']
+                                           );
+
+                    $rgId = $this->getServiceLocator()->get('Traininglog\Model\RegulationTable')->saveRegulation($regulationData);
+
+                    $breachRemediationPlanRegulationTable->saveBreachRemediationPlanRegulation(array('brprg_brp_id' => $id, 'brprg_rg_id' => $rgId));
+                } else {
+                    $breachRemediationPlanRegulationTable->saveBreachRemediationPlanRegulation(array('brprg_brp_id' => $id, 'brprg_rg_id' => $regulation));
+                }
+            }
+        }
     }
 
     public function deleteBreachremediationplan($id)

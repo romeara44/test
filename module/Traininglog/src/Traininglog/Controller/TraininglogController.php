@@ -96,7 +96,6 @@ class TraininglogController extends AbstractActionController
         if (!isset($this->regulationTable)) {
             $sm = $this->getServiceLocator();
             $this->regulationTable = $sm->get('Traininglog\Model\RegulationTable');
-            $this->regulationTable = $sm->get('Traininglog\Model\RegulationTable');
         }
         return $this->regulationTable;
     }

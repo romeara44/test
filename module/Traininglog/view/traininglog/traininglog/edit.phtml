@@ -106,7 +106,7 @@ $form->setAttribute('method', 'post');
             ?>
         </p>
         <div>
-            <?php foreach ($regulations as $key => $value) {?>
+            <?php foreach ($regulations as $value) {?>
                 <div id="_regulation_wrap_<?php echo $value->rg_id?>" style="display:none">
                     <p>
                         <label for="regulation_pp_name_<?php echo $value->rg_id?>">Policy&Procedure Name</label>

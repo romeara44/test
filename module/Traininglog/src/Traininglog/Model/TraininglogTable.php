@@ -200,7 +200,7 @@ class TraininglogTable implements ServiceLocatorAwareInterface
         $traininglogRegulationTable->deleteByTraininglogId($id);
 
         if($traininglog->_tl_cur_regulations) {
-            foreach ($traininglog->_tl_cur_regulations as $key => $_tl_cur_regulation) {
+            foreach ($traininglog->_tl_cur_regulations as $_tl_cur_regulation) {
                 if($_tl_cur_regulation == -1 && $traininglog->_regulation) {
                     $regulationData = array( 'rg_pp_name'     => $traininglog->_regulation[-1]['rg_pp_name']
                                            , 'rg_pp_number'   => $traininglog->_regulation[-1]['rg_pp_number']

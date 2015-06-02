@@ -85,6 +85,30 @@ class Module
                     return new TableGateway('breach_remediation_plans_actions', $dbAdapter, null, $resultSetPrototype);
                 },
 
+                'Breachlog\Model\BreachlogRegulationTable' =>  function($sm) {
+                    $tableGateway = $sm->get('BreachlogRegulationTableGateway');
+                    $table = new \Breachlog\Model\BreachlogRegulationTable($tableGateway);
+                    return $table;
+                },
+                'BreachlogRegulationTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new \Breachlog\Model\BreachlogRegulation());
+                    return new TableGateway('breach_logs_regulations', $dbAdapter, null, $resultSetPrototype);
+                },
+
+                'Breachlog\Model\BreachRemediationPlanRegulationTable' =>  function($sm) {
+                    $tableGateway = $sm->get('BreachRemediationPlanRegulationTableGateway');
+                    $table = new \Breachlog\Model\BreachRemediationPlanRegulationTable($tableGateway);
+                    return $table;
+                },
+                'BreachRemediationPlanRegulationTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new \Breachlog\Model\BreachRemediationPlanRegulation());
+                    return new TableGateway('breach_remediation_plans_regulations', $dbAdapter, null, $resultSetPrototype);
+                },
+
             ),
         );
     }

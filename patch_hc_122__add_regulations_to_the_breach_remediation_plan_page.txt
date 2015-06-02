@@ -1,0 +1,13 @@
+CREATE TABLE `breach_logs_regulations` (
+  `blrg_id` int(11) NOT NULL AUTO_INCREMENT,
+  `blrg_bl_id` int(11) NOT NULL,
+  `blrg_rg_id` int(11) NOT NULL,
+  PRIMARY KEY (`blrg_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `breach_remediation_plans_regulations` (
+  `brprg_id` INT(11) NOT NULL AUTO_INCREMENT,
+  `brprg_brp_id` INT(11) NOT NULL,
+  `brprg_rg_id` INT(11) NOT NULL,
+  PRIMARY KEY (`brprg_id`)
+) ENGINE=INNODB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;

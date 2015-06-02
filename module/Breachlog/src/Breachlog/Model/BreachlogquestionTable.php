@@ -95,6 +95,7 @@ class BreachlogquestionTable implements ServiceLocatorAwareInterface
             $brp->exchangeArray($dataBrp);
             $brpDb->setServiceLocator($this->getServiceLocator());
             $brpId = $brpDb->saveBreachremediationplan($brp);
+            $brpDb->setRegulations($brpId, $bl->_bl_cur_regulations);
 
             $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_ADD, \Application\Model\LogsTable::ITEM_TYPE_BRP, $brpId);
 

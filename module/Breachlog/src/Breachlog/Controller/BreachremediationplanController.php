@@ -14,6 +14,7 @@ use Zend\View\Model\ViewModel;
 use Zend\View\Renderer\PhpRenderer;
 use Zend\View\Resolver;
 use Note\Form\NoteForm;
+use Breachlog\Form\BreachremediationplanForm;
 use Breachlog\Form\TaskForm;
 use Note\Model\Note;
 use Breachlog\Model\Breachremediationplanaction;
@@ -83,6 +84,15 @@ class BreachremediationplanController extends AbstractActionController
         return $this->mailtemplateTable;
     }
 
+    public function getRegulationTable()
+    {
+        if (!isset($this->regulationTable)) {
+            $sm = $this->getServiceLocator();
+            $this->regulationTable = $sm->get('Traininglog\Model\RegulationTable');
+        }
+        return $this->regulationTable;
+    }
+
     public function getIdentity()
     {
         $authService = new \Zend\Authentication\AuthenticationService();
@@ -147,6 +157,7 @@ class BreachremediationplanController extends AbstractActionController
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_BRP, $id);
 
         $noteform = $request->isPost() && (int) $request->getPost('noteform');
+        $form = new BreachremediationplanForm($this->getServiceLocator());
         $formNote = new NoteForm($this->getServiceLocator());
 
         $notes = null;
@@ -157,7 +168,7 @@ class BreachremediationplanController extends AbstractActionController
 
         if ($request->isPost()) {
             $post = $request->getPost();
-
+            $form->setData($post);
             if ($noteform) {
                 if ($post['requestreview'] == 1) {
                     $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'requestreview', 'brpId' => $id, 'uId' => $post['brp_approver_u_id']));
@@ -173,6 +184,7 @@ class BreachremediationplanController extends AbstractActionController
                 $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_performed_u_id', $post['brp_performed_u_id']);
                 $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_approver_u_id', $post['brp_approver_u_id']);
                 $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_accepter_u_id', $post['brp_accepter_u_id']);
+                $this->getBreachremediationplanTable()->setRegulations($id, $post['_brp_cur_regulations'] , $post['_regulation']);
 
                 if (!$post['signedoff']) {
                     $ymd1 = \DateTime::createFromFormat('m/d/Y', $post['brp_incident_date']);
@@ -231,6 +243,8 @@ class BreachremediationplanController extends AbstractActionController
         $actions = $this->getBreachremediationplanactionTable()->getBreachremediationplanactions($id);
         $noteTable = $this->getNoteTable();
 
+        $form->bind($brpObj);
+
         $identity = $this->getIdentity();
 
         $userTable = $this->getServiceLocator()->get('Admin\Model\UserTable');
@@ -247,6 +261,7 @@ class BreachremediationplanController extends AbstractActionController
         $view = new ViewModel(array(
             'id' => $id,
             'formNote' => $formNote,
+            'form' => $form,
             'notes' => $notes,
             'brpObj' => $brpObj,
             'actions' => $actions,
@@ -256,6 +271,7 @@ class BreachremediationplanController extends AbstractActionController
             'contacts' => $contacts,
             'contactsApr' => $contactsApr,
             'approverAccepter' => $userTable->getContactsByCompanyId($brpObj->brp_c_id),
+            'regulations' => $this->getRegulationTable()->getRegulations(),
         ));
 
         if ($type == 'pdf') {
@@ -270,12 +286,14 @@ class BreachremediationplanController extends AbstractActionController
 
             $model = new ViewModel(array(
                 'id' => $id,
+                'form' => $form,
                 'formNote' => $formNote,
                 'notes' => $notes,
                 'brpObj' => $brpObj,
                 'actions' => $actions,
                 'writable' => $brpObj->brp_writable,
                 'noteTable' => $noteTable,
+                'regulations' => $this->getRegulationTable()->getRegulations(),
                 'isPdf' => true
             ));
             $model->setTemplate('breachremediationplan/pdfTemplate');
@@ -400,8 +418,26 @@ class BreachremediationplanController extends AbstractActionController
             }
         }
 
-        $csvList[] = 'Initials';
+        $csvList[] = 'Initials:';
         $csvList[] = $brpObj->brp_initials;
+
+        if($brpObj->_brp_cur_regulations) {
+            $regulations = $this->getRegulationTable()->getRegulations();
+            if($regulations) {
+                $csvList[] = 'Regulations:';
+                foreach ($regulations as $regulation) {
+                    if(in_array($regulation->rg_id, $brpObj->_brp_cur_regulations) !== false) {
+                        $csvList[] = array('Policy&Procedure Name: ', $regulation->rg_pp_name);
+                        $csvList[] = array('Policy&Procedure Number: ', $regulation->rg_pp_number);
+                        $csvList[] = array('Regulation Number: ', $regulation->rg_number);
+                        if($regulation->rg_u_owner_id) {
+                            $csvList[] = array('Regulation Description:', $regulation->rg_description);
+                        }
+                        $csvList[] = '';
+                    }
+                }
+            }
+        }
 
         $csvContent = '';
         foreach ($csvList as $row) {
