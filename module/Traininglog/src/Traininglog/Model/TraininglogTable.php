@@ -100,6 +100,48 @@ class TraininglogTable implements ServiceLocatorAwareInterface
         return $resultSet;
     }
 
+
+    public function getTraininglogsForReporting($searchValue = null)
+    {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
+        $select = $this->tableGateway->getSql()->select();
+        if ($identity['u_role_id'] != User::ROLE_ADMIN) {
+            $select->where('tl_active = 1');
+        }
+        
+        $resultSetPrototype = new ResultSet();
+        $resultSetPrototype->setArrayObjectPrototype(new Traininglog());
+        $paginatorAdapter = new DbSelect(
+            $select,
+            $this->tableGateway->getAdapter(),
+            $resultSetPrototype
+        );
+
+        if ($searchValue !== null) {
+            $select->where('(rg.rg_pp_number LIKE "%' . $searchValue . '%" OR rg.rg_pp_name LIKE "%' . $searchValue . '%")');
+        }
+        $select->columns(array('tl_id', 'tl_title'));
+        $select->join(array('tlrg' => 'training_logs_regulations'), new \Zend\Db\Sql\Expression('tl_id = tlrg.tlrg_tl_id'), array('_tl_tlrg_rg_id' => new \Zend\Db\Sql\Expression('tlrg.tlrg_rg_id')), 'inner');
+        $select->join(array('rg' => 'regulations'), new \Zend\Db\Sql\Expression('tlrg.tlrg_rg_id = rg.rg_id'), array('_tl_regulation' => new \Zend\Db\Sql\Expression('rg.rg_pp_name')), 'inner');
+        $select->join(array('u2' => 'users'), new \Zend\Db\Sql\Expression('tl_create_u_id = u2.u_id'), array(), 'inner');
+
+        $select->order('tl_id DESC');
+
+        if($identity['u_company_id']) {
+            $select->where("u2.u_company_id = " . $identity['u_company_id']);
+        } else {
+            $select->where("u2.u_company_id IS NULL ");
+        }
+        $select->group('tl_id');
+
+        $paginator = new Paginator($paginatorAdapter);
+// print_r($select->getSqlString());exit;
+        return $paginator;
+    }
+
     public function getTraininglog($id)
     {
         $id  = (int) $id;

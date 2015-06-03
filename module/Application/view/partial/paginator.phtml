@@ -8,6 +8,8 @@
             isset($role) ? ($params['roleFilter'] = $roleFilter) : '';
             if ($this->controller == 'search'):
                 $params['searchValue'] = $searchValue;
+            elseif (isset($search) && !empty($search)):
+                $params['search'] = $search;
             endif;
             ?>
             <a href="<?php echo $this->url($this->controller, $params); ?>"><i class="fa fa-caret-left"></i><i class="fa fa-caret-left"></i>&nbsp; First</a>
@@ -17,7 +19,9 @@
                     $params = array('action' => $action, 'page' => $this->previous, 'order_by' => $order_by, 'order' => $order);
                     if ($this->controller == 'search'):
                         $params['searchValue'] = $searchValue;
-                    endif
+                    elseif (isset($search) && !empty($search)):
+                        $params['search'] = $search;
+                    endif;
                 ?>
                 <a href="<?php echo $this->url($this->controller, $params); ?>">
                     <i class="fa fa-caret-left"></i>&nbsp; Previous
@@ -33,7 +37,9 @@
                     isset($role) ? ($params['roleFilter'] = $roleFilter) : '';
                     if ($this->controller == 'search'):
                         $params['searchValue'] = $searchValue;
-                    endif
+                    elseif (isset($search) && !empty($search)):
+                        $params['search'] = $search;
+                    endif;
                     ?>
                     <a href="<?php echo $this->url($this->controller, $params); ?>">
                         <?php echo $page; ?>
@@ -50,7 +56,9 @@
                 isset($role) ? ($params['roleFilter'] = $roleFilter) : '';
                 if ($this->controller == 'search'):
                     $params['searchValue'] = $searchValue;
-                endif
+                elseif (isset($search) && !empty($search)):
+                    $params['search'] = $search;
+                endif;
                 ?>
                 <a href="<?php echo $this->url($this->controller, $params); ?>">Next &nbsp;<i class="fa fa-caret-right"></i></a>
             <?php else: ?>
@@ -62,7 +70,9 @@
             isset($role) ? ($params['roleFilter'] = $roleFilter) : '';
             if ($this->controller == 'search'):
                 $params['searchValue'] = $searchValue;
-            endif
+            elseif (isset($search) && !empty($search)):
+                $params['search'] = $search;
+            endif;
             ?>
             <a href="<?php echo $this->url($this->controller, $params); ?>">Last &nbsp;<i class="fa fa-caret-right"></i><i class="fa fa-caret-right"></i></a>
         </div>

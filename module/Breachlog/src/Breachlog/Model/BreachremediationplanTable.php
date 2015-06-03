@@ -83,6 +83,55 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         return $resultSet;
     }
 
+    public function getBreachRemediationPlansForReporting($searchValue = null)
+    {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
+        $select = new Select('breach_remediation_plans');
+
+        $resultSetPrototype = new ResultSet();
+        $resultSetPrototype->setArrayObjectPrototype(new Breachremediationplan());
+        $paginatorAdapter = new DbSelect(
+            $select,
+            $this->tableGateway->getAdapter(),
+            $resultSetPrototype
+        );
+
+        if ($identity['u_role_id'] == User::ROLE_ADMIN) {
+            $select->where('(brp_status = 30 AND brp_active = 1) || (brp_active = 0)');
+        } else {
+            $select->where('brp_active = 1');
+
+            if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
+                $select->where('brp_consultant_u_id = ' . $identity['u_id']);
+            } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
+                $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
+                $ids[] = $identity['u_id'];
+                $select->where('brp_consultant_u_id IN (' . implode(',', $ids) . ')');
+            } elseif ($identity['u_role_id'] == User::ROLE_CLIENT) {
+                $select->where('brp_c_id = ' . $identity['u_company_id']);
+            }
+        }
+
+        if ($searchValue !== null) {
+            $select->where('(rg.rg_pp_number LIKE "%' . $searchValue . '%" OR rg.rg_pp_name LIKE "%' . $searchValue . '%")');
+        }
+        
+        $select->columns(array('brp_id'));
+        $select->join(array('c' => 'companies'), 'brp_c_id = c_id', array('_client_name' => 'c_name'), 'inner');
+        $select->join(array('brprg' => 'breach_remediation_plans_regulations'), new \Zend\Db\Sql\Expression('brp_id = brprg.brprg_brp_id'), array('_brp_brprg_id' => new \Zend\Db\Sql\Expression('brprg.brprg_id'), '_brp_brprg_rg_id' => new \Zend\Db\Sql\Expression('brprg.brprg_rg_id')), 'inner');
+        $select->join(array('rg' => 'regulations'), new \Zend\Db\Sql\Expression('brprg.brprg_rg_id = rg.rg_id'), array('_brp_regulation' => new \Zend\Db\Sql\Expression('rg.rg_pp_name')), 'inner');
+
+        $select->order('brp_id DESC');
+        $select->group('brp_id');
+
+        $paginator = new Paginator($paginatorAdapter);
+// print_r($select->getSqlString());exit;
+        return $paginator;
+    }
+
     public function getForReport($conditionNum = 0, $status = 1, $uId = 0)
     {
         $select = $this->tableGateway->getSql()->select();

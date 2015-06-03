@@ -1,0 +1,71 @@
+<div class="page-title">
+    <h1 class="fleft">Audit/Breach</h1>
+    <form id="reporting_search_form" method="GET" onsubmit="encodeInput(this)" action="<?php echo $this->url('reporting', array('action' => 'auditbreach', 'roleFilter' => 1)); ?>">
+        <a href="javascript:" onclick="$('#list_search_form').submit()" id="list_search-button"><i class="fa fa-search"></i></a>
+        <input type="text" name="search" id="list_search" placeholder="Search" value="<?php echo $search?>">
+    </form>
+    <div class="cboth"></div>
+</div>
+
+<div class="auditbreach_wrap">
+    <p><h4 class="fleft">Breach Remediation Plans</h4></p>
+    <div class="auditbreach_table_wrap">
+        <?php echo $this->partial('reporting/reporting/auditbreach_brp.phtml', array('bRPPaginator' => $this->bRPPaginator, 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'search' => $search)) ?>
+    </div>
+</div>
+
+<div class="auditbreach_wrap">
+    <p><h4 class="fleft">Remediation Plans Tasks</h4></p>
+    <div class="auditbreach_table_wrap">
+        <?php echo $this->partial('reporting/reporting/auditbreach_rpa.phtml', array('rPAPaginator' => $this->rPAPaginator, 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'search' => $search)) ?>
+    </div>
+</div>
+
+<div class="auditbreach_wrap">
+    <p><h4 class="fleft">Training Logs</h4></p>
+    <div class="auditbreach_table_wrap">
+        <?php echo $this->partial('reporting/reporting/auditbreach_tl.phtml', array('tLPaginator' => $this->tLPaginator, 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'search' => $search)) ?>
+    </div>
+</div>
+
+<div class="cboth"><br /></div>
+
+<script type="text/javascript">
+    jQuery(function() {
+        $(document).ready(function() {
+            $('#reporting_search_form').submit(function(e){
+                e.preventDefault();
+                var search = $('#list_search').val();
+                if(search === '') {
+                    window.location.href = $(this).attr('action');
+                } else if(search !== undefined) {
+                    window.location.href = $(this).attr('action') + '/search/' + search;
+                }
+            });
+        });
+    });
+</script>
+<script>
+    jQuery(document).ready(function(){
+       $('#canvas').on('click', '.pagination a', function(event) {
+           event.preventDefault();
+           var url = $(this).attr('href');
+           if(url == '#') return false;
+           
+           getStateList(url, $(this));
+           
+       });
+    });
+
+    function getStateList(url, elem) {
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'html',
+            data: {},
+            success: function(data, status) {
+                elem.closest('.auditbreach_table_wrap').html(data);
+            }
+       });
+    }
+</script>

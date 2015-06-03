@@ -22,7 +22,8 @@ return array(
         'Traininglog',
         'Securityreminder',
         'Sitesetting',
-        'Disclosure'
+        'Disclosure',
+        'Reporting'
         ),
     'module_listener_options' => array(
         'module_paths' => array(

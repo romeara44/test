@@ -685,11 +685,19 @@ th .button { margin-bottom: 0; }
 
 a.i-external { padding: 0 17px 0 0; background: transparent url(images/i-external.gif) right center no-repeat; }
 
-#list_search_form {
+#list_search_form,
+#reporting_search_form {
 	float: left;
-	width: 190px;
 	position: relative;
 	margin: 20px 0 0 20px;
+}
+
+#list_search_form {
+	width: 190px;
+}
+
+#reporting_search_form {
+	width: 683px;
 }
 
 #list_search {

@@ -1,0 +1,25 @@
+<table id="auditbreach_rpa" cellpadding="0" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Title</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->rPAPaginator as $rpa): ?>
+            <tr>
+                <td>
+                    <a href="/remediationplan/edit/<?php echo $rpa->rpa_rp_id ?>?edittask=<?php echo $rpa->rpa_id ?>" target="_blank"><?php echo $rpa->rpa_threat ?></a>
+                </td>
+            </tr>
+
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+<?php echo $this->paginationControl(
+    $this->rPAPaginator,
+    'sliding',
+    array('partial/paginator.phtml', 'Reporting'),
+    array('route' => 'auditbreach', 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'search' => $search, 'roleFilter' => 1, 'role' => 1, 'controller' => 'reporting', 'action' => 'auditbreachrpa')
+);
+?>

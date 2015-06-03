@@ -1,0 +1,25 @@
+<table id="auditbreach_tl" cellpadding="0" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Title</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->tLPaginator as $tl): ?>
+            <tr>
+                <td>
+                    <a href="<?php echo $this->url('traininglog', array('action' => 'edit', 'id' => $tl->tl_id)); ?>" target="_blank"><?php echo $tl->tl_title ?></a>
+                </td>
+            </tr>
+
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+<?php echo $this->paginationControl(
+    $this->tLPaginator,
+    'sliding',
+    array('partial/paginator.phtml', 'Reporting'),
+    array('route' => 'auditbreach', 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'search' => $search, 'roleFilter' => 1, 'controller' => 'reporting', 'action' => 'auditbreachtl')
+);
+?>
