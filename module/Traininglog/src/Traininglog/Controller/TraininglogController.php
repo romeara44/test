@@ -173,13 +173,6 @@ class TraininglogController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
 
-        $identity = $this->getIdentity();
-
-        if(!$this->getCompanyRolesTable()->checkFillCompanyRoles($identity['u_company_id'])){
-            $this->flashMessenger()->addErrorMessage('Please, fill all roles for you company');
-            return $this->redirect()->toRoute('traininglog', array('controller' => 'traininglog', 'action' => 'list'));
-        }
-
         $form     = new TraininglogForm($this->getServiceLocator());
         $formNote = new NoteForm($this->getServiceLocator());
 
@@ -188,7 +181,6 @@ class TraininglogController extends AbstractActionController
 
         $comments          = null;
         $trainingMaterials = null;
-        $companyRolesMsg   = null;
         
         if ((int) $id) {
             $tlObj             = $this->getTraininglogTable()->getTraininglog($id);
@@ -298,8 +290,7 @@ class TraininglogController extends AbstractActionController
             'formNote' => $formNote,
             'tlId' => $id,
             'tlObj' => $tlObj,
-            'regulations' => $this->getRegulationTable()->getRegulations(),
-            'companyRolesMsg' => $companyRolesMsg
+            'regulations' => $this->getRegulationTable()->getRegulations()
         );
     }
 
