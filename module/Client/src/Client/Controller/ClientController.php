@@ -39,7 +39,7 @@ class ClientController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         } else if ($identity['u_first_login'] == 1) {
             return $this->redirect()->toRoute('user', array('controller' => 'user', 'action' => 'acceptprivacyterms'));
-        } else if($identity['u_role_id'] == 7 || ($identity['u_role_id'] == 5 && !$identity['u_company_id_admin'])) {
+        } else if($identity['u_role_id'] == 5 && !$identity['u_company_id_admin']) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
 
@@ -194,7 +194,7 @@ class ClientController extends AbstractActionController
                         $clienLimit = false;
                     }
 
-                    if(!isset($post['u_company_id_admin']) && $post['u_company_id'] == $userObj->u_company_id) {
+                    if(!isset($post['u_company_id_admin']) && is_object($userObj) && $post['u_company_id'] == $userObj->u_company_id) {
                         $post['u_company_id_admin'] = $userObj->u_company_id_admin;
                     }
 

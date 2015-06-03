@@ -47,7 +47,7 @@ class SecurityreminderController extends AbstractActionController
 
     public function getUserTable()
     {
-        if (!$this->userTable) {
+        if (!isset($this->userTable)) {
             $sm = $this->getServiceLocator();
             $this->userTable = $sm->get('Admin\Model\UserTable');
         }
@@ -65,7 +65,7 @@ class SecurityreminderController extends AbstractActionController
 
     public function getNoteTable()
     {
-        if (!$this->noteTable) {
+        if (!isset($this->noteTable)) {
             $sm = $this->getServiceLocator();
             $this->noteTable = $sm->get('Note\Model\NoteTable');
         }
@@ -74,7 +74,7 @@ class SecurityreminderController extends AbstractActionController
 
     public function getSecurityreminderTable()
     {
-        if (!$this->securityreminderTable) {
+        if (!isset($this->securityreminderTable)) {
             $sm = $this->getServiceLocator();
             $this->securityreminderTable = $sm->get('Securityreminder\Model\SecurityreminderTable');
         }
@@ -83,7 +83,7 @@ class SecurityreminderController extends AbstractActionController
 
     public function getDistributiontypeTable()
     {
-        if (!$this->distributiontypeTable) {
+        if (!isset($this->distributiontypeTable)) {
             $sm = $this->getServiceLocator();
             $this->distributiontypeTable = $sm->get('Securityreminder\Model\DistributiontypeTable');
         }
@@ -92,7 +92,7 @@ class SecurityreminderController extends AbstractActionController
 
     public function getCompanyRolesTable()
     {
-        if (!$this->companyRolesTable) {
+        if (!isset($this->companyRolesTable)) {
             $sm = $this->getServiceLocator();
             $this->companyRolesTable = $sm->get('Client\Model\CompanyRolesTable');
         }
@@ -178,6 +178,9 @@ class SecurityreminderController extends AbstractActionController
             $srObj           = $this->getSecurityreminderTable()->getSecurityreminder($id);
             $copyOfMaterials = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_SRM);
             $comments        = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_SRC);
+        } else {
+            $copyOfMaterials = array();
+            $comments        = array();
         }
 
         $request = $this->getRequest();

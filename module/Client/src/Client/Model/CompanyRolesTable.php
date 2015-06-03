@@ -70,7 +70,11 @@ class CompanyRolesTable implements ServiceLocatorAwareInterface
 
     public function checkFillCompanyRoles($cId = null)
     {
-        if(!$cId) {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
+        if($identity['u_role_id'] == User::ROLE_PARTIAL || !$cId) {
             return true;
         }
 
