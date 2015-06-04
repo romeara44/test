@@ -102,7 +102,7 @@ class RemediationplanactionTable implements ServiceLocatorAwareInterface
         $select->order('rpa_id DESC');
 
         $paginator = new Paginator($paginatorAdapter);
-// print_r($select->getSqlString());exit;
+
         return $paginator;
     }
 

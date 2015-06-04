@@ -124,11 +124,11 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         $select->join(array('brprg' => 'breach_remediation_plans_regulations'), new \Zend\Db\Sql\Expression('brp_id = brprg.brprg_brp_id'), array('_brp_brprg_id' => new \Zend\Db\Sql\Expression('brprg.brprg_id'), '_brp_brprg_rg_id' => new \Zend\Db\Sql\Expression('brprg.brprg_rg_id')), 'inner');
         $select->join(array('rg' => 'regulations'), new \Zend\Db\Sql\Expression('brprg.brprg_rg_id = rg.rg_id'), array('_brp_regulation' => new \Zend\Db\Sql\Expression('rg.rg_pp_name')), 'inner');
 
-        $select->order('brp_id DESC');
         $select->group('brp_id');
-
+        $select->order('brp_id DESC');
+        
         $paginator = new Paginator($paginatorAdapter);
-// print_r($select->getSqlString());exit;
+
         return $paginator;
     }
 

@@ -146,6 +146,18 @@ class MenuTop extends AbstractHelper
                 )
             ),
             array(
+                'title' => 'Reporting',
+                'url' => '/reporting/auditbreach',
+                'items' => array(
+                    array('title' => 'Audit/Breach',
+                            'url' => '/reporting/auditbreach'
+                        ),
+                    array('title' => 'Plans Progress',
+                         'url' => '#',
+                        )
+                )
+            ),
+            array(
                 'title' => 'Users',
                 'url' => '/admin/users',
                 // 'items' => array(
@@ -274,6 +286,18 @@ class MenuTop extends AbstractHelper
                           'url' => '/securityreminder/list',
                         )
                 )
+            ),
+            array(
+                'title' => 'Reporting',
+                'url' => '/reporting/auditbreach',
+                'items' => array(
+                    array('title' => 'Audit/Breach',
+                            'url' => '/reporting/auditbreach'
+                        ),
+                    array('title' => 'Plans Progress',
+                         'url' => '#',
+                        )
+                )
             )
         );
 
@@ -350,6 +374,18 @@ class MenuTop extends AbstractHelper
                         ),
                     array('title' => 'Security Reminder',
                           'url' => '/securityreminder/list',
+                        )
+                )
+            ),
+            array(
+                'title' => 'Reporting',
+                'url' => '/reporting/auditbreach',
+                'items' => array(
+                    array('title' => 'Audit/Breach',
+                            'url' => '/reporting/auditbreach'
+                        ),
+                    array('title' => 'Plans Progress',
+                         'url' => '#',
                         )
                 )
             )

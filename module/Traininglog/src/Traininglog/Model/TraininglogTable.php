@@ -128,17 +128,19 @@ class TraininglogTable implements ServiceLocatorAwareInterface
         $select->join(array('rg' => 'regulations'), new \Zend\Db\Sql\Expression('tlrg.tlrg_rg_id = rg.rg_id'), array('_tl_regulation' => new \Zend\Db\Sql\Expression('rg.rg_pp_name')), 'inner');
         $select->join(array('u2' => 'users'), new \Zend\Db\Sql\Expression('tl_create_u_id = u2.u_id'), array(), 'inner');
 
+        if ($identity['u_role_id'] != User::ROLE_ADMIN) {
+            if($identity['u_company_id']) {
+                $select->where("u2.u_company_id = " . $identity['u_company_id']);
+            } else {
+                $select->where("u2.u_company_id IS NULL ");
+            }
+        }
+
+        $select->group('tl_id');
         $select->order('tl_id DESC');
 
-        if($identity['u_company_id']) {
-            $select->where("u2.u_company_id = " . $identity['u_company_id']);
-        } else {
-            $select->where("u2.u_company_id IS NULL ");
-        }
-        $select->group('tl_id');
-
         $paginator = new Paginator($paginatorAdapter);
-// print_r($select->getSqlString());exit;
+
         return $paginator;
     }
 
