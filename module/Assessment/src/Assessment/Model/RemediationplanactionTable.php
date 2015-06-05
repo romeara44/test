@@ -98,7 +98,7 @@ class RemediationplanactionTable implements ServiceLocatorAwareInterface
         $select->join(array('rp' => 'remediation_plans'), new \Zend\Db\Sql\Expression('rpa_rp_id = rp.rp_id'), array(), 'inner');
         $select->join(array('u2' => 'users'), new \Zend\Db\Sql\Expression('rpa_approver_u_id = u2.u_id'), array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)')), 'left');
 
-        $select->group('rpa_id');
+        $select->group(array('rpa_rp_id', 'rpa_id'));
         $select->order('rpa_id DESC');
 
         $paginator = new Paginator($paginatorAdapter);
