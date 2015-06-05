@@ -116,7 +116,7 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         }
 
         if ($searchValue !== null) {
-            $select->where('(rg.rg_pp_number LIKE "%' . $searchValue . '%" OR rg.rg_pp_name LIKE "%' . $searchValue . '%")');
+            $select->where('(rg.rg_number LIKE "%' . $searchValue . '%" OR rg.rg_description LIKE "%' . $searchValue . '%")');
         }
         
         $select->columns(array('brp_id'));

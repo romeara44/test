@@ -121,7 +121,7 @@ class TraininglogTable implements ServiceLocatorAwareInterface
         );
 
         if ($searchValue !== null) {
-            $select->where('(rg.rg_pp_number LIKE "%' . $searchValue . '%" OR rg.rg_pp_name LIKE "%' . $searchValue . '%")');
+            $select->where('(rg.rg_number LIKE "%' . $searchValue . '%" OR rg.rg_description LIKE "%' . $searchValue . '%")');
         }
         $select->columns(array('tl_id', 'tl_title'));
         $select->join(array('tlrg' => 'training_logs_regulations'), new \Zend\Db\Sql\Expression('tl_id = tlrg.tlrg_tl_id'), array('_tl_tlrg_rg_id' => new \Zend\Db\Sql\Expression('tlrg.tlrg_rg_id')), 'inner');
