@@ -106,6 +106,62 @@ class RemediationplanactionTable implements ServiceLocatorAwareInterface
         return $paginator;
     }
 
+    public function getRemediationPlanActionsForReportPage($rpId = 0, $status = null)
+    {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
+        $rpId  = (int) $rpId;
+
+        $select = $this->tableGateway->getSql()->select();
+        $select->columns(array('_id'        => 'rpa_id',
+                                '_c_name'    => new \Zend\Db\Sql\Expression('c_name'),
+                                '_type'      => new \Zend\Db\Sql\Expression('IF(true , "remediation" ,0)'),
+                                '_status'    => 'rpa_status',
+                                '_task'      => 'rpa_threat',
+                                '_approver_name' =>new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)'),
+                                '_contact_name'      => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)'),
+                                '_parent_id'      => new \Zend\Db\Sql\Expression('rpa_rp_id')
+                                )
+                            );
+
+        if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
+            $select->where('rp_consultant_u_id = ' . $identity['u_id']);
+        } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
+            $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
+            $ids[] = $identity['u_id'];
+            $select->where('rp_consultant_u_id IN (' . implode(',', $ids) . ')');
+        } elseif ($identity['u_role_id'] == User::ROLE_CLIENT) {
+            $select->where('rp_c_id = ' . $identity['u_company_id']);
+        }
+        
+
+        $select->where('rpa_rp_id = ' . $rpId);
+        $select->where('rpa_active = 1');
+
+        $select->join(array('rp' => 'remediation_plans'), new \Zend\Db\Sql\Expression('rpa_rp_id = rp.rp_id'), array(), 'inner');
+        $select->join(array('c' => 'companies'), 'rp_c_id = c_id', array(), 'left');
+        $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('rpa_contact_u_id = u_id'), array(), 'left');
+        $select->join(array('u2' => 'users'), new \Zend\Db\Sql\Expression('rpa_approver_u_id = u2.u_id'), array(), 'left');
+        
+        if($status) {
+            $select->where('rpa_status = ' . $status);
+        }
+
+        $select->order('_c_name, rpa_status');
+
+        $paginatorAdapter = new DbSelect(
+            $select,
+            $this->tableGateway->getAdapter(),
+            new ResultSet()
+        );
+
+        $paginator = new Paginator($paginatorAdapter);
+
+        return $paginator;
+    }
+
     public function getRemediationplanaction($id)
     {
         $id  = (int) $id;

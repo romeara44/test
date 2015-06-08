@@ -1070,7 +1070,33 @@ textarea.double { width: 586px; }
 .m10 {
     margin-top: 10px;
 }
-
+#plan-progress-form {
+	margin-bottom: 20px;
+	overflow: hidden;
+}
+.plan-progress-top-select {
+	border: 0;
+}
+.plan-progress-top-select label,
+.plan-progress-bottom-select label {
+	width: 100px;
+}
+.plan-progress-top-select select {
+	width: 89.6%;
+}
+.plan-progress-bottom-select {
+	border: 0;
+}
+.plan-progress-bottom-select select {
+	width: 304px;
+}
+.plan-progress-type,
+.plan-progress-status {
+	margin-right: 42px;
+}
+.plan-progress-submit {
+	margin: 0;
+}
 /* Tables */
 
 table {

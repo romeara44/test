@@ -11,6 +11,9 @@
             elseif (isset($search) && !empty($search)):
                 $params['search'] = $search;
             endif;
+            if (isset($customParams) && !empty($customParams)) {
+                $params = array_merge($params, $customParams);
+            }
             ?>
             <a href="<?php echo $this->url($this->controller, $params); ?>"><i class="fa fa-caret-left"></i><i class="fa fa-caret-left"></i>&nbsp; First</a>
             <!-- Previous page link -->
@@ -22,6 +25,9 @@
                     elseif (isset($search) && !empty($search)):
                         $params['search'] = $search;
                     endif;
+                    if (isset($customParams) && !empty($customParams)) {
+                        $params = array_merge($params, $customParams);
+                    }
                 ?>
                 <a href="<?php echo $this->url($this->controller, $params); ?>">
                     <i class="fa fa-caret-left"></i>&nbsp; Previous
@@ -40,6 +46,9 @@
                     elseif (isset($search) && !empty($search)):
                         $params['search'] = $search;
                     endif;
+                    if (isset($customParams) && !empty($customParams)) {
+                        $params = array_merge($params, $customParams);
+                    }
                     ?>
                     <a href="<?php echo $this->url($this->controller, $params); ?>">
                         <?php echo $page; ?>
@@ -59,6 +68,9 @@
                 elseif (isset($search) && !empty($search)):
                     $params['search'] = $search;
                 endif;
+                if (isset($customParams) && !empty($customParams)) {
+                    $params = array_merge($params, $customParams);
+                }
                 ?>
                 <a href="<?php echo $this->url($this->controller, $params); ?>">Next &nbsp;<i class="fa fa-caret-right"></i></a>
             <?php else: ?>
@@ -73,6 +85,9 @@
             elseif (isset($search) && !empty($search)):
                 $params['search'] = $search;
             endif;
+            if (isset($customParams) && !empty($customParams)) {
+                $params = array_merge($params, $customParams);
+            }
             ?>
             <a href="<?php echo $this->url($this->controller, $params); ?>">Last &nbsp;<i class="fa fa-caret-right"></i><i class="fa fa-caret-right"></i></a>
         </div>

@@ -13,6 +13,13 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
 use Zend\Session\Container;
+use Reporting\Form\PlanprogressForm;
+use Reporting\Form\ReportpageForm;
+use Reporting\Model\Planprogress;
+use Assessment\Model\Remediationplan;
+use Assessment\Model\Remediationplanaction;
+use Breachlog\Model\Breachremediationplan;
+use Breachlog\Model\Breachremediationplanaction;
 
 class ReportingController extends AbstractActionController
 {
@@ -71,6 +78,24 @@ class ReportingController extends AbstractActionController
             $this->remediationplanactionTable = $sm->get('Assessment\Model\RemediationplanactionTable');
         }
         return $this->remediationplanactionTable;
+    }
+
+    public function getRemediationplanTable()
+    {
+        if (!isset($this->remediationplanTable)) {
+            $sm = $this->getServiceLocator();
+            $this->remediationplanTable = $sm->get('Assessment\Model\RemediationplanTable');
+        }
+        return $this->remediationplanTable;
+    }
+
+    public function getBreachremediationplanactionTable()
+    {
+        if (!isset($this->breachremediationplanactionTable)) {
+            $sm = $this->getServiceLocator();
+            $this->breachremediationplanactionTable = $sm->get('Breachlog\Model\BreachremediationplanactionTable');
+        }
+        return $this->breachremediationplanactionTable;
     }
 
     public function hasIdentity()
@@ -206,6 +231,110 @@ class ReportingController extends AbstractActionController
 
             $view->setTerminal(true);
         }
+
+        return $view;
+    }
+
+    public function planProgressAction()
+    {
+        $form = new PlanprogressForm($this->getServiceLocator());
+        
+        $pp = new Planprogress();
+
+        $request = $this->getRequest();
+
+        if ($request->isGet()) {
+            $get = $request->getQuery();
+
+            $form->setInputFilter($pp->getInputFilter($this->getServiceLocator()));
+            $form->setData($get);
+        }
+        
+        $identity = $this->getIdentity();
+
+        $page = $this->params()->fromRoute('page') ? $this->params()->fromRoute('page') : null;
+
+        $company  = isset($get['company'])  ? $get['company']  : null;
+        $type     = isset($get['type'])     ? $get['type']     : null;
+        $status   = isset($get['status'])   ? $get['status']   : null;
+
+        $statuses['breach']      = Breachremediationplan::$statusesNames;
+        $statuses['remediation'] = Remediationplan::$statusesNames;
+
+        $typeMap = array( 'security' => 1, 'privacy' => 2, 'imported' => 'imported', 'breach' => 'breach');
+
+        $paginator = $this->getRemediationplanTable()->getRemediationPlansForPlanProgress($company, isset($typeMap[$type]) ? $typeMap[$type] : null, $status);
+
+        $paginator->setCurrentPageNumber($page);
+        $paginator->setItemCountPerPage($this->countPerPage);
+
+        $view = new ViewModel(array(
+            'order_by'  => 'id',
+            'order'     => 'DESC',
+            'page'      => $page,
+            'paginator' => $paginator,
+            'company'   => $company,
+            'type'      => $type,
+            'status'    => $status,
+            'statuses'  => $statuses,
+            'identity'  => $identity,
+            'form'      => $form
+        ));
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open reporting audit breach list page');
+
+        return $view;
+    }
+
+    public function reportPageAction()
+    {
+        $form = new ReportpageForm($this->getServiceLocator());
+        
+        $pp = new Planprogress();
+
+        $request = $this->getRequest();
+
+        if ($request->isGet()) {
+            $get = $request->getQuery();
+
+            $form->setInputFilter($pp->getInputFilter($this->getServiceLocator()));
+            $form->setData($get);
+        }
+        
+        $identity = $this->getIdentity();
+
+        $page = $this->params()->fromRoute('page') ? $this->params()->fromRoute('page') : null;
+        $type = $this->params()->fromRoute('type') ? $this->params()->fromRoute('type') : null;
+        $id   = $this->params()->fromRoute('id')   ? $this->params()->fromRoute('id')   : null;
+
+        $status = isset($get['status']) ? $get['status'] : null;
+
+        $statuses['breach']      = Breachremediationplanaction::$statusesNames;
+        $statuses['remediation'] = Remediationplanaction::$statusesNames;
+
+        if($type == 'breach') {
+            $paginator = $this->getBreachremediationplanactionTable()->getBreachRemediationPlanAnactionsForReportPage($id, $status);
+        } else {
+            $paginator = $this->getRemediationplanactionTable()->getRemediationPlanActionsForReportPage($id, $status);
+        }
+
+        $paginator->setCurrentPageNumber($page);
+        $paginator->setItemCountPerPage($this->countPerPage);
+
+        $view = new ViewModel(array(
+            'order_by'  => 'id',
+            'order'     => 'DESC',
+            'id'        => $id,
+            'page'      => $page,
+            'paginator' => $paginator,
+            'type'      => $type,
+            'status'    => $status,
+            'statuses'  => $statuses,
+            'identity'  => $identity,
+            'form'      => $form
+        ));
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open reporting audit breach list page');
 
         return $view;
     }

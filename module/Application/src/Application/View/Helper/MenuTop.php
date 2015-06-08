@@ -153,7 +153,7 @@ class MenuTop extends AbstractHelper
                             'url' => '/reporting/auditbreach'
                         ),
                     array('title' => 'Plans Progress',
-                         'url' => '#',
+                         'url' => '/reporting/planprogress',
                         )
                 )
             ),
@@ -232,7 +232,7 @@ class MenuTop extends AbstractHelper
                             'url' => '/reporting/auditbreach'
                         ),
                     array('title' => 'Plans Progress',
-                         'url' => '#',
+                         'url' => '/reporting/planprogress',
                         )
                 )
             )
@@ -295,7 +295,7 @@ class MenuTop extends AbstractHelper
                             'url' => '/reporting/auditbreach'
                         ),
                     array('title' => 'Plans Progress',
-                         'url' => '#',
+                         'url' => '/reporting/planprogress',
                         )
                 )
             )
@@ -385,7 +385,7 @@ class MenuTop extends AbstractHelper
                             'url' => '/reporting/auditbreach'
                         ),
                     array('title' => 'Plans Progress',
-                         'url' => '#',
+                         'url' => '/reporting/planprogress',
                         )
                 )
             )

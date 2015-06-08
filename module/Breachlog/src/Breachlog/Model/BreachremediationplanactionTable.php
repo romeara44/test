@@ -6,6 +6,7 @@ use Zend\Mail;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
+use Admin\Model\User;
 use Zend\Db\ResultSet\ResultSet;
 use Zend\Db\Sql\Select;
 use Zend\Paginator\Adapter\DbSelect;
@@ -63,6 +64,62 @@ class BreachremediationplanactionTable implements ServiceLocatorAwareInterface
         }
 
         return $row;
+    }
+
+    public function getBreachRemediationPlanAnactionsForReportPage($id, $status = null)
+    {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
+        $id  = (int) $id;
+
+        $select = $this->tableGateway->getSql()->select();
+        $select->columns(array('_id'        => 'brpa_id',
+                                '_c_name'    => new \Zend\Db\Sql\Expression('c_name'),
+                                '_type'      => new \Zend\Db\Sql\Expression('IF(true , "remediation" ,0)'),
+                                '_status'    => 'brpa_status',
+                                '_task'      => 'brpa_task',
+                                '_approver_name' =>new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)'),
+                                '_contact_name'      => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)'),
+                                '_parent_id'      => new \Zend\Db\Sql\Expression('brpa_brp_id')
+                                )
+                            );
+
+        if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
+            $select->where('brp_consultant_u_id = ' . $identity['u_id']);
+        } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
+            $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
+            $ids[] = $identity['u_id'];
+            $select->where('brp_consultant_u_id IN (' . implode(',', $ids) . ')');
+        } elseif ($identity['u_role_id'] == User::ROLE_CLIENT) {
+            $select->where('brp_c_id = ' . $identity['u_company_id']);
+        }
+
+
+        $select->where('brp_active = 1');
+        $select->where('brpa_brp_id = ' . $id);
+        
+        if($status) {
+            $select->where('brpa_status = ' . $status);
+        }
+        
+        $select->join(array('brp' => 'breach_remediation_plans'), new \Zend\Db\Sql\Expression('brpa_brp_id = brp.brp_id'), array(), 'inner');
+        $select->join(array('c' => 'companies'), 'brp_c_id = c_id', array(), 'left');
+        $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('brpa_contact_u_id = u_id'), array(), 'left');
+        $select->join(array('u2' => 'users'), new \Zend\Db\Sql\Expression('brpa_approver_u_id = u2.u_id'), array(), 'left');
+
+        $paginatorAdapter = new DbSelect(
+            $select,
+            $this->tableGateway->getAdapter(),
+            new ResultSet()
+        );
+
+        $select->order('_c_name, _status');
+
+        $paginator = new Paginator($paginatorAdapter);
+
+        return $paginator;
     }
 
     public function saveBreachremediationplanaction(Breachremediationplanaction $brpa)

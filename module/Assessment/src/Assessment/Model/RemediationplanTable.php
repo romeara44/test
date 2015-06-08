@@ -154,6 +154,132 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
         return ($row->_client_name);
     }
 
+    public function getRemediationPlansForPlanProgress($company = null, $type = null, $status = null)
+    {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
+        $selectRP = new Select('remediation_plans');
+
+        if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
+            $selectRP->where('rp_consultant_u_id = ' . $identity['u_id']);
+        } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
+            $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
+            $ids[] = $identity['u_id'];
+            $selectRP->where('rp_consultant_u_id IN (' . implode(',', $ids) . ')');
+        } elseif ($identity['u_role_id'] == User::ROLE_CLIENT) {
+            $selectRP->where('rp_c_id = ' . $identity['u_company_id']);
+        }
+
+        $selectRP->where('rp_active = 1');
+
+        if($company) {
+            $selectRP->where('rp_c_id = ' . $company);
+        }
+
+        if($type) {
+            if($type == 'imported') {
+                $selectRP->where('rp_a_id IS NULL');
+            } else if($type == 'breach') {
+                $selectRP->where('(1 = 0)');
+            } else {
+                $selectRP->where('(rp_type = ' . $type . ' AND rp_a_id IS NOT NULL)');
+            }
+        }
+
+        if($status) {
+            $selectRP->where('rp_status = ' . $status);
+        }
+        
+        $selectRP->where('rp_status != ' . \Assessment\Model\Remediationplan::STATUS_CLOSED);
+
+        $selectRP->columns(array('_id'       => 'rp_id',
+                                '_c_name'    => new \Zend\Db\Sql\Expression('c_name'),
+                                '_type'      => new \Zend\Db\Sql\Expression('IF(true , "remediation" ,0)'),
+                                '_status'    => 'rp_status',
+                                '_item_type' => 'rp_type',
+                                '_assesment' => 'rp_a_id',
+                                '_date'      => 'rp_create_date'
+                                )
+                            );
+
+        $selectRP->join(array('c' => 'companies'), 'rp_c_id = c_id', array(), 'left');
+
+        $selectRP->group(array('rp_id'));
+
+        $selectBRP = new Select('breach_remediation_plans');
+
+        $selectBRP->where('brp_active = 1');
+
+        if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
+            $selectBRP->where('brp_consultant_u_id = ' . $identity['u_id']);
+        } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
+            $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
+            $ids[] = $identity['u_id'];
+            $selectBRP->where('brp_consultant_u_id IN (' . implode(',', $ids) . ')');
+        } elseif ($identity['u_role_id'] == User::ROLE_CLIENT) {
+            $selectBRP->where('brp_c_id = ' . $identity['u_company_id']);
+        }
+
+        if($company) {
+            $selectBRP->where('brp_c_id = ' . $company);
+        }
+
+        if($type && $type != 'breach') {
+            $selectBRP->where('1 = 0');
+        }
+
+        if($status) {
+            $selectBRP->where('brp_status = ' . $status);
+        }
+
+        $selectBRP->where('brp_status != ' . \Breachlog\Model\Breachremediationplan::STATUS_CLOSED);
+
+        $selectBRP->columns(array('_id'       => 'brp_id',
+                                '_c_name'    => new \Zend\Db\Sql\Expression('c_name'),
+                                '_type'      => new \Zend\Db\Sql\Expression('IF(true , "breach" ,0)'),
+                                '_status'    => 'brp_status',
+                                '_item_type' => new \Zend\Db\Sql\Expression('IF(true , -1 ,0)'),
+                                '_assesment' => new \Zend\Db\Sql\Expression('IF(true , -1 ,0)'),
+                                '_date'      => 'brp_create_date'
+                                )
+                            );
+        $selectBRP->join(array('c' => 'companies'), 'brp_c_id = c_id', array(), 'left');
+
+        $selectBRP->group(array('brp_id'));
+        $selectBRP->combine($selectRP);
+
+        $selectBRP->order('_c_name, _type, _status');
+
+        $paginatorAdapter = new DbSelect(
+            $selectBRP,
+            $this->tableGateway->getAdapter(),
+            new ResultSet()
+        );
+
+        $paginator = new Paginator($paginatorAdapter);
+
+        return $paginator;
+    }
+
+    public static function getTypeForReporting($item)
+    {
+        $result = '';
+
+        if($item->_type == 'breach') {
+            $result = 'Breach Remediation Plan';
+        } else {
+            if(!$item->_assesment) {
+                $result = 'Imported Remediation Plans';
+            } else {
+                $result = \Assessment\Model\Assessment::$typesNames[$item->_item_type];
+            }
+        }
+
+        return $result;
+    }
+
     public function getRemediationplan($id)
     {
         $id  = (int) $id;
