@@ -146,9 +146,9 @@ class BreachremediationplanactionTable implements ServiceLocatorAwareInterface
         } else {
             if ($brpaAction = $this->getBreachremediationplanaction($id)) {
 
-                if ($brpa->brpa_status == Breachremediationplanaction::STATUS_PENDING_APPROVAL) {
-                    $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'pendingapproval', 'brpaId' => $id));
-                }
+                //if ($brpa->brpa_status == Breachremediationplanaction::STATUS_PENDING_APPROVAL) {
+                    //$this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'pendingapproval', 'brpaId' => $id));
+                //}
                 $this->tableGateway->update($data, array('brpa_id' => $id));
             } else {
                 throw new \Exception('Form id does not exist');
