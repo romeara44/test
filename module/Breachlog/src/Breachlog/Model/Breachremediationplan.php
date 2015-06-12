@@ -30,6 +30,7 @@ class Breachremediationplan
     public $brp_initials;
     public $brp_active;
     public $brp_initials_approver;
+    public $brpa_latest_action_date;
     public $_brp_incident_date_formatted;
     public $_brp_remediation_date_formatted;
 
@@ -70,6 +71,7 @@ class Breachremediationplan
         $this->brp_active     = (isset($data['brp_active'])) ? $data['brp_active'] : null;
         $this->brp_initials_approver     = (isset($data['brp_initials_approver'])) ? $data['brp_initials_approver'] : null;
         $this->brp_create_date     = (isset($data['brp_create_date'])) ? $data['brp_create_date'] : null;
+        $this->brpa_latest_action_date     = (isset($data['brpa_latest_action_date'])) ? $data['brpa_latest_action_date'] : null;
         $this->_client_name     = (isset($data['_client_name'])) ? $data['_client_name'] : null;
         $this->_approver_name     = (isset($data['_approver_name'])) ? $data['_approver_name'] : null;
         $this->_accepter_name     = (isset($data['_accepter_name'])) ? $data['_accepter_name'] : null;

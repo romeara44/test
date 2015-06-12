@@ -82,7 +82,8 @@ class BreachremediationplanactionTable implements ServiceLocatorAwareInterface
                                 '_task'      => 'brpa_task',
                                 '_approver_name' =>new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)'),
                                 '_contact_name'      => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)'),
-                                '_parent_id'      => new \Zend\Db\Sql\Expression('brpa_brp_id')
+                                '_parent_id'      => new \Zend\Db\Sql\Expression('brpa_brp_id'),
+                                '_latest_action_date'      => new \Zend\Db\Sql\Expression('brpa_latest_action_date')
                                 )
                             );
 
@@ -100,7 +101,7 @@ class BreachremediationplanactionTable implements ServiceLocatorAwareInterface
         $select->where('brp_active = 1');
         $select->where('brpa_brp_id = ' . $id);
         
-        if($status) {
+        if($status !== null) {
             $select->where('brpa_status = ' . $status);
         }
         
@@ -115,7 +116,7 @@ class BreachremediationplanactionTable implements ServiceLocatorAwareInterface
             new ResultSet()
         );
 
-        $select->order('_c_name, _status');
+        $select->order('_latest_action_date DESC');
 
         $paginator = new Paginator($paginatorAdapter);
 
@@ -145,6 +146,9 @@ class BreachremediationplanactionTable implements ServiceLocatorAwareInterface
             $id = $this->tableGateway->lastInsertValue;
         } else {
             if ($brpaAction = $this->getBreachremediationplanaction($id)) {
+                if($brpaAction->brpa_status !== $data['brpa_status']) {
+                    $data['brpa_latest_action_date'] = date('Y-m-d H:i:s');
+                }
 
                 //if ($brpa->brpa_status == Breachremediationplanaction::STATUS_PENDING_APPROVAL) {
                     //$this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'pendingapproval', 'brpaId' => $id));

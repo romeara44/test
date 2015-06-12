@@ -46,6 +46,7 @@ class Remediationplanaction
     public $rpa_active;
     public $rpa_create_date;
     public $rpa_aqc_id;
+    public $rpa_latest_action_date;
 
     public $_contact_name;
     public $_approver_name;
@@ -73,6 +74,7 @@ class Remediationplanaction
         $this->rpa_target_date     = (isset($data['rpa_target_date'])) ? $data['rpa_target_date'] : null;
         $this->rpa_active     = (isset($data['rpa_active'])) ? $data['rpa_active'] : null;
         $this->rpa_create_date     = (isset($data['rpa_create_date'])) ? $data['rpa_create_date'] : null;
+        $this->rpa_latest_action_date     = (isset($data['rpa_latest_action_date'])) ? $data['rpa_latest_action_date'] : null;
         $this->_contact_name     = (isset($data['_contact_name'])) ? $data['_contact_name'] : null;
         $this->_approver_name     = (isset($data['_approver_name'])) ? $data['_approver_name'] : null;
         $this->_location_name     = (isset($data['_location_name'])) ? $data['_location_name'] : null;

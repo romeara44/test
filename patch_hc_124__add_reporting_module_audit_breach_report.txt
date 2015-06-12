@@ -1,0 +1,2 @@
+ALTER TABLE  `breach_remediation_plans_actions` ADD  `brpa_latest_action_date` DATETIME DEFAULT NULL ;
+ALTER TABLE  `remediation_plans_actions` ADD  `rpa_latest_action_date` DATETIME DEFAULT NULL ;

@@ -122,7 +122,8 @@ class RemediationplanactionTable implements ServiceLocatorAwareInterface
                                 '_task'      => 'rpa_threat',
                                 '_approver_name' =>new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)'),
                                 '_contact_name'      => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)'),
-                                '_parent_id'      => new \Zend\Db\Sql\Expression('rpa_rp_id')
+                                '_parent_id'      => new \Zend\Db\Sql\Expression('rpa_rp_id'),
+                                '_latest_action_date'      => new \Zend\Db\Sql\Expression('rpa_latest_action_date')
                                 )
                             );
 
@@ -145,11 +146,11 @@ class RemediationplanactionTable implements ServiceLocatorAwareInterface
         $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('rpa_contact_u_id = u_id'), array(), 'left');
         $select->join(array('u2' => 'users'), new \Zend\Db\Sql\Expression('rpa_approver_u_id = u2.u_id'), array(), 'left');
         
-        if($status) {
+        if($status !== null) {
             $select->where('rpa_status = ' . $status);
         }
 
-        $select->order('_c_name, rpa_status');
+        $select->order('_latest_action_date DESC');
 
         $paginatorAdapter = new DbSelect(
             $select,
@@ -223,7 +224,9 @@ class RemediationplanactionTable implements ServiceLocatorAwareInterface
             $id = $this->tableGateway->lastInsertValue;
         } else {
             if ($rpaAction = $this->getRemediationplanaction($id)) {
-
+                if($rpaAction->rpa_status !== $data['rpa_status']) {
+                    $data['rpa_latest_action_date'] = date('Y-m-d H:i:s');
+                }
                 if ($rpa->rpa_status == Remediationplanaction::STATUS_PENDING_APPROVAL) {
                     // $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'pendingapproval', 'rpaId' => $id));
                 }

@@ -21,11 +21,12 @@
         <table cellpadding="0" cellspacing="0">
             <thead>
                 <tr>
-                    <th>Company</th>
+                    <th style="width: 190px">Company</th>
                     <th>Task|Threat</th>
                     <th>Status</th>
                     <th>Assignee</th>
                     <th>Approver</th>
+                    <th style="width: 70px">Date</th>
                 </tr>
             </thead>
             <tbody>
@@ -45,6 +46,9 @@
                         </td>
                         <td>
                             <?php echo $pn->_approver_name ?>
+                        </td>
+                        <td>
+                            <?php echo $pn->_latest_action_date ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
