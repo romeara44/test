@@ -73,7 +73,11 @@ class CompanyTable implements ServiceLocatorAwareInterface
                 $ids[] = $identity['u_id'];
                 $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR c_consultant_u_id IN (' . implode(',', $ids) . '))');
             } else if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
-                $select->where('c_owner_u_id = ' . $identity['u_id']);
+                if($identity['u_company_id_admin']) {
+                    $select->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR c_id = ' . $identity['u_company_id_admin'] . ')');
+                } else {
+                    $select->where('c_owner_u_id = ' . $identity['u_id']);
+                }
             }
 
             if ($typeItems == 'companies') {
@@ -114,7 +118,11 @@ class CompanyTable implements ServiceLocatorAwareInterface
                         $ids[] = $identity['u_id'];
                         $selectCom->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR c_consultant_u_id IN (' . implode(',', $ids) . '))');
                     } else if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
-                        $selectCom->where('c_owner_u_id = ' . $identity['u_id']);
+                        if($identity['u_company_id_admin']) {
+                            $selectCom->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR c_id = ' . $identity['u_company_id_admin'] . ')');
+                        } else {
+                            $selectCom->where('c_owner_u_id = ' . $identity['u_id']);
+                        }
                     }
                 }
 
@@ -208,7 +216,11 @@ class CompanyTable implements ServiceLocatorAwareInterface
             $ids[] = $identity['u_id'];
             $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR c_consultant_u_id IN (' . implode(',', $ids) . '))');
         } else if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
-            $select->where('c_owner_u_id = ' . $identity['u_id'] . ' OR c_id = ' . $identity['u_company_id']);
+            if($identity['u_company_id_admin']) {
+                $select->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR c_id = ' . $identity['u_company_id_admin'] . ')');
+            } else {
+                $select->where('c_owner_u_id = ' . $identity['u_id']);
+            }
         }
 
         $resultSet = $this->tableGateway->selectWith($select);
@@ -248,7 +260,11 @@ class CompanyTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
 
         if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
-            $select->where('c_owner_u_id = ' . $identity['u_id']);
+            if($identity['u_company_id_admin']) {
+                $select->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR c_id = ' . $identity['u_company_id_admin'] . ')');
+            } else {
+                $select->where('c_owner_u_id = ' . $identity['u_id']);
+            }
         }
 
         $select->where('c_id = ' . $id);
