@@ -200,7 +200,7 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
                                 '_status'    => 'rp_status',
                                 '_item_type' => 'rp_type',
                                 '_assesment' => 'rp_a_id',
-                                '_date'      => 'rp_create_date'
+                                '_date'      => new \Zend\Db\Sql\Expression('IF(rp_a_id , rp_incident_date , rp_remediation_date)')
                                 )
                             );
 
@@ -236,13 +236,13 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
 
         $selectBRP->where('brp_status != ' . \Breachlog\Model\Breachremediationplan::STATUS_CLOSED);
 
-        $selectBRP->columns(array('_id'       => 'brp_id',
-                                '_c_name'    => new \Zend\Db\Sql\Expression('c_name'),
-                                '_type'      => new \Zend\Db\Sql\Expression('IF(true , "breach" ,0)'),
-                                '_status'    => 'brp_status',
-                                '_item_type' => new \Zend\Db\Sql\Expression('IF(true , -1 ,0)'),
-                                '_assesment' => new \Zend\Db\Sql\Expression('IF(true , -1 ,0)'),
-                                '_date'      => 'brp_create_date'
+        $selectBRP->columns(array('_id'        => 'brp_id',
+                                  '_c_name'    => new \Zend\Db\Sql\Expression('c_name'),
+                                  '_type'      => new \Zend\Db\Sql\Expression('IF(true , "breach" ,0)'),
+                                  '_status'    => 'brp_status',
+                                  '_item_type' => new \Zend\Db\Sql\Expression('IF(true , -1 ,0)'),
+                                  '_assesment' => new \Zend\Db\Sql\Expression('IF(true , -1 ,0)'),
+                                  '_date'      => 'brp_create_date'
                                 )
                             );
         $selectBRP->join(array('c' => 'companies'), 'brp_c_id = c_id', array(), 'left');
@@ -250,7 +250,7 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
         $selectBRP->group(array('brp_id'));
         $selectBRP->combine($selectRP);
 
-        $selectBRP->order('_c_name, _type, _status');
+        $selectBRP->order('_c_name, _type, _status, _date DESC');
 
         $paginatorAdapter = new DbSelect(
             $selectBRP,

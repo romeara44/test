@@ -83,7 +83,7 @@ class BreachremediationplanactionTable implements ServiceLocatorAwareInterface
                                 '_approver_name' =>new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)'),
                                 '_contact_name'      => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)'),
                                 '_parent_id'      => new \Zend\Db\Sql\Expression('brpa_brp_id'),
-                                '_latest_action_date'      => new \Zend\Db\Sql\Expression('brpa_latest_action_date')
+                                '_latest_action_date'      => new \Zend\Db\Sql\Expression('IF(brpa_latest_action_date, brpa_latest_action_date, DATE_FORMAT(brp.brp_incident_date, "%Y-%m-%d"))')
                                 )
                             );
 

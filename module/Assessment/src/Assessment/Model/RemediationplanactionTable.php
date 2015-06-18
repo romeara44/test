@@ -123,7 +123,7 @@ class RemediationplanactionTable implements ServiceLocatorAwareInterface
                                 '_approver_name' =>new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)'),
                                 '_contact_name'      => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)'),
                                 '_parent_id'      => new \Zend\Db\Sql\Expression('rpa_rp_id'),
-                                '_latest_action_date'      => new \Zend\Db\Sql\Expression('rpa_latest_action_date')
+                                '_latest_action_date'      => new \Zend\Db\Sql\Expression('IF(rpa_latest_action_date, rpa_latest_action_date, IF(rp.rp_a_id , rp.rp_incident_date , rp.rp_remediation_date))')
                                 )
                             );
 
