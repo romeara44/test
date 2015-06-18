@@ -34,7 +34,7 @@ class VerbalLogForm extends Form
                 'type'  => 'text',
             ),
             'options' => array(
-                'label' => 'Date of requiest',
+                'label' => 'Date of request',
             ),
         ));
 
@@ -124,7 +124,7 @@ class VerbalLogForm extends Form
                 'type'  => 'text',
             ),
             'options' => array(
-                'label' => 'Date Account Sent',
+                'label' => 'Date Accounting Sent',
             ),
         ));
 
@@ -164,7 +164,7 @@ class VerbalLogForm extends Form
                 'type'  => 'text',
             ),
             'options' => array(
-                'label' => 'If yes, give reason',
+                'label' => 'Give reason',
             ),
         ));
 

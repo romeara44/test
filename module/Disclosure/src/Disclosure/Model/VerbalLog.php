@@ -229,7 +229,7 @@ class VerbalLog
 
             $inputFilter->add($factory->createInput(array(
                 'name'     => 'vl_date_patient_notified',
-                'required' => false,
+                'required' => true,
                 'filters'  => array(
                     array('name' => 'StripTags'),
                     array('name' => 'StringTrim'),
@@ -267,7 +267,7 @@ class VerbalLog
 
             $inputFilter->add($factory->createInput(array(
                 'name'     => 'vl_disclosure_address',
-                'required' => true,
+                'required' => false,
                 'filters'  => array(
                     array('name' => 'StripTags'),
                     array('name' => 'StringTrim'),
@@ -305,7 +305,7 @@ class VerbalLog
 
             $inputFilter->add($factory->createInput(array(
                 'name'     => 'vl_staff_member',
-                'required' => false,
+                'required' => true,
                 'filters'  => array(
                     array('name' => 'StripTags'),
                     array('name' => 'StringTrim'),

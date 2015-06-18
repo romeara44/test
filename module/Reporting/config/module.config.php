@@ -13,10 +13,11 @@ return array(
             'reporting' => array(
                 'type'    => 'segment',
                 'options' => array(
-                    'route'    => '/reporting[/:action][/:type][/:id][/page/:page]',
+                    'route'    => '/reporting[/:action][/:type][/:id][/page/:page][/search/:search]',
                     'constraints' => array(
                         'type'   => '(?!\bpage\b)(?!\border_by\b)[a-zA-Z][a-zA-Z0-9_-]*',
                         'action' => '(?!\bpage\b)(?!\border_by\b)[a-zA-Z][a-zA-Z0-9_-]*',
+                        'search' => '.*',
                         'id'     => '[0-9]+',
                         'page'   => '[0-9]+',
                     ),

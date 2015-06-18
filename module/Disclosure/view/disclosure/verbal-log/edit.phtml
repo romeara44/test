@@ -79,7 +79,7 @@ $form->setAttribute('method', 'post');
         <p>
             <?php $fn = $form->get('vl_disclosure_address');
             echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
             echo $this->formElementErrors($fn);
             ?>
         </p>
@@ -110,10 +110,10 @@ $form->setAttribute('method', 'post');
 
         <h5 class="fleft m10">FEES</h5>
 
-        <p>
+        <p id="vl_fees_charge">
             <?php $fn = $form->get('vl_fees_charge');
             echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
             echo $this->formElementErrors($fn);
             ?>
         </p>
@@ -123,9 +123,9 @@ $form->setAttribute('method', 'post');
         <p>
             <label>Fees</label>
             <span class="radio-button-wrap">
-                <input type="radio" name="vl_is_fees" id="vl_is_fees1" <?php if(!$vlObj || $vlObj->vl_is_fees){?>checked<?php }?> class="radio" value="1" />
+                <input type="radio" name="vl_is_fees" id="vl_is_fees1" <?php if(!$vlObj || $vlObj->vl_is_fees){?>checked<?php }?> class="radio vl_is_fees" value="1" />
                     <label for="vl_is_fees1" class="checkbox">Yes</label>
-                <input type="radio" name="vl_is_fees" id="vl_is_fees0" <?php if($vlObj && !$vlObj->vl_is_fees){?>checked<?php }?> class="radio" value="0" />
+                <input type="radio" name="vl_is_fees" id="vl_is_fees0" <?php if($vlObj && !$vlObj->vl_is_fees){?>checked<?php }?> class="radio vl_is_fees" value="0" />
                     <label for="vl_is_fees0" class="checkbox">No</label>
             </span>
         </p>
@@ -157,17 +157,17 @@ $form->setAttribute('method', 'post');
         <p>
             <label>Extension requested</label>
             <span class="radio-button-wrap">
-                <input type="radio" name="vl_is_extensions" id="vl_is_extensions1" <?php if(!$vlObj || $vlObj->vl_is_extensions){?>checked<?php }?> class="radio" value="1" />
+                <input type="radio" name="vl_is_extensions" id="vl_is_extensions1" <?php if(!$vlObj || $vlObj->vl_is_extensions){?>checked<?php }?> class="radio vl_is_extensions" value="1" />
                     <label for="vl_is_extensions1" class="checkbox">Yes</label>
-                <input type="radio" name="vl_is_extensions" id="vl_is_extensions0" <?php if($vlObj && !$vlObj->vl_is_extensions){?>checked<?php }?> class="radio" value="0" />
+                <input type="radio" name="vl_is_extensions" id="vl_is_extensions0" <?php if($vlObj && !$vlObj->vl_is_extensions){?>checked<?php }?> class="radio vl_is_extensions" value="0" />
                     <label for="vl_is_extensions0" class="checkbox">No</label>
             </span>
         </p>
 
-        <p>
+        <p id="p_vl_extension_reason">
             <?php $fn = $form->get('vl_extension_reason');
             echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
             echo $this->formElementErrors($fn);
             ?>
         </p>
@@ -178,7 +178,7 @@ $form->setAttribute('method', 'post');
                 $fn->setValue($this->formatDateA($this->vlObj->vl_date_patient_notified, false, true));
             endif;
             echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id' => 'vl_date_patient_notified', 'readonly' => 'readonly')));
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'vl_date_patient_notified', 'readonly' => 'readonly')));
             echo $this->formElementErrors($fn);
             ?>
         </p>
@@ -186,7 +186,7 @@ $form->setAttribute('method', 'post');
         <p>
             <?php $fn = $form->get('vl_staff_member');
             echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
             echo $this->formElementErrors($fn);
             ?>
         </p>
@@ -210,5 +210,38 @@ $form->setAttribute('method', 'post');
         $('#verballog').validate();
 
         $("#vl_date_of_request, #vl_date_of_birth, #vl_date_requested_from, #vl_date_requested_to, #vl_date_request_received, #vl_date_account_sent, #vl_date_patient_notified").datepicker({dateFormat: 'mm/dd/yy'});
+
+        $('.vl_is_extensions').click(function() {
+            checkExtensions();
+        });
+
+        $('.vl_is_fees').click(function() {
+            checkFees();
+        });
+
+        function checkExtensions() {
+            if($('.vl_is_extensions:checked').val() == 1) {
+                $('#p_vl_extension_reason').show();
+                $('#p_vl_extension_reason input').attr('required', true).addClass('required');
+            } else {
+                $('#p_vl_extension_reason').hide();
+                $('#p_vl_extension_reason input').attr('required', false).removeClass('error required');
+                $('#p_vl_extension_reason label[generated=true]').remove();
+            }
+        }
+
+        function checkFees() {
+            if($('.vl_is_fees:checked').val() == 1) {
+                $('#vl_fees_charge input').attr('required', true).addClass('required');
+            } else {
+                $('#vl_fees_charge input').attr('required', false).removeClass('error required');
+                $('#vl_fees_charge label[generated=true]').remove();
+            }
+        }
+
+        jQuery(document).ready(function(){
+            checkExtensions();
+            checkFees();
+        });
     });
 </script>
