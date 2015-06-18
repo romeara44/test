@@ -358,6 +358,9 @@ $form->setAttribute('method', 'post');
                 <?php if ($user->u_id == $trainingManagerId): ?>
                     <span class="label primary">Training Manager</span>
                 <?php endif; ?>
+                <?php if ($user->u_company_id_admin == $cId): ?>
+                    <span class="label primary">Company Admin</span>
+                <?php endif; ?>
                 <br class="cboth" />
                 <em style="font-weight: 400;"><?php echo $user->u_title ?></em>
             </h5>
