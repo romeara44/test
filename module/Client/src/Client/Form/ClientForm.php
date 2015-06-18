@@ -17,6 +17,8 @@ class ClientForm extends Form
             ),
         ));
 
+        $companies = array();
+        
         $companyTable = $sl->get('Client\Model\CompanyTable');
         foreach ($companyTable->getCompaniesPairs() as $key => $r) {
             $companies[$key] = $r;
