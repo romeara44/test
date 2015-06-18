@@ -697,7 +697,17 @@ a.i-external { padding: 0 17px 0 0; background: transparent url(images/i-externa
 }
 
 #reporting_search_form {
+	margin-top: 10px;
 	width: 683px;
+}
+#reporting_search_form {
+	margin-top: 10px;
+	width: 629px;
+}
+.auditbreach_search_label {
+	font-weight: bold;
+	margin: 10px 20px 0 0;
+	width: 310px;
 }
 
 #list_search {

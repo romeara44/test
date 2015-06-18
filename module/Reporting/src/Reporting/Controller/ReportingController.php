@@ -112,20 +112,26 @@ class ReportingController extends AbstractActionController
         $page   = 1;
         $search = $this->params()->fromRoute('search') ? $this->params()->fromRoute('search') : null;
 
-        $tLPaginator = $this->getTraininglogTable()->getTraininglogsForReporting($search);
+        if($search) {
+            $tLPaginator = $this->getTraininglogTable()->getTraininglogsForReporting($search);
 
-        $tLPaginator->setCurrentPageNumber($page);
-        $tLPaginator->setItemCountPerPage($this->countPerPage);
+            $tLPaginator->setCurrentPageNumber($page);
+            $tLPaginator->setItemCountPerPage($this->countPerPage);
 
-        $bRPPaginator = $this->getBreachremediationplanTable()->getBreachRemediationPlansForReporting($search);
+            $bRPPaginator = $this->getBreachremediationplanTable()->getBreachRemediationPlansForReporting($search);
 
-        $bRPPaginator->setCurrentPageNumber($page);
-        $bRPPaginator->setItemCountPerPage($this->countPerPage);
+            $bRPPaginator->setCurrentPageNumber($page);
+            $bRPPaginator->setItemCountPerPage($this->countPerPage);
 
-        $rPAPaginator = $this->getRemediationplanactionTable()->getRemediationPlanActionsForReporting($search);
+            $rPAPaginator = $this->getRemediationplanactionTable()->getRemediationPlanActionsForReporting($search);
 
-        $rPAPaginator->setCurrentPageNumber($page);
-        $rPAPaginator->setItemCountPerPage($this->countPerPage);
+            $rPAPaginator->setCurrentPageNumber($page);
+            $rPAPaginator->setItemCountPerPage($this->countPerPage);
+        } else {
+            $tLPaginator  = null;
+            $bRPPaginator = null;
+            $rPAPaginator = null;
+        }
 
         $view = new ViewModel(array(
             'order_by'     => 'id',

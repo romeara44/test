@@ -119,13 +119,13 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
             $select->where('(rg.rg_number LIKE "%' . $searchValue . '%" OR rg.rg_description LIKE "%' . $searchValue . '%")');
         }
         
-        $select->columns(array('brp_id'));
+        $select->columns(array('brp_id', 'brp_remediation_date'));
         $select->join(array('c' => 'companies'), 'brp_c_id = c_id', array('_client_name' => 'c_name'), 'inner');
         $select->join(array('brprg' => 'breach_remediation_plans_regulations'), new \Zend\Db\Sql\Expression('brp_id = brprg.brprg_brp_id'), array('_brp_brprg_id' => new \Zend\Db\Sql\Expression('brprg.brprg_id'), '_brp_brprg_rg_id' => new \Zend\Db\Sql\Expression('brprg.brprg_rg_id')), 'inner');
         $select->join(array('rg' => 'regulations'), new \Zend\Db\Sql\Expression('brprg.brprg_rg_id = rg.rg_id'), array('_brp_regulation' => new \Zend\Db\Sql\Expression('rg.rg_pp_name')), 'inner');
 
         $select->group('brp_id');
-        $select->order('brp_id DESC');
+        $select->order('brp_remediation_date DESC');
         
         $paginator = new Paginator($paginatorAdapter);
 

@@ -2,6 +2,7 @@
     <thead>
         <tr>
             <th>Title</th>
+            <th style="width: 80px">Date</th>
         </tr>
     </thead>
     <tbody>
@@ -9,6 +10,9 @@
             <tr>
                 <td>
                     <a href="/remediationplan/edit/<?php echo $rpa->rpa_rp_id ?>?edittask=<?php echo $rpa->rpa_id ?>" target="_blank"><?php echo $rpa->rpa_threat ?></a>
+                </td>
+                <td>
+                    <?php echo $rpa->rpa_target_date ?>
                 </td>
             </tr>
 

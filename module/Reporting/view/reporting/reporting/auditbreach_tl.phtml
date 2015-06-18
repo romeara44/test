@@ -2,6 +2,7 @@
     <thead>
         <tr>
             <th>Title</th>
+            <th style="width: 80px">Date</th>
         </tr>
     </thead>
     <tbody>
@@ -9,6 +10,9 @@
             <tr>
                 <td>
                     <a href="<?php echo $this->url('traininglog', array('action' => 'edit', 'id' => $tl->tl_id)); ?>" target="_blank"><?php echo $tl->tl_title ?></a>
+                </td>
+                <td>
+                    <?php echo $tl->tl_conducted_date ?>
                 </td>
             </tr>
 

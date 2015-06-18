@@ -2,6 +2,7 @@
     <thead>
         <tr>
             <th>Title</th>
+            <th style="width: 80px">Date</th>
         </tr>
     </thead>
     <tbody>
@@ -9,6 +10,9 @@
             <tr>
                 <td>
                     <a href="<?php echo $this->url('breachremediationplan', array('action' => 'edit', 'id' => $brp->brp_id)); ?>" target="_blank"><?php echo $brp->_client_name ?></a>
+                </td>
+                <td>
+                    <?php echo $brp->brp_remediation_date ?>
                 </td>
             </tr>
 

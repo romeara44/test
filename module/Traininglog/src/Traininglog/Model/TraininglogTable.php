@@ -123,7 +123,7 @@ class TraininglogTable implements ServiceLocatorAwareInterface
         if ($searchValue !== null) {
             $select->where('(rg.rg_number LIKE "%' . $searchValue . '%" OR rg.rg_description LIKE "%' . $searchValue . '%")');
         }
-        $select->columns(array('tl_id', 'tl_title'));
+        $select->columns(array('tl_id', 'tl_title', 'tl_conducted_date'));
         $select->join(array('tlrg' => 'training_logs_regulations'), new \Zend\Db\Sql\Expression('tl_id = tlrg.tlrg_tl_id'), array('_tl_tlrg_rg_id' => new \Zend\Db\Sql\Expression('tlrg.tlrg_rg_id')), 'inner');
         $select->join(array('rg' => 'regulations'), new \Zend\Db\Sql\Expression('tlrg.tlrg_rg_id = rg.rg_id'), array('_tl_regulation' => new \Zend\Db\Sql\Expression('rg.rg_pp_name')), 'inner');
         $select->join(array('u2' => 'users'), new \Zend\Db\Sql\Expression('tl_create_u_id = u2.u_id'), array(), 'inner');
@@ -137,7 +137,7 @@ class TraininglogTable implements ServiceLocatorAwareInterface
         }
 
         $select->group('tl_id');
-        $select->order('tl_id DESC');
+        $select->order('tl_conducted_date DESC');
 
         $paginator = new Paginator($paginatorAdapter);
 
