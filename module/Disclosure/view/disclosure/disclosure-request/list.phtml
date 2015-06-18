@@ -6,14 +6,16 @@ $identity = $authService->getIdentity();
 ?>
 
 <div class="page-title">
-    <h1 class="fleft" style="width: 220px">Disclosures Requests</h1>
+    <h1 class="fleft" style="width: 420px">Disclosures Requests</h1>
     <a href="<?php echo $this->url('disclosurerequest', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 0)); ?>" class="label <?php echo $roleFilter == 0 ? ' selected ' : '' ?>">All</a>
     <a href="<?php echo $this->url('disclosurerequest', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 1)); ?>" class="label <?php echo $roleFilter == 1 ? ' selected ' : '' ?>">Active</a>
     <a href="<?php echo $this->url('disclosurerequest', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 2)); ?>" class="label <?php echo $roleFilter == 2 ? ' selected ' : '' ?>">Archived</a>
-    <form id="list_search_form" method="GET" onsubmit="encodeInput(this)" action="<?php echo $this->url('disclosurerequest', array('action' => 'list', 'roleFilter' => $roleFilter)); ?>">
-        <a href="javascript:" onclick="$('#list_search_form').submit()" id="list_search-button"><i class="fa fa-search"></i></a>
-        <input type="text" name="search" id="list_search" placeholder="Search" value="<?php echo $search?>">
-    </form>
+    <?php if(false): ?>
+        <form id="list_search_form" method="GET" onsubmit="encodeInput(this)" action="<?php echo $this->url('disclosurerequest', array('action' => 'list', 'roleFilter' => $roleFilter)); ?>">
+            <a href="javascript:" onclick="$('#list_search_form').submit()" id="list_search-button"><i class="fa fa-search"></i></a>
+            <input type="text" name="search" id="list_search" placeholder="Search" value="<?php echo $search?>">
+        </form>
+    <?php endif;?>
     <a href="/disclosurerequest/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Disclosure Request</a>
     <div class="cboth"></div>
 </div>
