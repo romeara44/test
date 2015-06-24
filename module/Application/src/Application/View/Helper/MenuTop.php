@@ -225,6 +225,21 @@ class MenuTop extends AbstractHelper
                 )
             ),
             array(
+                'title' => 'Disclosures',
+                'url' => '/disclosurerequest/list',
+                'items' => array(
+                    array('title' => 'Requests',
+                            'url' => '/disclosurerequest/list'
+                        ),
+                    array('title' => 'Disclosure Tracking Logs',
+                         'url' => '/disclosuretrackinglog/list',
+                        ),
+                    array('title' => 'Verbal Logs',
+                         'url' => '/verballog/list',
+                        )
+                )
+            ),
+            array(
                 'title' => 'Reporting',
                 'url' => '/reporting/auditbreach',
                 'items' => array(
@@ -496,50 +511,6 @@ class MenuTop extends AbstractHelper
                     array('title' => 'Create Company',
                           'url' => '/company/edit',
                         )
-                )
-            )
-        );
-    }
-
-    private function _prepareItemsForCoordinator()
-    {
-        $this->items = array(
-            array(
-                'title' => 'Powiadomienia',
-                'items' => array(
-                    array('title' => 'Wyślij powiadomienie', 'url' => '/notifications/create'),
-                )
-            ),
-            array(
-                'title' => 'Dobre praktyki',
-                'items' => array(
-                    array('title' => 'Wszystkie dobre praktyki', 'url' => '/practice/alllist'),
-                    array('title' => 'Aktywne dobre praktyki', 'url' => '/practice/activelist'),
-                    array('title' => 'Czekające na akceptację', 'url' => '/practice/toacceptlist'),
-                    array('title' => 'border', 'url' => ''),
-                    array('title' => 'Edycja formularzy', 'url' => '/practice/formedit'),
-                    array('title' => 'Dodaj nowy projekt', 'url' => '/practice/create'),
-                    array('title' => 'border', 'url' => ''),
-                    array('title' => 'Lista przedstawicieli', 'url' => '/user/representativelist'),
-                    array('title' => 'Przedstawiciele do akceptacji', 'url' => '/user/representativetoacceptlist'),
-                    array('title' => 'Lista innych dodających', 'url' => '/user/simpleuserlist'),
-                )
-            ),
-            array(
-                'title' => 'Konkursy',
-                'items' => array(
-                    array('title' => 'Wszystkie konkursy', 'url' => '/contest/list'),
-                    array('title' => 'Aktywne konkursy', 'url' => '/contest/activelist'),
-                    array('title' => 'Zgłoszenia do konkursów', 'url' => '/contest/userlist'),
-                    array('title' => 'border', 'url' => ''),
-                    array('title' => 'Lista jurorów', 'url' => '/contest/jurors'),
-                    array('title' => 'Dodaj konkurs', 'url' => '/contest/create'),
-                )
-            ),
-            array(
-                'title' => 'Komentarze',
-                'items' => array(
-                    array('title' => 'Do zatwierdzenia', 'url' => '/practice/commentlist'),
                 )
             )
         );
