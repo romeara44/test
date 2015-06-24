@@ -22,6 +22,9 @@ $form->setAttribute('method', 'post');
         <ul id="tabs-nav">
             <li><a href="#tab1">Details</a></li>
             <li><a href="#tab2">Notes</a></li>
+            <?php if($administrationAccess): ?>
+                <li><a href="#tab3">Administration</a></li>
+            <?php endif; ?>
         </ul>
         <div class="cboth"></div>
     <?php endif; ?>
@@ -328,6 +331,21 @@ $form->setAttribute('method', 'post');
                     </div>
                 <?php endforeach; ?>
             <?php endif; ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($administrationAccess): ?>
+        <div id="tab3">
+            <h3>Administration</h3>
+
+            <form action="/client/resetpassword/<?php echo $this->uId ?>" name="" id="" method="POST">
+
+                <p style="border-bottom:0">
+                    <input type="submit"  name="reset" value="Reset Password" class="form-button" />
+                </p>
+
+            </form>
+
         </div>
     <?php endif; ?>
 </div>

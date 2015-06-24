@@ -79,12 +79,12 @@ class AuthController extends AbstractActionController
                 $email = $post['u_email'];
                 $userTable = $this->getServiceLocator()->get('Admin\Model\UserTable');
 
-                $ret = $userTable->sendPasswordReminder($email);
+                $ret = $userTable->sendPasswordForgotRequest($email);
 
                 $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Send forgot password email');
 
                 if ($ret) {
-                    $this->flashMessenger()->addSuccessMessage('Instruction on your email');
+                    $this->flashMessenger()->addSuccessMessage('Thank You. You will receive new password on email as soon as posible');
                 } else {
                     $this->flashMessenger()->addErrorMessage('E-mail doesn\'t exists.');
                     return $this->redirect()->toRoute('auth', array('controller' => 'auth', 'action' => 'forgotpassword'));

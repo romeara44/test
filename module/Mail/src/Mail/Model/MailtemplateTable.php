@@ -89,7 +89,8 @@ class MailtemplateTable
             }
             if (isset($params['password'])) {
                 $mt->mt_text = str_replace('<password>', $params['password'], $mt->mt_text);
-                $mt->mt_text = str_replace('<Full Name>', $user->u_firstname . ' ' . $user->u_lastname, $mt->mt_text);
+                $mt->mt_text = str_replace('<Full Name>', $addToName, $mt->mt_text);
+                $mt->mt_text = str_replace('<Admin Name>', $identity['u_firstname'] . ' ' . $identity['u_lastname'], $mt->mt_text);
                 if ($user->u_role_id == \Admin\Model\User::ROLE_CLIENT) {
                     $mt->mt_text = str_replace('<Consultant Name>', $identity['u_firstname'] . ' ' . $identity['u_lastname'], $mt->mt_text);
                 } else {
@@ -116,6 +117,13 @@ class MailtemplateTable
             $subject = $params['subject'];
         } else {
             $subject = $mt->mt_subject;
+        }
+
+        if (isset($params['forgot_password_user'])) {
+            $forgotPasswordUserName = $params['forgot_password_user']->u_firstname . ' ' . $params['forgot_password_user']->u_lastname;
+
+            $mt->mt_text = str_replace('<User Name>', $forgotPasswordUserName, $mt->mt_text);
+            $mt->mt_text = str_replace('<User Email>', $params['forgot_password_user']->u_email, $mt->mt_text);
         }
 
         $text = '';
@@ -182,7 +190,6 @@ class MailtemplateTable
         }
         
         $mail->setBody($body);
-
 
         $mail->setSubject($subject);
 
@@ -286,10 +293,10 @@ class MailtemplateTable
 
         $model = new ViewModel(array(
             'content' => $content,
-            'consultant_name' => $consultantName,
+            'consultant_name'  => $consultantName,
             'consultant_email' => $consultantEmail,
             'consultant_phone' => $consultantPhone,
-            'consultant_role' => $sl->get('Admin\Model\RoleTable')->getRoleName($identity['u_role_id']),
+            'consultant_role'  => $sl->get('Admin\Model\RoleTable')->getRoleName($identity['u_role_id']),
         ));
         $model->setTemplate('mail/mailtemplate');
 

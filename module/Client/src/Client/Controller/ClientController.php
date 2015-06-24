@@ -297,7 +297,8 @@ class ClientController extends AbstractActionController
             'cId' => (int) $this->params('company'),
             'clientLimitMsg' => $clientLimitMsg,
             'setTrainingManagerMsg' => $setTrainingManagerMsg,
-            'checkClientLimitCompany' => $this->getCompanyTable()->checkClientLimitCompany()
+            'checkClientLimitCompany' => $this->getCompanyTable()->checkClientLimitCompany(),
+            'administrationAccess' => $this->getUserTable()->checkClientAdministrationAccess($userObj)
         );
     }
 
@@ -316,6 +317,21 @@ class ClientController extends AbstractActionController
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Send client invite "' . $id . '"');
 
         return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
+    }
+
+    public function resetpasswordAction()
+    {
+        $id = (int) $this->params('id');
+
+        if ($id) {
+            if($this->getUserTable()->resetPassword($id)) {
+                $this->flashMessenger()->addSuccessMessage('Password reset succesfuly.');
+            } else {
+                $this->flashMessenger()->addErrorMessage('Password reset failure.');
+            }
+        }
+
+        return $this->redirect()->toRoute('client', array('controller' => 'client', 'action' => 'edit', 'id' => $id));
     }
 
     public function deleteAction()

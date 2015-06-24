@@ -313,18 +313,46 @@ class UserTable implements ServiceLocatorAwareInterface
         return $id;
     }
 
-    public function sendPasswordReminder($email)
+    public function sendPasswordForgotRequest($email)
     {
         if (!$this->checkIfUserExists($email)) {
             return false;
         }
 
-        $user = $this->getUserByEmail($email);
+        $adminId = null;
+        $user    = $this->getUserByEmail($email);
 
-        $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'forgotpassword', 'uId' => $user->u_id, 'link' => '<a style="color: #15c" href="http://' . $_SERVER['HTTP_HOST']  . '/auth/newpassword/' . $user->u_id . '/' . $user->u_hash . '">link</a>'));
+        if($user->u_company_id) {
+            $select = $this->tableGateway->getSql()->select();
+            $select->where('u_company_id_admin = ' . $user->u_company_id);
+            $select->where('u_active = 1');
 
-        return true;
+            $resultSet = $this->tableGateway->selectWith($select);
+            $row       = $resultSet->current();
+            if ($row) {
+                $adminId = $row->u_id;
+            }
+        }
 
+        if(!$adminId) {
+            $select = $this->tableGateway->getSql()->select();
+            $select->where('u_role_id = ' . User::ROLE_ADMIN);
+            $select->where('u_active = 1');
+
+            $resultSet = $this->tableGateway->selectWith($select);
+            $row       = $resultSet->current();
+            if ($row) {
+                $adminId = $row->u_id;
+            }
+        }
+
+        if($adminId) {
+            $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'forgot_password_request', 'uId' => $adminId, 'forgot_password_user' => $user));
+            $this->tableGateway->update(array('u_forgot_password' => 1), array('u_id' => $user->u_id));
+            return true;
+        }
+
+        return false;
     }
 
     public function setConfirmed($uId, $hash)
@@ -579,4 +607,39 @@ class UserTable implements ServiceLocatorAwareInterface
 
         return true;
     }
+
+    public function resetPassword($id)
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('u_id = ' . $id);
+
+        $user = $this->tableGateway->selectWith($select)->current();
+
+        if($user && $this->checkClientAdministrationAccess($user)) {
+            $password = sha1($user->u_email . time());
+            $password = substr($password, 0, 6);
+
+            $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'reset_password', 'uId' => $user->u_id, 'password' => $password));
+            $this->setNewPassword($user->u_id, $password);
+            $this->tableGateway->update(array('u_forgot_password' => 0), array('u_id' => $user->u_id));
+            
+            return true;
+        }
+
+        return false;
+    }
+
+    public function checkClientAdministrationAccess($user = null)
+    {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
+        return isset($user->u_id) &&
+              ( $identity['u_role_id'] == User::ROLE_ADMIN ||
+                ($identity['u_company_id_admin'] && $user->u_company_id == $identity['u_company_id_admin']) ||
+                ($user->u_senior_consultant_u_id && $user->u_senior_consultant_u_id == $identity['u_id'])
+              );
+    }
+
 }
