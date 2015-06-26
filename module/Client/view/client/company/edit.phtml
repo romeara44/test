@@ -22,6 +22,9 @@ $form->setAttribute('method', 'post');
             <li><a href="#tab1">Details</a></li>
             <li><a href="#tab2">Notes</a></li>
             <li><a <?php if($roleId == \Admin\Model\User::ROLE_PARTIAL){ ?>class="disabled"<?php }?> href="#tab3">Roles</a></li>
+            <?php if($administrationAccess): ?>
+                <li><a id="tab4Link" href="#tab4">Administration</a></li>
+            <?php endif; ?>
         </ul>
         <div class="cboth"></div>
     <?php endif; ?>
@@ -343,6 +346,31 @@ $form->setAttribute('method', 'post');
             </form>
         </div>
     <?php endif; ?>
+
+    <?php if ($administrationAccess): ?>
+        <div id="tab4">
+            <h3>Users Login History</h3>
+
+            <form action="javascript:;" name="usersLoginHistoryForm" id="usersLoginHistoryForm">
+
+                <p style="border-bottom:0">
+                    <input type="text" id="fromDate" name="fromDate" value="<?php echo $fromDate?>" class="form-control company-admin-date" />
+                    <input type="text" id="toDate" name="toDate" value="<?php echo $toDate?>" class="form-control company-admin-date" />
+                    <input type="submit" id="usersLoginHistoryBtn" name="search" value="Search" class="form-button" />
+                </p>
+
+            </form>
+            <div class="administrationBlockWrap usersLoginHistory">
+
+            </div>
+
+            <h3>Locked Users</h3>
+
+            <div class="administrationBlockWrap lockedUsers">
+
+            </div>
+        </div>
+    <?php endif; ?>
 </div>
 
 <?php if ($this->cId && is_array($contacts) && (count($contacts))): ?>
@@ -379,6 +407,9 @@ $form->setAttribute('method', 'post');
 
     var browseFilesCounter = 0;
     $(document).ready(function() {
+
+        $('#fromDate, #toDate').datepicker({dateFormat: 'mm/dd/yy'});
+
         $('#browseFile').click(function() {
             $('#filesToUploadBox').append('<input type="file" name="notesFiles[]" id="file' + browseFilesCounter + '" />');
 
@@ -391,6 +422,62 @@ $form->setAttribute('method', 'post');
             $('.need-activation-box').show().animate({opacity: 1.0}, 3000).fadeOut(1000);
             return false;
         });
+
+        function getAdministrationData(url, wrapper)
+        {
+            $.ajax({
+                type: "GET",
+                url: url,
+                data: {'from': $('#fromDate').val(), 'to': $('#toDate').val()},
+                success: function(data) {
+                    wrapper.html(data);
+                }
+            });
+        }
+
+        $('#tab4Link').click(function(e) {
+            e.preventDefault();
+            var url = "/company/usersloginhistory/" + <?php echo $this->cId?>;
+            getAdministrationData(url, $('.usersLoginHistory'))
+            url = "/company/lockedusers/" + <?php echo $this->cId?>;
+            getAdministrationData(url, $('.lockedUsers'))
+        });
+
+        $('#usersLoginHistoryBtn').click(function(e) {
+            e.preventDefault();
+            var url = "/company/usersloginhistory/" + <?php echo $this->cId?>;
+            getAdministrationData(url, $('.usersLoginHistory'));
+        });
+
+       $('.administrationBlockWrap').on('click', '.pagination a', function(e) {
+
+           e.preventDefault();
+           var url = $(this).attr('href');
+           if(url == '#') return false;
+
+           var wrapper = $(this).closest('.administrationBlockWrap');
+
+           getAdministrationData(url, wrapper);
+       });
+
+       $('.administrationBlockWrap').on('click', '.unlockUser', function(e) {
+
+           e.preventDefault();
+           var $this = $(this);
+           var url = $this.attr('href');
+           if(url == '#') return false;
+
+           $.ajax({
+                type: "GET",
+                url: url,
+                success: function(data) {
+                   var wrapper = $this.closest('.administrationBlockWrap');
+                   url = $('.pagination a.current').attr('href');
+                   if(url == '#') return false;
+                   getAdministrationData(url, wrapper);
+                }
+           });
+       });
 
     });
 

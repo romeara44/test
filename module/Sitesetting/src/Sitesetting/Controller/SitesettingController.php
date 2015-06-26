@@ -30,11 +30,10 @@ class SitesettingController extends AbstractActionController
         $container->activity = time();
         $this->layout()->flashMessagesSuccess = $this->flashMessenger()->getSuccessMessages();
         $this->layout()->flashMessagesErrors = $this->flashMessenger()->getErrorMessages();
-        if (true || !$this->hasIdentity()) {
-            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
-        }
+
         $identity = $this->getIdentity();
-        if (!in_array($identity['u_role_id'], array(1))) {
+
+        if (!$identity || $identity['u_role_id'] != \Admin\Model\User::ROLE_ADMIN) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
 
@@ -61,7 +60,7 @@ class SitesettingController extends AbstractActionController
 
     public function getSitesettingTable()
     {
-        if (!$this->SitesettingTable) {
+        if (!isset($this->SitesettingTable)) {
             $sm = $this->getServiceLocator();
             $this->SitesettingTable = $sm->get('Sitesetting\Model\SitesettingTable');
         }

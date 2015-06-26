@@ -174,7 +174,6 @@ class AuthController extends AbstractActionController
     public function authenticateAction()
     {
         $form = new AuthForm();
-        $redirect = 'login';
         
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -184,13 +183,23 @@ class AuthController extends AbstractActionController
             $form->setData($request->getPost());
 
             if ($form->isValid()) {
-                $usersTable = $this->getServiceLocator()->get('UsersTableGateway');
-                $usersDb = new \Admin\Model\UserTable($usersTable);
-                $user = $usersDb->getUserByEmail($request->getPost('u_email'));
+                $usersDb = $this->getServiceLocator()->get('Admin\Model\UserTable');
+                $user    = $usersDb->getUserByEmail($request->getPost('u_email'));
 
-                if($user['u_confirmed'] == 0) {
-                    $this->flashmessenger()->addErrorMessage('Wrong email or password. Please try again.');
-                    return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+                if($user) {
+                    if(!$user->u_active || $user->u_locked || !$user->u_confirmed) {
+                        $this->getSessionStorage()->forgetMe();
+                        $this->getAuthService()->clearIdentity();
+
+                        if($user->u_locked) {
+                            $this->flashmessenger()->addErrorMessage('You are locked. Please contact admin.');
+                            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_AUTH_LOCKED, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $user->u_id);
+                        } else {
+                            $this->flashmessenger()->addErrorMessage('Wrong email or password. Please try again.');
+                        }
+
+                        return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+                    }
                 }
 
                 $this->getAuthService()->getAdapter()
@@ -199,64 +208,51 @@ class AuthController extends AbstractActionController
 
                 $result = $this->getAuthService()->authenticate();
 
-                foreach($result->getMessages() as $message)
-                {
-                    //save message temporary into flashmessenger
-                    //$this->flashmessenger()->addSuccessMessage($message);
-                }
-                
                 if ($result->isValid()) {
-                    $this->flashmessenger()->addSuccessMessage('Log in');
-                    $redirect = 'index';
                     //check if it has rememberMe :
                     if ($request->getPost('u_remember_me') == 1) {
-                        $this->getSessionStorage()
-                             ->setRememberMe(1);
+                        $this->getSessionStorage()->setRememberMe(1);
                         //set storage again
                         $this->getAuthService()->setStorage($this->getSessionStorage());
                     }
+
                     $this->getAuthService()->setStorage($this->getSessionStorage());
 
-                    $user = $usersDb->getUserByEmail($request->getPost('u_email'));
-
-                    $dataStorage['u_email'] = $request->getPost('u_email');
-                    $dataStorage['u_firstname'] = $user->u_firstname;
-                    $dataStorage['u_title'] = $user->u_title;
-                    $dataStorage['u_lastname'] = $user->u_lastname;
-                    $dataStorage['u_role_id'] = $user->u_role_id;
-                    $dataStorage['u_id'] = $user->u_id;
+                    $dataStorage['u_email']                  = $request->getPost('u_email');
+                    $dataStorage['u_firstname']              = $user->u_firstname;
+                    $dataStorage['u_title']                  = $user->u_title;
+                    $dataStorage['u_lastname']               = $user->u_lastname;
+                    $dataStorage['u_role_id']                = $user->u_role_id;
+                    $dataStorage['u_id']                     = $user->u_id;
                     $dataStorage['u_senior_consultant_u_id'] = $user->u_senior_consultant_u_id;
-                    $dataStorage['u_company_id'] = $user->u_company_id;
-                    $dataStorage['u_office_phone'] = $user->u_office_phone;
-                    $dataStorage['u_register'] = $user->u_register;
-                    $dataStorage['u_first_login'] = $user->u_first_login;
-                    $dataStorage['u_company_id_admin'] = $user->u_company_id_admin;
-                    $dataStorage['u_grant_to_disclosures'] = $user->u_grant_to_disclosures;
+                    $dataStorage['u_company_id']             = $user->u_company_id;
+                    $dataStorage['u_office_phone']           = $user->u_office_phone;
+                    $dataStorage['u_register']               = $user->u_register;
+                    $dataStorage['u_first_login']            = $user->u_first_login;
+                    $dataStorage['u_company_id_admin']       = $user->u_company_id_admin;
+                    $dataStorage['u_grant_to_disclosures']   = $user->u_grant_to_disclosures;
 
                     $this->getAuthService()->getStorage()->write($dataStorage);
 
-                    if (!$user->u_active) {
-                        $this->getSessionStorage()->forgetMe();
-                        $this->getAuthService()->clearIdentity();
-
-                        $this->flashmessenger()->addErrorMessage('Wrong email or password. Please try again.');
-                    }
-
                     $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Authenticate');
 
+                    $this->getServiceLocator()->get('Admin\Model\UserTable')->updateFailedLoginCount($user, true);
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_AUTH_SUCCESS, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $user->u_id);
 
-                    $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+                    $this->flashmessenger()->addSuccessMessage('Log in');
                 } else {
+                    if(isset($user->u_id)) {
+                        $this->getServiceLocator()->get('Admin\Model\UserTable')->updateFailedLoginCount($user);
+                        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_AUTH_FAILED, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $user->u_id);
+                    }
                     $this->flashmessenger()->addErrorMessage('Wrong email or password. Please try again.');
-                    $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
                 }
             } else {
                 $this->flashmessenger()->addErrorMessage('Wrong');
-                $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
             }
         }
         
-        return $this->redirect()->toRoute($redirect);
+        return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
     }
     
     public function logoutAction()

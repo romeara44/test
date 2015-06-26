@@ -642,4 +642,79 @@ class UserTable implements ServiceLocatorAwareInterface
               );
     }
 
+    public function checkCompanyAdministrationAccess($company = null)
+    {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
+        return isset($company->c_id) &&
+              ( $identity['u_role_id'] == User::ROLE_ADMIN ||
+                ($identity['u_company_id_admin'] && $company->c_id == $identity['u_company_id_admin']) ||
+                ($company->c_consultant_u_id && $company->c_consultant_u_id == $identity['u_id'])
+              );
+    }
+
+    public function updateFailedLoginCount($user, $reset = false)
+    {
+        if($user->u_role_id != User::ROLE_ADMIN) {
+            $locked = 0;
+
+            if($reset) {
+                $data['u_locked'] = 0;
+                $data['u_failed_logins_count'] = $locked;
+                $data['u_locked_unlocked_date'] = date('Y-m-d H:i:s');
+            } else {
+                $data['u_failed_logins_count'] = ++$user->u_failed_logins_count;
+                $locked = (int) $user->u_failed_logins_count >= \Sitesetting\Model\Sitesetting::FAILED_USER_LOGINS_LIMIT;
+                if($locked) {
+                    $data['u_locked'] = $locked;
+                    $data['u_locked_unlocked_date'] = date('Y-m-d H:i:s');
+                }
+            }
+
+            $this->tableGateway->update($data, array('u_id' => $user->u_id));
+        }
+
+        return true;
+    }
+
+    public function getLockedCompanyUsers($companyId)
+    {
+        $select = new Select('users');
+        $resultSetPrototype = new ResultSet();
+        $resultSetPrototype->setArrayObjectPrototype(new User());
+        $paginatorAdapter = new DbSelect(
+            $select,
+            $this->tableGateway->getAdapter(),
+            $resultSetPrototype
+        );
+
+        $select->columns(array('u_id',
+                               'u_locked_unlocked_date',
+                               'u_locked',
+                               '_username' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)')
+                               )
+                        );
+
+        $select->where('u_company_id = ' . $companyId);
+        $select->where('u_active = 1');
+        $select->where('u_locked = 1');
+
+        $select->order('u_locked_unlocked_date DESC');
+
+        $paginator = new Paginator($paginatorAdapter);
+
+        return $paginator;
+    }
+
+    public function lockUser($id, $lock)
+    {
+        $data['u_locked'] = $lock;
+        $data['u_failed_logins_count'] = 0;
+        $data['u_locked_unlocked_date'] = date('Y-m-d H:i:s');
+
+        return $this->tableGateway->update($data, array('u_id' => $id));
+    }
+
 }

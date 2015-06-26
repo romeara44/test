@@ -8,8 +8,8 @@ use Zend\InputFilter\InputFilterInterface;
 
 class Sitesetting
 {
-
-    const NUMBER_USERS_OF_COMPANY = 'number_users_of_company';
+    const NUMBER_USERS_OF_COMPANY  = 'number_users_of_company';
+    const FAILED_USER_LOGINS_LIMIT = 'failed_user_logins_limit';
     
     public $ss_id;
     public $ss_name;

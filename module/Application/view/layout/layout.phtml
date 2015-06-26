@@ -72,7 +72,7 @@
             <?php if ($uRoleId): ?>
                 <div id="top-links">
                     Welcome, <?php echo $this->userName(); ?><br />
-                    <?php if (false && $uRoleId == \Admin\Model\User::ROLE_ADMIN): ?>
+                    <?php if ($uRoleId == \Admin\Model\User::ROLE_ADMIN): ?>
                         <a href="/sitesetting">Site Settings</a><br />
                     <?php endif ?>
                     <a href="/user/account">My Profile</a><br />

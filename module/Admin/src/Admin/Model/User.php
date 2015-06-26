@@ -58,8 +58,12 @@ class User
     public $u_company_id_admin;
     public $u_grant_to_disclosures;
     public $u_forgot_password;
+    public $u_failed_logins_count;
+    public $u_locked;
+    public $u_locked_unlocked_date;
 
     public $_rolename;
+    public $_username;
 
     protected $inputFilter;
 
@@ -100,6 +104,10 @@ class User
         $this->u_company_id_admin     = (isset($data['u_company_id_admin'])) ? $data['u_company_id_admin'] : null;
         $this->u_grant_to_disclosures = (isset($data['u_grant_to_disclosures'])) ? $data['u_grant_to_disclosures'] : null;
         $this->u_forgot_password     = (isset($data['u_forgot_password'])) ? $data['u_forgot_password'] : null;
+        $this->u_failed_logins_count     = (isset($data['u_failed_logins_count'])) ? $data['u_failed_logins_count'] : null;
+        $this->u_locked     = (isset($data['u_locked'])) ? $data['u_locked'] : null;
+        $this->u_locked_unlocked_date     = (isset($data['u_locked_unlocked_date'])) ? $data['u_locked_unlocked_date'] : null;
+        $this->_username     = (isset($data['_username'])) ? $data['_username'] : null;
     }
 
     public function getArrayCopy()

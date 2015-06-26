@@ -14,6 +14,7 @@ use Note\Form\NoteForm;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Client\Model\Company;
+use Application\Model\LogsTable;
 use Client\Model\CompanyRoles;
 use Note\Model\Note;
 use Zend\Session\Container;
@@ -74,6 +75,15 @@ class CompanyController extends AbstractActionController
         return $this->userTable;
     }
 
+    public function getLogTable()
+    {
+        if (!isset($this->logTable)) {
+            $sm = $this->getServiceLocator();
+            $this->logTable = $sm->get('Application\Model\LogsTable');
+        }
+        return $this->logTable;
+    }
+
     public function getNoteTable()
     {
         if (!$this->noteTable) {
@@ -110,7 +120,7 @@ class CompanyController extends AbstractActionController
         $rolesform = $request->isPost() && (int) $request->getPost('rolesform');
         $roleFilter = $this->params()->fromRoute('roleFilter') ? (int) $this->params()->fromRoute('roleFilter') : 0;
 
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_COMPANY, $id);
+        $this->getLogTable()->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_COMPANY, $id);
 
         if (!$this->hasIdentity()) {
             $this->flashMessenger()->addErrorMessage('You must log in');
@@ -219,9 +229,9 @@ class CompanyController extends AbstractActionController
                     $this->flashMessenger()->addSuccessMessage('Company saved');
 
                     if ($id) {
-                        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update company "' . $companyId . '"');
+                        $this->getLogTable()->saveUserFileLog('Update company "' . $companyId . '"');
                     } else {
-                        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Add new company "' . $companyId . '"');
+                        $this->getLogTable()->saveUserFileLog('Add new company "' . $companyId . '"');
                     }
 
                     if(isset($post['save_continue'])) {
@@ -242,9 +252,9 @@ class CompanyController extends AbstractActionController
             if ($id) {
                 $form->bind($companyObj);
                 $addresses = $this->getAddressTable()->getAddresses($id, \Client\Model\AddressItem::COMPANY_TYPE);
-                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open edit company "' . $id . '" page');
+                $this->getLogTable()->saveUserFileLog('Open edit company "' . $id . '" page');
             } else {
-                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open add new company page');
+                $this->getLogTable()->saveUserFileLog('Open add new company page');
             }
         }
 
@@ -263,7 +273,10 @@ class CompanyController extends AbstractActionController
             'checkClientLimitCompany' => $checkClientLimitCompany,
             'checkHasPartial' => $checkHasPartial,
             'existsCompanyRoles' => $existsCompanyRoles,
-            'ownerContact' => $ownerContact
+            'ownerContact' => $ownerContact,
+            'fromDate' => date('m/d/Y'),
+            'toDate' => date('m/d/Y'),
+            'administrationAccess' => $this->getUserTable()->checkCompanyAdministrationAccess($companyObj)
         );
     }
 
@@ -277,7 +290,7 @@ class CompanyController extends AbstractActionController
             $this->flashMessenger()->addSuccessMessage('Company has been deleted');
         }
 
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete company "' . $id . '"');
+        $this->getLogTable()->saveUserFileLog('Delete company "' . $id . '"');
 
         return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
     }
@@ -289,7 +302,7 @@ class CompanyController extends AbstractActionController
         $this->getCompanyTable()->unarchiveCompany($id);
         $this->flashMessenger()->addSuccessMessage('Company has been unarchived');
 
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Unarchive company "' . $id . '"');
+        $this->getLogTable()->saveUserFileLog('Unarchive company "' . $id . '"');
 
         return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
     }
@@ -306,7 +319,7 @@ class CompanyController extends AbstractActionController
         $companyObj = $this->getCompanyTable()->getCompany($id);
         $primaryAddressObj = $this->getAddressTable()->getAddress($companyObj->c_primary_adr_id);
 
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Get primary address for company "' . $id . '"');
+        $this->getLogTable()->saveUserFileLog('Get primary address for company "' . $id . '"');
 
         return $this->getResponse()->setContent(json_encode(array('company' => $companyObj, 'address' => $primaryAddressObj)));
     }
@@ -319,7 +332,7 @@ class CompanyController extends AbstractActionController
         $this->getServiceLocator()->get('Client\Model\AddressTable')->deleteAddress($adrId);
         $this->flashMessenger()->addSuccessMessage('Address has been deleted');
 
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete address "' . $adrId . '"" for company "' . $id . '"');
+        $this->getLogTable()->saveUserFileLog('Delete address "' . $adrId . '"" for company "' . $id . '"');
 
         return $this->redirect()->toRoute('company', array('controller' => 'company', 'action' => 'edit', 'id' => $id));
     }
@@ -340,9 +353,88 @@ class CompanyController extends AbstractActionController
 
         $activate = $this->getUserTable()->activatePartialsByCompany($id);
 
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Active partial users company "' . $id . '"');
+        $this->getLogTable()->saveUserFileLog('Active partial users company "' . $id . '"');
 
         return new JsonModel(array('result' => (boolean)$activate));
+    }
+
+    public function usersloginhistoryAction()
+    {
+        $request = $this->getRequest();
+
+        if($request->isXmlHttpRequest()) {
+            $countPerPage = 10;
+
+            $cId  = $this->params('id')                ? $this->params('id')                : null;
+            $page = $this->params('page')              ? $this->params('page')              : null;
+            $from = $this->params()->fromQuery('from') ? $this->params()->fromQuery('from') : null;
+            $to   = $this->params()->fromQuery('to')   ? $this->params()->fromQuery('to')   : null;
+
+            $from = date('Y-m-d', strtotime($from));
+            $to   = date('Y-m-d', strtotime($to));
+
+            $paginator = $this->getLogTable()->getCompanyUsersLoginHistory($cId, $from, $to);
+
+            $paginator->setCurrentPageNumber($page);
+            $paginator->setItemCountPerPage($countPerPage);
+
+            $statusesMap = array(LogsTable::TYPE_AUTH_SUCCESS => 'Success',
+                                 LogsTable::TYPE_AUTH_FAILED  => 'Unsuccess',
+                                 LogsTable::TYPE_AUTH_LOCKED  => 'Locked'
+                                );
+
+            $view = new ViewModel;
+
+            $view->setVariables(array(
+                'order_by'    => 'date',
+                'order'       => 'DESC',
+                'cId'         => $cId,
+                'from'        => $from,
+                'to'          => $to,
+                'page'        => $page,
+                'statusesMap' => $statusesMap,
+                'paginator'   => $paginator
+            ));
+
+            $view->setTemplate('client/company/users_login_history.phtml');
+
+            $view->setTerminal(true);
+        }
+        
+        return $view;
+    }
+
+    public function lockedusersAction()
+    {
+        $request = $this->getRequest();
+
+        // if($request->isXmlHttpRequest()) {
+            $countPerPage = 10;
+
+            $cId  = $this->params('id')   ? $this->params('id')   : null;
+            $page = $this->params('page') ? $this->params('page') : null;
+
+            $paginator = $this->getUserTable()->getLockedCompanyUsers($cId);
+
+            $paginator->setCurrentPageNumber($page);
+            $paginator->setItemCountPerPage($countPerPage);
+
+            $view = new ViewModel;
+
+            $view->setVariables(array(
+                'order_by'    => 'date',
+                'order'       => 'DESC',
+                'cId'         => $cId,
+                'page'        => $page,
+                'paginator'   => $paginator
+            ));
+
+            $view->setTemplate('client/company/locked_users.phtml');
+
+            $view->setTerminal(true);
+        // }
+        
+        return $view;
     }
 
 }

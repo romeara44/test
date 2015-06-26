@@ -1,0 +1,5 @@
+ALTER TABLE `users` ADD COLUMN `u_failed_logins_count` TINYINT(2) DEFAULT '0';
+ALTER TABLE `users` ADD COLUMN `u_locked` TINYINT(1) DEFAULT '0';
+ALTER TABLE `users` ADD COLUMN `u_locked_unlocked_date` DATETIME DEFAULT NULL;
+ALTER TABLE `logs` ADD COLUMN `lo_ip` VARCHAR(30) DEFAULT NULL;
+INSERT INTO `site_settings` (`ss_name`, `ss_title`, `ss_value`) VALUES ('failed_user_logins_limit', 'Max. number of failed user logins', '3');

@@ -1107,6 +1107,20 @@ textarea.double { width: 586px; }
 .plan-progress-submit {
 	margin: 0;
 }
+#usersLoginHistoryForm {
+	overflow: hidden;
+}
+.company-admin-date {
+	width: 80px;
+	margin-right: 20px;
+}
+tr.login-unsuccess td {
+	background-color: #F8E0E0;
+}
+.administrationBlockWrap {
+	overflow: hidden;
+	margin-bottom: 30px;
+}
 /* Tables */
 
 table {

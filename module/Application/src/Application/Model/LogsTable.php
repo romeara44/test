@@ -11,6 +11,7 @@ use Zend\Db\ResultSet\ResultSet;
 use Zend\Db\Sql\Select;
 use Zend\Paginator\Adapter\DbSelect;
 use Zend\View\Helper\ServerUrl;
+use Zend\Paginator\Paginator;
 
 class LogsTable
 {
@@ -24,6 +25,9 @@ class LogsTable
     const TYPE_UPLOADED_ROLES = 8;
     const TYPE_UPLOADED_INVENTORY = 9;
     const TYPE_REOPEN = 10;
+    const TYPE_AUTH_SUCCESS = 11;
+    const TYPE_AUTH_FAILED = 12;
+    const TYPE_AUTH_LOCKED = 13;
 
     const ITEM_TYPE_COMPANY = 1;
     const ITEM_TYPE_CLIENT = 2;
@@ -157,10 +161,19 @@ class LogsTable
         $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
         $identity = $authService->getIdentity();
 
+        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+            $lo_ip = $_SERVER['HTTP_CLIENT_IP'];
+        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $lo_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else {
+            $lo_ip = $_SERVER['REMOTE_ADDR'];
+        }
+
         $dataLog['lo_type'] = $type;
         $dataLog['lo_item_type'] = $itemType;
         $dataLog['lo_item_id'] = $itemId;
         $dataLog['lo_u_id'] = $identity['u_id'];
+        $dataLog['lo_ip'] = $lo_ip;
 
         $this->tableGateway->insert($dataLog);
         $id = $this->tableGateway->lastInsertValue;
@@ -212,5 +225,37 @@ class LogsTable
                 array("<", ">", ":", '"', "/", "\\", "|", "?", "*"));
 
         return $this->logDir . 'logs_' . implode('_', array(str_replace($bad, "", $identity['u_firstname']), str_replace($bad, "", $identity['u_lastname']), $identity['u_id'], date('Y_m_d'))) . '.txt';
+    }
+
+    public function getCompanyUsersLoginHistory($companyId, $from, $to)
+    {
+        $select = $this->tableGateway->getSql()->select();
+
+        $resultSetPrototype = new ResultSet();
+        $paginatorAdapter = new DbSelect(
+            $select,
+            $this->tableGateway->getAdapter(),
+            $resultSetPrototype
+        );
+        $select->columns(array('lo_id',
+                               'lo_type',
+                               'lo_ip',
+                               'lo_create_date',
+                               '_date' => new \Zend\Db\Sql\Expression('DATE_FORMAT(lo_create_date, "%Y-%m-%d")')
+                               )
+                        );
+        $select->join(array('cl' => 'users'), new \Zend\Db\Sql\Expression('u_id = lo_item_id AND lo_item_type = ' . LogsTable::ITEM_TYPE_CLIENT), array('u_id', '_username' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)')), 'inner');
+        $select->join(array('c' => 'companies'), new \Zend\Db\Sql\Expression('c_id = u_company_id'), array(), 'inner');
+
+        $select->where('c_id = ' . $companyId = 64);
+        $select->where('lo_type IN (' . implode(',', array(LogsTable::TYPE_AUTH_SUCCESS, LogsTable::TYPE_AUTH_FAILED, LogsTable::TYPE_AUTH_LOCKED)) . ')');
+        $select->having('_date >= "' . $from . '"');
+        $select->having('_date <= "' . $to . '"');
+
+        $select->order('lo_create_date DESC');
+
+        $paginator = new Paginator($paginatorAdapter);
+
+        return $paginator;
     }
 }

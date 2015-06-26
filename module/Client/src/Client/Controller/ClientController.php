@@ -334,6 +334,28 @@ class ClientController extends AbstractActionController
         return $this->redirect()->toRoute('client', array('controller' => 'client', 'action' => 'edit', 'id' => $id));
     }
 
+    public function lockClientAction()
+    {
+        if (!$this->hasIdentity()) {
+            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+        }
+
+        $result = false;
+
+        $id   = $this->params('id');
+        $lock = $this->params('lock');
+
+        $request = $this->getRequest();
+
+        $userObj = new User();
+
+        if($id && $lock !== null) {
+            $result = $this->getUserTable()->lockUser($id, $lock);
+        }
+
+        return $request->isXmlHttpRequest() ? new JsonModel($result) : $this->redirect()->toRoute('client', array('controller' => 'client', 'action' => 'edit', 'id' => $id));
+    }
+
     public function deleteAction()
     {
         $id = $this->params('id');
