@@ -67,7 +67,6 @@ class SitesettingTable implements ServiceLocatorAwareInterface
                 throw new \Exception('Form id does not exist');
             }
         }
-// print_r($regulationData);exit;
 
         return $id;
     }

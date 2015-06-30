@@ -666,7 +666,7 @@ class UserTable implements ServiceLocatorAwareInterface
                 $data['u_locked_unlocked_date'] = date('Y-m-d H:i:s');
             } else {
                 $data['u_failed_logins_count'] = ++$user->u_failed_logins_count;
-                $locked = (int) $user->u_failed_logins_count >= \Sitesetting\Model\Sitesetting::FAILED_USER_LOGINS_LIMIT;
+                $locked = (int) $user->u_failed_logins_count > $this->getServiceLocator()->get('Sitesetting\Model\SitesettingTable')->getValueByName(\Sitesetting\Model\Sitesetting::FAILED_USER_LOGINS_LIMIT);
                 if($locked) {
                     $data['u_locked'] = $locked;
                     $data['u_locked_unlocked_date'] = date('Y-m-d H:i:s');
