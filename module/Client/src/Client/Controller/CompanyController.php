@@ -408,7 +408,7 @@ class CompanyController extends AbstractActionController
     {
         $request = $this->getRequest();
 
-        // if($request->isXmlHttpRequest()) {
+        if($request->isXmlHttpRequest()) {
             $countPerPage = 10;
 
             $cId  = $this->params('id')   ? $this->params('id')   : null;
@@ -432,7 +432,7 @@ class CompanyController extends AbstractActionController
             $view->setTemplate('client/company/locked_users.phtml');
 
             $view->setTerminal(true);
-        // }
+        }
         
         return $view;
     }

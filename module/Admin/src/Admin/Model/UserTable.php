@@ -710,11 +710,20 @@ class UserTable implements ServiceLocatorAwareInterface
 
     public function lockUser($id, $lock)
     {
-        $data['u_locked'] = $lock;
-        $data['u_failed_logins_count'] = 0;
-        $data['u_locked_unlocked_date'] = date('Y-m-d H:i:s');
+        $user = $this->getUser($id);
 
-        return $this->tableGateway->update($data, array('u_id' => $id));
+        if($this->checkClientAdministrationAccess($user)) {
+
+            $data['u_locked']               = $lock;
+            $data['u_failed_logins_count']  = 0;
+            $data['u_locked_unlocked_date'] = date('Y-m-d H:i:s');
+
+            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog(($lock ? 'Lock' : 'Unlock') . ' client "' . $id . '"');
+
+            return $this->tableGateway->update($data, array('u_id' => $id));
+        } else {
+            return false;
+        }
     }
 
 }

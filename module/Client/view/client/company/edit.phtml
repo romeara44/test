@@ -472,9 +472,13 @@ $form->setAttribute('method', 'post');
                 url: url,
                 success: function(data) {
                    var wrapper = $this.closest('.administrationBlockWrap');
-                   url = $('.pagination a.current').attr('href');
-                   if(url == '#') return false;
-                   getAdministrationData(url, wrapper);
+                   url = $(wrapper).find('.pagination a#current').attr('href');
+                   if(url != '#') {
+                       getAdministrationData(url, wrapper);
+                   } else {
+                      url = "/company/lockedusers/" + <?php echo $this->cId?>;
+                      getAdministrationData(url, $('.lockedUsers'))
+                   }
                 }
            });
        });

@@ -17,6 +17,7 @@ use Note\Form\NoteForm;
 use Admin\Model\User;
 use Note\Model\Note;
 use Zend\Session\Container;
+use Zend\View\Model\JsonModel;
 
 class ClientController extends AbstractActionController
 {
@@ -336,24 +337,16 @@ class ClientController extends AbstractActionController
 
     public function lockClientAction()
     {
-        if (!$this->hasIdentity()) {
-            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
-        }
-
         $result = false;
 
         $id   = $this->params('id');
         $lock = $this->params('lock');
 
-        $request = $this->getRequest();
-
-        $userObj = new User();
-
         if($id && $lock !== null) {
-            $result = $this->getUserTable()->lockUser($id, $lock);
+            $result = (bool)$this->getUserTable()->lockUser($id, $lock);
         }
 
-        return $request->isXmlHttpRequest() ? new JsonModel($result) : $this->redirect()->toRoute('client', array('controller' => 'client', 'action' => 'edit', 'id' => $id));
+        return new JsonModel(array($result));
     }
 
     public function deleteAction()
@@ -366,7 +359,7 @@ class ClientController extends AbstractActionController
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_DELETE, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $id);
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete client "' . $id . '"');
-        
+
         return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
     }
 
