@@ -109,6 +109,9 @@ class MailtemplateTable
         if (isset($params['brpaId'])) {
             $mt->mt_text = str_replace('<id>', $params['brpaId'], $mt->mt_text);
         }
+        if (isset($params['modules_access_code'])) {
+            $mt->mt_text = str_replace('<code>', $params['modules_access_code'], $mt->mt_text);
+        }
 
         $mail = new Mail\Message();
 

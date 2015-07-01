@@ -107,6 +107,7 @@ class MenuTop extends AbstractHelper
                         ),
                     array('title' => 'Breach Remediation Plans',
                          'url' => '/breachremediationplan/list',
+                         'class' => 'with-access'
                         )
                 )
             ),
@@ -133,15 +134,19 @@ class MenuTop extends AbstractHelper
             array(
                 'title' => 'Disclosures',
                 'url' => '/disclosurerequest/list',
+                'class' => 'with-access',
                 'items' => array(
                     array('title' => 'Requests',
-                            'url' => '/disclosurerequest/list'
+                            'url' => '/disclosurerequest/list',
+                            'class' => 'with-access'
                         ),
                     array('title' => 'Disclosure Tracking Logs',
                          'url' => '/disclosuretrackinglog/list',
+                         'class' => 'with-access',
                         ),
                     array('title' => 'Verbal Logs',
                          'url' => '/verballog/list',
+                         'class' => 'with-access',
                         )
                 )
             ),
@@ -201,6 +206,7 @@ class MenuTop extends AbstractHelper
                         ),
                     array('title' => 'Breach Remediation Plans',
                          'url' => '/breachremediationplan/list',
+                         'class' => 'with-access'
                         )
                 )
             ),
@@ -227,15 +233,19 @@ class MenuTop extends AbstractHelper
             array(
                 'title' => 'Disclosures',
                 'url' => '/disclosurerequest/list',
+                'class' => 'with-access',
                 'items' => array(
                     array('title' => 'Requests',
-                            'url' => '/disclosurerequest/list'
+                            'url' => '/disclosurerequest/list',
+                            'class' => 'with-access'
                         ),
                     array('title' => 'Disclosure Tracking Logs',
                          'url' => '/disclosuretrackinglog/list',
+                         'class' => 'with-access'
                         ),
                     array('title' => 'Verbal Logs',
                          'url' => '/verballog/list',
+                         'class' => 'with-access'
                         )
                 )
             ),
@@ -279,6 +289,7 @@ class MenuTop extends AbstractHelper
                         ),
                     array('title' => 'Breach Remediation Plans',
                           'url' => '/breachremediationplan/list',
+                          'class' => 'with-access'
                         )
                 )
             ),
@@ -320,15 +331,19 @@ class MenuTop extends AbstractHelper
             $this->items[] = array(
                                 'title' => 'Disclosures',
                                 'url' => '/disclosurerequest/list',
+                                'class' => 'with-access',
                                 'items' => array(
                                     array('title' => 'Requests',
-                                            'url' => '/disclosurerequest/list'
+                                            'url' => '/disclosurerequest/list',
+                                            'class' => 'with-access'
                                         ),
                                     array('title' => 'Disclosure Tracking Logs',
                                          'url' => '/disclosuretrackinglog/list',
+                                         'class' => 'with-access'
                                         ),
                                     array('title' => 'Verbal Logs',
                                          'url' => '/verballog/list',
+                                         'class' => 'with-access'
                                         )
                                 )
                             );
@@ -369,6 +384,7 @@ class MenuTop extends AbstractHelper
                         ),
                     array('title' => 'Breach Remediation Plans',
                           'url' => '/breachremediationplan/list',
+                          'class' => 'with-access'
                         )
                 )
             ),
@@ -410,15 +426,19 @@ class MenuTop extends AbstractHelper
             $this->items[] = array(
                                 'title' => 'Disclosures',
                                 'url' => '/disclosurerequest/list',
+                                'class' => 'with-access',
                                 'items' => array(
                                     array('title' => 'Requests',
-                                            'url' => '/disclosurerequest/list'
+                                            'url' => '/disclosurerequest/list',
+                                            'class' => 'with-access'
                                         ),
                                     array('title' => 'Disclosure Tracking Logs',
                                          'url' => '/disclosuretrackinglog/list',
+                                         'class' => 'with-access'
                                         ),
                                     array('title' => 'Verbal Logs',
                                          'url' => '/verballog/list',
+                                         'class' => 'with-access'
                                         )
                                 )
                             );

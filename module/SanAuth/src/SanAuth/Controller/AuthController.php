@@ -9,6 +9,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Form\Annotation\AnnotationBuilder;
 use Zend\View\Model\ViewModel;
 use Zend\Session\Container;
+use Zend\View\Model\JsonModel;
 
 use SanAuth\Model\User;
 
@@ -36,13 +37,23 @@ class AuthController extends AbstractActionController
     
     public function getSessionStorage()
     {
-        if (! $this->storage) {
+        if (!isset($this->storage)) {
             $this->storage = $this->getServiceLocator()->get('SanAuth\Model\MyAuthStorage');
         }
         
         return $this->storage;
     }
     
+
+    public function getUserTable()
+    {
+        if (!isset($this->userTable)) {
+            $sm = $this->getServiceLocator();
+            $this->userTable = $sm->get('Admin\Model\UserTable');
+        }
+        return $this->userTable;
+    }
+
     public function loginAction()
     {
         //if already login, redirect to success page
@@ -267,5 +278,62 @@ class AuthController extends AbstractActionController
         }
 
         $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+    }
+
+    public function checkAccessForModulesAction()
+    {
+        if($this->getAuthService()->hasIdentity()) {
+
+            $identity = $this->getAuthService()->getIdentity();
+            $key      = $this->getUserTable()->getModulesAccessCode($identity['u_id']);
+
+            if($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN || (isset($identity['has_modules_access']) && $identity['has_modules_access'] == 1)) {
+                return new JsonModel(array('result' => 1));
+            } else {
+                return new JsonModel(array('result' => 0));
+            }
+        }
+
+        $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+    }
+
+    public function getAccessForModulesAction()
+    {
+        $request = $this->getRequest();
+
+        if($this->getAuthService()->hasIdentity() && $request->isPost()) {
+
+            $identity = $this->getAuthService()->getIdentity();
+
+            if($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN) {
+                $identity['has_modules_access'] = 1;
+
+                $this->getAuthService()->setStorage($this->getSessionStorage());
+                $this->getAuthService()->getStorage()->write($identity);
+
+                return new JsonModel(array('result' => 1));
+            }
+
+            $htmlEntities = new \Zend\Filter\HtmlEntities();
+
+            $action = $htmlEntities->filter($request->getPost('action'));
+            $code   = $htmlEntities->filter($request->getPost('code'));
+
+            if($action == 'send_code') {
+                if($this->getUserTable()->sendModulesAccessCode($identity['u_id'])) {
+                    return new JsonModel(array('result' => 1));
+                }
+            } else if($action == 'get_access' && isset($code)) {
+                if($this->getUserTable()->getModulesAccess($identity['u_id'], $code)) {
+                    $identity['has_modules_access'] = 1;
+
+                    $this->getAuthService()->setStorage($this->getSessionStorage());
+                    $this->getAuthService()->getStorage()->write($identity);
+                    return new JsonModel(array('result' => 1));
+                }
+            }
+        }
+
+        return new JsonModel(array('result' => 0));
     }
 }

@@ -1,0 +1,20 @@
+ALTER TABLE  `users` ADD  `u_modules_access_code` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL AFTER  `u_locked_unlocked_date` ,
+ADD  `u_modules_access_code_created` INT( 11 ) NULL DEFAULT NULL AFTER  `u_modules_access_code` ;
+
+INSERT INTO  `hipaacar_app`.`mail_templates` (
+`mt_id` ,
+`mt_name` ,
+`mt_key` ,
+`mt_subject` ,
+`mt_text` ,
+`mt_active` ,
+`mt_create_date`
+)
+VALUES (
+NULL ,  'Send Modules Access Code',  'send_modules_access_code',  'Send Modules Access Code',  '<div style="font-size: 24px; color: #189696"><Full Name>,</div>
+<br />
+Your code for access:<code><br />
+It will be avaliable for 20 minutes<br />
+<br />',  '1', 
+CURRENT_TIMESTAMP
+);

@@ -726,4 +726,57 @@ class UserTable implements ServiceLocatorAwareInterface
         }
     }
 
+    public function getModulesAccessCode($id)
+    {
+        $user = $this->getUser($id);
+
+        $expiration = 60 * 20;
+
+        if($user->u_modules_access_code && $user->u_modules_access_code_created + $expiration > time()) {
+
+            return $user->u_modules_access_code;
+        } else {
+            $data['u_modules_access_code']         = null;
+            $data['u_modules_access_code_created'] = null;
+
+             $this->tableGateway->update($data, array('u_id' => $id));
+
+             return false;
+        }
+    }
+
+    public function sendModulesAccessCode($id)
+    {
+        $user = $this->getUser($id);
+
+        if($user) {
+            $modulesAccessCode = substr(sha1($user->u_email . time()), 0, 8);
+
+            $data['u_modules_access_code']         = $modulesAccessCode;
+            $data['u_modules_access_code_created'] = time();
+
+            $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'send_modules_access_code', 'addto' => $user->u_email, 'modules_access_code' => $modulesAccessCode));
+
+            return $this->tableGateway->update($data, array('u_id' => $id));
+        } else {
+            return false;
+        }
+    }
+
+    public function getModulesAccess($id, $code)
+    {
+        $existsCode = $this->getModulesAccessCode($id);
+
+        if($existsCode && $existsCode == $code) {
+            $data['u_modules_access_code']         = null;
+            $data['u_modules_access_code_created'] = null;
+
+            $this->tableGateway->update($data, array('u_id' => $id));
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }

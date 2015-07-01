@@ -70,6 +70,7 @@ class LogsTable
         $identity = $authService->getIdentity();
 
         $select = $this->tableGateway->getSql()->select();
+        $select->columns(array('lo_id', 'lo_type', 'lo_item_type', 'lo_item_id', 'lo_u_id', 'lo_create_date'));
         if ($onlyOpen) {
             $select->where('lo_type = 1');
         } elseif ($upcoming) {

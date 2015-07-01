@@ -61,6 +61,8 @@ class User
     public $u_failed_logins_count;
     public $u_locked;
     public $u_locked_unlocked_date;
+    public $u_modules_access_code;
+    public $u_modules_access_code_created;
 
     public $_rolename;
     public $_username;
@@ -107,6 +109,8 @@ class User
         $this->u_failed_logins_count     = (isset($data['u_failed_logins_count'])) ? $data['u_failed_logins_count'] : null;
         $this->u_locked     = (isset($data['u_locked'])) ? $data['u_locked'] : null;
         $this->u_locked_unlocked_date     = (isset($data['u_locked_unlocked_date'])) ? $data['u_locked_unlocked_date'] : null;
+        $this->u_modules_access_code     = (isset($data['u_modules_access_code'])) ? $data['u_modules_access_code'] : null;
+        $this->u_modules_access_code_created     = (isset($data['u_modules_access_code_created'])) ? $data['u_modules_access_code_created'] : null;
         $this->_username     = (isset($data['_username'])) ? $data['_username'] : null;
     }
 
