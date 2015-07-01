@@ -101,9 +101,11 @@ class MenuTop extends AbstractHelper
             array(
                 'title' => 'Breach Management',
                 'url' => '/breachlog/list',
+                'class' => 'with-access',
                 'items' => array(
                     array('title' => 'Breach Logs',
                           'url' => '/breachlog/list',
+                         'class' => 'with-access'
                         ),
                     array('title' => 'Breach Remediation Plans',
                          'url' => '/breachremediationplan/list',
@@ -200,9 +202,11 @@ class MenuTop extends AbstractHelper
             array(
                 'title' => 'Breach Management',
                 'url' => '/breachlog/list',
+                'class' => 'with-access',
                 'items' => array(
                     array('title' => 'Breach Logs',
                           'url' => '/breachlog/list',
+                          'class' => 'with-access'
                         ),
                     array('title' => 'Breach Remediation Plans',
                          'url' => '/breachremediationplan/list',
@@ -283,9 +287,11 @@ class MenuTop extends AbstractHelper
             array(
                 'title' => 'Breach Management',
                 'url' => '/breachlog/list',
+                'class' => 'with-access',
                 'items' => array(
                     array('title' => 'Breach Logs',
                           'url' => '/breachlog/list',
+                          'class' => 'with-access'
                         ),
                     array('title' => 'Breach Remediation Plans',
                           'url' => '/breachremediationplan/list',
@@ -378,9 +384,11 @@ class MenuTop extends AbstractHelper
             array(
                 'title' => 'Breach Management',
                 'url' => '/breachlog/list',
+                'class' => 'with-access',
                 'items' => array(
                     array('title' => 'Breach Logs',
                           'url' => '/breachlog/list',
+                          'class' => 'with-access'
                         ),
                     array('title' => 'Breach Remediation Plans',
                           'url' => '/breachremediationplan/list',
