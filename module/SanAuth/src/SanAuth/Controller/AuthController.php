@@ -211,6 +211,20 @@ class AuthController extends AbstractActionController
 
                         return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
                     }
+
+                    $config = $this->getServiceLocator()->get('config');
+
+                    if(file_exists($config['application_vars']['secure_db_key_file'])) {
+                        $config['application_vars']['secure_db_key'] = file_get_contents($config['application_vars']['secure_db_key_file']);
+                    } else {
+                        $this->getSessionStorage()->forgetMe();
+                        $this->getAuthService()->clearIdentity();
+
+                        return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+                    }
+
+                    $container = new Container('application_vars');
+                    $container->storage = $config['application_vars'];
                 }
 
                 $this->getAuthService()->getAdapter()
@@ -241,8 +255,8 @@ class AuthController extends AbstractActionController
                     $dataStorage['u_register']               = $user->u_register;
                     $dataStorage['u_first_login']            = $user->u_first_login;
                     $dataStorage['u_company_id_admin']       = $user->u_company_id_admin;
-                    $dataStorage['u_grant_to_disclosures']   = $user->u_role_id == \Admin\Model\User::ROLE_ADMIN ? 1 : $user->u_grant_to_disclosures;
-                    $dataStorage['u_grant_to_breach']        = $user->u_role_id == \Admin\Model\User::ROLE_ADMIN ? 1 : $user->u_grant_to_breach;
+                    $dataStorage['u_grant_to_disclosures']   = $user->u_grant_to_disclosures;
+                    $dataStorage['u_grant_to_breach']        = $user->u_grant_to_breach;
                     $dataStorage['has_modules_access']       = $user->u_role_id == \Admin\Model\User::ROLE_ADMIN ? 1 : 0;
 
                     $this->getAuthService()->getStorage()->write($dataStorage);

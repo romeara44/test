@@ -256,11 +256,11 @@ class BreachlogController extends AbstractActionController
                 }
             }
 
-            if(!$checkFillCompanyRoles = $this->getCompanyRolesTable()->checkFillCompanyRoles($post['bl_c_id'])) {
+            if($checkFillCompanyRoles = $this->getCompanyRolesTable()->checkFillCompanyRoles($post['bl_c_id'])) {
                 $companyRolesMsg = 'Please, fill all roles for this company';
             }
 
-            if ($form->isValid() && $checkFillCompanyRoles && !$questionsErrors) {
+            if ($form->isValid() && !$checkFillCompanyRoles && !$questionsErrors) {
                 $post['bl_consultant_u_id'] = $identity['u_id'];
                 if(isset($post['questions'][11]) && $post['questions'][11] == 2) $post['bl_date_of_occurrence'] = '';
                 $bl->exchangeArray($post);

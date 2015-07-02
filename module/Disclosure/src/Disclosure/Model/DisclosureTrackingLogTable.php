@@ -17,10 +17,12 @@ class DisclosureTrackingLogTable implements ServiceLocatorAwareInterface
 {
     protected $tableGateway;
     protected $serviceLocator;
+    private $_secureDBKey;
 
     public function __construct(TableGateway $tableGateway)
     {
         $this->tableGateway = $tableGateway;
+        $this->_secureDBKey  = (new \Zend\Session\Container('application_vars'))->storage['secure_db_key'];
     }
 
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
@@ -32,14 +34,48 @@ class DisclosureTrackingLogTable implements ServiceLocatorAwareInterface
         return $this->serviceLocator;
     }
 
-    public function getDisclosureTrackingLogs($paginated = false, $orderBy = null, $order = null, $identity = null, $searchValue = null, $roleFilter = null)
+    private function _encryptValue($value, $expression = true) {
+        return $expression ? new \Zend\Db\Sql\Expression('AES_ENCRYPT("' . $value . '", "' . $this->_secureDBKey . '")') : 'AES_ENCRYPT("' . $value . '", "' . $this->_secureDBKey . '")';
+    }
+
+    private function _decryptField($field, $expression = true) {
+        return $expression ? new \Zend\Db\Sql\Expression('AES_DECRYPT(' . $field . ', "' . $this->_secureDBKey . '")') : 'AES_DECRYPT(' . $field . ', "' . $this->_secureDBKey . '")';
+    }
+
+    private function _getIdentity()
     {
         $authService = new \Zend\Authentication\AuthenticationService();
         $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
-        $identity = $authService->getIdentity();
+
+        return $authService->getIdentity();
+    }
+
+    public function getDisclosureTrackingLogs($paginated = false, $orderBy = null, $order = null, $identity = null, $searchValue = null, $roleFilter = null)
+    {
+        $identity = $this->_getIdentity();
 
         if ($paginated) {
             $select = $this->tableGateway->getSql()->select();
+
+            $select->columns(array('dtl_id'                        => 'dtl_id',
+                                   'dtl_reference_number'          => $this->_decryptField('dtl_reference_number'),
+                                   'dtl_patient_name'              => $this->_decryptField('dtl_patient_name'),
+                                   'dtl_medical_record_number'     => $this->_decryptField('dtl_medical_record_number'),
+                                   'dtl_date_received'             => $this->_decryptField('dtl_date_received'),
+                                   'dtl_name_of_requestor'         => $this->_decryptField('dtl_name_of_requestor'),
+                                   'dtl_address'                   => $this->_decryptField('dtl_address'),
+                                   'dtl_auth_type'                 => $this->_decryptField('dtl_auth_type'),
+                                   'dtl_purpose_of_disclosure'     => $this->_decryptField('dtl_purpose_of_disclosure'),
+                                   'dtl_phi_information_disclosed' => $this->_decryptField('dtl_phi_information_disclosed'),
+                                   'dtl_date_disclosed'            => $this->_decryptField('dtl_date_disclosed'),
+                                   'dtl_disclosed_by'              => $this->_decryptField('dtl_disclosed_by'),
+                                   'dtl_extension_notification'    => $this->_decryptField('dtl_extension_notification'),
+                                   'dtl_copy_of_request'           => $this->_decryptField('dtl_copy_of_request'),
+                                   'dtl_create_u_id'               => 'dtl_create_u_id',
+                                   'dtl_active'                    => 'dtl_active'
+                                  )
+                                );
+
             if ($identity['u_role_id'] != User::ROLE_ADMIN) {
                 $select->where('dtl_active = 1');
             }
@@ -62,20 +98,72 @@ class DisclosureTrackingLogTable implements ServiceLocatorAwareInterface
             }
 
             $paginator = new Paginator($paginatorAdapter);
-// print_r($select->getSqlString());exit;
+
             return $paginator;
         }
 
-        $resultSet = $this->tableGateway->select();
+        $select = $this->tableGateway->getSql()->select();
 
-        return $resultSet;
+        $select->columns(array('dtl_id'                        => 'dtl_id',
+                               'dtl_reference_number'          => $this->_decryptField('dtl_reference_number'),
+                               'dtl_patient_name'              => $this->_decryptField('dtl_patient_name'),
+                               'dtl_medical_record_number'     => $this->_decryptField('dtl_medical_record_number'),
+                               'dtl_date_received'             => $this->_decryptField('dtl_date_received'),
+                               'dtl_name_of_requestor'         => $this->_decryptField('dtl_name_of_requestor'),
+                               'dtl_address'                   => $this->_decryptField('dtl_address'),
+                               'dtl_auth_type'                 => $this->_decryptField('dtl_auth_type'),
+                               'dtl_purpose_of_disclosure'     => $this->_decryptField('dtl_purpose_of_disclosure'),
+                               'dtl_phi_information_disclosed' => $this->_decryptField('dtl_phi_information_disclosed'),
+                               'dtl_date_disclosed'            => $this->_decryptField('dtl_date_disclosed'),
+                               'dtl_disclosed_by'              => $this->_decryptField('dtl_disclosed_by'),
+                               'dtl_extension_notification'    => $this->_decryptField('dtl_extension_notification'),
+                               'dtl_copy_of_request'           => $this->_decryptField('dtl_copy_of_request'),
+                               'dtl_create_u_id'               => 'dtl_create_u_id',
+                               'dtl_active'                    => 'dtl_active'
+                              )
+                            );
+
+        if ($identity['u_role_id'] != User::ROLE_ADMIN) {
+            $select->where('dtl_active = 1');
+        }
+
+        return $this->tableGateway->selectWith($select);
     }
 
     public function getDisclosureTrackingLog($id)
     {
+        $identity = $this->_getIdentity();
+
         $id  = (int) $id;
-        $rowset = $this->tableGateway->select(array('dtl_id' => $id));
-        $row = $rowset->current();
+
+        $select = $this->tableGateway->getSql()->select();
+
+        $select->columns(array('dtl_id'                        => 'dtl_id',
+                               'dtl_reference_number'          => $this->_decryptField('dtl_reference_number'),
+                               'dtl_patient_name'              => $this->_decryptField('dtl_patient_name'),
+                               'dtl_medical_record_number'     => $this->_decryptField('dtl_medical_record_number'),
+                               'dtl_date_received'             => $this->_decryptField('dtl_date_received'),
+                               'dtl_name_of_requestor'         => $this->_decryptField('dtl_name_of_requestor'),
+                               'dtl_address'                   => $this->_decryptField('dtl_address'),
+                               'dtl_auth_type'                 => $this->_decryptField('dtl_auth_type'),
+                               'dtl_purpose_of_disclosure'     => $this->_decryptField('dtl_purpose_of_disclosure'),
+                               'dtl_phi_information_disclosed' => $this->_decryptField('dtl_phi_information_disclosed'),
+                               'dtl_date_disclosed'            => $this->_decryptField('dtl_date_disclosed'),
+                               'dtl_disclosed_by'              => $this->_decryptField('dtl_disclosed_by'),
+                               'dtl_extension_notification'    => $this->_decryptField('dtl_extension_notification'),
+                               'dtl_copy_of_request'           => $this->_decryptField('dtl_copy_of_request'),
+                               'dtl_create_u_id'               => 'dtl_create_u_id',
+                               'dtl_active'                    => 'dtl_active'
+                              )
+                            );
+
+        if ($identity['u_role_id'] != User::ROLE_ADMIN) {
+            $select->where('dtl_active = 1');
+        }
+
+        $select->where('dtl_id = ' . $id);
+
+        $row = $this->tableGateway->selectWith($select)->current();
 
         if (!$row) {
             return false;
@@ -86,28 +174,26 @@ class DisclosureTrackingLogTable implements ServiceLocatorAwareInterface
 
     public function saveDisclosureTrackingLog(DisclosureTrackingLog $disclosureTrackingLog)
     {
-        $authService = new \Zend\Authentication\AuthenticationService();
-        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
-        $identity = $authService->getIdentity();
+        $identity = $this->_getIdentity();
 
         $data = array(
-            'dtl_reference_number'         => $disclosureTrackingLog->dtl_reference_number,
-            'dtl_patient_name' => $disclosureTrackingLog->dtl_patient_name,
-            'dtl_medical_record_number'      => $disclosureTrackingLog->dtl_medical_record_number,
-            'dtl_date_received'      => $disclosureTrackingLog->dtl_date_received,
-            'dtl_name_of_requestor'      => $disclosureTrackingLog->dtl_name_of_requestor,
-            'dtl_address'      => $disclosureTrackingLog->dtl_address,
-            'dtl_auth_type'      => $disclosureTrackingLog->dtl_auth_type,
-            'dtl_purpose_of_disclosure'      => $disclosureTrackingLog->dtl_purpose_of_disclosure,
-            'dtl_phi_information_disclosed'      => $disclosureTrackingLog->dtl_phi_information_disclosed,
-            'dtl_date_disclosed'      => $disclosureTrackingLog->dtl_date_disclosed,
-            'dtl_disclosed_by'      => $disclosureTrackingLog->dtl_disclosed_by,
-            'dtl_extension_notification'      => $disclosureTrackingLog->dtl_extension_notification,
-            'dtl_copy_of_request'      => $disclosureTrackingLog->dtl_copy_of_request
+            'dtl_reference_number'          => $this->_encryptValue($disclosureTrackingLog->dtl_reference_number),
+            'dtl_patient_name'              => $this->_encryptValue($disclosureTrackingLog->dtl_patient_name),
+            'dtl_medical_record_number'     => $this->_encryptValue($disclosureTrackingLog->dtl_medical_record_number),
+            'dtl_date_received'             => $this->_encryptValue($disclosureTrackingLog->dtl_date_received),
+            'dtl_name_of_requestor'         => $this->_encryptValue($disclosureTrackingLog->dtl_name_of_requestor),
+            'dtl_address'                   => $this->_encryptValue($disclosureTrackingLog->dtl_address),
+            'dtl_auth_type'                 => $this->_encryptValue($disclosureTrackingLog->dtl_auth_type),
+            'dtl_purpose_of_disclosure'     => $this->_encryptValue($disclosureTrackingLog->dtl_purpose_of_disclosure),
+            'dtl_phi_information_disclosed' => $this->_encryptValue($disclosureTrackingLog->dtl_phi_information_disclosed),
+            'dtl_date_disclosed'            => $this->_encryptValue($disclosureTrackingLog->dtl_date_disclosed),
+            'dtl_disclosed_by'              => $this->_encryptValue($disclosureTrackingLog->dtl_disclosed_by),
+            'dtl_extension_notification'    => $this->_encryptValue($disclosureTrackingLog->dtl_extension_notification),
+            'dtl_copy_of_request'           => $this->_encryptValue($disclosureTrackingLog->dtl_copy_of_request)
         );
 
         $id = (int) $disclosureTrackingLog->dtl_id;
-// var_dump($data);exit;
+
         if ($id == 0) {
             $data['dtl_create_u_id'] = $identity['u_id'];
 
@@ -130,10 +216,13 @@ class DisclosureTrackingLogTable implements ServiceLocatorAwareInterface
 
     public function deleteDisclosureTrackingLog($id)
     {
-        $data['dtl_id'] = $id;
+        $data['dtl_id']     = $id;
         $data['dtl_active'] = 0;
+
         $this->tableGateway->update($data, array('dtl_id' => $id));
+
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_DELETE, \Application\Model\LogsTable::ITEM_TYPE_DTL, $id);
+
         return true;
     }
 
@@ -153,8 +242,9 @@ class DisclosureTrackingLogTable implements ServiceLocatorAwareInterface
 
     public function unarchiveDisclosureTrackingLog($id)
     {
-        $data['dtl_id'] = $id;
+        $data['dtl_id']     = $id;
         $data['dtl_active'] = 1;
+
         $this->tableGateway->update($data, array('dtl_id' => $id));
 
         return true;

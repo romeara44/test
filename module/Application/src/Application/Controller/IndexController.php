@@ -48,11 +48,6 @@ class IndexController extends AbstractActionController
         $this->layout()->flashMessagesErrors = $this->flashMessenger()->getErrorMessages();
         if ($this->hasIdentity()) {
             $identity = $this->getIdentity();
-            $config = $this->getServiceLocator()->get('config');
-            if(isset($config['application_vars'])) {
-                $container = new Container('application_vars');
-                $container->storage = $config['application_vars'];
-            }
             
             $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open index page');
 

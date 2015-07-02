@@ -1,0 +1,82 @@
+TRUNCATE `disclosure_requests`;
+
+ALTER TABLE  `disclosure_requests` CHANGE  `dr_reference_number`  `dr_reference_number` BLOB NOT NULL ,
+CHANGE  `dr_requested_by`  `dr_requested_by` BLOB NOT NULL ,
+CHANGE  `dr_staff_member`  `dr_staff_member` BLOB NOT NULL ,
+CHANGE  `dr_completing_request`  `dr_completing_request` BLOB NOT NULL,
+CHANGE  `dr_date_requested`  `dr_date_requested` TINYBLOB NOT NULL ,
+CHANGE  `dr_date_range_requested`  `dr_date_range_requested` TINYBLOB NOT NULL ,
+CHANGE  `dr_date_provided`  `dr_date_provided` TINYBLOB NOT NULL ;
+
+
+TRUNCATE `disclosure_tracking_logs`;
+
+ALTER TABLE  `disclosure_tracking_logs` CHANGE  `dtl_reference_number`  `dtl_reference_number` TINYBLOB NOT NULL ,
+CHANGE  `dtl_patient_name`  `dtl_patient_name` BLOB NOT NULL ,
+CHANGE  `dtl_medical_record_number`  `dtl_medical_record_number` TINYBLOB NOT NULL ,
+CHANGE  `dtl_date_received`  `dtl_date_received` TINYBLOB NOT NULL,
+CHANGE  `dtl_name_of_requestor`  `dtl_name_of_requestor` BLOB NOT NULL ,
+CHANGE  `dtl_address`  `dtl_address` BLOB NOT NULL ,
+CHANGE  `dtl_auth_type`  `dtl_auth_type` TINYBLOB NOT NULL, 
+CHANGE  `dtl_purpose_of_disclosure`  `dtl_purpose_of_disclosure` BLOB NOT NULL, 
+CHANGE  `dtl_phi_information_disclosed`  `dtl_phi_information_disclosed` BLOB NOT NULL, 
+CHANGE  `dtl_date_disclosed`  `dtl_date_disclosed` TINYBLOB NOT NULL,
+CHANGE  `dtl_disclosed_by`  `dtl_disclosed_by` BLOB NOT NULL, 
+CHANGE  `dtl_extension_notification`  `dtl_extension_notification` BLOB NOT NULL, 
+CHANGE  `dtl_copy_of_request`  `dtl_copy_of_request` BLOB NOT NULL;
+
+
+TRUNCATE `verbal_logs`;
+
+ALTER TABLE  `verbal_logs` CHANGE  `vl_date_of_request`  `vl_date_of_request` TINYBLOB DEFAULT NULL ,
+CHANGE  `vl_medical_record_number`  `vl_medical_record_number` TINYBLOB DEFAULT NULL ,
+CHANGE  `vl_name`  `vl_name` BLOB DEFAULT NULL ,
+CHANGE  `vl_date_of_birth`  `vl_date_of_birth` TINYBLOB DEFAULT NULL,
+CHANGE  `vl_address`  `vl_address` BLOB DEFAULT NULL ,
+CHANGE  `vl_disclosure_address`  `vl_disclosure_address` BLOB DEFAULT NULL ,
+CHANGE  `vl_date_requested_from`  `vl_date_requested_from` TINYBLOB DEFAULT NULL, 
+CHANGE  `vl_date_requested_to`  `vl_date_requested_to` TINYBLOB DEFAULT NULL, 
+CHANGE  `vl_is_fees`  `vl_is_fees` TINYBLOB DEFAULT NULL, 
+CHANGE  `vl_fees_charge`  `vl_fees_charge` TINYBLOB DEFAULT NULL,
+CHANGE  `vl_date_request_received`  `vl_date_request_received` TINYBLOB DEFAULT NULL, 
+CHANGE  `vl_date_account_sent`  `vl_date_account_sent` TINYBLOB DEFAULT NULL, 
+CHANGE  `vl_is_extensions`  `vl_is_extensions` TINYBLOB DEFAULT NULL,
+CHANGE  `vl_extension_reason`  `vl_extension_reason` BLOB DEFAULT NULL, 
+CHANGE  `vl_date_patient_notified`  `vl_date_patient_notified` TINYBLOB DEFAULT NULL, 
+CHANGE  `vl_staff_member`  `vl_staff_member` BLOB DEFAULT NULL;
+
+
+TRUNCATE `breach_logs`;
+
+ALTER TABLE  `breach_logs` CHANGE  `bl_name`  `bl_name` TINYBLOB DEFAULT NULL ,
+CHANGE  `bl_invest_led_by`  `bl_invest_led_by` BLOB DEFAULT NULL ,
+CHANGE  `bl_date_of_occurrence`  `bl_date_of_occurrence` TINYBLOB DEFAULT NULL,
+CHANGE  `bl_date_invest_start`  `bl_date_invest_start` TINYBLOB DEFAULT NULL ,
+CHANGE  `bl_date_invest_complete`  `bl_date_invest_complete` TINYBLOB DEFAULT NULL,
+CHANGE  `bl_size`  `bl_size` BLOB DEFAULT NULL ,
+CHANGE  `bl_description`  `bl_description` BLOB DEFAULT NULL ,
+CHANGE  `bl_initials`  `bl_initials` BLOB DEFAULT NULL,
+CHANGE  `bl_initials_approver`  `bl_initials_approver` BLOB DEFAULT NULL,
+CHANGE  `bl_create_date`  `bl_create_date` TINYBLOB NOT NULL ,
+CHANGE  `bl_update_date`  `bl_update_date` TINYBLOB NOT NULL;
+
+
+TRUNCATE `breach_remediation_plans`;
+
+ALTER TABLE  `breach_remediation_plans` CHANGE  `brp_initials_approver`  `brp_initials_approver` BLOB DEFAULT NULL ,
+CHANGE  `brp_version_index`  `brp_version_index` TINYBLOB DEFAULT NULL ,
+CHANGE  `brp_version_index_item`  `brp_version_index_item` TINYBLOB DEFAULT NULL ,
+CHANGE  `brp_incident_date`  `brp_incident_date` TINYBLOB DEFAULT NULL ,
+CHANGE  `brp_remediation_date`  `brp_remediation_date` TINYBLOB DEFAULT NULL,
+CHANGE  `brp_initials`  `brp_initials` TINYBLOB DEFAULT NULL ,
+CHANGE  `brp_create_date`  `brp_create_date` BLOB DEFAULT NULL,
+CHANGE  `brp_status`  `brp_status` TINYBLOB DEFAULT NULL;
+
+
+TRUNCATE `breach_remediation_plans_actions`;
+
+ALTER TABLE  `breach_remediation_plans_actions` CHANGE  `brpa_task`  `brpa_task` MEDIUMBLOB DEFAULT NULL,
+CHANGE  `brpa_action_plan`  `brpa_action_plan` MEDIUMBLOB DEFAULT NULL,
+CHANGE  `brpa_target_date`  `brpa_target_date` TINYBLOB DEFAULT NULL,
+CHANGE  `brpa_create_date`  `brpa_create_date` TINYBLOB DEFAULT NULL,
+CHANGE  `brpa_latest_action_date`  `brpa_latest_action_date` TINYBLOB DEFAULT NULL;

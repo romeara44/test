@@ -190,8 +190,8 @@ class BreachremediationplanController extends AbstractActionController
                 $id = $this->getBreachremediationplanTable()->clonePlan($id);
 
 
-                $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_initials', $post['brp_initials']);
-                $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_initials_approver', $post['brp_initials_approver']);
+                $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_initials', $post['brp_initials'], true);
+                $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_initials_approver', $post['brp_initials_approver'], true);
 
                 $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_performed_u_id', $post['brp_performed_u_id']);
                 $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_approver_u_id', $post['brp_approver_u_id']);
@@ -208,7 +208,7 @@ class BreachremediationplanController extends AbstractActionController
                     } else {
                         $ymd1 = '';
                     }
-                    $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_incident_date', $ymd1);
+                    $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_incident_date', $ymd1, true);
 
                     $ymd2 = \DateTime::createFromFormat('m/d/Y', $post['brp_remediation_date']);
                     if (is_object($ymd2)) {
@@ -219,7 +219,7 @@ class BreachremediationplanController extends AbstractActionController
                     } else {
                         $ymd2 = '';
                     }
-                    $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_remediation_date', $ymd2);
+                    $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_remediation_date', $ymd2, true);
                 }
 
                 if ($post['signedoff'] == 1) {

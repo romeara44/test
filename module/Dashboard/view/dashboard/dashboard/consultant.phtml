@@ -7,7 +7,7 @@
     <a href="/company/edit" class="button" style="padding: 0 15px;"><i class="fa fa-plus-circle"></i> Add Company</a>
     <a href="/client/edit" class="button" style="padding: 0 15px;"><i class="fa fa-plus-circle"></i> Add Contact</a>
     <a href="/businessassociate/edit" class="button" style="padding: 0 15px;"><i class="fa fa-plus-circle"></i> Add Business Associate</a>
-    <a href="/breachlog/edit" class="button" style="padding: 0 15px;"><i class="fa fa-plus-circle"></i> Add Incident Log</a>
+    <a href="/breachlog/edit" class="with-access button" style="padding: 0 15px;"><i class="fa fa-plus-circle"></i> Add Incident Log</a>
     <a href="/assessment/edit/0/step/1" class="button"><i class="fa fa-clipboard"></i> Start New Assessment</a>
 <div class="cboth"></div>
 </p>
@@ -41,37 +41,6 @@
             <tbody id="logsUpcoming">
                 <?php echo $this->partial('dashboard/dashboard/_logs_upcoming.phtml', array('logsUpcoming' => $this->logsUpcoming)); ?>
             </tbody>
-
-        <?php /*<tr>
-            <td><a href="assessment-new-step1.php">Start assessment</a> for &lt;Client Name&gt;.</td>
-        </tr>
-        <tr>
-            <td>Assessment has been completed for &lt;Client Name&gt;, <a href="remediation-plan.php">review remediation plan.</a></td>
-        </tr>
-        <tr>
-            <td><a href="assessment-new-step1.php">Start assessment</a> for &lt;Client Name&gt;.</td>
-        </tr>
-        <tr>
-            <td>Assessment has been completed for &lt;Client Name&gt;, <a href="remediation-plan.php">review remediation plan.</a></td>
-        </tr>
-        <tr>
-            <td><a href="assessment-new-step1.php">Start assessment</a> for &lt;Client Name&gt;.</td>
-        </tr>
-        <tr>
-            <td>Assessment has been completed for &lt;Client Name&gt;, <a href="remediation-plan.php">review remediation plan.</a></td>
-        </tr>
-        <tr>
-            <td><a href="assessment-new-step1.php">Start assessment</a> for &lt;Client Name&gt;.</td>
-        </tr>
-        <tr>
-            <td>Assessment has been completed for &lt;Client Name&gt;, <a href="remediation-plan.php">review remediation plan.</a></td>
-        </tr>
-        <tr>
-            <td><a href="assessment-new-step1.php">Start assessment</a> for &lt;Client Name&gt;.</td>
-        </tr>
-        <tr>
-            <td>Assessment has been completed for &lt;Client Name&gt;, <a href="remediation-plan.php">review remediation plan.</a></td>
-        </tr> */ ?>
     </table>
     <p>
         <a href="javascript:" id="loadMoreUpcoming" class="button" style="float: none; width: 80px; margin: 0 auto;">Load More</a>

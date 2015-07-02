@@ -16,6 +16,7 @@ class DisclosureRequest
     public $dr_staff_member;
     public $dr_completing_request;
     public $dr_date_provided;
+    public $dr_create_u_id;
     public $dr_active;
 
     protected $inputFilter;
@@ -30,6 +31,7 @@ class DisclosureRequest
         $this->dr_staff_member         = (isset($data['dr_staff_member']))         ? $data['dr_staff_member']         : null;
         $this->dr_completing_request   = (isset($data['dr_completing_request']))   ? $data['dr_completing_request']   : null;
         $this->dr_date_provided        = (isset($data['dr_date_provided']))        ? $data['dr_date_provided']        : null;
+        $this->dr_create_u_id          = (isset($data['dr_create_u_id']))          ? $data['dr_create_u_id']          : null;
         $this->dr_active               = (isset($data['dr_active']))               ? $data['dr_active']               : null;
     }
 
