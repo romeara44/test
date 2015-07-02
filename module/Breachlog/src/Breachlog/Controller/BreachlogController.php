@@ -40,7 +40,7 @@ class BreachlogController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
         $identity = $this->getIdentity();
-        if ($identity['u_role_id'] != \Admin\Model\User::ROLE_ADMIN && (!isset($identity['has_modules_access']) || $identity['has_modules_access'] != 1)) {
+        if (!$this->getUserTable()->checkModulesAccess('breach')) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
         if (!in_array($identity['u_role_id'], array(1, 2, 3, 5))) {

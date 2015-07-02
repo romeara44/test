@@ -57,6 +57,7 @@ class User
     public $u_confirmed;
     public $u_company_id_admin;
     public $u_grant_to_disclosures;
+    public $u_grant_to_breach;
     public $u_forgot_password;
     public $u_failed_logins_count;
     public $u_locked;
@@ -105,6 +106,7 @@ class User
         $this->u_confirmed     = (isset($data['u_confirmed'])) ? $data['u_confirmed'] : null;
         $this->u_company_id_admin     = (isset($data['u_company_id_admin'])) ? $data['u_company_id_admin'] : null;
         $this->u_grant_to_disclosures = (isset($data['u_grant_to_disclosures'])) ? $data['u_grant_to_disclosures'] : null;
+        $this->u_grant_to_breach = (isset($data['u_grant_to_breach'])) ? $data['u_grant_to_breach'] : null;
         $this->u_forgot_password     = (isset($data['u_forgot_password'])) ? $data['u_forgot_password'] : null;
         $this->u_failed_logins_count     = (isset($data['u_failed_logins_count'])) ? $data['u_failed_logins_count'] : null;
         $this->u_locked     = (isset($data['u_locked'])) ? $data['u_locked'] : null;

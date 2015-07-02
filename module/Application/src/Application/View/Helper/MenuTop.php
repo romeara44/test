@@ -285,21 +285,6 @@ class MenuTop extends AbstractHelper
                 )
             ),
             array(
-                'title' => 'Breach Management',
-                'url' => '/breachlog/list',
-                'class' => 'with-access',
-                'items' => array(
-                    array('title' => 'Breach Logs',
-                          'url' => '/breachlog/list',
-                          'class' => 'with-access'
-                        ),
-                    array('title' => 'Breach Remediation Plans',
-                          'url' => '/breachremediationplan/list',
-                          'class' => 'with-access'
-                        )
-                )
-            ),
-            array(
                 'title' => 'Assessments',
                 'url' => '/assessment/list',
             ),
@@ -332,6 +317,24 @@ class MenuTop extends AbstractHelper
                 )
             )
         );
+
+        if($identity['u_grant_to_breach']) {
+            $this->items[] = array(
+                                'title' => 'Breach Management',
+                                'url' => '/breachlog/list',
+                                'class' => 'with-access',
+                                'items' => array(
+                                    array('title' => 'Breach Logs',
+                                          'url' => '/breachlog/list',
+                                          'class' => 'with-access'
+                                        ),
+                                    array('title' => 'Breach Remediation Plans',
+                                          'url' => '/breachremediationplan/list',
+                                          'class' => 'with-access'
+                                        )
+                                )
+                            );
+        }
 
         if($identity['u_grant_to_disclosures']) {
             $this->items[] = array(
@@ -382,21 +385,6 @@ class MenuTop extends AbstractHelper
                 )
             ),
             array(
-                'title' => 'Breach Management',
-                'url' => '/breachlog/list',
-                'class' => 'with-access',
-                'items' => array(
-                    array('title' => 'Breach Logs',
-                          'url' => '/breachlog/list',
-                          'class' => 'with-access'
-                        ),
-                    array('title' => 'Breach Remediation Plans',
-                          'url' => '/breachremediationplan/list',
-                          'class' => 'with-access'
-                        )
-                )
-            ),
-            array(
                 'title' => 'Assessments',
                 'url' => '/assessment/list',
             ),
@@ -429,6 +417,24 @@ class MenuTop extends AbstractHelper
                 )
             )
         );
+
+        if($identity['u_grant_to_breach']) {
+            $this->items[] = array(
+                                'title' => 'Breach Management',
+                                'url' => '/breachlog/list',
+                                'class' => 'with-access',
+                                'items' => array(
+                                    array('title' => 'Breach Logs',
+                                          'url' => '/breachlog/list',
+                                          'class' => 'with-access'
+                                        ),
+                                    array('title' => 'Breach Remediation Plans',
+                                          'url' => '/breachremediationplan/list',
+                                          'class' => 'with-access'
+                                        )
+                                )
+                            );
+        }
 
         if($identity['u_grant_to_disclosures']) {
             $this->items[] = array(

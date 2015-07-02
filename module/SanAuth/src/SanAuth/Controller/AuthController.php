@@ -241,7 +241,9 @@ class AuthController extends AbstractActionController
                     $dataStorage['u_register']               = $user->u_register;
                     $dataStorage['u_first_login']            = $user->u_first_login;
                     $dataStorage['u_company_id_admin']       = $user->u_company_id_admin;
-                    $dataStorage['u_grant_to_disclosures']   = $user->u_grant_to_disclosures;
+                    $dataStorage['u_grant_to_disclosures']   = $user->u_role_id == \Admin\Model\User::ROLE_ADMIN ? 1 : $user->u_grant_to_disclosures;
+                    $dataStorage['u_grant_to_breach']        = $user->u_role_id == \Admin\Model\User::ROLE_ADMIN ? 1 : $user->u_grant_to_breach;
+                    $dataStorage['has_modules_access']       = $user->u_role_id == \Admin\Model\User::ROLE_ADMIN ? 1 : 0;
 
                     $this->getAuthService()->getStorage()->write($dataStorage);
 
@@ -287,7 +289,7 @@ class AuthController extends AbstractActionController
             $identity = $this->getAuthService()->getIdentity();
             $key      = $this->getUserTable()->getModulesAccessCode($identity['u_id']);
 
-            if($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN || (isset($identity['has_modules_access']) && $identity['has_modules_access'] == 1)) {
+            if($identity['has_modules_access'] == 1) {
                 return new JsonModel(array('result' => 1));
             } else {
                 return new JsonModel(array('result' => 0));
@@ -304,15 +306,6 @@ class AuthController extends AbstractActionController
         if($this->getAuthService()->hasIdentity() && $request->isPost()) {
 
             $identity = $this->getAuthService()->getIdentity();
-
-            if($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN) {
-                $identity['has_modules_access'] = 1;
-
-                $this->getAuthService()->setStorage($this->getSessionStorage());
-                $this->getAuthService()->getStorage()->write($identity);
-
-                return new JsonModel(array('result' => 1));
-            }
 
             $htmlEntities = new \Zend\Filter\HtmlEntities();
 

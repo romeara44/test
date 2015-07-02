@@ -224,6 +224,7 @@ class UserTable implements ServiceLocatorAwareInterface
 
         if($identity['u_role_id'] == User::ROLE_ADMIN) {
             $data['u_grant_to_disclosures'] = $user->u_grant_to_disclosures;
+            $data['u_grant_to_breach'] = $user->u_grant_to_breach;
         }
 
         if (!(int) $user->u_state_id) {
@@ -732,7 +733,7 @@ class UserTable implements ServiceLocatorAwareInterface
 
         $expiration = 60 * 20;
 
-        if($user->u_modules_access_code && $user->u_modules_access_code_created + $expiration > time()) {
+        if(($user->u_grant_to_breach || $user->u_grant_to_disclosures) && $user->u_modules_access_code && $user->u_modules_access_code_created + $expiration > time()) {
 
             return $user->u_modules_access_code;
         } else {
@@ -749,7 +750,7 @@ class UserTable implements ServiceLocatorAwareInterface
     {
         $user = $this->getUser($id);
 
-        if($user) {
+        if($user && ($user->u_grant_to_breach || $user->u_grant_to_disclosures)) {
             $modulesAccessCode = substr(sha1($user->u_email . time()), 0, 8);
 
             $data['u_modules_access_code']         = $modulesAccessCode;
@@ -777,6 +778,31 @@ class UserTable implements ServiceLocatorAwareInterface
         } else {
             return false;
         }
+    }
+
+    public function checkModulesAccess($module)
+    {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
+        switch ($module) {
+            case 'breach':
+                $moduleAccessName = 'u_grant_to_breach';
+                break;
+            case 'disclosures':
+                $moduleAccessName = 'u_grant_to_disclosures';
+                break;
+            default:
+                return false;
+                break;
+        }
+
+        if($identity && $identity[$moduleAccessName] == 1 &&  $identity['has_modules_access'] == 1) {
+            return true;
+        }
+
+        return false;
     }
 
 }

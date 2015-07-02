@@ -96,12 +96,17 @@ $form->setAttribute('method', 'post');
                     <label>&nbsp;</label>
                     <?php if ((!$uId || $userObj->u_role_id == 5) && $identity['u_role_id'] == 1): ?>
                         <input type="checkbox" name="u_grant_to_disclosures" <?php if(is_object($userObj) && $userObj->u_grant_to_disclosures):?>checked <?php endif; ?> id="grantToDisclosures"  class="checkbox" value="1"/>
-                        <?php if($identity['u_role_id'] == 1) :?>
                             <label for="grantToDisclosures" class="checkbox">Grant To Disclosures</label>
-                        <?php endif; ?>
                     <?php endif; ?>
                     <input type="checkbox" name="is_training_manager" <?php if(is_object($clientObj) && $clientObj->c_training_manager_u_id && $clientObj->c_training_manager_u_id == $userObj->u_id):?>checked <?php endif; ?> id="trainingManager" class="checkbox" value="1" />
                     <label for="trainingManager" class="checkbox">Training Manager</label>
+                </p>
+                <p style="padding: 2px 0 12px 0; line-height: 14px; border-top: 0;">
+                    <label>&nbsp;</label>
+                    <?php if ((!$uId || $userObj->u_role_id == 5) && $identity['u_role_id'] == 1): ?>
+                        <input type="checkbox" name="u_grant_to_breach" <?php if(is_object($userObj) && $userObj->u_grant_to_breach):?>checked <?php endif; ?> id="grantToBreach" class="checkbox" value="1"/>
+                            <label for="grantToBreach" class="checkbox">Grant To Breach</label>
+                    <?php endif; ?>
                 </p>
             <?php endif; ?>
 
