@@ -236,7 +236,7 @@ class BreachremediationplanController extends AbstractActionController
                     $post['note_item_id'] = $id;
                     $note->exchangeArray($post);
                     $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-                    $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
+                    $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles(), false, 'notesFiles', true);
 
                     $this->flashMessenger()->addSuccessMessage('Plan saved');
                 }
@@ -352,7 +352,7 @@ class BreachremediationplanController extends AbstractActionController
             $noteData['note_item_id'] = $id;
             $note->exchangeArray($noteData);
             $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-            $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
+            $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles(), false, 'notesFiles', true);
         }
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Save files for breachlog action "' . $id . '" for breachlog "' . $brpId . '"');
@@ -576,7 +576,7 @@ class BreachremediationplanController extends AbstractActionController
                 $noteData['note_item_id'] = $brpaId;
                 $note->exchangeArray($noteData);
                 $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-                $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
+                $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles(), false, 'notesFiles', true);
 
                 /////////////////
                 $added = true;

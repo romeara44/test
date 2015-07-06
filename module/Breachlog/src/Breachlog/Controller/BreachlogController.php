@@ -304,7 +304,7 @@ class BreachlogController extends AbstractActionController
                     $noteData['note_item_id'] = $blId;
                     $note->exchangeArray($noteData);
                     $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-                    $noteId = $this->getNoteTable()->saveNote($note);
+                    $noteId = $this->getNoteTable()->saveNote($note, null, false, 'notesFiles', true);
                 }
                 
                 // save files

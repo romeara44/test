@@ -75,10 +75,13 @@ CHANGE  `brp_status`  `brp_status` TINYBLOB DEFAULT NULL;
 
 TRUNCATE `breach_remediation_plans_actions`;
 
-ALTER TABLE  `breach_remediation_plans_actions` CHANGE  `brpa_task`  `brpa_task` MEDIUMBLOB DEFAULT NULL,
-CHANGE  `brpa_action_plan`  `brpa_action_plan` MEDIUMBLOB DEFAULT NULL,
+ALTER TABLE  `breach_remediation_plans_actions` CHANGE  `brpa_task`  `brpa_task` BLOB DEFAULT NULL,
+CHANGE  `brpa_status`  `brpa_status` TINYBLOB DEFAULT NULL,
+CHANGE  `brpa_action_plan`  `brpa_action_plan` BLOB DEFAULT NULL,
 CHANGE  `brpa_target_date`  `brpa_target_date` TINYBLOB DEFAULT NULL,
 CHANGE  `brpa_create_date`  `brpa_create_date` TINYBLOB DEFAULT NULL,
 CHANGE  `brpa_latest_action_date`  `brpa_latest_action_date` TINYBLOB DEFAULT NULL;
 
 ALTER TABLE  `files` ADD COLUMN `f_encrypted` TINYINT(1) DEFAULT '0';
+ALTER TABLE  `notes` ADD COLUMN `note_encrypted` TINYINT(1) DEFAULT '0';
+ALTER TABLE  `notes` CHANGE  `note_text` `note_text` BLOB DEFAULT NULL;

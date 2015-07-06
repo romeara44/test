@@ -310,7 +310,7 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         $select->where('brp_id = ' . $id);
         $select->where('brp_active = 1');
         $select->join(array('c' => 'companies'), 'brp_c_id = c_id', array('_client_name' => 'c_name'), 'left');
-        $select->join(array('u' => 'users'), 'brp_approver_u_id = u_id', array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)'), '_brp_incident_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(brp_incident_date, "%m/%d/%Y")'), '_brp_remediation_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(brp_remediation_date, "%m/%d/%Y")')), 'left');
+        $select->join(array('u' => 'users'), 'brp_approver_u_id = u_id', array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)'), '_brp_incident_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(' . DbCrypt::decryptField('brp_incident_date', false) . ', "%m/%d/%Y")'), '_brp_remediation_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(' . DbCrypt::decryptField('brp_remediation_date', false) . ', "%m/%d/%Y")')), 'left');
         $select->join(array('u2' => 'users'), 'brp_consultant_u_id = u2.u_id', array('_consultant_name' => new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)')), 'left');
         $select->join(array('u3' => 'users'), 'brp_performed_u_id = u3.u_id', array('_performed_name' => new \Zend\Db\Sql\Expression('CONCAT(u3.u_firstname, " ", u3.u_lastname)')), 'left');
         $select->join(array('u4' => 'users'), 'brp_approver_u_id = u4.u_id', array('_accepter_name' => new \Zend\Db\Sql\Expression('CONCAT(u4.u_firstname, " ", u4.u_lastname)')), 'left');
@@ -581,7 +581,7 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         // create new row
         $brp->brp_id            = 0;
         $brp->brp_parent_brp_id = $id;
-        $brp->brp_status        = DbCrypt::encryptValue(\Breachlog\Model\Breachremediationplan::STATUS_NEW);
+        $brp->brp_status        = \Breachlog\Model\Breachremediationplan::STATUS_NEW;
 
         $newId = $this->saveBreachremediationplan($brp);
 

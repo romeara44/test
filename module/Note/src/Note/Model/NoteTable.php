@@ -12,6 +12,7 @@ use Zend\Paginator\Adapter\DbSelect;
 use Zend\Paginator\Paginator;
 use Zend\Db\Sql\Sql;
 use DataCrypt\FileCrypt;
+use DataCrypt\DbCrypt;
 
 class NoteTable implements ServiceLocatorAwareInterface
 {
@@ -36,6 +37,19 @@ class NoteTable implements ServiceLocatorAwareInterface
     public function getNotes($itemId = 0, $itemType = 1, $subItemId = 0, $type = Null)
     {
         $select = $this->tableGateway->getSql()->select();
+
+        $select->columns(array('note_id'          => 'note_id',
+                               'note_text'        => new \Zend\Db\Sql\Expression('IF(note_encrypted,' . DbCrypt::decryptField('note_text', false) . ', note_text)'),
+                               'note_u_id'        => 'note_u_id',
+                               'note_item_type'   => 'note_item_type',
+                               'note_item_id'     => 'note_item_id',
+                               'note_subitem_id'  => 'note_subitem_id',
+                               'note_active'      => 'note_active',
+                               'note_create_date' => 'note_create_date',
+                               'note_encrypted'   => 'note_encrypted'
+                              )
+                            );
+
         $select->join(array('u' => 'users'), 'note_u_id = u_id', array('_username' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'), '_note_create_date_format' => new \Zend\Db\Sql\Expression("DATE_FORMAT(note_create_date, '%b %D, %Y')")));
 
         $select->join(array('nf' => 'notes_files'), 'note_id = nf_note_id', array('*', '_files' => new \Zend\Db\Sql\Expression('GROUP_CONCAT(CONCAT(f_name, "::", f_id))')), 'left');
@@ -106,6 +120,19 @@ class NoteTable implements ServiceLocatorAwareInterface
         $id  = (int) $id;
 
         $select = $this->tableGateway->getSql()->select();
+
+        $select->columns(array('note_id'          => 'note_id',
+                               'note_text'        =>  new \Zend\Db\Sql\Expression('IF(note_encrypted,' . DbCrypt::decryptField('note_text', false) . ', note_text)'),
+                               'note_u_id'        => 'note_u_id',
+                               'note_item_type'   => 'note_item_type',
+                               'note_item_id'     => 'note_item_id',
+                               'note_subitem_id'  => 'note_subitem_id',
+                               'note_active'      => 'note_active',
+                               'note_create_date' => 'note_create_date',
+                               'note_encrypted'   => 'note_encrypted'
+                              )
+                            );
+
         $select->join(array('u' => 'users'), 'note_u_id = u_id', array('_username' => 'CONCAT(u_firstname, " ", u_lastname)'));
 
         $select->where('note_id = ' . $id);
@@ -134,10 +161,11 @@ class NoteTable implements ServiceLocatorAwareInterface
         }
 
         $data = array(
-            'note_text' => $note->note_text,
+            'note_text' => $encrypt ? DbCrypt::encryptValue($note->note_text) : $note->note_text,
             'note_u_id' => $identity['u_id'],
             'note_item_type' => $note->note_item_type,
             'note_item_id' => $note->note_item_id,
+            'note_encrypted' => $encrypt ? 1 : 0,
         );
 
         if ($note->note_subitem_id) {
