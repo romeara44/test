@@ -11,17 +11,16 @@ use Zend\Db\ResultSet\ResultSet;
 use Zend\Db\Sql\Select;
 use Zend\Paginator\Adapter\DbSelect;
 use Zend\Paginator\Paginator;
+use DataCrypt\DbCrypt;
 
 class BreachlogTable implements ServiceLocatorAwareInterface
 {
     protected $tableGateway;
     protected $serviceLocator;
-    private $_secureDBKey;
 
     public function __construct(TableGateway $tableGateway)
     {
         $this->tableGateway = $tableGateway;
-        $this->_secureDBKey  = (new \Zend\Session\Container('application_vars'))->storage['secure_db_key'];
     }
 
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
@@ -32,14 +31,6 @@ class BreachlogTable implements ServiceLocatorAwareInterface
     public function getServiceLocator()
     {
         return $this->serviceLocator;
-    }
-
-    private function _encryptValue($value, $expression = true) {
-        return $expression ? new \Zend\Db\Sql\Expression('AES_ENCRYPT("' . $value . '", "' . $this->_secureDBKey . '")') : 'AES_ENCRYPT("' . $value . '", "' . $this->_secureDBKey . '")';
-    }
-
-    private function _decryptField($field, $expression = true) {
-        return $expression ? new \Zend\Db\Sql\Expression('AES_DECRYPT(' . $field . ', "' . $this->_secureDBKey . '")') : 'AES_DECRYPT(' . $field . ', "' . $this->_secureDBKey . '")';
     }
 
     private function _getIdentity()
@@ -60,18 +51,18 @@ class BreachlogTable implements ServiceLocatorAwareInterface
                                    'bl_create_u_id'          => 'bl_create_u_id',
                                    'bl_update_u_id'          => 'bl_update_u_id',
                                    'bl_c_id'                 => 'bl_c_id',
-                                   'bl_name'                 => $this->_decryptField('bl_name'),
-                                   'bl_date_of_occurrence'   => $this->_decryptField('bl_date_of_occurrence'),
-                                   'bl_size'                 => $this->_decryptField('bl_size'),
-                                   'bl_description'          => $this->_decryptField('bl_description'),
-                                   'bl_reportable'           => $this->_decryptField('bl_reportable'),
-                                   'bl_create_date'          => $this->_decryptField('bl_create_date'),
-                                   'bl_update_date'          => $this->_decryptField('bl_update_date'),
-                                   'bl_invest_led_by'        => $this->_decryptField('bl_invest_led_by'),
-                                   'bl_date_invest_start'    => $this->_decryptField('bl_date_invest_start'),
-                                   'bl_date_invest_complete' => $this->_decryptField('bl_date_invest_complete'),
-                                   'bl_initials_approver'    => $this->_decryptField('bl_initials_approver'),
-                                   'bl_initials'             => $this->_decryptField('bl_initials'),
+                                   'bl_name'                 => DbCrypt::decryptField('bl_name'),
+                                   'bl_date_of_occurrence'   => DbCrypt::decryptField('bl_date_of_occurrence'),
+                                   'bl_size'                 => DbCrypt::decryptField('bl_size'),
+                                   'bl_description'          => DbCrypt::decryptField('bl_description'),
+                                   'bl_reportable'           => DbCrypt::decryptField('bl_reportable'),
+                                   'bl_create_date'          => DbCrypt::decryptField('bl_create_date'),
+                                   'bl_update_date'          => DbCrypt::decryptField('bl_update_date'),
+                                   'bl_invest_led_by'        => DbCrypt::decryptField('bl_invest_led_by'),
+                                   'bl_date_invest_start'    => DbCrypt::decryptField('bl_date_invest_start'),
+                                   'bl_date_invest_complete' => DbCrypt::decryptField('bl_date_invest_complete'),
+                                   'bl_initials_approver'    => DbCrypt::decryptField('bl_initials_approver'),
+                                   'bl_initials'             => DbCrypt::decryptField('bl_initials'),
                                    'bl_approver_u_id'        => 'bl_approver_u_id',
                                    'bl_accepter_u_id'        => 'bl_accepter_u_id',
                                    'bl_active'               => 'bl_active'
@@ -119,18 +110,18 @@ class BreachlogTable implements ServiceLocatorAwareInterface
                                'bl_create_u_id'          => 'bl_create_u_id',
                                'bl_update_u_id'          => 'bl_update_u_id',
                                'bl_c_id'                 => 'bl_c_id',
-                               'bl_name'                 => $this->_decryptField('bl_name'),
-                               'bl_date_of_occurrence'   => $this->_decryptField('bl_date_of_occurrence'),
-                               'bl_size'                 => $this->_decryptField('bl_size'),
-                               'bl_description'          => $this->_decryptField('bl_description'),
-                               'bl_reportable'           => $this->_decryptField('bl_reportable'),
-                               'bl_create_date'          => $this->_decryptField('bl_create_date'),
-                               'bl_update_date'          => $this->_decryptField('bl_update_date'),
-                               'bl_invest_led_by'        => $this->_decryptField('bl_invest_led_by'),
-                               'bl_date_invest_start'    => $this->_decryptField('bl_date_invest_start'),
-                               'bl_date_invest_complete' => $this->_decryptField('bl_date_invest_complete'),
-                               'bl_initials_approver'    => $this->_decryptField('bl_initials_approver'),
-                               'bl_initials'             => $this->_decryptField('bl_initials'),
+                               'bl_name'                 => DbCrypt::decryptField('bl_name'),
+                               'bl_date_of_occurrence'   => DbCrypt::decryptField('bl_date_of_occurrence'),
+                               'bl_size'                 => DbCrypt::decryptField('bl_size'),
+                               'bl_description'          => DbCrypt::decryptField('bl_description'),
+                               'bl_reportable'           => DbCrypt::decryptField('bl_reportable'),
+                               'bl_create_date'          => DbCrypt::decryptField('bl_create_date'),
+                               'bl_update_date'          => DbCrypt::decryptField('bl_update_date'),
+                               'bl_invest_led_by'        => DbCrypt::decryptField('bl_invest_led_by'),
+                               'bl_date_invest_start'    => DbCrypt::decryptField('bl_date_invest_start'),
+                               'bl_date_invest_complete' => DbCrypt::decryptField('bl_date_invest_complete'),
+                               'bl_initials_approver'    => DbCrypt::decryptField('bl_initials_approver'),
+                               'bl_initials'             => DbCrypt::decryptField('bl_initials'),
                                'bl_approver_u_id'        => 'bl_approver_u_id',
                                'bl_accepter_u_id'        => 'bl_accepter_u_id',
                                'bl_active'               => 'bl_active'
@@ -153,18 +144,18 @@ class BreachlogTable implements ServiceLocatorAwareInterface
                                'bl_create_u_id'          => 'bl_create_u_id',
                                'bl_update_u_id'          => 'bl_update_u_id',
                                'bl_c_id'                 => 'bl_c_id',
-                               'bl_name'                 => $this->_decryptField('bl_name'),
-                               'bl_date_of_occurrence'   => $this->_decryptField('bl_date_of_occurrence'),
-                               'bl_size'                 => $this->_decryptField('bl_size'),
-                               'bl_description'          => $this->_decryptField('bl_description'),
-                               'bl_reportable'           => $this->_decryptField('bl_reportable'),
-                               'bl_create_date'          => $this->_decryptField('bl_create_date'),
-                               'bl_update_date'          => $this->_decryptField('bl_update_date'),
-                               'bl_invest_led_by'        => $this->_decryptField('bl_invest_led_by'),
-                               'bl_date_invest_start'    => $this->_decryptField('bl_date_invest_start'),
-                               'bl_date_invest_complete' => $this->_decryptField('bl_date_invest_complete'),
-                               'bl_initials_approver'    => $this->_decryptField('bl_initials_approver'),
-                               'bl_initials'             => $this->_decryptField('bl_initials'),
+                               'bl_name'                 => DbCrypt::decryptField('bl_name'),
+                               'bl_date_of_occurrence'   => DbCrypt::decryptField('bl_date_of_occurrence'),
+                               'bl_size'                 => DbCrypt::decryptField('bl_size'),
+                               'bl_description'          => DbCrypt::decryptField('bl_description'),
+                               'bl_reportable'           => DbCrypt::decryptField('bl_reportable'),
+                               'bl_create_date'          => DbCrypt::decryptField('bl_create_date'),
+                               'bl_update_date'          => DbCrypt::decryptField('bl_update_date'),
+                               'bl_invest_led_by'        => DbCrypt::decryptField('bl_invest_led_by'),
+                               'bl_date_invest_start'    => DbCrypt::decryptField('bl_date_invest_start'),
+                               'bl_date_invest_complete' => DbCrypt::decryptField('bl_date_invest_complete'),
+                               'bl_initials_approver'    => DbCrypt::decryptField('bl_initials_approver'),
+                               'bl_initials'             => DbCrypt::decryptField('bl_initials'),
                                'bl_approver_u_id'        => 'bl_approver_u_id',
                                'bl_accepter_u_id'        => 'bl_accepter_u_id',
                                'bl_active'               => 'bl_active'
@@ -172,7 +163,7 @@ class BreachlogTable implements ServiceLocatorAwareInterface
                             );
 
         $select->where('bl_active = 1');
-        $select->where($this->_decryptField('bl_name') . ' LIKE "%' . $searchValue . '%"');
+        $select->where(DbCrypt::decryptField('bl_name') . ' LIKE "%' . $searchValue . '%"');
 
         $select->columns(array('_id' => 'bl_id', '_name' => 'bl_name', '_type' => new \Zend\Db\Sql\Expression('CONCAT("breachlog")')));
 
@@ -196,7 +187,7 @@ class BreachlogTable implements ServiceLocatorAwareInterface
         $condition = isset(\Admin\Model\UserTable::$reportCondition[$conditionNum]) ? \Admin\Model\UserTable::$reportCondition[$conditionNum] : null;
 
         if ($condition != '') {
-            $condition = str_replace('?', $this->_decryptField('bl_create_date', false), $condition);
+            $condition = str_replace('?', DbCrypt::decryptField('bl_create_date', false), $condition);
             $select->where($condition);
         }
 
@@ -244,18 +235,18 @@ class BreachlogTable implements ServiceLocatorAwareInterface
                                'bl_create_u_id'          => 'bl_create_u_id',
                                'bl_update_u_id'          => 'bl_update_u_id',
                                'bl_c_id'                 => 'bl_c_id',
-                               'bl_name'                 => $this->_decryptField('bl_name'),
-                               'bl_date_of_occurrence'   => $this->_decryptField('bl_date_of_occurrence'),
-                               'bl_size'                 => $this->_decryptField('bl_size'),
-                               'bl_description'          => $this->_decryptField('bl_description'),
-                               'bl_reportable'           => $this->_decryptField('bl_reportable'),
-                               'bl_create_date'          => $this->_decryptField('bl_create_date'),
-                               'bl_update_date'          => $this->_decryptField('bl_update_date'),
-                               'bl_invest_led_by'        => $this->_decryptField('bl_invest_led_by'),
-                               'bl_date_invest_start'    => $this->_decryptField('bl_date_invest_start'),
-                               'bl_date_invest_complete' => $this->_decryptField('bl_date_invest_complete'),
-                               'bl_initials_approver'    => $this->_decryptField('bl_initials_approver'),
-                               'bl_initials'             => $this->_decryptField('bl_initials'),
+                               'bl_name'                 => DbCrypt::decryptField('bl_name'),
+                               'bl_date_of_occurrence'   => DbCrypt::decryptField('bl_date_of_occurrence'),
+                               'bl_size'                 => DbCrypt::decryptField('bl_size'),
+                               'bl_description'          => DbCrypt::decryptField('bl_description'),
+                               'bl_reportable'           => DbCrypt::decryptField('bl_reportable'),
+                               'bl_create_date'          => DbCrypt::decryptField('bl_create_date'),
+                               'bl_update_date'          => DbCrypt::decryptField('bl_update_date'),
+                               'bl_invest_led_by'        => DbCrypt::decryptField('bl_invest_led_by'),
+                               'bl_date_invest_start'    => DbCrypt::decryptField('bl_date_invest_start'),
+                               'bl_date_invest_complete' => DbCrypt::decryptField('bl_date_invest_complete'),
+                               'bl_initials_approver'    => DbCrypt::decryptField('bl_initials_approver'),
+                               'bl_initials'             => DbCrypt::decryptField('bl_initials'),
                                'bl_approver_u_id'        => 'bl_approver_u_id',
                                'bl_accepter_u_id'        => 'bl_accepter_u_id',
                                'bl_active'               => 'bl_active'
@@ -294,16 +285,16 @@ class BreachlogTable implements ServiceLocatorAwareInterface
 
         $data = array(
             'bl_c_id'                 => $bl->bl_c_id,
-            'bl_name'                 => $this->_encryptValue($bl->bl_name),
-            'bl_invest_led_by'        => $this->_encryptValue($bl->bl_invest_led_by),
-            'bl_date_of_occurrence'   => $this->_encryptValue($bl->bl_date_of_occurrence),
-            'bl_date_invest_start'    => $this->_encryptValue($bl->bl_date_invest_start),
-            'bl_date_invest_complete' => $this->_encryptValue($bl->bl_date_invest_complete),
-            'bl_size'                 => $this->_encryptValue($bl->bl_size),
-            'bl_description'          => $this->_encryptValue($bl->bl_description),
-            'bl_initials_approver'    => $this->_encryptValue($bl->bl_initials_approver),
-            'bl_initials'             => $this->_encryptValue($bl->bl_initials),
-            'bl_reportable'           => $this->_encryptValue($bl->bl_reportable),
+            'bl_name'                 => DbCrypt::encryptValue($bl->bl_name),
+            'bl_invest_led_by'        => DbCrypt::encryptValue($bl->bl_invest_led_by),
+            'bl_date_of_occurrence'   => DbCrypt::encryptValue($bl->bl_date_of_occurrence),
+            'bl_date_invest_start'    => DbCrypt::encryptValue($bl->bl_date_invest_start),
+            'bl_date_invest_complete' => DbCrypt::encryptValue($bl->bl_date_invest_complete),
+            'bl_size'                 => DbCrypt::encryptValue($bl->bl_size),
+            'bl_description'          => DbCrypt::encryptValue($bl->bl_description),
+            'bl_initials_approver'    => DbCrypt::encryptValue($bl->bl_initials_approver),
+            'bl_initials'             => DbCrypt::encryptValue($bl->bl_initials),
+            'bl_reportable'           => DbCrypt::encryptValue($bl->bl_reportable),
             'bl_approver_u_id'        => $bl->bl_approver_u_id,
             'bl_accepter_u_id'        => $bl->bl_accepter_u_id
         );
@@ -319,7 +310,7 @@ class BreachlogTable implements ServiceLocatorAwareInterface
             }
 
             $data['bl_create_u_id'] = $identity['u_id'];
-            $data['bl_create_date'] = $this->_encryptValue(date('Y-m-d H:i:s'));
+            $data['bl_create_date'] = DbCrypt::encryptValue(date('Y-m-d H:i:s'));
         }
 
         if ($id == 0) {
@@ -328,7 +319,7 @@ class BreachlogTable implements ServiceLocatorAwareInterface
             $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_ADD, \Application\Model\LogsTable::ITEM_TYPE_BREACHLOG, $id);
         } else {
             if ($this->getBreachlog($id)) {
-                $data['bl_update_date'] = $this->_encryptValue(date('Y-m-d H:i:s'));
+                $data['bl_update_date'] = DbCrypt::encryptValue(date('Y-m-d H:i:s'));
                 $data['bl_update_u_id'] = $identity['u_id'];
 
                 $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_EDIT, \Application\Model\LogsTable::ITEM_TYPE_BREACHLOG, $id);

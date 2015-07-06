@@ -12,6 +12,7 @@ use Zend\Db\Sql\Select;
 use Zend\Paginator\Adapter\DbSelect;
 use Zend\View\Helper\ServerUrl;
 use Zend\Paginator\Paginator;
+use DataCrypt\DbCrypt;
 
 class LogsTable
 {
@@ -46,13 +47,11 @@ class LogsTable
     protected $tableGateway;
     protected $serviceLocator;
     protected $logDir;
-    private $_secureDBKey;
 
     public function __construct(TableGateway $tableGateway)
     {
         $this->tableGateway = $tableGateway;
         $this->logDir = ROOT_PATH . '/public/data/logs/';
-        $this->_secureDBKey  = (new \Zend\Session\Container('application_vars'))->storage['secure_db_key'];
     }
 
 
@@ -63,14 +62,6 @@ class LogsTable
 
     public function getServiceLocator() {
         return $this->serviceLocator;
-    }
-
-    private function _encryptValue($value, $expression = true) {
-        return $expression ? new \Zend\Db\Sql\Expression('AES_ENCRYPT("' . $value . '", "' . $this->_secureDBKey . '")') : 'AES_ENCRYPT("' . $value . '", "' . $this->_secureDBKey . '")';
-    }
-
-    private function _decryptField($field, $expression = true) {
-        return $expression ? new \Zend\Db\Sql\Expression('AES_DECRYPT(' . $field . ', "' . $this->_secureDBKey . '")') : 'AES_DECRYPT(' . $field . ', "' . $this->_secureDBKey . '")';
     }
 
     private function _getIdentity()
@@ -118,7 +109,7 @@ class LogsTable
 
             $select->join(array('ba' => 'business_associates'), new \Zend\Db\Sql\Expression('ba_id = lo_item_id AND lo_item_type = 3'), array('_ba_id' => 'ba_id', '_ba_name' => 'ba_name'), 'left');
 
-            $select->join(array('bl' => 'breach_logs'), new \Zend\Db\Sql\Expression('bl_id = lo_item_id AND lo_item_type = 4'), array('_bl_id' => 'bl_id', '_bl_name' => $this->_decryptField('bl_name')), 'left');
+            $select->join(array('bl' => 'breach_logs'), new \Zend\Db\Sql\Expression('bl_id = lo_item_id AND lo_item_type = 4'), array('_bl_id' => 'bl_id', '_bl_name' => DbCrypt::decryptField('bl_name')), 'left');
             $select->join(array('blc' => 'companies'), new \Zend\Db\Sql\Expression('blc.c_id = bl.bl_c_id AND lo_item_type = 4'), array('_blc_id' => 'c_id', '_blc_name' => 'c_name'), 'left');
 
             $select->join(array('brp' => 'breach_remediation_plans'), new \Zend\Db\Sql\Expression('brp_id = lo_item_id AND lo_item_type = 5'), array('_brp_id' => 'brp_id'), 'left');

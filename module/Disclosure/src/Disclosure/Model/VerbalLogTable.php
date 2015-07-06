@@ -12,17 +12,16 @@ use Zend\Paginator\Adapter\DbSelect;
 use Zend\Paginator\Paginator;
 
 use Zend\Db\Sql\Expression;
+use DataCrypt\DbCrypt;
 
 class VerbalLogTable implements ServiceLocatorAwareInterface
 {
     protected $tableGateway;
     protected $serviceLocator;
-    private $_secureDBKey;
 
     public function __construct(TableGateway $tableGateway)
     {
         $this->tableGateway = $tableGateway;
-        $this->_secureDBKey  = (new \Zend\Session\Container('application_vars'))->storage['secure_db_key'];
     }
 
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
@@ -32,14 +31,6 @@ class VerbalLogTable implements ServiceLocatorAwareInterface
 
     public function getServiceLocator() {
         return $this->serviceLocator;
-    }
-
-    private function _encryptValue($value, $expression = true) {
-        return $expression ? new \Zend\Db\Sql\Expression('AES_ENCRYPT("' . $value . '", "' . $this->_secureDBKey . '")') : 'AES_ENCRYPT("' . $value . '", "' . $this->_secureDBKey . '")';
-    }
-
-    private function _decryptField($field, $expression = true) {
-        return $expression ? new \Zend\Db\Sql\Expression('AES_DECRYPT(' . $field . ', "' . $this->_secureDBKey . '")') : 'AES_DECRYPT(' . $field . ', "' . $this->_secureDBKey . '")';
     }
 
     private function _getIdentity()
@@ -58,22 +49,22 @@ class VerbalLogTable implements ServiceLocatorAwareInterface
             $select = $this->tableGateway->getSql()->select();
 
             $select->columns(array('vl_id'                    => 'vl_id',
-                                   'vl_date_of_request'       => $this->_decryptField('vl_date_of_request'),
-                                   'vl_medical_record_number' => $this->_decryptField('vl_medical_record_number'),
-                                   'vl_name'                  => $this->_decryptField('vl_name'),
-                                   'vl_date_of_birth'         => $this->_decryptField('vl_date_of_birth'),
-                                   'vl_address'               => $this->_decryptField('vl_address'),
-                                   'vl_disclosure_address'    => $this->_decryptField('vl_disclosure_address'),
-                                   'vl_date_requested_from'   => $this->_decryptField('vl_date_requested_from'),
-                                   'vl_date_requested_to'     => $this->_decryptField('vl_date_requested_to'),
-                                   'vl_is_fees'               => $this->_decryptField('vl_is_fees'),
-                                   'vl_fees_charge'           => $this->_decryptField('vl_fees_charge'),
-                                   'vl_date_request_received' => $this->_decryptField('vl_date_request_received'),
-                                   'vl_date_account_sent'     => $this->_decryptField('vl_date_account_sent'),
-                                   'vl_is_extensions'         => $this->_decryptField('vl_is_extensions'),
-                                   'vl_extension_reason'      => $this->_decryptField('vl_extension_reason'),
-                                   'vl_date_patient_notified' => $this->_decryptField('vl_date_patient_notified'),
-                                   'vl_staff_member'          => $this->_decryptField('vl_staff_member'),
+                                   'vl_date_of_request'       => DbCrypt::decryptField('vl_date_of_request'),
+                                   'vl_medical_record_number' => DbCrypt::decryptField('vl_medical_record_number'),
+                                   'vl_name'                  => DbCrypt::decryptField('vl_name'),
+                                   'vl_date_of_birth'         => DbCrypt::decryptField('vl_date_of_birth'),
+                                   'vl_address'               => DbCrypt::decryptField('vl_address'),
+                                   'vl_disclosure_address'    => DbCrypt::decryptField('vl_disclosure_address'),
+                                   'vl_date_requested_from'   => DbCrypt::decryptField('vl_date_requested_from'),
+                                   'vl_date_requested_to'     => DbCrypt::decryptField('vl_date_requested_to'),
+                                   'vl_is_fees'               => DbCrypt::decryptField('vl_is_fees'),
+                                   'vl_fees_charge'           => DbCrypt::decryptField('vl_fees_charge'),
+                                   'vl_date_request_received' => DbCrypt::decryptField('vl_date_request_received'),
+                                   'vl_date_account_sent'     => DbCrypt::decryptField('vl_date_account_sent'),
+                                   'vl_is_extensions'         => DbCrypt::decryptField('vl_is_extensions'),
+                                   'vl_extension_reason'      => DbCrypt::decryptField('vl_extension_reason'),
+                                   'vl_date_patient_notified' => DbCrypt::decryptField('vl_date_patient_notified'),
+                                   'vl_staff_member'          => DbCrypt::decryptField('vl_staff_member'),
                                    'vl_create_u_id'           => 'vl_create_u_id',
                                    'vl_active'                => 'vl_active'
                                   )
@@ -108,22 +99,22 @@ class VerbalLogTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
 
         $select->columns(array('vl_id'                    => 'vl_id',
-                               'vl_date_of_request'       => $this->_decryptField('vl_date_of_request'),
-                               'vl_medical_record_number' => $this->_decryptField('vl_medical_record_number'),
-                               'vl_name'                  => $this->_decryptField('vl_name'),
-                               'vl_date_of_birth'         => $this->_decryptField('vl_date_of_birth'),
-                               'vl_address'               => $this->_decryptField('vl_address'),
-                               'vl_disclosure_address'    => $this->_decryptField('vl_disclosure_address'),
-                               'vl_date_requested_from'   => $this->_decryptField('vl_date_requested_from'),
-                               'vl_date_requested_to'     => $this->_decryptField('vl_date_requested_to'),
-                               'vl_is_fees'               => $this->_decryptField('vl_is_fees'),
-                               'vl_fees_charge'           => $this->_decryptField('vl_fees_charge'),
-                               'vl_date_request_received' => $this->_decryptField('vl_date_request_received'),
-                               'vl_date_account_sent'     => $this->_decryptField('vl_date_account_sent'),
-                               'vl_is_extensions'         => $this->_decryptField('vl_is_extensions'),
-                               'vl_extension_reason'      => $this->_decryptField('vl_extension_reason'),
-                               'vl_date_patient_notified' => $this->_decryptField('vl_date_patient_notified'),
-                               'vl_staff_member'          => $this->_decryptField('vl_staff_member'),
+                               'vl_date_of_request'       => DbCrypt::decryptField('vl_date_of_request'),
+                               'vl_medical_record_number' => DbCrypt::decryptField('vl_medical_record_number'),
+                               'vl_name'                  => DbCrypt::decryptField('vl_name'),
+                               'vl_date_of_birth'         => DbCrypt::decryptField('vl_date_of_birth'),
+                               'vl_address'               => DbCrypt::decryptField('vl_address'),
+                               'vl_disclosure_address'    => DbCrypt::decryptField('vl_disclosure_address'),
+                               'vl_date_requested_from'   => DbCrypt::decryptField('vl_date_requested_from'),
+                               'vl_date_requested_to'     => DbCrypt::decryptField('vl_date_requested_to'),
+                               'vl_is_fees'               => DbCrypt::decryptField('vl_is_fees'),
+                               'vl_fees_charge'           => DbCrypt::decryptField('vl_fees_charge'),
+                               'vl_date_request_received' => DbCrypt::decryptField('vl_date_request_received'),
+                               'vl_date_account_sent'     => DbCrypt::decryptField('vl_date_account_sent'),
+                               'vl_is_extensions'         => DbCrypt::decryptField('vl_is_extensions'),
+                               'vl_extension_reason'      => DbCrypt::decryptField('vl_extension_reason'),
+                               'vl_date_patient_notified' => DbCrypt::decryptField('vl_date_patient_notified'),
+                               'vl_staff_member'          => DbCrypt::decryptField('vl_staff_member'),
                                'vl_create_u_id'           => 'vl_create_u_id',
                                'vl_active'                => 'vl_active'
                               )
@@ -145,22 +136,22 @@ class VerbalLogTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
 
         $select->columns(array('vl_id'                    => 'vl_id',
-                               'vl_date_of_request'       => $this->_decryptField('vl_date_of_request'),
-                               'vl_medical_record_number' => $this->_decryptField('vl_medical_record_number'),
-                               'vl_name'                  => $this->_decryptField('vl_name'),
-                               'vl_date_of_birth'         => $this->_decryptField('vl_date_of_birth'),
-                               'vl_address'               => $this->_decryptField('vl_address'),
-                               'vl_disclosure_address'    => $this->_decryptField('vl_disclosure_address'),
-                               'vl_date_requested_from'   => $this->_decryptField('vl_date_requested_from'),
-                               'vl_date_requested_to'     => $this->_decryptField('vl_date_requested_to'),
-                               'vl_is_fees'               => $this->_decryptField('vl_is_fees'),
-                               'vl_fees_charge'           => $this->_decryptField('vl_fees_charge'),
-                               'vl_date_request_received' => $this->_decryptField('vl_date_request_received'),
-                               'vl_date_account_sent'     => $this->_decryptField('vl_date_account_sent'),
-                               'vl_is_extensions'         => $this->_decryptField('vl_is_extensions'),
-                               'vl_extension_reason'      => $this->_decryptField('vl_extension_reason'),
-                               'vl_date_patient_notified' => $this->_decryptField('vl_date_patient_notified'),
-                               'vl_staff_member'          => $this->_decryptField('vl_staff_member'),
+                               'vl_date_of_request'       => DbCrypt::decryptField('vl_date_of_request'),
+                               'vl_medical_record_number' => DbCrypt::decryptField('vl_medical_record_number'),
+                               'vl_name'                  => DbCrypt::decryptField('vl_name'),
+                               'vl_date_of_birth'         => DbCrypt::decryptField('vl_date_of_birth'),
+                               'vl_address'               => DbCrypt::decryptField('vl_address'),
+                               'vl_disclosure_address'    => DbCrypt::decryptField('vl_disclosure_address'),
+                               'vl_date_requested_from'   => DbCrypt::decryptField('vl_date_requested_from'),
+                               'vl_date_requested_to'     => DbCrypt::decryptField('vl_date_requested_to'),
+                               'vl_is_fees'               => DbCrypt::decryptField('vl_is_fees'),
+                               'vl_fees_charge'           => DbCrypt::decryptField('vl_fees_charge'),
+                               'vl_date_request_received' => DbCrypt::decryptField('vl_date_request_received'),
+                               'vl_date_account_sent'     => DbCrypt::decryptField('vl_date_account_sent'),
+                               'vl_is_extensions'         => DbCrypt::decryptField('vl_is_extensions'),
+                               'vl_extension_reason'      => DbCrypt::decryptField('vl_extension_reason'),
+                               'vl_date_patient_notified' => DbCrypt::decryptField('vl_date_patient_notified'),
+                               'vl_staff_member'          => DbCrypt::decryptField('vl_staff_member'),
                                'vl_create_u_id'           => 'vl_create_u_id',
                                'vl_active'                => 'vl_active'
                               )
@@ -184,22 +175,22 @@ class VerbalLogTable implements ServiceLocatorAwareInterface
         $identity = $this->_getIdentity();
 
         $data = array(
-            'vl_date_of_request'       => $this->_encryptValue($verballog->vl_date_of_request),
-            'vl_medical_record_number' => $this->_encryptValue($verballog->vl_medical_record_number),
-            'vl_name'                  => $this->_encryptValue($verballog->vl_name),
-            'vl_date_of_birth'         => $this->_encryptValue($verballog->vl_date_of_birth),
-            'vl_address'               => $this->_encryptValue($verballog->vl_address),
-            'vl_disclosure_address'    => $this->_encryptValue($verballog->vl_disclosure_address),
-            'vl_date_requested_from'   => $this->_encryptValue($verballog->vl_date_requested_from),
-            'vl_date_requested_to'     => $this->_encryptValue($verballog->vl_date_requested_to),
-            'vl_is_fees'               => $this->_encryptValue($verballog->vl_is_fees),
-            'vl_fees_charge'           => $this->_encryptValue($verballog->vl_fees_charge),
-            'vl_date_request_received' => $this->_encryptValue($verballog->vl_date_request_received),
-            'vl_date_account_sent'     => $this->_encryptValue($verballog->vl_date_account_sent),
-            'vl_is_extensions'         => $this->_encryptValue($verballog->vl_is_extensions),
-            'vl_extension_reason'      => $this->_encryptValue($verballog->vl_extension_reason),
-            'vl_date_patient_notified' => $this->_encryptValue($verballog->vl_date_patient_notified),
-            'vl_staff_member'          => $this->_encryptValue($verballog->vl_staff_member)
+            'vl_date_of_request'       => DbCrypt::encryptValue($verballog->vl_date_of_request),
+            'vl_medical_record_number' => DbCrypt::encryptValue($verballog->vl_medical_record_number),
+            'vl_name'                  => DbCrypt::encryptValue($verballog->vl_name),
+            'vl_date_of_birth'         => DbCrypt::encryptValue($verballog->vl_date_of_birth),
+            'vl_address'               => DbCrypt::encryptValue($verballog->vl_address),
+            'vl_disclosure_address'    => DbCrypt::encryptValue($verballog->vl_disclosure_address),
+            'vl_date_requested_from'   => DbCrypt::encryptValue($verballog->vl_date_requested_from),
+            'vl_date_requested_to'     => DbCrypt::encryptValue($verballog->vl_date_requested_to),
+            'vl_is_fees'               => DbCrypt::encryptValue($verballog->vl_is_fees),
+            'vl_fees_charge'           => DbCrypt::encryptValue($verballog->vl_fees_charge),
+            'vl_date_request_received' => DbCrypt::encryptValue($verballog->vl_date_request_received),
+            'vl_date_account_sent'     => DbCrypt::encryptValue($verballog->vl_date_account_sent),
+            'vl_is_extensions'         => DbCrypt::encryptValue($verballog->vl_is_extensions),
+            'vl_extension_reason'      => DbCrypt::encryptValue($verballog->vl_extension_reason),
+            'vl_date_patient_notified' => DbCrypt::encryptValue($verballog->vl_date_patient_notified),
+            'vl_staff_member'          => DbCrypt::encryptValue($verballog->vl_staff_member)
         );
 
         $id = (int) $verballog->vl_id;

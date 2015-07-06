@@ -80,3 +80,5 @@ CHANGE  `brpa_action_plan`  `brpa_action_plan` MEDIUMBLOB DEFAULT NULL,
 CHANGE  `brpa_target_date`  `brpa_target_date` TINYBLOB DEFAULT NULL,
 CHANGE  `brpa_create_date`  `brpa_create_date` TINYBLOB DEFAULT NULL,
 CHANGE  `brpa_latest_action_date`  `brpa_latest_action_date` TINYBLOB DEFAULT NULL;
+
+ALTER TABLE  `files` ADD COLUMN `f_encrypted` TINYINT(1) DEFAULT '0';

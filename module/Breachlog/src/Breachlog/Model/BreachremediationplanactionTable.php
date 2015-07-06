@@ -12,17 +12,16 @@ use Zend\Db\Sql\Select;
 use Zend\Paginator\Adapter\DbSelect;
 use Zend\Paginator\Paginator;
 use Breachlog\Model\Breachremediationplanaction;
+use DataCrypt\DbCrypt;
 
 class BreachremediationplanactionTable implements ServiceLocatorAwareInterface
 {
     protected $tableGateway;
     protected $serviceLocator;
-    private $_secureDBKey;
 
     public function __construct(TableGateway $tableGateway)
     {
         $this->tableGateway = $tableGateway;
-        $this->_secureDBKey  = (new \Zend\Session\Container('application_vars'))->storage['secure_db_key'];
     }
 
 
@@ -33,14 +32,6 @@ class BreachremediationplanactionTable implements ServiceLocatorAwareInterface
 
     public function getServiceLocator() {
         return $this->serviceLocator;
-    }
-
-    private function _encryptValue($value, $expression = true) {
-        return $expression ? new \Zend\Db\Sql\Expression('AES_ENCRYPT("' . $value . '", "' . $this->_secureDBKey . '")') : 'AES_ENCRYPT("' . $value . '", "' . $this->_secureDBKey . '")';
-    }
-
-    private function _decryptField($field, $expression = true) {
-        return $expression ? new \Zend\Db\Sql\Expression('AES_DECRYPT(' . $field . ', "' . $this->_secureDBKey . '")') : 'AES_DECRYPT(' . $field . ', "' . $this->_secureDBKey . '")';
     }
 
     private function _getIdentity()
@@ -59,14 +50,14 @@ class BreachremediationplanactionTable implements ServiceLocatorAwareInterface
 
         $select->columns(array('brpa_id'                 => 'brpa_id',
                                'brpa_brp_id'             => 'brpa_brp_id',
-                               'brpa_task'               => $this->_decryptField('brpa_task'),
-                               'brpa_action_plan'        => $this->_decryptField('brpa_action_plan'),
+                               'brpa_task'               => DbCrypt::decryptField('brpa_task'),
+                               'brpa_action_plan'        => DbCrypt::decryptField('brpa_action_plan'),
                                'brpa_status'             => 'brpa_status',
                                'brpa_contact_u_id'       => 'brpa_contact_u_id',
                                'brpa_approver_u_id'      => 'brpa_approver_u_id',
-                               'brpa_target_date'        => $this->_decryptField('brpa_target_date'),
-                               'brpa_create_date'        => $this->_decryptField('brpa_create_date'),
-                               'brpa_latest_action_date' => $this->_decryptField('brpa_latest_action_date'),
+                               'brpa_target_date'        => DbCrypt::decryptField('brpa_target_date'),
+                               'brpa_create_date'        => DbCrypt::decryptField('brpa_create_date'),
+                               'brpa_latest_action_date' => DbCrypt::decryptField('brpa_latest_action_date'),
                                'brpa_active'             => 'brpa_active'
                               )
                             );
@@ -74,7 +65,7 @@ class BreachremediationplanactionTable implements ServiceLocatorAwareInterface
         $select->where('brpa_brp_id = ' . $brpId);
         $select->where('brpa_active = 1');
 
-        $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('brpa_contact_u_id = u_id'), array('_contact_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)'), '_brpa_target_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(' . $this->_decryptField('brpa_target_date', false) . ', "%c/%e/%Y")')), 'left');
+        $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('brpa_contact_u_id = u_id'), array('_contact_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)'), '_brpa_target_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(' . DbCrypt::decryptField('brpa_target_date', false) . ', "%c/%e/%Y")')), 'left');
         $select->join(array('u2' => 'users'), new \Zend\Db\Sql\Expression('brpa_approver_u_id = u2.u_id'), array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)')), 'left');
 
         $resultSet = $this->tableGateway->selectWith($select);
@@ -90,20 +81,20 @@ class BreachremediationplanactionTable implements ServiceLocatorAwareInterface
 
         $select->columns(array('brpa_id'                 => 'brpa_id',
                                'brpa_brp_id'             => 'brpa_brp_id',
-                               'brpa_task'               => $this->_decryptField('brpa_task'),
-                               'brpa_action_plan'        => $this->_decryptField('brpa_action_plan'),
+                               'brpa_task'               => DbCrypt::decryptField('brpa_task'),
+                               'brpa_action_plan'        => DbCrypt::decryptField('brpa_action_plan'),
                                'brpa_status'             => 'brpa_status',
                                'brpa_contact_u_id'       => 'brpa_contact_u_id',
                                'brpa_approver_u_id'      => 'brpa_approver_u_id',
-                               'brpa_target_date'        => $this->_decryptField('brpa_target_date'),
-                               'brpa_create_date'        => $this->_decryptField('brpa_create_date'),
-                               'brpa_latest_action_date' => $this->_decryptField('brpa_latest_action_date'),
+                               'brpa_target_date'        => DbCrypt::decryptField('brpa_target_date'),
+                               'brpa_create_date'        => DbCrypt::decryptField('brpa_create_date'),
+                               'brpa_latest_action_date' => DbCrypt::decryptField('brpa_latest_action_date'),
                                'brpa_active'             => 'brpa_active'
                               )
                             );
 
         $select->where('brpa_id = ' . $id);
-        $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('brpa_contact_u_id = u_id'), array('_contact_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'), '_brpa_target_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(' . $this->_decryptField('brpa_target_date', false) . ', "%m/%d/%Y")')), 'left');
+        $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('brpa_contact_u_id = u_id'), array('_contact_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'), '_brpa_target_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(' . DbCrypt::decryptField('brpa_target_date', false) . ', "%m/%d/%Y")')), 'left');
 
         $resultSet = $this->tableGateway->selectWith($select);
 
@@ -132,7 +123,7 @@ class BreachremediationplanactionTable implements ServiceLocatorAwareInterface
                                 '_approver_name'      => new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)'),
                                 '_contact_name'       => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)'),
                                 '_parent_id'          => new \Zend\Db\Sql\Expression('brpa_brp_id'),
-                                '_latest_action_date' => new \Zend\Db\Sql\Expression('IF(brpa_latest_action_date, ' . $this->_decryptField('brpa_latest_action_date', false) . ', DATE_FORMAT(' . $this->_decryptField('brp.brp_incident_date', false) . ', "%Y-%m-%d"))')
+                                '_latest_action_date' => new \Zend\Db\Sql\Expression('IF(brpa_latest_action_date, ' . DbCrypt::decryptField('brpa_latest_action_date', false) . ', DATE_FORMAT(' . DbCrypt::decryptField('brp.brp_incident_date', false) . ', "%Y-%m-%d"))')
                                 )
                             );
 
@@ -176,12 +167,12 @@ class BreachremediationplanactionTable implements ServiceLocatorAwareInterface
     {
         $data = array(
             'brpa_brp_id'        => $brpa->brpa_brp_id,
-            'brpa_task'          => $this->_encryptValue($brpa->brpa_task),
-            'brpa_action_plan'   => $this->_encryptValue($brpa->brpa_action_plan),
+            'brpa_task'          => DbCrypt::encryptValue($brpa->brpa_task),
+            'brpa_action_plan'   => DbCrypt::encryptValue($brpa->brpa_action_plan),
             'brpa_status'        => $brpa->brpa_status,
             'brpa_contact_u_id'  => $brpa->brpa_contact_u_id,
             'brpa_approver_u_id' => $brpa->brpa_approver_u_id,
-            'brpa_target_date'   => $this->_encryptValue($brpa->brpa_target_date),
+            'brpa_target_date'   => DbCrypt::encryptValue($brpa->brpa_target_date),
         );
 
         $id = (int) $brpa->brpa_id;
@@ -191,14 +182,14 @@ class BreachremediationplanactionTable implements ServiceLocatorAwareInterface
         }
 
         if ($id == 0) {
-            $data['brpa_create_date'] = $this->_encryptValue(date('Y-m-d H:i:s'));
+            $data['brpa_create_date'] = DbCrypt::encryptValue(date('Y-m-d H:i:s'));
 
             $this->tableGateway->insert($data);
             $id = $this->tableGateway->lastInsertValue;
         } else {
             if ($brpaAction = $this->getBreachremediationplanaction($id)) {
                 if($brpaAction->brpa_status !== $data['brpa_status']) {
-                    $data['brpa_latest_action_date'] = $this->_encryptValue(date('Y-m-d H:i:s'));
+                    $data['brpa_latest_action_date'] = DbCrypt::encryptValue(date('Y-m-d H:i:s'));
                 }
 
                 //if ($brpa->brpa_status == Breachremediationplanaction::STATUS_PENDING_APPROVAL) {

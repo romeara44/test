@@ -11,6 +11,7 @@ use Zend\Db\Sql\Select;
 use Zend\Paginator\Adapter\DbSelect;
 use Zend\Paginator\Paginator;
 use Zend\Db\Sql\Sql;
+use DataCrypt\FileCrypt;
 
 class NoteTable implements ServiceLocatorAwareInterface
 {
@@ -120,7 +121,7 @@ class NoteTable implements ServiceLocatorAwareInterface
         return $row;
     }
 
-    public function saveNote(Note $note, $files = null, $isCopy = false, $fileName = 'notesFiles')
+    public function saveNote(Note $note, $files = null, $isCopy = false, $fileName = 'notesFiles', $encrypt = false)
     {
         $authService = new \Zend\Authentication\AuthenticationService();
         $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
@@ -160,12 +161,12 @@ class NoteTable implements ServiceLocatorAwareInterface
             }
         }
 
-        if($files) $this->_saveFiles($id, $files, $fileName);
+        if($files) $this->_saveFiles($id, $files, $fileName, $encrypt);
 
         return $id;
     }
 
-    public function _saveFiles($id, $files, $fileName)
+    public function _saveFiles($id, $files, $fileName, $encrypt = false)
     {
         if (!isset($files[$fileName])) {
             return;
@@ -192,8 +193,9 @@ class NoteTable implements ServiceLocatorAwareInterface
 
                 $tempFile = $file['tmp_name'];
 
-                $dataFile['f_name'] = $file['name'];
-                $dataFile['f_type'] = $file['type'];
+                $dataFile['f_name']      = $file['name'];
+                $dataFile['f_type']      = $file['type'];
+                $dataFile['f_encrypted'] = $encrypt ? 1 : 0;
 
                 $fId = $filesTable->saveFile($dataFile);
 
@@ -203,7 +205,7 @@ class NoteTable implements ServiceLocatorAwareInterface
 
                 $notesFilesTable->saveFile($notesDataFile);
 
-                $ret = move_uploaded_file($tempFile, $notesFolder . '/' . $id . '/' . $fId);
+                $ret = $encrypt ? FileCrypt::encrypt($tempFile, $notesFolder . '/' . $id . '/' . $fId) : move_uploaded_file($tempFile, $notesFolder . '/' . $id . '/' . $fId);
             }
         }
 

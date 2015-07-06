@@ -12,17 +12,16 @@ use Zend\Db\Sql\Select;
 use Zend\Paginator\Adapter\DbSelect;
 use Zend\Paginator\Paginator;
 use Breachlog\Model\Breachremediationplan;
+use DataCrypt\DbCrypt;
 
 class BreachremediationplanTable implements ServiceLocatorAwareInterface
 {
     protected $tableGateway;
     protected $serviceLocator;
-    private $_secureDBKey;
 
     public function __construct(TableGateway $tableGateway)
     {
         $this->tableGateway = $tableGateway;
-        $this->_secureDBKey  = (new \Zend\Session\Container('application_vars'))->storage['secure_db_key'];
     }
 
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
@@ -32,14 +31,6 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
 
     public function getServiceLocator() {
         return $this->serviceLocator;
-    }
-
-    private function _encryptValue($value, $expression = true) {
-        return $expression ? new \Zend\Db\Sql\Expression('AES_ENCRYPT("' . $value . '", "' . $this->_secureDBKey . '")') : 'AES_ENCRYPT("' . $value . '", "' . $this->_secureDBKey . '")';
-    }
-
-    private function _decryptField($field, $expression = true) {
-        return $expression ? new \Zend\Db\Sql\Expression('AES_DECRYPT(' . $field . ', "' . $this->_secureDBKey . '")') : 'AES_DECRYPT(' . $field . ', "' . $this->_secureDBKey . '")';
     }
 
     private function _getIdentity()
@@ -56,8 +47,8 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
             $select = $this->tableGateway->getSql()->select();
 
             $select->columns(array('brp_id'                 => 'brp_id',
-                                   'brp_version_index'      => $this->_decryptField('brp_version_index'),
-                                   'brp_version_index_item' => $this->_decryptField('brp_version_index_item'),
+                                   'brp_version_index'      => DbCrypt::decryptField('brp_version_index'),
+                                   'brp_version_index_item' => DbCrypt::decryptField('brp_version_index_item'),
                                    'brp_writable'           => 'brp_writable',
                                    'brp_bl_id'              => 'brp_bl_id',
                                    'brp_c_id'               => 'brp_c_id',
@@ -69,11 +60,11 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
                                    'brp_update_u_id'        => 'brp_update_u_id',
                                    'brp_parent_brp_id'      => 'brp_parent_brp_id',
                                    'brp_is_version'         => 'brp_is_version',
-                                   'brp_status'             => $this->_decryptField('brp_status'),
-                                   'brp_incident_date'      => $this->_decryptField('brp_incident_date'),
-                                   'brp_remediation_date'   => $this->_decryptField('brp_remediation_date'),
-                                   'brp_initials'           => $this->_decryptField('brp_initials'),
-                                   'brp_initials_approver'  => $this->_decryptField('brp_initials_approver'),
+                                   'brp_status'             => DbCrypt::decryptField('brp_status'),
+                                   'brp_incident_date'      => DbCrypt::decryptField('brp_incident_date'),
+                                   'brp_remediation_date'   => DbCrypt::decryptField('brp_remediation_date'),
+                                   'brp_initials'           => DbCrypt::decryptField('brp_initials'),
+                                   'brp_initials_approver'  => DbCrypt::decryptField('brp_initials_approver'),
                                    'brp_active'             => 'brp_active'
                                   )
                                 );
@@ -88,7 +79,7 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
 
 
             if ($identity['u_role_id'] == User::ROLE_ADMIN) {
-                $select->where('(' . $this->_decryptField('brp_status', false) . ' = 30 AND brp_active = 1) || (brp_active = 0)');
+                $select->where('(' . DbCrypt::decryptField('brp_status', false) . ' = 30 AND brp_active = 1) || (brp_active = 0)');
             } else {
                 $select->where('brp_active = 1');
 
@@ -124,8 +115,8 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
 
         $select->columns(array('brp_id'                 => 'brp_id',
-                               'brp_version_index'      => $this->_decryptField('brp_version_index'),
-                               'brp_version_index_item' => $this->_decryptField('brp_version_index_item'),
+                               'brp_version_index'      => DbCrypt::decryptField('brp_version_index'),
+                               'brp_version_index_item' => DbCrypt::decryptField('brp_version_index_item'),
                                'brp_writable'           => 'brp_writable',
                                'brp_bl_id'              => 'brp_bl_id',
                                'brp_c_id'               => 'brp_c_id',
@@ -137,11 +128,11 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
                                'brp_update_u_id'        => 'brp_update_u_id',
                                'brp_parent_brp_id'      => 'brp_parent_brp_id',
                                'brp_is_version'         => 'brp_is_version',
-                               'brp_status'             => $this->_decryptField('brp_status'),
-                               'brp_incident_date'      => $this->_decryptField('brp_incident_date'),
-                               'brp_remediation_date'   => $this->_decryptField('brp_remediation_date'),
-                               'brp_initials'           => $this->_decryptField('brp_initials'),
-                               'brp_initials_approver'  => $this->_decryptField('brp_initials_approver'),
+                               'brp_status'             => DbCrypt::decryptField('brp_status'),
+                               'brp_incident_date'      => DbCrypt::decryptField('brp_incident_date'),
+                               'brp_remediation_date'   => DbCrypt::decryptField('brp_remediation_date'),
+                               'brp_initials'           => DbCrypt::decryptField('brp_initials'),
+                               'brp_initials_approver'  => DbCrypt::decryptField('brp_initials_approver'),
                                'brp_active'             => 'brp_active'
                               )
                             );
@@ -160,8 +151,8 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
 
         $select->columns(array('brp_id'                 => 'brp_id',
-                               'brp_version_index'      => $this->_decryptField('brp_version_index'),
-                               'brp_version_index_item' => $this->_decryptField('brp_version_index_item'),
+                               'brp_version_index'      => DbCrypt::decryptField('brp_version_index'),
+                               'brp_version_index_item' => DbCrypt::decryptField('brp_version_index_item'),
                                'brp_writable'           => 'brp_writable',
                                'brp_bl_id'              => 'brp_bl_id',
                                'brp_c_id'               => 'brp_c_id',
@@ -173,11 +164,11 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
                                'brp_update_u_id'        => 'brp_update_u_id',
                                'brp_parent_brp_id'      => 'brp_parent_brp_id',
                                'brp_is_version'         => 'brp_is_version',
-                               'brp_status'             => $this->_decryptField('brp_status'),
-                               'brp_incident_date'      => $this->_decryptField('brp_incident_date'),
-                               'brp_remediation_date'   => $this->_decryptField('brp_remediation_date'),
-                               'brp_initials'           => $this->_decryptField('brp_initials'),
-                               'brp_initials_approver'  => $this->_decryptField('brp_initials_approver'),
+                               'brp_status'             => DbCrypt::decryptField('brp_status'),
+                               'brp_incident_date'      => DbCrypt::decryptField('brp_incident_date'),
+                               'brp_remediation_date'   => DbCrypt::decryptField('brp_remediation_date'),
+                               'brp_initials'           => DbCrypt::decryptField('brp_initials'),
+                               'brp_initials_approver'  => DbCrypt::decryptField('brp_initials_approver'),
                                'brp_active'             => 'brp_active'
                               )
                             );
@@ -191,7 +182,7 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         );
 
         if ($identity['u_role_id'] == User::ROLE_ADMIN) {
-            $select->where('(' . $this->_decryptField('brp_status', false) . ' = 30 AND brp_active = 1) || (brp_active = 0)');
+            $select->where('(' . DbCrypt::decryptField('brp_status', false) . ' = 30 AND brp_active = 1) || (brp_active = 0)');
         } else {
             $select->where('brp_active = 1');
 
@@ -210,7 +201,7 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
             $select->where('(rg.rg_number LIKE "%' . $searchValue . '%" OR rg.rg_description LIKE "%' . $searchValue . '%")');
         }
         
-        $select->columns(array('brp_id' => 'brp_id', 'brp_remediation_date' => $this->_decryptField('brp_remediation_date')));
+        $select->columns(array('brp_id' => 'brp_id', 'brp_remediation_date' => DbCrypt::decryptField('brp_remediation_date')));
         $select->join(array('c' => 'companies'), 'brp_c_id = c_id', array('_client_name' => 'c_name'), 'inner');
         $select->join(array('brprg' => 'breach_remediation_plans_regulations'), new \Zend\Db\Sql\Expression('brp_id = brprg.brprg_brp_id'), array('_brp_brprg_id' => new \Zend\Db\Sql\Expression('brprg.brprg_id'), '_brp_brprg_rg_id' => new \Zend\Db\Sql\Expression('brprg.brprg_rg_id')), 'inner');
         $select->join(array('rg' => 'regulations'), new \Zend\Db\Sql\Expression('brprg.brprg_rg_id = rg.rg_id'), array('_brp_regulation' => new \Zend\Db\Sql\Expression('rg.rg_pp_name')), 'inner');
@@ -228,8 +219,8 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
 
         $select->columns(array('brp_id'                 => 'brp_id',
-                               'brp_version_index'      => $this->_decryptField('brp_version_index'),
-                               'brp_version_index_item' => $this->_decryptField('brp_version_index_item'),
+                               'brp_version_index'      => DbCrypt::decryptField('brp_version_index'),
+                               'brp_version_index_item' => DbCrypt::decryptField('brp_version_index_item'),
                                'brp_writable'           => 'brp_writable',
                                'brp_bl_id'              => 'brp_bl_id',
                                'brp_c_id'               => 'brp_c_id',
@@ -241,11 +232,11 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
                                'brp_update_u_id'        => 'brp_update_u_id',
                                'brp_parent_brp_id'      => 'brp_parent_brp_id',
                                'brp_is_version'         => 'brp_is_version',
-                               'brp_status'             => $this->_decryptField('brp_status'),
-                               'brp_incident_date'      => $this->_decryptField('brp_incident_date'),
-                               'brp_remediation_date'   => $this->_decryptField('brp_remediation_date'),
-                               'brp_initials'           => $this->_decryptField('brp_initials'),
-                               'brp_initials_approver'  => $this->_decryptField('brp_initials_approver'),
+                               'brp_status'             => DbCrypt::decryptField('brp_status'),
+                               'brp_incident_date'      => DbCrypt::decryptField('brp_incident_date'),
+                               'brp_remediation_date'   => DbCrypt::decryptField('brp_remediation_date'),
+                               'brp_initials'           => DbCrypt::decryptField('brp_initials'),
+                               'brp_initials_approver'  => DbCrypt::decryptField('brp_initials_approver'),
                                'brp_active'             => 'brp_active'
                               )
                             );
@@ -254,16 +245,16 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         $condition = isset(\Admin\Model\UserTable::$reportCondition[$conditionNum]) ? \Admin\Model\UserTable::$reportCondition[$conditionNum] : null;
 
         if ($condition != '') {
-            $condition = str_replace('?', $this->_decryptField('brp_create_date', false), $condition);
+            $condition = str_replace('?', DbCrypt::decryptField('brp_create_date', false), $condition);
             $select->where($condition);
         }
 
         $select->columns(array('_client_name' => new \Zend\Db\Sql\Expression('COUNT(brp_id)')));
 
         if ($status == 1) {
-            $select->where($this->_decryptField("brp_status", false) . "IN (10, 20)");
+            $select->where(DbCrypt::decryptField("brp_status", false) . "IN (10, 20)");
         } else {
-            $select->where($this->_decryptField("brp_status", false) . "IN (30, 40)");
+            $select->where(DbCrypt::decryptField("brp_status", false) . "IN (30, 40)");
         }
 
         if ($uId) {
@@ -294,8 +285,8 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
 
         $select->columns(array('brp_id'                 => 'brp_id',
-                               'brp_version_index'      => $this->_decryptField('brp_version_index'),
-                               'brp_version_index_item' => $this->_decryptField('brp_version_index_item'),
+                               'brp_version_index'      => DbCrypt::decryptField('brp_version_index'),
+                               'brp_version_index_item' => DbCrypt::decryptField('brp_version_index_item'),
                                'brp_writable'           => 'brp_writable',
                                'brp_bl_id'              => 'brp_bl_id',
                                'brp_c_id'               => 'brp_c_id',
@@ -307,11 +298,11 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
                                'brp_update_u_id'        => 'brp_update_u_id',
                                'brp_parent_brp_id'      => 'brp_parent_brp_id',
                                'brp_is_version'         => 'brp_is_version',
-                               'brp_status'             => $this->_decryptField('brp_status'),
-                               'brp_incident_date'      => $this->_decryptField('brp_incident_date'),
-                               'brp_remediation_date'   => $this->_decryptField('brp_remediation_date'),
-                               'brp_initials'           => $this->_decryptField('brp_initials'),
-                               'brp_initials_approver'  => $this->_decryptField('brp_initials_approver'),
+                               'brp_status'             => DbCrypt::decryptField('brp_status'),
+                               'brp_incident_date'      => DbCrypt::decryptField('brp_incident_date'),
+                               'brp_remediation_date'   => DbCrypt::decryptField('brp_remediation_date'),
+                               'brp_initials'           => DbCrypt::decryptField('brp_initials'),
+                               'brp_initials_approver'  => DbCrypt::decryptField('brp_initials_approver'),
                                'brp_active'             => 'brp_active'
                               )
                             );
@@ -334,8 +325,8 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
 
         $select->columns(array('brp_id'                 => 'brp_id',
-                               'brp_version_index'      => $this->_decryptField('brp_version_index'),
-                               'brp_version_index_item' => $this->_decryptField('brp_version_index_item'),
+                               'brp_version_index'      => DbCrypt::decryptField('brp_version_index'),
+                               'brp_version_index_item' => DbCrypt::decryptField('brp_version_index_item'),
                                'brp_writable'           => 'brp_writable',
                                'brp_bl_id'              => 'brp_bl_id',
                                'brp_c_id'               => 'brp_c_id',
@@ -347,11 +338,11 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
                                'brp_update_u_id'        => 'brp_update_u_id',
                                'brp_parent_brp_id'      => 'brp_parent_brp_id',
                                'brp_is_version'         => 'brp_is_version',
-                               'brp_status'             => $this->_decryptField('brp_status'),
-                               'brp_incident_date'      => $this->_decryptField('brp_incident_date'),
-                               'brp_remediation_date'   => $this->_decryptField('brp_remediation_date'),
-                               'brp_initials'           => $this->_decryptField('brp_initials'),
-                               'brp_initials_approver'  => $this->_decryptField('brp_initials_approver'),
+                               'brp_status'             => DbCrypt::decryptField('brp_status'),
+                               'brp_incident_date'      => DbCrypt::decryptField('brp_incident_date'),
+                               'brp_remediation_date'   => DbCrypt::decryptField('brp_remediation_date'),
+                               'brp_initials'           => DbCrypt::decryptField('brp_initials'),
+                               'brp_initials_approver'  => DbCrypt::decryptField('brp_initials_approver'),
                                'brp_active'             => 'brp_active'
                               )
                             );
@@ -381,17 +372,17 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
             'brp_performed_u_id'    => $brp->brp_performed_u_id,
             'brp_accepter_u_id'     => $brp->brp_accepter_u_id,
             'brp_parent_brp_id'     => $brp->brp_parent_brp_id,
-            'brp_version_index'     => $this->_encryptValue($brp->brp_version_index),
-            'brp_initials'          => $this->_encryptValue($brp->brp_initials),
-            'brp_initials_approver' => $this->_encryptValue($brp->brp_initials_approver),
-            'brp_remediation_date'  => $this->_encryptValue($brp->brp_remediation_date),
-            'brp_incident_date'     => $this->_encryptValue($brp->brp_incident_date),
-            'brp_status'            => $this->_encryptValue($brp->brp_status),
+            'brp_version_index'     => DbCrypt::encryptValue($brp->brp_version_index),
+            'brp_initials'          => DbCrypt::encryptValue($brp->brp_initials),
+            'brp_initials_approver' => DbCrypt::encryptValue($brp->brp_initials_approver),
+            'brp_remediation_date'  => DbCrypt::encryptValue($brp->brp_remediation_date),
+            'brp_incident_date'     => DbCrypt::encryptValue($brp->brp_incident_date),
+            'brp_status'            => DbCrypt::encryptValue($brp->brp_status),
             'brp_is_version'        => $brp->brp_is_version,
         );
 
         if (!$data['brp_status']) {
-            $data['brp_status'] = $this->_encryptValue(\Breachlog\Model\Breachremediationplan::STATUS_NEW);
+            $data['brp_status'] = DbCrypt::encryptValue(\Breachlog\Model\Breachremediationplan::STATUS_NEW);
             $newBrp = true;
         }
 
@@ -410,7 +401,7 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
             }
 
             $data['brp_create_u_id'] = $identity['u_id'];
-            $data['brp_create_date'] = $this->_encryptValue(date('Y-m-d H:i:s'));
+            $data['brp_create_date'] = DbCrypt::encryptValue(date('Y-m-d H:i:s'));
         }
 
         if ($id == 0) {
@@ -445,13 +436,13 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
 
         $select->columns(array('brp_id'            => 'brp_id',
-                               'brp_version_index' => $this->_decryptField('brp_version_index'),
+                               'brp_version_index' => DbCrypt::decryptField('brp_version_index'),
                                'brp_parent_brp_id' => 'brp_parent_brp_id',
                                'brp_active'        => 'brp_active'
                               )
                             );
 
-        $select->where($this->_decryptField('brp_version_index', false) . ' = ' . $versionIndex);
+        $select->where(DbCrypt::decryptField('brp_version_index', false) . ' = ' . $versionIndex);
         $select->where('brp_active = 1');
         $select->where('brp_parent_brp_id IS NOT NULL');
 
@@ -462,7 +453,7 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         $indexItem = 1;
         foreach ($resultSet as $rs) {
 
-            $this->tableGateway->update(array('brp_version_index_item' => $this->_encryptValue($indexItem)), array('brp_id' => $rs->brp_id));
+            $this->tableGateway->update(array('brp_version_index_item' => DbCrypt::encryptValue($indexItem)), array('brp_id' => $rs->brp_id));
             $indexItem++;
 
         }
@@ -472,7 +463,7 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
     {
         $data = array(
             'brp_id' => $id,
-            'brp_status' => $this->_encryptValue($status),
+            'brp_status' => DbCrypt::encryptValue($status),
         );
 
         if ($brp = $this->getBreachremediationplan($id)) {
@@ -493,7 +484,7 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
     {
         $data = array(
             'brp_id' => $id,
-             $field => $encrypt ? $this->_encryptValue($value) : $value,
+             $field => $encrypt ? DbCrypt::encryptValue($value) : $value,
         );
 
         return $this->tableGateway->update($data, array('brp_id' => $id));
@@ -568,7 +559,7 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         $brp = $this->getBreachremediationplan($id);
 
         $data['brp_id']       = $id;
-        $data['brp_status']   = $this->_encryptValue(20);
+        $data['brp_status']   = DbCrypt::encryptValue(20);
         $data['brp_writable'] = 1;
 
         $this->tableGateway->update($data, array('brp_id' => $id));
@@ -585,12 +576,12 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         $brp = $this->getBreachremediationplan($id);
 
         // writable to false
-        $this->tableGateway->update(array('brp_writable' => 0, 'brp_status' => $this->_encryptValue(\Breachlog\Model\Breachremediationplan::STATUS_CLOSED)), array('brp_id' => $id));
+        $this->tableGateway->update(array('brp_writable' => 0, 'brp_status' => DbCrypt::encryptValue(\Breachlog\Model\Breachremediationplan::STATUS_CLOSED)), array('brp_id' => $id));
 
         // create new row
         $brp->brp_id            = 0;
         $brp->brp_parent_brp_id = $id;
-        $brp->brp_status        = $this->_encryptValue(\Breachlog\Model\Breachremediationplan::STATUS_NEW);
+        $brp->brp_status        = DbCrypt::encryptValue(\Breachlog\Model\Breachremediationplan::STATUS_NEW);
 
         $newId = $this->saveBreachremediationplan($brp);
 

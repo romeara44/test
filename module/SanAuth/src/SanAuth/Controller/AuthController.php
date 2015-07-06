@@ -214,8 +214,9 @@ class AuthController extends AbstractActionController
 
                     $config = $this->getServiceLocator()->get('config');
 
-                    if(file_exists($config['application_vars']['secure_db_key_file'])) {
-                        $config['application_vars']['secure_db_key'] = file_get_contents($config['application_vars']['secure_db_key_file']);
+                    if(file_exists($config['application_vars']['secure_db_key_file']) && file_exists($config['application_vars']['secure_file_key_file'])) {
+                        $config['application_vars']['secure_db_key']   = file_get_contents($config['application_vars']['secure_db_key_file']);
+                        $config['application_vars']['secure_file_key'] = file_get_contents($config['application_vars']['secure_file_key_file']);
                     } else {
                         $this->getSessionStorage()->forgetMe();
                         $this->getAuthService()->clearIdentity();

@@ -228,7 +228,7 @@
     <?php else: ?>
         <p style="border: 0;"><strong>Regulations:</strong></p>
         <?php foreach ($regulations as $value) {?>
-            <?php if(in_array($value->rg_id, $this->brpObj->_brp_cur_regulations) != false): ?>
+            <?php if($this->brpObj->_brp_cur_regulations && in_array($value->rg_id, $this->brpObj->_brp_cur_regulations) != false): ?>
             <div>
                 <p>Policy&Procedure Name: <?php echo $value->rg_pp_name?></p>
                 <p style="border: 0;">Policy&Procedure Number: <?php echo $value->rg_pp_number?></p>

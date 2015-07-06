@@ -12,17 +12,16 @@ use Zend\Paginator\Adapter\DbSelect;
 use Zend\Paginator\Paginator;
 
 use Zend\Db\Sql\Expression;
+use DataCrypt\DbCrypt;
 
 class DisclosureRequestTable implements ServiceLocatorAwareInterface
 {
     protected $tableGateway;
     protected $serviceLocator;
-    private $_secureDBKey;
 
     public function __construct(TableGateway $tableGateway)
     {
         $this->tableGateway = $tableGateway;
-        $this->_secureDBKey  = (new \Zend\Session\Container('application_vars'))->storage['secure_db_key'];
     }
 
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
@@ -32,14 +31,6 @@ class DisclosureRequestTable implements ServiceLocatorAwareInterface
 
     public function getServiceLocator() {
         return $this->serviceLocator;
-    }
-
-    private function _encryptValue($value, $expression = true) {
-        return $expression ? new \Zend\Db\Sql\Expression('AES_ENCRYPT("' . $value . '", "' . $this->_secureDBKey . '")') : 'AES_ENCRYPT("' . $value . '", "' . $this->_secureDBKey . '")';
-    }
-
-    private function _decryptField($field, $expression = true) {
-        return $expression ? new \Zend\Db\Sql\Expression('AES_DECRYPT(' . $field . ', "' . $this->_secureDBKey . '")') : 'AES_DECRYPT(' . $field . ', "' . $this->_secureDBKey . '")';
     }
 
     private function _getIdentity()
@@ -58,13 +49,13 @@ class DisclosureRequestTable implements ServiceLocatorAwareInterface
             $select = $this->tableGateway->getSql()->select();
 
             $select->columns(array('dr_id'                   => 'dr_id',
-                                   'dr_reference_number'     => $this->_decryptField('dr_reference_number'),
-                                   'dr_requested_by'         => $this->_decryptField('dr_requested_by'),
-                                   'dr_date_requested'       => $this->_decryptField('dr_date_requested'),
-                                   'dr_date_range_requested' => $this->_decryptField('dr_date_range_requested'),
-                                   'dr_staff_member'         => $this->_decryptField('dr_staff_member'),
-                                   'dr_completing_request'   => $this->_decryptField('dr_completing_request'),
-                                   'dr_date_provided'        => $this->_decryptField('dr_date_provided'),
+                                   'dr_reference_number'     => DbCrypt::decryptField('dr_reference_number'),
+                                   'dr_requested_by'         => DbCrypt::decryptField('dr_requested_by'),
+                                   'dr_date_requested'       => DbCrypt::decryptField('dr_date_requested'),
+                                   'dr_date_range_requested' => DbCrypt::decryptField('dr_date_range_requested'),
+                                   'dr_staff_member'         => DbCrypt::decryptField('dr_staff_member'),
+                                   'dr_completing_request'   => DbCrypt::decryptField('dr_completing_request'),
+                                   'dr_date_provided'        => DbCrypt::decryptField('dr_date_provided'),
                                    'dr_create_u_id'          => 'dr_create_u_id',
                                    'dr_active'               => 'dr_active'
                                   )
@@ -99,13 +90,13 @@ class DisclosureRequestTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
 
         $select->columns(array('dr_id'                   => 'dr_id',
-                               'dr_reference_number'     => $this->_decryptField('dr_reference_number'),
-                               'dr_requested_by'         => $this->_decryptField('dr_requested_by'),
-                               'dr_date_requested'       => $this->_decryptField('dr_date_requested'),
-                               'dr_date_range_requested' => $this->_decryptField('dr_date_range_requested'),
-                               'dr_staff_member'         => $this->_decryptField('dr_staff_member'),
-                               'dr_completing_request'   => $this->_decryptField('dr_completing_request'),
-                               'dr_date_provided'        => $this->_decryptField('dr_date_provided'),
+                               'dr_reference_number'     => DbCrypt::decryptField('dr_reference_number'),
+                               'dr_requested_by'         => DbCrypt::decryptField('dr_requested_by'),
+                               'dr_date_requested'       => DbCrypt::decryptField('dr_date_requested'),
+                               'dr_date_range_requested' => DbCrypt::decryptField('dr_date_range_requested'),
+                               'dr_staff_member'         => DbCrypt::decryptField('dr_staff_member'),
+                               'dr_completing_request'   => DbCrypt::decryptField('dr_completing_request'),
+                               'dr_date_provided'        => DbCrypt::decryptField('dr_date_provided'),
                                'dr_create_u_id'          => 'dr_create_u_id',
                                'dr_active'               => 'dr_active'
                               )
@@ -127,13 +118,13 @@ class DisclosureRequestTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
 
         $select->columns(array('dr_id'                   => 'dr_id',
-                               'dr_reference_number'     => $this->_decryptField('dr_reference_number'),
-                               'dr_requested_by'         => $this->_decryptField('dr_requested_by'),
-                               'dr_date_requested'       => $this->_decryptField('dr_date_requested'),
-                               'dr_date_range_requested' => $this->_decryptField('dr_date_range_requested'),
-                               'dr_staff_member'         => $this->_decryptField('dr_staff_member'),
-                               'dr_completing_request'   => $this->_decryptField('dr_completing_request'),
-                               'dr_date_provided'        => $this->_decryptField('dr_date_provided'),
+                               'dr_reference_number'     => DbCrypt::decryptField('dr_reference_number'),
+                               'dr_requested_by'         => DbCrypt::decryptField('dr_requested_by'),
+                               'dr_date_requested'       => DbCrypt::decryptField('dr_date_requested'),
+                               'dr_date_range_requested' => DbCrypt::decryptField('dr_date_range_requested'),
+                               'dr_staff_member'         => DbCrypt::decryptField('dr_staff_member'),
+                               'dr_completing_request'   => DbCrypt::decryptField('dr_completing_request'),
+                               'dr_date_provided'        => DbCrypt::decryptField('dr_date_provided'),
                                'dr_create_u_id'          => 'dr_create_u_id',
                                'dr_active'               => 'dr_active'
                               )
@@ -159,13 +150,13 @@ class DisclosureRequestTable implements ServiceLocatorAwareInterface
         $identity = $this->_getIdentity();
 
         $data = array(
-            'dr_reference_number'     => $this->_encryptValue($disclosurerequest->dr_reference_number),
-            'dr_requested_by'         => $this->_encryptValue($disclosurerequest->dr_requested_by),
-            'dr_date_requested'       => $this->_encryptValue($disclosurerequest->dr_date_requested),
-            'dr_date_range_requested' => $this->_encryptValue($disclosurerequest->dr_date_range_requested),
-            'dr_staff_member'         => $this->_encryptValue($disclosurerequest->dr_staff_member),
-            'dr_completing_request'   => $this->_encryptValue($disclosurerequest->dr_completing_request),
-            'dr_date_provided'        => $this->_encryptValue($disclosurerequest->dr_date_provided)
+            'dr_reference_number'     => DbCrypt::encryptValue($disclosurerequest->dr_reference_number),
+            'dr_requested_by'         => DbCrypt::encryptValue($disclosurerequest->dr_requested_by),
+            'dr_date_requested'       => DbCrypt::encryptValue($disclosurerequest->dr_date_requested),
+            'dr_date_range_requested' => DbCrypt::encryptValue($disclosurerequest->dr_date_range_requested),
+            'dr_staff_member'         => DbCrypt::encryptValue($disclosurerequest->dr_staff_member),
+            'dr_completing_request'   => DbCrypt::encryptValue($disclosurerequest->dr_completing_request),
+            'dr_date_provided'        => DbCrypt::encryptValue($disclosurerequest->dr_date_provided)
         );
 
         $id = (int) $disclosurerequest->dr_id;
