@@ -283,40 +283,7 @@ class MenuTop extends AbstractHelper
                           'url' => '/businessassociate/list',
                     )
                 )
-            ),
-            array(
-                'title' => 'Assessments',
-                'url' => '/assessment/list',
-            ),
-            array(
-                'title' => 'Remediation Plans',
-                'url' => '/remediationplan/list',
-            ),
-            array(
-                'title' => 'Trainings',
-                'url' => '/traininglog/list',
-                'items' => array(
-                    array('title' => 'Training Logs',
-                          'url' => '/traininglog/list'
-                        ),
-                    array('title' => 'Security Reminder',
-                          'url' => '/securityreminder/list',
-                        )
-                )
-            ),
-            array(
-                'title' => 'Reporting',
-                'url' => '/reporting/auditbreach',
-                'items' => array(
-                    array('title' => 'Audit/Breach',
-                            'url' => '/reporting/auditbreach'
-                        ),
-                    array('title' => 'Plans Progress',
-                         'url' => '/reporting/planprogress',
-                        )
-                )
-            )
-        );
+            ));
 
         if($identity['u_grant_to_breach']) {
             $this->items[] = array(
@@ -335,6 +302,42 @@ class MenuTop extends AbstractHelper
                                 )
                             );
         }
+
+        $this->items = array_merge($this->items, array(
+                                                        array(
+                                                            'title' => 'Assessments',
+                                                            'url' => '/assessment/list',
+                                                        ),
+                                                        array(
+                                                            'title' => 'Remediation Plans',
+                                                            'url' => '/remediationplan/list',
+                                                        ),
+                                                        array(
+                                                            'title' => 'Trainings',
+                                                            'url' => '/traininglog/list',
+                                                            'items' => array(
+                                                                array('title' => 'Training Logs',
+                                                                      'url' => '/traininglog/list'
+                                                                    ),
+                                                                array('title' => 'Security Reminder',
+                                                                      'url' => '/securityreminder/list',
+                                                                    )
+                                                            )
+                                                        ),
+                                                        array(
+                                                            'title' => 'Reporting',
+                                                            'url' => '/reporting/auditbreach',
+                                                            'items' => array(
+                                                                array('title' => 'Audit/Breach',
+                                                                        'url' => '/reporting/auditbreach'
+                                                                    ),
+                                                                array('title' => 'Plans Progress',
+                                                                     'url' => '/reporting/planprogress',
+                                                                    )
+                                                            )
+                                                        )
+                                                    )
+                                                );
 
         if($identity['u_grant_to_disclosures']) {
             $this->items[] = array(
@@ -362,79 +365,84 @@ class MenuTop extends AbstractHelper
     private function _prepareItemsForClientCompanyAdmin($identity)
     {
         $this->items = array(
-            array(
-                'title' => 'Dashboard',
-                'url' => '/dashboard/client',
-            ),
-            array(
-                'title' => 'Clients',
-                'url' => '/client/list',
-                'items' => array(
-                    array('title' => 'Business Associates',
-                          'url' => '/businessassociate/list',
-                    ),
-                    array('title' => 'All Clients',
-                          'url' => '/client/list',
-                        ),
-                    array('title' => 'Create Contact',
-                          'url' => '/client/edit',
-                        ),
-                    array('title' => 'Create Company',
-                          'url' => '/company/edit',
-                        )
-                )
-            ),
-            array(
-                'title' => 'Assessments',
-                'url' => '/assessment/list',
-            ),
-            array(
-                'title' => 'Remediation Plans',
-                'url' => '/remediationplan/list',
-            ),
-            array(
-                'title' => 'Trainings',
-                'url' => '/traininglog/list',
-                'items' => array(
-                    array('title' => 'Training Logs',
-                          'url' => '/traininglog/list'
-                        ),
-                    array('title' => 'Security Reminder',
-                          'url' => '/securityreminder/list',
-                        )
-                )
-            ),
-            array(
-                'title' => 'Reporting',
-                'url' => '/reporting/auditbreach',
-                'items' => array(
-                    array('title' => 'Audit/Breach',
-                            'url' => '/reporting/auditbreach'
-                        ),
-                    array('title' => 'Plans Progress',
-                         'url' => '/reporting/planprogress',
-                        )
-                )
-            )
-        );
-
-        if($identity['u_grant_to_breach']) {
-            $this->items[] = array(
-                                'title' => 'Breach Management',
-                                'url' => '/breachlog/list',
-                                'class' => 'with-access',
+                            array(
+                                'title' => 'Dashboard',
+                                'url' => '/dashboard/client',
+                            ),
+                            array(
+                                'title' => 'Clients',
+                                'url' => '/client/list',
                                 'items' => array(
-                                    array('title' => 'Breach Logs',
-                                          'url' => '/breachlog/list',
-                                          'class' => 'with-access'
+                                    array('title' => 'Business Associates',
+                                          'url' => '/businessassociate/list',
+                                    ),
+                                    array('title' => 'All Clients',
+                                          'url' => '/client/list',
                                         ),
-                                    array('title' => 'Breach Remediation Plans',
-                                          'url' => '/breachremediationplan/list',
-                                          'class' => 'with-access'
+                                    array('title' => 'Create Contact',
+                                          'url' => '/client/edit',
+                                        ),
+                                    array('title' => 'Create Company',
+                                          'url' => '/company/edit',
                                         )
                                 )
-                            );
-        }
+                            )
+                        );
+
+            if($identity['u_grant_to_breach']) {
+                $this->items[] = array(
+                                    'title' => 'Breach Management',
+                                    'url' => '/breachlog/list',
+                                    'class' => 'with-access',
+                                    'items' => array(
+                                        array('title' => 'Breach Logs',
+                                              'url' => '/breachlog/list',
+                                              'class' => 'with-access'
+                                            ),
+                                        array('title' => 'Breach Remediation Plans',
+                                              'url' => '/breachremediationplan/list',
+                                              'class' => 'with-access'
+                                            )
+                                    )
+                                );
+            }
+            
+            $this->items = array_merge($this->items, array(
+                                                        array(
+                                                            'title' => 'Assessments',
+                                                            'url' => '/assessment/list',
+                                                        ),
+                                                        array(
+                                                            'title' => 'Remediation Plans',
+                                                            'url' => '/remediationplan/list',
+                                                        ),
+                                                        array(
+                                                            'title' => 'Trainings',
+                                                            'url' => '/traininglog/list',
+                                                            'items' => array(
+                                                                array('title' => 'Training Logs',
+                                                                      'url' => '/traininglog/list'
+                                                                    ),
+                                                                array('title' => 'Security Reminder',
+                                                                      'url' => '/securityreminder/list',
+                                                                    )
+                                                            )
+                                                        ),
+                                                        array(
+                                                            'title' => 'Reporting',
+                                                            'url' => '/reporting/auditbreach',
+                                                            'items' => array(
+                                                                array('title' => 'Audit/Breach',
+                                                                        'url' => '/reporting/auditbreach'
+                                                                    ),
+                                                                array('title' => 'Plans Progress',
+                                                                     'url' => '/reporting/planprogress',
+                                                                    )
+                                                            )
+                                                        )
+                                                    )
+                                                );
+
 
         if($identity['u_grant_to_disclosures']) {
             $this->items[] = array(
