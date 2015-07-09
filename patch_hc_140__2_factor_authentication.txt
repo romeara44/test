@@ -13,7 +13,7 @@ INSERT INTO  `hipaacar_app`.`mail_templates` (
 VALUES (
 NULL ,  'Send Modules Access Code',  'send_modules_access_code',  'Send Modules Access Code',  '<div style="font-size: 24px; color: #189696"><Full Name>,</div>
 <br />
-Your code for access:<code><br />
+Your code for access: <code><br />
 It will be avaliable for 20 minutes<br />
 <br />',  '1', 
 CURRENT_TIMESTAMP
