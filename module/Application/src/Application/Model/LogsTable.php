@@ -257,7 +257,7 @@ class LogsTable
         $select->join(array('cl' => 'users'), new \Zend\Db\Sql\Expression('u_id = lo_item_id AND lo_item_type = ' . LogsTable::ITEM_TYPE_CLIENT), array('u_id', '_username' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)')), 'inner');
         $select->join(array('c' => 'companies'), new \Zend\Db\Sql\Expression('c_id = u_company_id'), array(), 'inner');
 
-        $select->where('c_id = ' . $companyId = 64);
+        $select->where('c_id = ' . $companyId);
         $select->where('lo_type IN (' . implode(',', array(LogsTable::TYPE_AUTH_SUCCESS, LogsTable::TYPE_AUTH_FAILED, LogsTable::TYPE_AUTH_LOCKED)) . ')');
         $select->having('_date >= "' . $from . '"');
         $select->having('_date <= "' . $to . '"');

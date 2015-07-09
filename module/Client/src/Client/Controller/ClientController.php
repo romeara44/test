@@ -195,7 +195,9 @@ class ClientController extends AbstractActionController
                         $clienLimit = false;
                     }
 
-                    if(!isset($post['u_company_id_admin']) && is_object($userObj) && $post['u_company_id'] == $userObj->u_company_id) {
+                    if(!(in_array($identity['u_role_id'], array(1, 2))
+                        || (is_object($clientObj) && $clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $identity['u_id']))
+                        && is_object($userObj) && $post['u_company_id'] == $userObj->u_company_id) {
                         $post['u_company_id_admin'] = $userObj->u_company_id_admin;
                     }
 
