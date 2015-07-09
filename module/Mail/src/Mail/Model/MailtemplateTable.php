@@ -110,7 +110,7 @@ class MailtemplateTable
             $mt->mt_text = str_replace('<id>', $params['brpaId'], $mt->mt_text);
         }
         if (isset($params['modules_access_code'])) {
-            $mt->mt_text = str_replace('<Full Name>', $addToName, $mt->mt_text);
+            $mt->mt_text = str_replace('<Full Name>', $params['addToName'], $mt->mt_text);
             $mt->mt_text = str_replace('<code>', $params['modules_access_code'], $mt->mt_text);
         }
 

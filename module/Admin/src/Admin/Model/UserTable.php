@@ -761,7 +761,11 @@ class UserTable implements ServiceLocatorAwareInterface
             $data['u_modules_access_code']         = $modulesAccessCode;
             $data['u_modules_access_code_created'] = time();
 
-            $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'send_modules_access_code', 'addto' => $user->u_email, 'modules_access_code' => $modulesAccessCode));
+            $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey'         => 'send_modules_access_code',
+                                                                                                                        'addto'               => $user->u_email,
+                                                                                                                        'addToName'           => $user->u_firstname . ' ' . $user->u_lastname,
+                                                                                                                        'modules_access_code' => $modulesAccessCode
+                                                                                                                         ));
 
             return $this->tableGateway->update($data, array('u_id' => $id));
         } else {
