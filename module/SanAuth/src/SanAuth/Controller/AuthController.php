@@ -184,9 +184,12 @@ class AuthController extends AbstractActionController
 
     public function authenticateAction()
     {
-        $form = new AuthForm();
+        $form = new AuthForm($this->getRequest()->getBaseUrl() . '/data/captcha/');
         
         $request = $this->getRequest();
+
+        $flashMessagesErrors = array();
+
         if ($request->isPost()) {
 
             $user = new \Admin\Model\User();
@@ -203,10 +206,10 @@ class AuthController extends AbstractActionController
                         $this->getAuthService()->clearIdentity();
 
                         if($user->u_locked) {
-                            $this->flashmessenger()->addErrorMessage('You are locked. Please contact admin.');
+                            $flashMessagesErrors[] = 'You are locked. Please contact admin.';
                             $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_AUTH_LOCKED, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $user->u_id);
                         } else {
-                            $this->flashmessenger()->addErrorMessage('Wrong email or password. Please try again.');
+                            $flashMessagesErrors[] = 'Wrong email or password. Please try again.';
                         }
 
                         return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
@@ -268,19 +271,39 @@ class AuthController extends AbstractActionController
                     $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_AUTH_SUCCESS, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $user->u_id);
 
                     $this->flashmessenger()->addSuccessMessage('Log in');
+
+                    return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
                 } else {
                     if(isset($user->u_id)) {
                         $this->getServiceLocator()->get('Admin\Model\UserTable')->updateFailedLoginCount($user);
                         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_AUTH_FAILED, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $user->u_id);
                     }
-                    $this->flashmessenger()->addErrorMessage('Wrong email or password. Please try again.');
+                    $flashMessagesErrors[] = 'Wrong email or password. Please try again.';
                 }
             } else {
-                $this->flashmessenger()->addErrorMessage('Wrong');
+                if(count($form->getMessages('captcha'))) {
+                    $captchaMessages       = $form->getMessages('captcha');
+                    $flashMessagesErrors[] = array_pop($captchaMessages);
+                } else {
+                    $flashMessagesErrors[] = 'Wrong email or password. Please try again.';
+                }
             }
         }
         
-        return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+        $view = new ViewModel;
+
+        $view->setVariables(array(
+            'form' => $form,
+        ));
+
+        $this->layout( 'layout/layout_login' );
+
+        $this->layout()->flashMessagesSuccess = $this->flashMessenger()->getSuccessMessages();
+        $this->layout()->flashMessagesErrors  = $flashMessagesErrors;
+
+        $view->setTemplate( 'san-auth/auth/login.phtml' );
+
+        return $view;
     }
     
     public function logoutAction()

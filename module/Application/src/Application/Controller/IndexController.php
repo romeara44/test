@@ -45,7 +45,6 @@ class IndexController extends AbstractActionController
     {
         $this->layout()->bodyId = 'pFirst';
 
-        $this->layout()->flashMessagesErrors = $this->flashMessenger()->getErrorMessages();
         if ($this->hasIdentity()) {
             $identity = $this->getIdentity();
             
@@ -68,19 +67,8 @@ class IndexController extends AbstractActionController
             }
 
         } else {
-            $this->layout('layout/layout_login');
+            return $this->redirect()->toRoute('auth', array('controller' => 'auth', 'action' => 'authenticate'));
         }
-
-        /*
-        $sm = $this->getServiceLocator();
-        $practiceTable = $sm->get('Practice\Model\PracticeTable');
-        $last5practices = $practiceTable->fetchAll(true, null, null, null, array('last5' => true));
-        $last5practices->setItemCountPerPage(5);
-        $view = new ViewModel(array(
-            'last5practices' => $last5practices,
-        ));
-
-        */
     }
 
 }
