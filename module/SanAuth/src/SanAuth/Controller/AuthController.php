@@ -101,7 +101,7 @@ class AuthController extends AbstractActionController
                     return $this->redirect()->toRoute('auth', array('controller' => 'auth', 'action' => 'forgotpassword'));
                 }
 
-                return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+                return $this->redirect()->toRoute('auth', array('controller' => 'auth', 'action' => 'authenticate'));
 
             } else {
                 foreach ($form->getMessages() as $messageId => $message) {
