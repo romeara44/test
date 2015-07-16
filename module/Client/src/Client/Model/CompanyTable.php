@@ -60,7 +60,9 @@ class CompanyTable implements ServiceLocatorAwareInterface
                 } else {
                     $select->where('u_active = 1');
                 }
-                if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
+                if($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
+                    $select->where('u_senior_consultant_u_id = ' . $identity['u_id']);
+                } elseif($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
                     if($identity['u_company_id_admin']) {
                         $select->where('(u_senior_consultant_u_id = ' . $identity['u_id'] . ' OR u_company_id = ' . $identity['u_company_id_admin'] . ') AND u_id != ' . $identity['u_id']);
                     } else {

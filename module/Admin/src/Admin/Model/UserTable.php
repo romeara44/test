@@ -669,6 +669,23 @@ class UserTable implements ServiceLocatorAwareInterface
                 $data['u_failed_logins_count'] = ++$user->u_failed_logins_count;
                 $locked = (int) $user->u_failed_logins_count > $this->getServiceLocator()->get('Sitesetting\Model\SitesettingTable')->getValueByName(\Sitesetting\Model\Sitesetting::FAILED_USER_LOGINS_LIMIT);
                 if($locked) {
+                    $select = $this->tableGateway->getSql()->select();
+                    $whereStr = '(u_role_id = ' . User::ROLE_ADMIN;
+                    if($user->u_company_id) {
+                        $whereStr .= ' OR u_company_id_admin = ' . $user->u_company_id;
+                    }
+                    if($user->u_senior_consultant_u_id) {
+                        $whereStr .= ' OR u_id = ' . $user->u_senior_consultant_u_id;
+                    }
+                    $select->where($whereStr . ')');
+                    $select->where('u_active = 1');
+
+                    $resultSet = $this->tableGateway->selectWith($select);
+
+                    foreach ($resultSet as $rs) {
+                        $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'user_locked', 'uId' => $rs->u_id, 'locked_user' => $user));
+                    }
+
                     $data['u_locked'] = $locked;
                     $data['u_locked_unlocked_date'] = date('Y-m-d H:i:s');
                 }

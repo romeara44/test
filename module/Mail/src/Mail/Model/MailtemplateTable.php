@@ -130,6 +130,13 @@ class MailtemplateTable
             $mt->mt_text = str_replace('<User Email>', $params['forgot_password_user']->u_email, $mt->mt_text);
         }
 
+        if (isset($params['locked_user'])) {
+            $lockedUserName = $params['locked_user']->u_firstname . ' ' . $params['locked_user']->u_lastname;
+
+            $mt->mt_text = str_replace('<User Name>', $lockedUserName, $mt->mt_text);
+            $mt->mt_text = str_replace('<User Email>', $params['locked_user']->u_email, $mt->mt_text);
+        }
+
         $text = '';
         if (isset($params['text'])) {
             $text = $params['text'];

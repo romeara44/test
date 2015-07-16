@@ -206,13 +206,13 @@ class AuthController extends AbstractActionController
                         $this->getAuthService()->clearIdentity();
 
                         if($user->u_locked) {
-                            $flashMessagesErrors[] = 'You are locked. Please contact admin.';
+                            $this->flashMessenger()->addErrorMessage('You are locked. Please contact admin.');
                             $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_AUTH_LOCKED, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $user->u_id);
                         } else {
-                            $flashMessagesErrors[] = 'Wrong email or password. Please try again.';
+                            $this->flashMessenger()->addErrorMessage('Wrong email or password. Please try again.');
                         }
 
-                        return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+                        return $this->redirect()->toRoute('auth', array('controller' => 'auth', 'action' => 'authenticate'));
                     }
 
                     $config = $this->getServiceLocator()->get('config');
@@ -299,7 +299,7 @@ class AuthController extends AbstractActionController
         $this->layout( 'layout/layout_login' );
 
         $this->layout()->flashMessagesSuccess = $this->flashMessenger()->getSuccessMessages();
-        $this->layout()->flashMessagesErrors  = $flashMessagesErrors;
+        $this->layout()->flashMessagesErrors  = $flashMessagesErrors ? $flashMessagesErrors : $this->flashMessenger()->getErrorMessages();
 
         $view->setTemplate( 'san-auth/auth/login.phtml' );
 
