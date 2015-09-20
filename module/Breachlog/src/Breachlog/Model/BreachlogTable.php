@@ -45,7 +45,6 @@ class BreachlogTable implements ServiceLocatorAwareInterface
             );
 
             if ($identity['u_role_id'] == User::ROLE_ADMIN) {
-                $select->where('bl_active = 0');
             } else {
                 $select->where('bl_active = 1');
                 if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
@@ -195,6 +194,7 @@ class BreachlogTable implements ServiceLocatorAwareInterface
             }
 
             $data['bl_create_u_id'] = $identity['u_id'];
+            $data['bl_create_date'] = new \Zend\Db\Sql\Expression('NOW()');
         }
 
         if ($id == 0) {

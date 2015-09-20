@@ -194,10 +194,6 @@ class ClientController extends AbstractActionController
                         $clienLimit = false;
                     }
 
-                    if(!isset($post['u_company_id_admin']) && is_object($userObj) && $post['u_company_id'] == $userObj->u_company_id) {
-                        $post['u_company_id_admin'] = $userObj->u_company_id_admin;
-                    }
-
                     $iisTrainingManager = isset($post['is_training_manager']) ? 1 : 0;
                     $curTrainingManager = $this->getCompanyTable()->getTrainingManager($post['u_company_id']);
 
@@ -224,10 +220,12 @@ class ClientController extends AbstractActionController
                         }
 
                         $users = $this->getUserTable()->getContactsByCompanyId($post['u_company_id']);
-                        
+
                         $iisPrimaryContact = isset($post['is_primary_contact']) ? 1 : 0;
                         if ($iisPrimaryContact || (count($users) == 1)) {
                             $this->getCompanyTable()->setPrimaryContactId($post['u_company_id'], $uId);
+                        } else {
+                            $this->getCompanyTable()->unsetPrimaryContactId($post['u_company_id']);
                         }
 
                         if ($iisTrainingManager) {

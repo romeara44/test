@@ -193,7 +193,7 @@ class BreachlogController extends AbstractActionController
         $notes = null;
         $blObj = null;
         $userObj = null;
-        $companyUsers[''] = 'Please Select';
+        $companyUsers['options'][''] = 'Please Select';
         $companyRolesMsg = '';
         
         if ((int) $id) {
@@ -201,7 +201,7 @@ class BreachlogController extends AbstractActionController
             $companyUsersObj = $this->getUserTable()->getUsersByCompany($blObj->bl_c_id);
             if($companyUsersObj) {
                 foreach($companyUsersObj as $companyUserObj) {
-                    $companyUsers[$companyUserObj->u_id] = $companyUserObj->u_firstname . ' ' . $companyUserObj->u_lastname; 
+                    $companyUsers['options'][$companyUserObj->u_id] = $companyUserObj->u_firstname . ' ' . $companyUserObj->u_lastname; 
                 }
             }
             $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_BL);
@@ -209,7 +209,7 @@ class BreachlogController extends AbstractActionController
             $companyUsersObj = $this->getUserTable()->getUsersByCompany($identity['u_company_id']);
             if($companyUsersObj) {
                 foreach($companyUsersObj as $companyUserObj) {
-                    $companyUsers[$companyUserObj->u_id] = $companyUserObj->u_firstname . ' ' . $companyUserObj->u_lastname; 
+                    $companyUsers['options'][$companyUserObj->u_id] = $companyUserObj->u_firstname . ' ' . $companyUserObj->u_lastname; 
                 }
             }
         }

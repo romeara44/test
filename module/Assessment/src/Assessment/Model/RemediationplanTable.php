@@ -45,7 +45,6 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
             );
 
             if ($identity['u_role_id'] == User::ROLE_ADMIN) {
-                $select->where('(rp_status = 30 AND rp_active = 1) || (rp_active = 0)');
             } else {
                 $select->where('rp_active = 1');
 

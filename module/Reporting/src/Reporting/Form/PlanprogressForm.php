@@ -19,7 +19,7 @@ class PlanprogressForm extends Form
             $companies[$key] = $r;
         }
 
-        if(count($companies) != 1) {
+        if(isset($companies) && count($companies) > 1) {
             $companies = array('' => 'All') + $companies;
         }
 

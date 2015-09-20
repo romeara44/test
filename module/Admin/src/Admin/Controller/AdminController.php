@@ -115,6 +115,8 @@ class AdminController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
 
+        $identity = $this->getIdentity();
+
         $userObj = null;
 
         if ((int) $id) {
@@ -136,7 +138,11 @@ class AdminController extends AbstractActionController
                 $post = $request->getPost();
                 $post['u_confirmed'] = $uId ? $userObj->u_confirmed : null;
                 $post['u_company_id'] = $post['u_company_id'] ? $post['u_company_id'] : (is_object($userObj) ? $userObj->u_company_id : null);
-                
+
+                if($post['u_role_id'] == \Admin\Model\User::ROLE_CLIENT && $userObj->u_role_id == \Admin\Model\User::ROLE_PARTIAL) {
+                    $post['u_senior_consultant_u_id'] = $identity['u_id'];
+                }
+
                 $user->exchangeArray($post);
                 $saveUserId = $this->getUserTable()->saveUser($user);
                 if((int) $id) {
