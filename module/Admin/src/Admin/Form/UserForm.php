@@ -34,6 +34,26 @@ class UserForm extends Form
             ),
         ));
 
+        $companies = array();
+        
+        $companyTable = $sl->get('Client\Model\CompanyTable');
+        foreach ($companyTable->getCompaniesPairs() as $key => $r) {
+            $companies[$key] = $r;
+        }
+
+        if(count($companies) != 1) {
+            $companies = array('' => 'Please select') + $companies;
+        }
+
+        $this->add(array(
+            'name' => 'u_company_id',
+            'type' => 'Zend\Form\Element\Select',
+            'options' => array(
+                'label' => 'Company',
+                'value_options' => $companies
+            ),
+        ));
+
         $userTable = $sl->get('Admin\Model\UserTable');
         $seniorConsultants[''] = 'Please Select';
         $seniorConsultants[0] = '---';
@@ -77,15 +97,6 @@ class UserForm extends Form
             ),
             'options' => array(
                 'label' => 'Title',
-            ),
-        ));
-        $this->add(array(
-            'name' => 'u_company',
-            'attributes' => array(
-                'type'  => 'text',
-            ),
-            'options' => array(
-                'label' => 'Company',
             ),
         ));
 

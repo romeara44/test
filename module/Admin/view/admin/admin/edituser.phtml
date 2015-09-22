@@ -42,10 +42,15 @@ $_options = array(0 => 'Current Month', 1 => 'Last Month', 2 => 'Last 3 Months',
                     <?php $fn = $form->get('u_role_id');
                     echo $this->formLabel($fn);
                     $attrs = array('id'=>'accountType', 'class'=>'form-control required');
-                    if ($this->uId && $this->roleId != \Admin\Model\User::ROLE_PARTIAL):
-                        $attrs['disabled'] = 'disabled';
-                    endif;
                     echo $this->formSelect($fn->setAttributes($attrs));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+
+                <p>
+                    <?php $fn = $form->get('u_company_id');
+                    echo $this->formLabel($fn);
+                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control required', 'id' => 'u_company_id')));
                     echo $this->formElementErrors($fn);
                     ?>
                 </p>
@@ -79,14 +84,6 @@ $_options = array(0 => 'Current Month', 1 => 'Last Month', 2 => 'Last 3 Months',
                 <p>
                     <?php
                     $fn = $form->get('u_title');
-                    echo $this->formLabel($fn);
-                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
-                    echo $this->formElementErrors($fn);
-                    ?>
-                </p>
-                <p>
-                    <?php
-                    $fn = $form->get('u_company');
                     echo $this->formLabel($fn);
                     echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
                     echo $this->formElementErrors($fn);
