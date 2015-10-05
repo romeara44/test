@@ -99,7 +99,7 @@ class MenuTop extends AbstractHelper
                 )
             ),
             array(
-                'title' => 'Breach Management',
+                'title' => 'Incident Response',
                 'url' => '/breachlog/list',
                 'items' => array(
                     array('title' => 'Breach Logs',
@@ -193,7 +193,7 @@ class MenuTop extends AbstractHelper
                 )
             ),
             array(
-                'title' => 'Breach Management',
+                'title' => 'Incident Response',
                 'url' => '/breachlog/list',
                 'items' => array(
                     array('title' => 'Breach Logs',
@@ -271,7 +271,7 @@ class MenuTop extends AbstractHelper
                 )
             ),
             array(
-                'title' => 'Breach Management',
+                'title' => 'Incident Response',
                 'url' => '/breachlog/list',
                 'items' => array(
                     array('title' => 'Breach Logs',
@@ -361,7 +361,7 @@ class MenuTop extends AbstractHelper
                 )
             ),
             array(
-                'title' => 'Breach Management',
+                'title' => 'Incident Response',
                 'url' => '/breachlog/list',
                 'items' => array(
                     array('title' => 'Breach Logs',
@@ -452,7 +452,7 @@ class MenuTop extends AbstractHelper
                 )
             ),
             array(
-                'title' => 'Breach Management',
+                'title' => 'Incident Response',
                 'url' => '/breachlog/list',
                 'disabled' => true,
                 'items' => array(

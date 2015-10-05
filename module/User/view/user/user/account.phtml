@@ -70,14 +70,6 @@ $form->setAttribute('method', 'post');
             </p>
             <p>
                 <?php
-                $fn = $form->get('u_company');
-                echo $this->formLabel($fn);
-                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
-                echo $this->formElementErrors($fn);
-                ?>
-            </p>
-            <p>
-                <?php
                 $fn = $form->get('u_office_phone');
                 echo $this->formLabel($fn);
                 echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
