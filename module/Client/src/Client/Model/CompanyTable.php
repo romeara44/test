@@ -192,7 +192,7 @@ class CompanyTable implements ServiceLocatorAwareInterface
             $select->where('DATE_FORMAT(a_create_date, "%Y") <> DATE_FORMAT(NOW(), "%Y") OR a_create_date IS NULL');
         }
 
-        $select->columns(array('lo_id' => new Expression('c_id'), 'lo_type' => new Expression('100'), new Expression('NULL'), new Expression('NULL'), new Expression('NULL'), new Expression('NULL'), new Expression('NULL'), new Expression('NULL')));
+        $select->columns(array('lo_id' => new Expression('c_id'), 'lo_type' => new Expression('100'), new Expression('NULL'), new Expression('NULL'), new Expression('NULL'), new Expression('NULL'), new Expression('NULL')));
         $select->join(array('a' => 'assessments'), 'a_c_id = c_id', array('_rpc_name' => new Expression('c_name')), 'left');
         $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = c_id', array('cc_consultant_id'), 'left');
 

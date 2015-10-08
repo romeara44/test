@@ -30,7 +30,7 @@ class CompanyForm extends Form
                 'multiple' => 'multiple',
             ),
             'options' => array(
-                'label' => 'Type',
+                'label' => 'Consultants',
                 'value_options' => $consultants
             ),
         ));
