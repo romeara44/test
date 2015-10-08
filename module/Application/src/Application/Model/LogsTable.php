@@ -141,8 +141,8 @@ class LogsTable
             $resultSet = $this->tableGateway->selectWith($select);
         }
 
-        //echo $select->getSqlString($this->tableGateway->getAdapter()->getPlatform());
-        //die;
+        // echo $select->getSqlString($this->tableGateway->getAdapter()->getPlatform());
+        // die;
 
 
         return $resultSet;

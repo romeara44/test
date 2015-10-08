@@ -56,7 +56,7 @@ $form->setAttribute('method', 'post');
 
         <p id="_tl_type_name_wrap" style="border: 0;display: none">
             <label for="_tl_type_name">Type Name</label>
-            <input type="text" name="_tl_type_name" id="_tl_type_name" value="<?php echo $tlObj->_tl_type_name?>" required disabled="disabled">
+            <input type="text" name="_tl_type_name" id="_tl_type_name" value="<?php echo $tlObj ? $tlObj->_tl_type_name : ''?>" required disabled="disabled">
         </p>
 
         <p>
@@ -319,12 +319,12 @@ $form->setAttribute('method', 'post');
             
             $( "#tl_conducted_date, #tl_hire_date" ).datepicker({dateFormat: 'mm/dd/yy'});
 
-            if($('#type option:selected').text() != 'Initial') {
+            if($('#type option:selected').val() != '1') {
                 $("#tl_hire_date").datepicker("disable").val('-');
             }
 
             $('#type').change(function(){
-                if($('#type option:selected').text() != 'Initial') {
+                if($('#type option:selected').val() != '1') {
                     $("#tl_hire_date").datepicker("disable").val('-');
                 } else {
                     $("#tl_hire_date").val('').attr('disabled',false).datepicker('enable');

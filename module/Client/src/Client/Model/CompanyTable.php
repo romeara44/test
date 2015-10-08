@@ -53,6 +53,7 @@ class CompanyTable implements ServiceLocatorAwareInterface
                 $resultSetPrototype
             );
 
+            $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = c_id', array('cc_consultant_id'), 'left');
             if (in_array($typeItems, array('all', 'contacts'))) {
                 $select->join(array('u' => 'users'), 'u_company_id = c_id', array('u_id', 'u_firstname', 'u_lastname', 'u_office_phone', '_name' => 'u_lastname', '_id' => 'u_id', '_c_active' => new \Zend\Db\Sql\Expression('u.u_active')), 'left');
                 if ($identity['u_role_id'] == User::ROLE_ADMIN) {
@@ -73,11 +74,11 @@ class CompanyTable implements ServiceLocatorAwareInterface
             if ($identity['u_role_id'] == User::ROLE_SALES_REP) {
                 $select->where('c_owner_u_id = ' . $identity['u_id']);
             } elseif (in_array($identity['u_role_id'], array(User::ROLE_CONSULTANT))) {
-                $select->where('c_owner_u_id = ' . $identity['u_id'] . ' OR c_consultant_u_id = ' . $identity['u_id']);
+                $select->where('c_owner_u_id = ' . $identity['u_id'] . ' OR cc.cc_consultant_id = ' . $identity['u_id']);
             } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
                 $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
                 $ids[] = $identity['u_id'];
-                $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR c_consultant_u_id IN (' . implode(',', $ids) . '))');
+                $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR cc.cc_consultant_id IN (' . implode(',', $ids) . '))');
             } else if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
                 if($identity['u_company_id_admin']) {
                     $select->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR c_id = ' . $identity['u_company_id_admin'] . ')');
@@ -108,7 +109,7 @@ class CompanyTable implements ServiceLocatorAwareInterface
                 $resultSetPrototype = new ResultSet();
                 $resultSetPrototype->setArrayObjectPrototype(new Company());
                 $selectCom->columns(array('*', new \Zend\Db\Sql\Expression('NULL'), new \Zend\Db\Sql\Expression('NULL'), new \Zend\Db\Sql\Expression('NULL'), new \Zend\Db\Sql\Expression('NULL'), '_name' => 'c_name', '_id' => 'c_id', '_c_active' => 'c_active'));
-
+                $selectCom->join(array('cc2' => 'company_consultants'), 'cc2.cc_company_id = c_id', array('cc_consultant_id'), 'left');
                 if ($identity['u_role_id'] == User::ROLE_ADMIN) {
                     $select->where('c_active IN (0, 1)');
                 } else {
@@ -118,11 +119,11 @@ class CompanyTable implements ServiceLocatorAwareInterface
                     if ($identity['u_role_id'] == \Admin\Model\User::ROLE_SALES_REP) {
                         $selectCom->where('c_owner_u_id = ' . $identity['u_id']);
                     } elseif (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_CONSULTANT))) {
-                        $selectCom->where('c_owner_u_id = ' . $identity['u_id'] . ' OR c_consultant_u_id = ' . $identity['u_id']);
+                        $selectCom->where('c_owner_u_id = ' . $identity['u_id'] . ' OR cc2.cc_consultant_id = ' . $identity['u_id']);
                     } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
                         $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
                         $ids[] = $identity['u_id'];
-                        $selectCom->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR c_consultant_u_id IN (' . implode(',', $ids) . '))');
+                        $selectCom->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR cc2.cc_consultant_id IN (' . implode(',', $ids) . '))');
                     } else if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
                         if($identity['u_company_id_admin']) {
                             $selectCom->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR c_id = ' . $identity['u_company_id_admin'] . ')');
@@ -131,8 +132,14 @@ class CompanyTable implements ServiceLocatorAwareInterface
                         }
                     }
                 }
-
+                $select->group('u.u_id');
                 $select->combine($selectCom, 'union', 'all');
+            }
+
+            if($typeItems == 'contacts') {
+                $select->group('u.u_id');
+            } else if($typeItems == 'companies') {
+                $select->group('c_id');
             }
 
             if ($orderBy) {
@@ -158,17 +165,19 @@ class CompanyTable implements ServiceLocatorAwareInterface
         $select->where('c_name LIKE "%' . $searchValue . '%"');
 
         $select->columns(array('_id' => 'c_id', '_name' => 'c_name', '_type' => new \Zend\Db\Sql\Expression('CONCAT("company")')));
+        $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = c_id', array('cc_consultant_id'), 'left');
 
         if ($identity['u_role_id'] == \Admin\Model\User::ROLE_SALES_REP) {
             $select->where('c_owner_u_id = ' . $identity['u_id']);
         } elseif (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_CONSULTANT))) {
-            $select->where('c_owner_u_id = ' . $identity['u_id'] . ' OR c_consultant_u_id = ' . $identity['u_id']);
+            $select->where('c_owner_u_id = ' . $identity['u_id'] . ' OR cc_consultant_id = ' . $identity['u_id']);
         } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
             $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
             $ids[] = $identity['u_id'];
-            $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR c_consultant_u_id IN (' . implode(',', $ids) . '))');
+            $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR cc_consultant_id IN (' . implode(',', $ids) . '))');
         }
 
+        $select->group('c_id');
 
         return $select;
     }
@@ -185,19 +194,19 @@ class CompanyTable implements ServiceLocatorAwareInterface
 
         $select->columns(array('lo_id' => new Expression('c_id'), 'lo_type' => new Expression('100'), new Expression('NULL'), new Expression('NULL'), new Expression('NULL'), new Expression('NULL'), new Expression('NULL'), new Expression('NULL')));
         $select->join(array('a' => 'assessments'), 'a_c_id = c_id', array('_rpc_name' => new Expression('c_name')), 'left');
+        $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = c_id', array('cc_consultant_id'), 'left');
 
         if ($identity['u_role_id'] == \Admin\Model\User::ROLE_SALES_REP) {
             $select->where('c_owner_u_id = ' . $identity['u_id']);
         } elseif (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_CONSULTANT))) {
-            $select->where('c_owner_u_id = ' . $identity['u_id'] . ' OR c_consultant_u_id = ' . $identity['u_id']);
+            $select->where('c_owner_u_id = ' . $identity['u_id'] . ' OR cc_consultant_id = ' . $identity['u_id']);
         } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
             $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
             $ids[] = $identity['u_id'];
-            $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR c_consultant_u_id IN (' . implode(',', $ids) . '))');
+            $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR cc_consultant_id IN (' . implode(',', $ids) . '))');
         } else if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
             $select->where('c_owner_u_id = ' . $identity['u_id']);
         }
-
 
         $select->group('c_id');
 
@@ -212,15 +221,16 @@ class CompanyTable implements ServiceLocatorAwareInterface
         $identity = $authService->getIdentity();
 
         $select = $this->tableGateway->getSql()->select();
+        $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = c_id', array('cc_consultant_id'), 'left');
         $select->where('c_active = 1');
         if ($identity['u_role_id'] == \Admin\Model\User::ROLE_SALES_REP) {
             $select->where('c_owner_u_id = ' . $identity['u_id']);
         } elseif (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_CONSULTANT))) {
-            $select->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR c_consultant_u_id = ' . $identity['u_id'] . ')');
+            $select->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR cc_consultant_id = ' . $identity['u_id'] . ')');
         } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
             $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
             $ids[] = $identity['u_id'];
-            $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR c_consultant_u_id IN (' . implode(',', $ids) . '))');
+            $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR cc_consultant_id IN (' . implode(',', $ids) . '))');
         } else if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
             if($identity['u_company_id_admin']) {
                 $select->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR c_id = ' . $identity['u_company_id_admin'] . ')');
@@ -228,6 +238,8 @@ class CompanyTable implements ServiceLocatorAwareInterface
                 $select->where('c_owner_u_id = ' . $identity['u_id']);
             }
         }
+
+        $select->group('c_id');
 
         $resultSet = $this->tableGateway->selectWith($select);
 
@@ -275,13 +287,24 @@ class CompanyTable implements ServiceLocatorAwareInterface
 
         $select->where('c_id = ' . $id);
 
-        $resultSet = $this->tableGateway->selectWith($select)->current();
+        $row = $this->tableGateway->selectWith($select)->current();
 
-        if (!$resultSet) {
+        if (!$row) {
             return false;
         }
 
-        return $resultSet;
+        $select = $this->tableGateway->getSql()->select();
+        $select->join(array('cc' => 'company_consultants'), new \Zend\Db\Sql\Expression('cc.cc_company_id = c_id'), array('_c_consultant_id' => new \Zend\Db\Sql\Expression('cc.cc_consultant_id')), 'inner');
+        $select->where("c_id =" . $id);
+
+        $consultants = $this->tableGateway->selectWith($select);
+
+        foreach ($consultants as $consultant) {
+            $row->_c_cur_consultants[$consultant->_c_consultant_id] = $consultant->_c_consultant_id;
+        }
+        $companyConsultantsTable = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable');
+
+        return $row;
     }
 
     public function saveCompany(Company $company)
@@ -313,12 +336,9 @@ class CompanyTable implements ServiceLocatorAwareInterface
                 $data['c_users_limit'] = 0;
             }
         }
-        if ((int) $company->c_consultant_u_id) {
-            $data['c_consultant_u_id'] = $company->c_consultant_u_id;
-        } else {
-            if (in_array($identity['u_role_id'], array(User::ROLE_CONSULTANT, User::ROLE_SENIOR_CONSULTANT))) {
-                $data['c_consultant_u_id'] = $identity['u_id'];
-            }
+
+        if (in_array($identity['u_role_id'], array(User::ROLE_CONSULTANT))) {
+            $company->_c_cur_consultants[] = $identity['u_id'];
         }
 
         if ($id == 0) {
@@ -337,6 +357,21 @@ class CompanyTable implements ServiceLocatorAwareInterface
                 $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_EDIT, \Application\Model\LogsTable::ITEM_TYPE_COMPANY, $id);
             } else {
                 throw new \Exception('Form id does not exist');
+            }
+        }
+
+        if (in_array($identity['u_role_id'], array(User::ROLE_SALES_REP, User::ROLE_SENIOR_CONSULTANT, User::ROLE_ADMIN))) {
+            $companyConsultantsTable = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable');
+
+            $companyConsultantsTable->deleteByCompanyId($id);
+
+            if($company->_c_cur_consultants) {
+                $company->_c_cur_consultants = array_unique($company->_c_cur_consultants);
+                foreach ($company->_c_cur_consultants as $_c_cur_consultant) {
+                    if($_c_cur_consultant) {
+                        $companyConsultantsTable->saveCompanyConsultants(array('cc_company_id' => $id, 'cc_consultant_id' => $_c_cur_consultant));
+                    }
+                }
             }
         }
 

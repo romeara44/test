@@ -40,9 +40,9 @@ $form->setAttribute('method', 'post');
                 echo $this->formHidden($fn);
             ?>
 
-            <?php if (in_array($this->roleId, array(\Admin\Model\User::ROLE_SALES_REP, \Admin\Model\User::ROLE_ADMIN))): ?>
+            <?php if (in_array($this->roleId, array(\Admin\Model\User::ROLE_SALES_REP, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_ADMIN))): ?>
                 <p>
-                    <?php $fn = $form->get('c_consultant_u_id');
+                    <?php $fn = $form->get('_c_cur_consultants');
                     echo $this->formLabel($fn);
                     echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
                     echo $this->formElementErrors($fn);

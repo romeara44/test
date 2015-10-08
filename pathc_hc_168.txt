@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS `company_consultants` (
+  `cc_company_id` INT(11) NOT NULL,
+  `cc_consultant_id` INT(11) NOT NULL
+) ENGINE=INNODB  DEFAULT CHARSET=utf8;
+
+CREATE UNIQUE INDEX cc_company_consultant ON company_consultants (cc_company_id, cc_consultant_id);

@@ -91,7 +91,7 @@ class UserTable implements ServiceLocatorAwareInterface
         $select->where('u_active = 1');
         $select->where('(u_firstname LIKE "%' . $searchValue . '%" OR u_lastname LIKE "%' . $searchValue . '%")');
 
-        $select->columns(array('_id' => 'u_id', '_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("user")')));
+        $select->columns(array('_id' => 'u_id', '_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("user")'), new \Zend\Db\Sql\Expression('NULL')));
 
         $select->where('u_role_id <> 1'); // without admin
 
@@ -104,7 +104,7 @@ class UserTable implements ServiceLocatorAwareInterface
         $select->where('u_active = 1');
         $select->where('(u_firstname LIKE "%' . $searchValue . '%" OR u_lastname LIKE "%' . $searchValue . '%")');
 
-        $select->columns(array('_id' => 'u_id', '_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("contact")')));
+        $select->columns(array('_id' => 'u_id', '_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("contact")'), new \Zend\Db\Sql\Expression('NULL')));
 
         $select->where('u_role_id = 5'); // without admin
 
@@ -442,6 +442,7 @@ class UserTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
         $select->where('u_role_id IN (' . implode(',', $roles) . ')');
         $select->where('u_active = 1');
+        $select->order('u_role_id');
 
         $resultSet = $this->tableGateway->selectWith($select);
 

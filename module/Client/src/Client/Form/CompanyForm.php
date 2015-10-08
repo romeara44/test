@@ -18,17 +18,19 @@ class CompanyForm extends Form
         ));
 
         $userTable = $sl->get('Admin\Model\UserTable');
-        $consultants[''] = 'Please Select';
-        $consultants[0] = '---';
-        foreach ($userTable->getUsersByRole(array(\Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_CONSULTANT)) as $key => $r) {
+        $consultants[''] = 'Please select';
+        foreach ($userTable->getUsersByRole(array(\Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SALES_REP)) as $key => $r) {
             $consultants[$key] = $r;
         }
 
         $this->add(array(
-            'name' => 'c_consultant_u_id',
+            'name' => '_c_cur_consultants',
             'type' => 'Zend\Form\Element\Select',
+            'attributes' => array(
+                'multiple' => 'multiple',
+            ),
             'options' => array(
-                'label' => 'Assign Consultant',
+                'label' => 'Type',
                 'value_options' => $consultants
             ),
         ));

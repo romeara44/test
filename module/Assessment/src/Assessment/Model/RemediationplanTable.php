@@ -92,7 +92,7 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
         $select->where('rp_active = 1');
         $select->where('c_name LIKE "%' . $searchValue . '%"');
 
-        $select->columns(array('_id' => new \Zend\Db\Sql\Expression('rp_id')));
+        $select->columns(array('_id' => new \Zend\Db\Sql\Expression('rp_id'), new \Zend\Db\Sql\Expression('NULL')));
         $select->join(array('c' => 'companies'), 'rp_c_id = c_id', array('_name' => new \Zend\Db\Sql\Expression('c_name'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("remediationplan")')), 'left');
 
         if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
@@ -667,15 +667,17 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
         $select->where('rp_id = ' . $id);
         $select->join(array('c' => 'companies'), 'c.c_id = rp_c_id', array(), 'inner');
-        $select->join(array('u1' => 'users'), 'c.c_consultant_u_id = u1.u_id', array('_u_id' => 'u_id', '_u_name' => new \Zend\Db\Sql\Expression('CONCAT(u1.u_firstname, " ", u1.u_lastname)')), 'inner');
-        $select->where('c.c_consultant_u_id IS NOT NULL');
+        $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = c.c_id', array(), 'inner');
+        $select->join(array('u1' => 'users'), 'cc.cc_consultant_id = u1.u_id', array('_u_id' => 'u_id', '_u_name' => new \Zend\Db\Sql\Expression('CONCAT(u1.u_firstname, " ", u1.u_lastname)')), 'inner');
 
-        $resultSet = $this->tableGateway->selectWith($select)->current();
+        $resultSet = $this->tableGateway->selectWith($select);
 
-        if($resultSet && $resultSet->_u_id) {
-            if(!isset($result[$resultSet->_u_id])) {
-                $result[$resultSet->_u_id] = $resultSet;
-                $result[$resultSet->_u_id]->_ar_id = array();
+        if($resultSet) {
+            foreach ($resultSet as $rs) {
+                if(!isset($result[$rs->_u_id])) {
+                    $result[$rs->_u_id] = $rs;
+                    $result[$rs->_u_id]->_ar_id = array();
+                }
             }
         }
         
