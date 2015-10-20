@@ -119,7 +119,7 @@ $form->setAttribute('method', 'post');
                     echo $this->formElementErrors($fn);
                     ?>
                 </p>
-            <? endif; ?>
+            <?php endif; ?>
 
             <?php if ($this->cId): ?>
                 <?php $counter = 1;
@@ -209,9 +209,11 @@ $form->setAttribute('method', 'post');
                 </div>
             <?php endif; ?>
 
+            <?php if (in_array($this->roleId, array(\Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_ADMIN))): ?>
             <p>
                 <a id="addLocationButton" href="javascript:" onclick="return addLocation()" class="button"><i class="fa fa-plus-circle"></i> Add Additional Location</a>
             </p>
+            <?php endif; ?>
 
             <div class="cboth"></div>
             <div class="form-buttons">
