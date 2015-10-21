@@ -913,24 +913,11 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         $dataRp['rp_consultant_u_id'] = $a->a_consultant_u_id;
         $dataRp['rp_performed_u_id'] = $identity['u_id'];
         $dataRp['rp_remediation_date'] = new \Zend\Db\Sql\Expression('NOW()');
-        $dataRp['rp_incident_date'] = $a->a_create_date;
-
-        if ($a->a_security_a_id) {
-            $this->getServiceLocator()->get('Assessment\Model\RemediationplanTable')->setServiceLocator($this->getServiceLocator());
-            $rp = $this->getServiceLocator()->get('Assessment\Model\RemediationplanTable')->getRemediationplanByAId($a->a_security_a_id);
-            if (is_object($rp)) {
-                $dataRp['rp_security_rp_id'] = $rp->rp_id;
-            }
-        }
+        $dataRp['rp_incident_date'] = $a->a_create_date;        
 
         $rpDb = $this->getServiceLocator()->get('Assessment\Model\RemediationplanTable');
-        $rp = new Remediationplan();
-        $rp->exchangeArray($dataRp);
         $rpDb->setServiceLocator($this->getServiceLocator());
-        $rpId = $rpDb->saveRemediationplan($rp);
-
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_ADD, \Application\Model\LogsTable::ITEM_TYPE_RP, $rpId);
-
+        
         $catsDb = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionCategoryTable');
         $cats = $catsDb->getCategoriesByType($a->a_type);
 
@@ -938,8 +925,23 @@ class AssessmentTable implements ServiceLocatorAwareInterface
 
         $addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($aId, \Client\Model\AddressItem::ASSESSMENT_TYPE);
         foreach ($addresses->buffer() as $addressKey => $address) {
+
+            if ($a->a_security_a_id) {
+                $this->getServiceLocator()->get('Assessment\Model\RemediationplanTable')->setServiceLocator($this->getServiceLocator());
+                $rp = $this->getServiceLocator()->get('Assessment\Model\RemediationplanTable')->getRemediationplanByAId($a->a_security_a_id);
+                if (is_object($rp)) {
+                    $dataRp['rp_security_rp_id'] = $rp->rp_id;
+                }
+            }
+
+            $rp = new Remediationplan();
+            $rp->exchangeArray($dataRp);            
+            $rpId = $rpDb->saveRemediationplan($rp);
+            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_ADD, \Application\Model\LogsTable::ITEM_TYPE_RP, $rpId);
+
             $arlc = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->getArlcByLocation($aId, $address->adr_id);
             foreach ($cats->buffer() as $catKey => $cat) {
+
                 $rpa = new Remediationplanaction();
 
                 $answerScore = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionAnswerTable')->getAnswersScore($aId, $cat->aqc_id, $address->adr_id);

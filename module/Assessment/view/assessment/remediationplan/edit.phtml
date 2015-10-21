@@ -2,6 +2,16 @@
 
 <div class="page-title">
     <h1 class="fleft">Remediation Plan for <?php echo (!$this->isPdf) ? '<br/>' : '' ?><?php echo $this->rpObj->_client_name ?>
+    <?php foreach ($this->actions as $rpa): ?>
+    <?php
+        if($rpa->rpa_adr_id === null){
+            echo 'Additional Tasks';
+        } else {
+            echo $rpa->_location_name;
+        }        
+        break;
+    ?>
+    <?php endforeach; ?>
     <?php echo !$this->rpObj->rp_a_id ? ' <span class="remediationplan_imported_edit">(imported)</span>' : ''?>
     </h1>
     <?php if (!$this->isPdf): ?>
