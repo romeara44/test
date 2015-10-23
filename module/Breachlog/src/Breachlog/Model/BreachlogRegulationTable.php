@@ -55,7 +55,7 @@ class BreachlogRegulationTable implements ServiceLocatorAwareInterface
     {
         $db           = $this->serviceLocator->get('Zend\Db\Adapter\Adapter');
         $sql          = new Sql( $db );
-        $delete       = $sql->delete('breach_logs_regulations')->where(array('blrg_bl_id' => $blId));
+        $delete       = $sql->delete('breach_logs_regulations')->where('blrg_bl_id = ' . $blId);
         $deleteString = $sql->getSqlStringForSqlObject($delete);
         
         $db->query($deleteString, $db::QUERY_MODE_EXECUTE);

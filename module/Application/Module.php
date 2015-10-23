@@ -68,6 +68,17 @@ class Module
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $resultSetPrototype = new ResultSet();
                     return new TableGateway('logs', $dbAdapter, null, $resultSetPrototype);
+                },
+                'Sitesetting\Model\SitesettingTable' =>  function($sm) {
+                    $tableGateway = $sm->get('SitesettingTableGateway');
+                    $table = new \Sitesetting\Model\SitesettingTable($tableGateway);
+                    return $table;
+                },
+                'SitesettingTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new \Sitesetting\Model\Sitesetting());
+                    return new TableGateway('site_settings', $dbAdapter, null, $resultSetPrototype);
                 }
 
 

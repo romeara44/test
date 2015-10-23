@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS `disclosure_requests` (
   `dr_completing_request` varchar(255) NOT NULL,
   `dr_date_provided` date NOT NULL,
   `dr_active` tinyint(1) NOT NULL DEFAULT '1',
-  `dr_create_id` int(11) NOT NULL,
+  `dr_create_u_id` int(11) NOT NULL,
   PRIMARY KEY (`dr_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 

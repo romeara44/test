@@ -1107,6 +1107,20 @@ textarea.double { width: 586px; }
 .plan-progress-submit {
 	margin: 0;
 }
+#usersLoginHistoryForm {
+	overflow: hidden;
+}
+.company-admin-date {
+	width: 80px;
+	margin-right: 20px;
+}
+tr.login-unsuccess td {
+	background-color: #F8E0E0;
+}
+.administrationBlockWrap {
+	overflow: hidden;
+	margin-bottom: 30px;
+}
 /* Tables */
 
 table {
@@ -1303,7 +1317,46 @@ form ul li {
     left: 0;
     width: 100%;
 }
-
+.modules-access-box {
+    display: none;
+    padding: 15px 30px;
+    text-align: center;
+    z-index: 10000;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    color: #0a253d;
+    font-size: 16px;
+    line-height: 22px;
+    background: #c7d8e2;
+    border-radius: 6px;
+    margin-left: -223px;
+}
+.modules-access-box #moduleAccessCode {
+    width: 424px;
+    margin-bottom: 3px;
+}
+.modules-access-box .send-code-msg-ok {
+    display: none;
+    text-align: left;
+    margin: 0 0 10px 0;
+    padding: 0;
+    background-color: #dff0d8;
+    color: #468847;
+    border-radius: 3px;
+    padding: 3px 5px;
+}
+.modules-access-box label.error {
+    display: none;
+    clear: left;
+    margin-top: 0;
+    padding: 0;
+    text-align: left;
+    line-height: 14px;
+}
+.modules-access-box .form-buttons {
+    margin-top: 0;
+}
 .confirmation-box p,
 .activity-box p,
 .need-activation-box p {

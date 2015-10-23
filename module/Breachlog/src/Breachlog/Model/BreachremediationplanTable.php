@@ -12,6 +12,7 @@ use Zend\Db\Sql\Select;
 use Zend\Paginator\Adapter\DbSelect;
 use Zend\Paginator\Paginator;
 use Breachlog\Model\Breachremediationplan;
+use DataCrypt\DbCrypt;
 
 class BreachremediationplanTable implements ServiceLocatorAwareInterface
 {
@@ -32,10 +33,42 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         return $this->serviceLocator;
     }
 
+    private function _getIdentity()
+    {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+
+        return $authService->getIdentity();
+    }
+
     public function getBreachremediationplans($paginated = false, $orderBy = null, $order = null, $identity = null, $searchValue = null, $params = array())
     {
         if ($paginated) {
-            $select = new Select('breach_remediation_plans');
+            $select = $this->tableGateway->getSql()->select();
+
+            $select->columns(array('brp_id'                 => 'brp_id',
+                                   'brp_version_index'      => DbCrypt::decryptField('brp_version_index'),
+                                   'brp_version_index_item' => DbCrypt::decryptField('brp_version_index_item'),
+                                   'brp_writable'           => 'brp_writable',
+                                   'brp_bl_id'              => 'brp_bl_id',
+                                   'brp_c_id'               => 'brp_c_id',
+                                   'brp_consultant_u_id'    => 'brp_consultant_u_id',
+                                   'brp_performed_u_id'     => 'brp_performed_u_id',
+                                   'brp_approver_u_id'      => 'brp_approver_u_id',
+                                   'brp_accepter_u_id'      => 'brp_accepter_u_id',
+                                   'brp_create_u_id'        => 'brp_create_u_id',
+                                   'brp_update_u_id'        => 'brp_update_u_id',
+                                   'brp_parent_brp_id'      => 'brp_parent_brp_id',
+                                   'brp_is_version'         => 'brp_is_version',
+                                   'brp_status'             => DbCrypt::decryptField('brp_status'),
+                                   'brp_incident_date'      => DbCrypt::decryptField('brp_incident_date'),
+                                   'brp_remediation_date'   => DbCrypt::decryptField('brp_remediation_date'),
+                                   'brp_initials'           => DbCrypt::decryptField('brp_initials'),
+                                   'brp_initials_approver'  => DbCrypt::decryptField('brp_initials_approver'),
+                                   'brp_active'             => 'brp_active'
+                                  )
+                                );
+
             $resultSetPrototype = new ResultSet();
             $resultSetPrototype->setArrayObjectPrototype(new Breachremediationplan());
             $paginatorAdapter = new DbSelect(
@@ -46,7 +79,7 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
 
 
             if ($identity['u_role_id'] == User::ROLE_ADMIN) {
-                $select->where('(brp_status = 30 AND brp_active = 1) || (brp_active = 0)');
+                $select->where('(' . DbCrypt::decryptField('brp_status', false) . ' = 30 AND brp_active = 1) || (brp_active = 0)');
             } else {
                 $select->where('brp_active = 1');
 
@@ -63,7 +96,6 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
 
             $select->join(array('c' => 'companies'), 'brp_c_id = c_id', array('_client_name' => 'c_name'), 'left');
             $select->join(array('u' => 'users'), 'brp_approver_u_id = u.u_id', array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)')), 'left');
-            ///////////////
 
             $order = $order ? $order : 'ASC';
 
@@ -79,17 +111,67 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
 
             return $paginator;
         }
-        $resultSet = $this->tableGateway->select();
-        return $resultSet;
+
+        $select = $this->tableGateway->getSql()->select();
+
+        $select->columns(array('brp_id'                 => 'brp_id',
+                               'brp_version_index'      => DbCrypt::decryptField('brp_version_index'),
+                               'brp_version_index_item' => DbCrypt::decryptField('brp_version_index_item'),
+                               'brp_writable'           => 'brp_writable',
+                               'brp_bl_id'              => 'brp_bl_id',
+                               'brp_c_id'               => 'brp_c_id',
+                               'brp_consultant_u_id'    => 'brp_consultant_u_id',
+                               'brp_performed_u_id'     => 'brp_performed_u_id',
+                               'brp_approver_u_id'      => 'brp_approver_u_id',
+                               'brp_accepter_u_id'      => 'brp_accepter_u_id',
+                               'brp_create_u_id'        => 'brp_create_u_id',
+                               'brp_update_u_id'        => 'brp_update_u_id',
+                               'brp_parent_brp_id'      => 'brp_parent_brp_id',
+                               'brp_is_version'         => 'brp_is_version',
+                               'brp_status'             => DbCrypt::decryptField('brp_status'),
+                               'brp_incident_date'      => DbCrypt::decryptField('brp_incident_date'),
+                               'brp_remediation_date'   => DbCrypt::decryptField('brp_remediation_date'),
+                               'brp_initials'           => DbCrypt::decryptField('brp_initials'),
+                               'brp_initials_approver'  => DbCrypt::decryptField('brp_initials_approver'),
+                               'brp_active'             => 'brp_active'
+                              )
+                            );
+
+         if ($identity['u_role_id'] != User::ROLE_ADMIN) {
+            $select->where('brp_active = 1');
+         }
+
+         return $this->tableGateway->selectWith($select);
     }
 
     public function getBreachRemediationPlansForReporting($searchValue = null)
     {
-        $authService = new \Zend\Authentication\AuthenticationService();
-        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
-        $identity = $authService->getIdentity();
+        $identity = $this->_getIdentity();
 
-        $select = new Select('breach_remediation_plans');
+        $select = $this->tableGateway->getSql()->select();
+
+        $select->columns(array('brp_id'                 => 'brp_id',
+                               'brp_version_index'      => DbCrypt::decryptField('brp_version_index'),
+                               'brp_version_index_item' => DbCrypt::decryptField('brp_version_index_item'),
+                               'brp_writable'           => 'brp_writable',
+                               'brp_bl_id'              => 'brp_bl_id',
+                               'brp_c_id'               => 'brp_c_id',
+                               'brp_consultant_u_id'    => 'brp_consultant_u_id',
+                               'brp_performed_u_id'     => 'brp_performed_u_id',
+                               'brp_approver_u_id'      => 'brp_approver_u_id',
+                               'brp_accepter_u_id'      => 'brp_accepter_u_id',
+                               'brp_create_u_id'        => 'brp_create_u_id',
+                               'brp_update_u_id'        => 'brp_update_u_id',
+                               'brp_parent_brp_id'      => 'brp_parent_brp_id',
+                               'brp_is_version'         => 'brp_is_version',
+                               'brp_status'             => DbCrypt::decryptField('brp_status'),
+                               'brp_incident_date'      => DbCrypt::decryptField('brp_incident_date'),
+                               'brp_remediation_date'   => DbCrypt::decryptField('brp_remediation_date'),
+                               'brp_initials'           => DbCrypt::decryptField('brp_initials'),
+                               'brp_initials_approver'  => DbCrypt::decryptField('brp_initials_approver'),
+                               'brp_active'             => 'brp_active'
+                              )
+                            );
 
         $resultSetPrototype = new ResultSet();
         $resultSetPrototype->setArrayObjectPrototype(new Breachremediationplan());
@@ -100,7 +182,7 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         );
 
         if ($identity['u_role_id'] == User::ROLE_ADMIN) {
-            $select->where('(brp_status = 30 AND brp_active = 1) || (brp_active = 0)');
+            $select->where('(' . DbCrypt::decryptField('brp_status', false) . ' = 30 AND brp_active = 1) || (brp_active = 0)');
         } else {
             $select->where('brp_active = 1');
 
@@ -119,14 +201,14 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
             $select->where('(rg.rg_number LIKE "%' . $searchValue . '%" OR rg.rg_description LIKE "%' . $searchValue . '%")');
         }
         
-        $select->columns(array('brp_id', 'brp_remediation_date'));
+        $select->columns(array('brp_id' => 'brp_id', 'brp_remediation_date' => DbCrypt::decryptField('brp_remediation_date')));
         $select->join(array('c' => 'companies'), 'brp_c_id = c_id', array('_client_name' => 'c_name'), 'inner');
         $select->join(array('brprg' => 'breach_remediation_plans_regulations'), new \Zend\Db\Sql\Expression('brp_id = brprg.brprg_brp_id'), array('_brp_brprg_id' => new \Zend\Db\Sql\Expression('brprg.brprg_id'), '_brp_brprg_rg_id' => new \Zend\Db\Sql\Expression('brprg.brprg_rg_id')), 'inner');
         $select->join(array('rg' => 'regulations'), new \Zend\Db\Sql\Expression('brprg.brprg_rg_id = rg.rg_id'), array('_brp_regulation' => new \Zend\Db\Sql\Expression('rg.rg_pp_name')), 'inner');
 
         $select->group('brp_id');
         $select->order('brp_remediation_date DESC');
-        
+
         $paginator = new Paginator($paginatorAdapter);
 
         return $paginator;
@@ -135,20 +217,44 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
     public function getForReport($conditionNum = 0, $status = 1, $uId = 0)
     {
         $select = $this->tableGateway->getSql()->select();
+
+        $select->columns(array('brp_id'                 => 'brp_id',
+                               'brp_version_index'      => DbCrypt::decryptField('brp_version_index'),
+                               'brp_version_index_item' => DbCrypt::decryptField('brp_version_index_item'),
+                               'brp_writable'           => 'brp_writable',
+                               'brp_bl_id'              => 'brp_bl_id',
+                               'brp_c_id'               => 'brp_c_id',
+                               'brp_consultant_u_id'    => 'brp_consultant_u_id',
+                               'brp_performed_u_id'     => 'brp_performed_u_id',
+                               'brp_approver_u_id'      => 'brp_approver_u_id',
+                               'brp_accepter_u_id'      => 'brp_accepter_u_id',
+                               'brp_create_u_id'        => 'brp_create_u_id',
+                               'brp_update_u_id'        => 'brp_update_u_id',
+                               'brp_parent_brp_id'      => 'brp_parent_brp_id',
+                               'brp_is_version'         => 'brp_is_version',
+                               'brp_status'             => DbCrypt::decryptField('brp_status'),
+                               'brp_incident_date'      => DbCrypt::decryptField('brp_incident_date'),
+                               'brp_remediation_date'   => DbCrypt::decryptField('brp_remediation_date'),
+                               'brp_initials'           => DbCrypt::decryptField('brp_initials'),
+                               'brp_initials_approver'  => DbCrypt::decryptField('brp_initials_approver'),
+                               'brp_active'             => 'brp_active'
+                              )
+                            );
+
         $select->where('brp_active = 1');
         $condition = isset(\Admin\Model\UserTable::$reportCondition[$conditionNum]) ? \Admin\Model\UserTable::$reportCondition[$conditionNum] : null;
 
         if ($condition != '') {
-            $condition = str_replace('?', 'brp_create_date', $condition);
+            $condition = str_replace('?', DbCrypt::decryptField('brp_create_date', false), $condition);
             $select->where($condition);
         }
 
         $select->columns(array('_client_name' => new \Zend\Db\Sql\Expression('COUNT(brp_id)')));
 
         if ($status == 1) {
-            $select->where("brp_status IN (10, 20)");
+            $select->where(DbCrypt::decryptField("brp_status", false) . "IN (10, 20)");
         } else {
-            $select->where("brp_status IN (30, 40)");
+            $select->where(DbCrypt::decryptField("brp_status", false) . "IN (30, 40)");
         }
 
         if ($uId) {
@@ -163,9 +269,7 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
             }
         }
 
-        $resultSet = $this->tableGateway->selectWith($select);
-
-        $row = $resultSet->current();
+        $row = $this->tableGateway->selectWith($select)->current();
 
         if (!$row) {
             return false;
@@ -179,10 +283,34 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         $id  = (int) $id;
 
         $select = $this->tableGateway->getSql()->select();
+
+        $select->columns(array('brp_id'                 => 'brp_id',
+                               'brp_version_index'      => DbCrypt::decryptField('brp_version_index'),
+                               'brp_version_index_item' => DbCrypt::decryptField('brp_version_index_item'),
+                               'brp_writable'           => 'brp_writable',
+                               'brp_bl_id'              => 'brp_bl_id',
+                               'brp_c_id'               => 'brp_c_id',
+                               'brp_consultant_u_id'    => 'brp_consultant_u_id',
+                               'brp_performed_u_id'     => 'brp_performed_u_id',
+                               'brp_approver_u_id'      => 'brp_approver_u_id',
+                               'brp_accepter_u_id'      => 'brp_accepter_u_id',
+                               'brp_create_u_id'        => 'brp_create_u_id',
+                               'brp_update_u_id'        => 'brp_update_u_id',
+                               'brp_parent_brp_id'      => 'brp_parent_brp_id',
+                               'brp_is_version'         => 'brp_is_version',
+                               'brp_status'             => DbCrypt::decryptField('brp_status'),
+                               'brp_incident_date'      => DbCrypt::decryptField('brp_incident_date'),
+                               'brp_remediation_date'   => DbCrypt::decryptField('brp_remediation_date'),
+                               'brp_initials'           => DbCrypt::decryptField('brp_initials'),
+                               'brp_initials_approver'  => DbCrypt::decryptField('brp_initials_approver'),
+                               'brp_active'             => 'brp_active'
+                              )
+                            );
+
         $select->where('brp_id = ' . $id);
         $select->where('brp_active = 1');
         $select->join(array('c' => 'companies'), 'brp_c_id = c_id', array('_client_name' => 'c_name'), 'left');
-        $select->join(array('u' => 'users'), 'brp_approver_u_id = u_id', array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)'), '_brp_incident_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(brp_incident_date, "%m/%d/%Y")'), '_brp_remediation_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(brp_remediation_date, "%m/%d/%Y")')), 'left');
+        $select->join(array('u' => 'users'), 'brp_approver_u_id = u_id', array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)'), '_brp_incident_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(' . DbCrypt::decryptField('brp_incident_date', false) . ', "%m/%d/%Y")'), '_brp_remediation_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(' . DbCrypt::decryptField('brp_remediation_date', false) . ', "%m/%d/%Y")')), 'left');
         $select->join(array('u2' => 'users'), 'brp_consultant_u_id = u2.u_id', array('_consultant_name' => new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)')), 'left');
         $select->join(array('u3' => 'users'), 'brp_performed_u_id = u3.u_id', array('_performed_name' => new \Zend\Db\Sql\Expression('CONCAT(u3.u_firstname, " ", u3.u_lastname)')), 'left');
         $select->join(array('u4' => 'users'), 'brp_approver_u_id = u4.u_id', array('_accepter_name' => new \Zend\Db\Sql\Expression('CONCAT(u4.u_firstname, " ", u4.u_lastname)')), 'left');
@@ -195,6 +323,30 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         }
 
         $select = $this->tableGateway->getSql()->select();
+
+        $select->columns(array('brp_id'                 => 'brp_id',
+                               'brp_version_index'      => DbCrypt::decryptField('brp_version_index'),
+                               'brp_version_index_item' => DbCrypt::decryptField('brp_version_index_item'),
+                               'brp_writable'           => 'brp_writable',
+                               'brp_bl_id'              => 'brp_bl_id',
+                               'brp_c_id'               => 'brp_c_id',
+                               'brp_consultant_u_id'    => 'brp_consultant_u_id',
+                               'brp_performed_u_id'     => 'brp_performed_u_id',
+                               'brp_approver_u_id'      => 'brp_approver_u_id',
+                               'brp_accepter_u_id'      => 'brp_accepter_u_id',
+                               'brp_create_u_id'        => 'brp_create_u_id',
+                               'brp_update_u_id'        => 'brp_update_u_id',
+                               'brp_parent_brp_id'      => 'brp_parent_brp_id',
+                               'brp_is_version'         => 'brp_is_version',
+                               'brp_status'             => DbCrypt::decryptField('brp_status'),
+                               'brp_incident_date'      => DbCrypt::decryptField('brp_incident_date'),
+                               'brp_remediation_date'   => DbCrypt::decryptField('brp_remediation_date'),
+                               'brp_initials'           => DbCrypt::decryptField('brp_initials'),
+                               'brp_initials_approver'  => DbCrypt::decryptField('brp_initials_approver'),
+                               'brp_active'             => 'brp_active'
+                              )
+                            );
+
         $select->join(array('brprg' => 'breach_remediation_plans_regulations'), new \Zend\Db\Sql\Expression('brp_id = brprg.brprg_brp_id'), array('_brp_brprg_id' => new \Zend\Db\Sql\Expression('brprg.brprg_id'), '_brp_brprg_rg_id' => new \Zend\Db\Sql\Expression('brprg.brprg_rg_id')), 'inner');
         $select->join(array('rg' => 'regulations'), new \Zend\Db\Sql\Expression('brprg.brprg_rg_id = rg.rg_id'), array('_brp_regulation' => new \Zend\Db\Sql\Expression('rg.rg_pp_name')), 'inner');
         $select->where("brp_id =" . $id);
@@ -210,32 +362,33 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
 
     public function saveBreachremediationplan(Breachremediationplan $brp)
     {
+        $newBrp = false;
+
         $data = array(
-            'brp_bl_id' => $brp->brp_bl_id,
-            'brp_c_id' => $brp->brp_c_id,
-            'brp_consultant_u_id' => $brp->brp_consultant_u_id,
-            'brp_approver_u_id' => $brp->brp_approver_u_id,
-            'brp_performed_u_id' => $brp->brp_performed_u_id,
-            'brp_accepter_u_id' => $brp->brp_accepter_u_id,
-            'brp_parent_brp_id' => $brp->brp_parent_brp_id,
-            'brp_version_index' => $brp->brp_version_index,
-            'brp_initials' => $brp->brp_initials,
-            'brp_initials_approver' => $brp->brp_initials_approver,
-            'brp_remediation_date' => $brp->brp_remediation_date,
-            'brp_incident_date' => $brp->brp_incident_date,
-            'brp_status' => $brp->brp_status,
-            'brp_is_version' => $brp->brp_is_version,
+            'brp_bl_id'             => $brp->brp_bl_id,
+            'brp_c_id'              => $brp->brp_c_id,
+            'brp_consultant_u_id'   => $brp->brp_consultant_u_id,
+            'brp_approver_u_id'     => $brp->brp_approver_u_id,
+            'brp_performed_u_id'    => $brp->brp_performed_u_id,
+            'brp_accepter_u_id'     => $brp->brp_accepter_u_id,
+            'brp_parent_brp_id'     => $brp->brp_parent_brp_id,
+            'brp_version_index'     => DbCrypt::encryptValue($brp->brp_version_index),
+            'brp_initials'          => DbCrypt::encryptValue($brp->brp_initials),
+            'brp_initials_approver' => DbCrypt::encryptValue($brp->brp_initials_approver),
+            'brp_remediation_date'  => DbCrypt::encryptValue($brp->brp_remediation_date),
+            'brp_incident_date'     => DbCrypt::encryptValue($brp->brp_incident_date),
+            'brp_status'            => DbCrypt::encryptValue($brp->brp_status),
+            'brp_is_version'        => $brp->brp_is_version,
         );
 
         if (!$data['brp_status']) {
-            $data['brp_status'] = \Breachlog\Model\Breachremediationplan::STATUS_NEW;
+            $data['brp_status'] = DbCrypt::encryptValue(\Breachlog\Model\Breachremediationplan::STATUS_NEW);
+            $newBrp = true;
         }
 
         $id = (int) $brp->brp_id;
 
-        $authService = new \Zend\Authentication\AuthenticationService();
-        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
-        $identity = $authService->getIdentity();
+        $identity = $this->_getIdentity();
 
         if (!$id) {
             $data['brp_consultant_u_id'] = $brp->brp_consultant_u_id;
@@ -248,13 +401,14 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
             }
 
             $data['brp_create_u_id'] = $identity['u_id'];
+            $data['brp_create_date'] = DbCrypt::encryptValue(date('Y-m-d H:i:s'));
         }
 
         if ($id == 0) {
             $this->tableGateway->insert($data);
             $id = $this->tableGateway->lastInsertValue;
 
-            if ($data['brp_status'] == \Breachlog\Model\Breachremediationplan::STATUS_NEW) {
+            if ($newBrp) {
                 $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_EDIT, \Application\Model\LogsTable::ITEM_TYPE_BRP, $id);
             }
 
@@ -265,8 +419,7 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
             if ($this->getBreachremediationplan($id)) {
 
                 $this->tableGateway->update($data, array('brp_id' => $id));
-                throw new \Exception('Form id does not exist');            } else {
-
+                throw new \Exception('Form id does not exist');
             }
         }
         if ((int) $data['brp_parent_brp_id']) {
@@ -281,7 +434,15 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         $versionIndex  = (int) $versionIndex;
 
         $select = $this->tableGateway->getSql()->select();
-        $select->where('brp_version_index = ' . $versionIndex);
+
+        $select->columns(array('brp_id'            => 'brp_id',
+                               'brp_version_index' => DbCrypt::decryptField('brp_version_index'),
+                               'brp_parent_brp_id' => 'brp_parent_brp_id',
+                               'brp_active'        => 'brp_active'
+                              )
+                            );
+
+        $select->where(DbCrypt::decryptField('brp_version_index', false) . ' = ' . $versionIndex);
         $select->where('brp_active = 1');
         $select->where('brp_parent_brp_id IS NOT NULL');
 
@@ -291,12 +452,8 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
 
         $indexItem = 1;
         foreach ($resultSet as $rs) {
-            $data = array(
-                'brp_id' => $rs->brp_id,
-                'brp_version_index_item' => $indexItem,
-            );
 
-            $this->tableGateway->update(array('brp_version_index_item' => $indexItem), array('brp_id' => $rs->brp_id));
+            $this->tableGateway->update(array('brp_version_index_item' => DbCrypt::encryptValue($indexItem)), array('brp_id' => $rs->brp_id));
             $indexItem++;
 
         }
@@ -306,7 +463,7 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
     {
         $data = array(
             'brp_id' => $id,
-            'brp_status' => $status,
+            'brp_status' => DbCrypt::encryptValue($status),
         );
 
         if ($brp = $this->getBreachremediationplan($id)) {
@@ -323,25 +480,19 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         return $id;
     }
 
-    public function setFieldValue($id, $field, $value)
+    public function setFieldValue($id, $field, $value, $encrypt = false)
     {
         $data = array(
             'brp_id' => $id,
-            $field => $value,
+             $field => $encrypt ? DbCrypt::encryptValue($value) : $value,
         );
 
-        if ($this->getBreachremediationplan($id)) {
-            $this->tableGateway->update($data, array('brp_id' => $id));
-        }
-
-        return $id;
+        return $this->tableGateway->update($data, array('brp_id' => $id));
     }
 
     public function setRegulations($id, $cur_regulations, $regulations = array())
     {
-        $authService = new \Zend\Authentication\AuthenticationService();
-        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
-        $identity = $authService->getIdentity();
+        $identity = $this->_getIdentity();
 
         $breachRemediationPlanRegulationTable = $this->getServiceLocator()->get('Breachlog\Model\BreachRemediationPlanRegulationTable');
 
@@ -371,8 +522,9 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
     {
         $brp = $this->getBreachremediationplan($id);
 
-        $data['brp_id'] = $id;
+        $data['brp_id']     = $id;
         $data['brp_active'] = 0;
+
         $this->tableGateway->update($data, array('brp_id' => $id));
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_DELETE, \Application\Model\LogsTable::ITEM_TYPE_BRP, $id);
@@ -384,8 +536,9 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
 
     public function unarchiveBreachremediationplan($id)
     {
-        $data['brp_id'] = $id;
+        $data['brp_id']     = $id;
         $data['brp_active'] = 1;
+
         $this->tableGateway->update($data, array('brp_id' => $id));
 
         return true;
@@ -394,6 +547,7 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
     public function deleteBreachremediationplansByCompanyId($cId, $value = 0)
     {
         $data['brp_active'] = $value;
+
         $this->tableGateway->update($data, array('brp_c_id' => $cId));
 
         return true;
@@ -404,9 +558,10 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
     {
         $brp = $this->getBreachremediationplan($id);
 
-        $data['brp_id'] = $id;
-        $data['brp_status'] = 20;
+        $data['brp_id']       = $id;
+        $data['brp_status']   = DbCrypt::encryptValue(20);
         $data['brp_writable'] = 1;
+
         $this->tableGateway->update($data, array('brp_id' => $id));
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_REOPEN, \Application\Model\LogsTable::ITEM_TYPE_BRP, $id);
@@ -421,31 +576,34 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         $brp = $this->getBreachremediationplan($id);
 
         // writable to false
-        $this->tableGateway->update(array('brp_writable' => 0, 'brp_status' =>  \Breachlog\Model\Breachremediationplan::STATUS_CLOSED), array('brp_id' => $id));
+        $this->tableGateway->update(array('brp_writable' => 0, 'brp_status' => DbCrypt::encryptValue(\Breachlog\Model\Breachremediationplan::STATUS_CLOSED)), array('brp_id' => $id));
 
         // create new row
-        $brp->brp_id = 0;
+        $brp->brp_id            = 0;
         $brp->brp_parent_brp_id = $id;
-        $brp->brp_status = \Breachlog\Model\Breachremediationplan::STATUS_NEW;
+        $brp->brp_status        = \Breachlog\Model\Breachremediationplan::STATUS_NEW;
 
         $newId = $this->saveBreachremediationplan($brp);
 
         // copy notes with files
         $noteDb = $this->getServiceLocator()->get('Note\Model\NoteTable');
-        $notes = $noteDb->getNotes($id, \Note\Model\Note::NOTE_BRP);
+        $notes  = $noteDb->getNotes($id, \Note\Model\Note::NOTE_BRP);
+
         foreach ($notes as $note) {
-            $oldNoteId = $note->note_id;
-            $note->note_id = 0;
+            $oldNoteId          = $note->note_id;
+            $note->note_id      = 0;
             $note->note_item_id = $newId;
+
             $noteId = $noteDb->saveNote($note, array(), true);
 
             // copy files to notes
             $noteFilesDb = $this->getServiceLocator()->get('Note\Model\NotesFilesTable');
-            $files = $noteFilesDb->getFilesByNoteId($oldNoteId);
+            $files       = $noteFilesDb->getFilesByNoteId($oldNoteId);
 
             foreach ($files as $file) {
                 $dataFile = array();
-                $dataFile['nf_f_id'] = $file['nf_f_id'];
+
+                $dataFile['nf_f_id']    = $file['nf_f_id'];
                 $dataFile['nf_note_id'] = $noteId;
 
                 $noteFilesDb->saveFile($dataFile);
@@ -453,30 +611,34 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         }
 
         // copy actions
-        $brpaDb = $this->getServiceLocator()->get('Breachlog\Model\BreachremediationplanactionTable');
+        $brpaDb  = $this->getServiceLocator()->get('Breachlog\Model\BreachremediationplanactionTable');
         $actions = $brpaDb->getBreachremediationplanactions($id);
+
         foreach ($actions as $action) {
-            $oldActionId = $action->brpa_id;
-            $action->brpa_id = 0;
+            $oldActionId         = $action->brpa_id;
+            $action->brpa_id     = 0;
             $action->brpa_brp_id = $newId;
+
             $newActionId = $brpaDb->saveBreachremediationplanaction($action);
 
             // copy notes with files to actions
             $noteDb = $this->getServiceLocator()->get('Note\Model\NoteTable');
-            $notes = $noteDb->getNotes($oldActionId, \Note\Model\Note::NOTE_BRPA);
+            $notes  = $noteDb->getNotes($oldActionId, \Note\Model\Note::NOTE_BRPA);
+
             foreach ($notes as $note) {
-                $oldNoteId = $note->note_id;
-                $note->note_id = 0;
+                $oldNoteId          = $note->note_id;
+                $note->note_id      = 0;
                 $note->note_item_id = $newActionId;
+
                 $noteId = $noteDb->saveNote($note, array(), true);
 
                 // copy files to notes
                 $noteFilesDb = $this->getServiceLocator()->get('Note\Model\NotesFilesTable');
-                $files = $noteFilesDb->getFilesByNoteId($oldNoteId);
+                $files       = $noteFilesDb->getFilesByNoteId($oldNoteId);
 
                 foreach ($files as $file) {
-                    $dataFile = array();
-                    $dataFile['nf_f_id'] = $file['nf_f_id'];
+                    $dataFile               = array();
+                    $dataFile['nf_f_id']    = $file['nf_f_id'];
                     $dataFile['nf_note_id'] = $noteId;
 
                     $noteFilesDb->saveFile($dataFile);

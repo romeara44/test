@@ -146,7 +146,7 @@ class RemediationplanactionTable implements ServiceLocatorAwareInterface
         $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('rpa_contact_u_id = u_id'), array(), 'left');
         $select->join(array('u2' => 'users'), new \Zend\Db\Sql\Expression('rpa_approver_u_id = u2.u_id'), array(), 'left');
         
-        if($status !== null) {
+        if($status !== null && $status !== '') {
             $select->where('rpa_status = ' . $status);
         }
 

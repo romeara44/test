@@ -12,6 +12,7 @@ use Zend\Paginator\Adapter\DbSelect;
 use Zend\Paginator\Paginator;
 
 use Zend\Db\Sql\Expression;
+use DataCrypt\DbCrypt;
 
 class DisclosureRequestTable implements ServiceLocatorAwareInterface
 {
@@ -32,14 +33,34 @@ class DisclosureRequestTable implements ServiceLocatorAwareInterface
         return $this->serviceLocator;
     }
 
-    public function getDisclosureRequests($paginated = false, $orderBy = null, $order = null, $identity = null, $searchValue = null, $roleFilter = null)
+    private function _getIdentity()
     {
         $authService = new \Zend\Authentication\AuthenticationService();
         $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
-        $identity = $authService->getIdentity();
+
+        return $authService->getIdentity();
+    }
+
+    public function getDisclosureRequests($paginated = false, $orderBy = null, $order = null, $identity = null, $searchValue = null, $roleFilter = null)
+    {
+        $identity = $this->_getIdentity();
 
         if ($paginated) {
             $select = $this->tableGateway->getSql()->select();
+
+            $select->columns(array('dr_id'                   => 'dr_id',
+                                   'dr_reference_number'     => DbCrypt::decryptField('dr_reference_number'),
+                                   'dr_requested_by'         => DbCrypt::decryptField('dr_requested_by'),
+                                   'dr_date_requested'       => DbCrypt::decryptField('dr_date_requested'),
+                                   'dr_date_range_requested' => DbCrypt::decryptField('dr_date_range_requested'),
+                                   'dr_staff_member'         => DbCrypt::decryptField('dr_staff_member'),
+                                   'dr_completing_request'   => DbCrypt::decryptField('dr_completing_request'),
+                                   'dr_date_provided'        => DbCrypt::decryptField('dr_date_provided'),
+                                   'dr_create_u_id'          => 'dr_create_u_id',
+                                   'dr_active'               => 'dr_active'
+                                  )
+                                );
+
             if ($identity['u_role_id'] != User::ROLE_ADMIN) {
                 $select->where('dr_active = 1');
             }
@@ -62,20 +83,60 @@ class DisclosureRequestTable implements ServiceLocatorAwareInterface
             }
 
             $paginator = new Paginator($paginatorAdapter);
-// print_r($select->getSqlString());exit;
+
             return $paginator;
         }
 
-        $resultSet = $this->tableGateway->select();
+        $select = $this->tableGateway->getSql()->select();
 
-        return $resultSet;
+        $select->columns(array('dr_id'                   => 'dr_id',
+                               'dr_reference_number'     => DbCrypt::decryptField('dr_reference_number'),
+                               'dr_requested_by'         => DbCrypt::decryptField('dr_requested_by'),
+                               'dr_date_requested'       => DbCrypt::decryptField('dr_date_requested'),
+                               'dr_date_range_requested' => DbCrypt::decryptField('dr_date_range_requested'),
+                               'dr_staff_member'         => DbCrypt::decryptField('dr_staff_member'),
+                               'dr_completing_request'   => DbCrypt::decryptField('dr_completing_request'),
+                               'dr_date_provided'        => DbCrypt::decryptField('dr_date_provided'),
+                               'dr_create_u_id'          => 'dr_create_u_id',
+                               'dr_active'               => 'dr_active'
+                              )
+                            );
+
+        if ($identity['u_role_id'] != User::ROLE_ADMIN) {
+            $select->where('dr_active = 1');
+        }
+
+        return $this->tableGateway->selectWith($select);
     }
 
     public function getDisclosureRequest($id)
     {
+        $identity = $this->_getIdentity();
+
         $id  = (int) $id;
-        $rowset = $this->tableGateway->select(array('dr_id' => $id));
-        $row = $rowset->current();
+
+        $select = $this->tableGateway->getSql()->select();
+
+        $select->columns(array('dr_id'                   => 'dr_id',
+                               'dr_reference_number'     => DbCrypt::decryptField('dr_reference_number'),
+                               'dr_requested_by'         => DbCrypt::decryptField('dr_requested_by'),
+                               'dr_date_requested'       => DbCrypt::decryptField('dr_date_requested'),
+                               'dr_date_range_requested' => DbCrypt::decryptField('dr_date_range_requested'),
+                               'dr_staff_member'         => DbCrypt::decryptField('dr_staff_member'),
+                               'dr_completing_request'   => DbCrypt::decryptField('dr_completing_request'),
+                               'dr_date_provided'        => DbCrypt::decryptField('dr_date_provided'),
+                               'dr_create_u_id'          => 'dr_create_u_id',
+                               'dr_active'               => 'dr_active'
+                              )
+                         );
+
+        if ($identity['u_role_id'] != User::ROLE_ADMIN) {
+            $select->where('dr_active = 1');
+        }
+
+        $select->where('dr_id = ' . $id);
+
+        $row = $this->tableGateway->selectWith($select)->current();
 
         if (!$row) {
             return false;
@@ -86,18 +147,16 @@ class DisclosureRequestTable implements ServiceLocatorAwareInterface
 
     public function saveDisclosureRequest(DisclosureRequest $disclosurerequest)
     {
-        $authService = new \Zend\Authentication\AuthenticationService();
-        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
-        $identity = $authService->getIdentity();
+        $identity = $this->_getIdentity();
 
         $data = array(
-            'dr_reference_number'         => $disclosurerequest->dr_reference_number,
-            'dr_requested_by' => $disclosurerequest->dr_requested_by,
-            'dr_date_requested'      => $disclosurerequest->dr_date_requested,
-            'dr_date_range_requested'      => $disclosurerequest->dr_date_range_requested,
-            'dr_staff_member'      => $disclosurerequest->dr_staff_member,
-            'dr_completing_request'      => $disclosurerequest->dr_completing_request,
-            'dr_date_provided'      => $disclosurerequest->dr_date_provided
+            'dr_reference_number'     => DbCrypt::encryptValue($disclosurerequest->dr_reference_number),
+            'dr_requested_by'         => DbCrypt::encryptValue($disclosurerequest->dr_requested_by),
+            'dr_date_requested'       => DbCrypt::encryptValue($disclosurerequest->dr_date_requested),
+            'dr_date_range_requested' => DbCrypt::encryptValue($disclosurerequest->dr_date_range_requested),
+            'dr_staff_member'         => DbCrypt::encryptValue($disclosurerequest->dr_staff_member),
+            'dr_completing_request'   => DbCrypt::encryptValue($disclosurerequest->dr_completing_request),
+            'dr_date_provided'        => DbCrypt::encryptValue($disclosurerequest->dr_date_provided)
         );
 
         $id = (int) $disclosurerequest->dr_id;
@@ -124,10 +183,13 @@ class DisclosureRequestTable implements ServiceLocatorAwareInterface
 
     public function deleteDisclosureRequest($id)
     {
-        $data['dr_id'] = $id;
+        $data['dr_id']     = $id;
         $data['dr_active'] = 0;
+
         $this->tableGateway->update($data, array('dr_id' => $id));
+
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_DELETE, \Application\Model\LogsTable::ITEM_TYPE_DR, $id);
+
         return true;
     }
 
@@ -147,12 +209,11 @@ class DisclosureRequestTable implements ServiceLocatorAwareInterface
 
     public function unarchiveDisclosureRequest($id)
     {
-        $data['dr_id'] = $id;
+        $data['dr_id']     = $id;
         $data['dr_active'] = 1;
+
         $this->tableGateway->update($data, array('dr_id' => $id));
 
         return true;
     }
-
-
 }

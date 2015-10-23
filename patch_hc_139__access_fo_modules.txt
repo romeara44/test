@@ -1,0 +1,15 @@
+ALTER TABLE  `users` ADD  `u_grant_to_breach` TINYINT( 1 ) NULL DEFAULT  '0' AFTER  `u_grant_to_disclosures` ;
+
+INSERT INTO  `hipaacar_app`.`mail_templates` (
+`mt_id` ,
+`mt_name` ,
+`mt_key` ,
+`mt_subject` ,
+`mt_text` ,
+`mt_active` ,
+`mt_create_date`
+)
+VALUES (
+NULL ,  'Forgot Password Request',  'forgot_password_request',  'Forgot Password Request',  'User <User Name> with email <User Email> forgot password.',  '1', 
+CURRENT_TIMESTAMP
+);

@@ -22,6 +22,9 @@ $form->setAttribute('method', 'post');
         <ul id="tabs-nav">
             <li><a href="#tab1">Details</a></li>
             <li><a href="#tab2">Notes</a></li>
+            <?php if($administrationAccess): ?>
+                <li><a href="#tab3">Administration</a></li>
+            <?php endif; ?>
         </ul>
         <div class="cboth"></div>
     <?php endif; ?>
@@ -97,6 +100,13 @@ $form->setAttribute('method', 'post');
                     <?php endif; ?>
                     <input type="checkbox" name="is_training_manager" <?php if(is_object($clientObj) && $clientObj->c_training_manager_u_id && $clientObj->c_training_manager_u_id == $userObj->u_id):?>checked <?php endif; ?> id="trainingManager" class="checkbox" value="1" />
                     <label for="trainingManager" class="checkbox">Training Manager</label>
+                </p>
+                <p style="padding: 2px 0 12px 0; line-height: 14px; border-top: 0;">
+                    <label>&nbsp;</label>
+                    <?php if ((!$uId || $userObj->u_role_id == 5) && $identity['u_role_id'] == 1): ?>
+                        <input type="checkbox" name="u_grant_to_breach" <?php if(is_object($userObj) && $userObj->u_grant_to_breach):?>checked <?php endif; ?> id="grantToBreach" class="checkbox" value="1"/>
+                            <label for="grantToBreach" class="checkbox">Grant To Breach</label>
+                    <?php endif; ?>
                 </p>
             <?php endif; ?>
 
@@ -326,6 +336,21 @@ $form->setAttribute('method', 'post');
                     </div>
                 <?php endforeach; ?>
             <?php endif; ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($administrationAccess): ?>
+        <div id="tab3">
+            <h3>Administration</h3>
+
+            <form action="/client/resetpassword/<?php echo $this->uId ?>" name="" id="" method="POST">
+
+                <p style="border-bottom:0">
+                    <input type="submit"  name="reset" value="Reset Password" class="form-button" />
+                </p>
+
+            </form>
+
         </div>
     <?php endif; ?>
 </div>

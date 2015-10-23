@@ -12,6 +12,7 @@ namespace Note\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Zend\Session\Container;
+use DataCrypt\FileCrypt;
 
 class FilesController extends AbstractActionController
 {
@@ -24,6 +25,8 @@ class FilesController extends AbstractActionController
         $container->activity = time();
         $this->layout()->flashMessagesSuccess = $this->flashMessenger()->getSuccessMessages();
         $this->layout()->flashMessagesErrors = $this->flashMessenger()->getErrorMessages();
+        $identity = $this->getIdentity();
+
         if (!$this->hasIdentity()) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         } else if ($identity['u_first_login'] == 1) {
@@ -35,7 +38,7 @@ class FilesController extends AbstractActionController
 
     public function getFileTable()
     {
-        if (!$this->fileTable) {
+        if (!isset($this->fileTable)) {
             $sm = $this->getServiceLocator();
             $this->fileTable = $sm->get('Application\Model\FilesTable');
         }
@@ -44,7 +47,7 @@ class FilesController extends AbstractActionController
 
     public function getNotefilesTable()
     {
-        if (!$this->noteFilesTable) {
+        if (!isset($this->noteFilesTable)) {
             $sm = $this->getServiceLocator();
             $this->noteFilesTable = $sm->get('Note\Model\NotesFilesTable');
         }
@@ -86,6 +89,7 @@ class FilesController extends AbstractActionController
 
         $filename = '';
         $filetype = '';
+
         if ($type == 'note') {
             $file = $this->getFileTable()->getFile($fId);
 
@@ -109,8 +113,19 @@ class FilesController extends AbstractActionController
             $filetype = $file->f_type;
         }
 
+        $tmpfile = $docRoot . '/data/tmp/' . $filename;
+
+        if($file->f_encrypted) {
+            if(FileCrypt::decrypt($filepath, $tmpfile)) {
+                $filepath = $tmpfile;
+            } else {
+                echo "Sorry, such file doesn't exist";
+                die;
+            }
+        }
 
         if ($fId > 0 && (file_exists($filepath))) {
+            
             header('Content-Description: File Transfer');
             if ($filetype) {
                 header('Content-Type: ' . $filetype);
@@ -123,9 +138,12 @@ class FilesController extends AbstractActionController
             header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
             header('Pragma: public');
             header('Content-Length: ' . filesize($filepath));
-            ob_clean();
-            flush();
+            @ob_clean();
+            @flush();
             readfile($filepath);
+            if($file->f_encrypted) {
+                unlink($filepath);
+            }
             exit;
         } else {
             echo "Sorry, such file doesn't exist";

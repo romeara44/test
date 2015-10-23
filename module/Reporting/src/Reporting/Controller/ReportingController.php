@@ -98,6 +98,15 @@ class ReportingController extends AbstractActionController
         return $this->breachremediationplanactionTable;
     }
 
+    public function getUserTable()
+    {
+        if (!isset($this->userTable)) {
+            $sm = $this->getServiceLocator();
+            $this->userTable = $sm->get('Admin\Model\UserTable');
+        }
+        return $this->userTable;
+    }
+
     public function hasIdentity()
     {
         $authService = new \Zend\Authentication\AuthenticationService();
@@ -109,8 +118,9 @@ class ReportingController extends AbstractActionController
 
     public function auditBreachAction()
     {
-        $page   = 1;
-        $search = $this->params()->fromRoute('search') ? $this->params()->fromRoute('search') : null;
+        $page         = 1;
+        $search       = $this->params()->fromRoute('search') ? $this->params()->fromRoute('search') : null;
+        $breachAccess = false;
 
         if($search) {
             $tLPaginator = $this->getTraininglogTable()->getTraininglogsForReporting($search);
@@ -118,10 +128,16 @@ class ReportingController extends AbstractActionController
             $tLPaginator->setCurrentPageNumber($page);
             $tLPaginator->setItemCountPerPage($this->countPerPage);
 
-            $bRPPaginator = $this->getBreachremediationplanTable()->getBreachRemediationPlansForReporting($search);
+            $breachAccess = $this->getUserTable()->checkModulesAccess('breach');
 
-            $bRPPaginator->setCurrentPageNumber($page);
-            $bRPPaginator->setItemCountPerPage($this->countPerPage);
+            if($breachAccess) {
+                $bRPPaginator = $this->getBreachremediationplanTable()->getBreachRemediationPlansForReporting($search);
+
+                $bRPPaginator->setCurrentPageNumber($page);
+                $bRPPaginator->setItemCountPerPage($this->countPerPage);
+            } else {
+                $bRPPaginator = null;
+            }
 
             $rPAPaginator = $this->getRemediationplanactionTable()->getRemediationPlanActionsForReporting($search);
 
@@ -140,7 +156,8 @@ class ReportingController extends AbstractActionController
             'tLPaginator'  => $tLPaginator,
             'bRPPaginator' => $bRPPaginator,
             'rPAPaginator' => $rPAPaginator,
-            'search'       => $search
+            'search'       => $search,
+            'breachAccess' => $breachAccess
         ));
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open reporting audit breach list page');
@@ -181,6 +198,10 @@ class ReportingController extends AbstractActionController
 
     public function auditBreachBRPAction()
     {
+        if(!$this->getUserTable()->checkModulesAccess('breach')) {
+            return false;
+        }
+
         $request = $this->getRequest();
         
         if($request->isXmlHttpRequest()){
@@ -319,6 +340,9 @@ class ReportingController extends AbstractActionController
         $statuses['remediation'] = Remediationplanaction::$statusesNames;
 
         if($type == 'breach') {
+            if(!$this->getUserTable()->checkModulesAccess('breach')) {
+                return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+            }
             $paginator = $this->getBreachremediationplanactionTable()->getBreachRemediationPlanAnactionsForReportPage($id, $status);
         } else {
             $paginator = $this->getRemediationplanactionTable()->getRemediationPlanActionsForReportPage($id, $status);
