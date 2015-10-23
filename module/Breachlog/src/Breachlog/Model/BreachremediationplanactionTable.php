@@ -73,6 +73,30 @@ class BreachremediationplanactionTable implements ServiceLocatorAwareInterface
         return $resultSet;
     }
 
+    public function encryptItems()
+    {
+        $identity = $this->_getIdentity();
+
+        $select = $this->tableGateway->getSql()->select();
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        foreach ($resultSet as $brpa) {
+            $data = array(
+              'brpa_task'               => DbCrypt::encryptValue($brpa->brpa_task),
+              'brpa_action_plan'        => DbCrypt::encryptValue($brpa->brpa_action_plan),
+              'brpa_status'             => DbCrypt::encryptValue($brpa->brpa_status),
+              'brpa_target_date'        => DbCrypt::encryptValue($brpa->brpa_target_date),
+              'brpa_create_date'        => DbCrypt::encryptValue($brpa->brpa_create_date),
+              'brpa_latest_action_date' => DbCrypt::encryptValue($brpa->brpa_latest_action_date)
+          );
+
+          $this->tableGateway->update($data, array('brpa_id' => $brpa->brpa_id));
+        }
+
+        return true;
+    }
+
     public function getBreachremediationplanaction($id)
     {
         $id  = (int) $id;

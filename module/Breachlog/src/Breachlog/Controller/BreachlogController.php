@@ -393,6 +393,12 @@ class BreachlogController extends AbstractActionController
         return $this->redirect()->toRoute('breachlog', array('controller' => 'breachlog', 'action' => 'list'));
     }
 
+    public function encryptAction()
+    {
+        $this->getBreachlogTable()->encryptItems();
+        return true;
+    }
+
     public function unarchiveAction()
     {
         $id = $this->params('id');

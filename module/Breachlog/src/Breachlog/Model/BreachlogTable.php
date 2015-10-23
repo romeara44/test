@@ -223,6 +223,36 @@ class BreachlogTable implements ServiceLocatorAwareInterface
         return ($row->_client_name);
     }
 
+    public function encryptItems()
+    {
+        $identity = $this->_getIdentity();
+
+        $select = $this->tableGateway->getSql()->select();
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        foreach ($resultSet as $bl) {
+            $data = array(
+              'bl_name'                 => DbCrypt::encryptValue($bl->bl_name),
+              'bl_invest_led_by'        => DbCrypt::encryptValue($bl->bl_invest_led_by),
+              'bl_date_of_occurrence'   => DbCrypt::encryptValue($bl->bl_date_of_occurrence),
+              'bl_date_invest_start'    => DbCrypt::encryptValue($bl->bl_date_invest_start),
+              'bl_date_invest_complete' => DbCrypt::encryptValue($bl->bl_date_invest_complete),
+              'bl_size'                 => DbCrypt::encryptValue($bl->bl_size),
+              'bl_description'          => DbCrypt::encryptValue($bl->bl_description),
+              'bl_initials_approver'    => DbCrypt::encryptValue($bl->bl_initials_approver),
+              'bl_initials'             => DbCrypt::encryptValue($bl->bl_initials),
+              'bl_reportable'           => DbCrypt::encryptValue($bl->bl_reportable),
+              'bl_create_date'          => DbCrypt::encryptValue($bl->bl_create_date),
+              'bl_update_date'          => DbCrypt::encryptValue($bl->bl_update_date),
+          );
+
+          $this->tableGateway->update($data, array('bl_id' => $bl->bl_id));
+        }
+
+        return true;
+    }
+
     public function getBreachlog($id)
     {
         $identity = $this->_getIdentity();

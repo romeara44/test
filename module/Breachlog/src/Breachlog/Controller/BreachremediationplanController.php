@@ -740,5 +740,10 @@ class BreachremediationplanController extends AbstractActionController
         return $viewModel;
     }
 
-
+    public function encryptAction()
+    {
+        $this->getBreachremediationplanTable()->encryptItems();
+        $this->getBreachremediationplanactionTable()->encryptItems();
+        return true;
+    }
 }
