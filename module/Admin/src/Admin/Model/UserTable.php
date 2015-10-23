@@ -749,7 +749,8 @@ class UserTable implements ServiceLocatorAwareInterface
     {
         $user = $this->getUser($id);
 
-        $expiration = (new \Zend\Session\Container('application_vars'))->storage['module_access_code_expiration'];;
+        $application_vars = new \Zend\Session\Container('application_vars');
+        $expiration = $application_vars->storage['module_access_code_expiration'];
 
         if((in_array($user->u_role_id, array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT))
             || ($user->u_grant_to_breach || $user->u_grant_to_disclosures))

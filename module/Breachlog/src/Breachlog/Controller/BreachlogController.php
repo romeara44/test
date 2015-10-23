@@ -395,7 +395,7 @@ class BreachlogController extends AbstractActionController
 
     public function encryptAction()
     {
-        $this->getBreachlogTable()->encryptItems();
+        //$this->getBreachlogTable()->encryptItems();
         return true;
     }
 
