@@ -304,6 +304,13 @@ class CompanyTable implements ServiceLocatorAwareInterface
         }
         $companyConsultantsTable = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable');
 
+        if ($row->c_rel_type == \Client\Model\Company::RELATION_TYPE_PARENT) {
+            $row->c_parent_type = $row->c_type;
+            $row->_c_child_c_ids = $this->getChildCompaniesIds($id);
+        } elseif ($row->c_rel_type == \Client\Model\Company::RELATION_TYPE_CHILD) {
+            $row->c_child_type = $row->c_type;
+        }        
+
         return $row;
     }
 
@@ -324,6 +331,17 @@ class CompanyTable implements ServiceLocatorAwareInterface
             'c_primary_adr_id' => $company->c_primary_adr_id,
             'c_update_u_id' => $company->c_update_u_id,
         );
+
+        if (in_array($identity['u_role_id'], array(User::ROLE_SALES_REP, User::ROLE_SENIOR_CONSULTANT, User::ROLE_ADMIN))) {
+            $data['c_rel_type'] = $company->c_rel_type;
+            if ($company->c_rel_type == \Client\Model\Company::RELATION_TYPE_PARENT) {
+                $data['c_type'] = $company->c_parent_type;        
+                $data['c_parent_c_id'] = 0;    
+            } elseif ($company->c_rel_type == \Client\Model\Company::RELATION_TYPE_CHILD) {
+                $data['c_type'] = $company->c_child_type;
+                $data['c_parent_c_id'] = $company->c_parent_c_id;
+            }
+        }
 
         $id = (int) $company->c_id;
 
@@ -370,6 +388,21 @@ class CompanyTable implements ServiceLocatorAwareInterface
                 foreach ($company->_c_cur_consultants as $_c_cur_consultant) {
                     if($_c_cur_consultant) {
                         $companyConsultantsTable->saveCompanyConsultants(array('cc_company_id' => $id, 'cc_consultant_id' => $_c_cur_consultant));
+                    }
+                }
+            }
+        }
+
+        if (in_array($identity['u_role_id'], array(User::ROLE_SALES_REP, User::ROLE_SENIOR_CONSULTANT, User::ROLE_ADMIN))) {
+            if($company->_c_child_c_ids) {
+                $company->_c_child_c_ids = array_unique($company->_c_child_c_ids);
+                $data = array(
+                    'c_parent_c_id' => $id,
+                    'c_rel_type' => \Client\Model\Company::RELATION_TYPE_CHILD,
+                );
+                foreach ($company->_c_child_c_ids as $_c_child_c_id) {
+                    if($_c_child_c_id) {
+                        $this->tableGateway->update($data, array('c_id' => $_c_child_c_id));
                     }
                 }
             }
@@ -618,4 +651,63 @@ class CompanyTable implements ServiceLocatorAwareInterface
         return true;
     }
 
+    public function getCompaniesForParent($c_id = 0)
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('c_active = 1');        
+        $select->where('c_rel_type != ' . \Client\Model\Company::RELATION_TYPE_CHILD);
+        if ($c_id) {
+            $select->where('c_id != ' . $c_id);
+        }
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        $result = array();
+
+        foreach ($resultSet as $rs) {
+            $result[$rs->c_id] = $rs->c_name;
+        }
+
+        return $result;
+    }
+
+    public function getCompaniesForChild($c_id = 0)
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('c_active = 1');        
+        $select->where('c_rel_type != ' . \Client\Model\Company::RELATION_TYPE_PARENT);
+        if ($c_id) {
+            $select->where('c_id != ' . $c_id);
+        }
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        $result = array();
+
+        foreach ($resultSet as $rs) {
+            $result[$rs->c_id] = $rs->c_name;
+        }
+
+        return $result;
+    }
+
+    public function getChildCompaniesIds($c_id = 0)
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('c_active = 1');        
+        $select->where('c_rel_type = ' . \Client\Model\Company::RELATION_TYPE_CHILD);
+        if ($c_id) {
+            $select->where('c_parent_c_id = ' . $c_id);
+        }
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        $result = array();
+
+        foreach ($resultSet as $rs) {
+            $result[] = $rs->c_id;
+        }
+
+        return $result;
+    }
 }

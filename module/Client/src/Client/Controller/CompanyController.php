@@ -126,7 +126,7 @@ class CompanyController extends AbstractActionController
             }
         }
 
-        $form = new CompanyForm($this->getServiceLocator());
+        $form = new CompanyForm($this->getServiceLocator(), $id);
         $formNote = new NoteForm($this->getServiceLocator());
         $companyObj = null;
         $contacts = null;
@@ -199,8 +199,9 @@ class CompanyController extends AbstractActionController
             } else {
 
                 $company = new Company();
-                $form->setInputFilter($company->getInputFilter($this->getServiceLocator(), $id));
+                $company->exchangeArray($request->getPost());
                 $form->setData($request->getPost());
+                $form->setInputFilter($company->getInputFilter($this->getServiceLocator(), $id));                
 
                 if ($form->isValid()) {
                     $post = $request->getPost();
@@ -210,8 +211,7 @@ class CompanyController extends AbstractActionController
                     if (!$id) {
                         $post['c_primary_contact_u_id'] = $identity['u_id'];
                     }
-
-                    $company->exchangeArray($request->getPost());
+                    
                     $this->getCompanyTable()->setServiceLocator($this->getServiceLocator());
                     $companyId = $this->getCompanyTable()->saveCompany($company);
                     $this->getCompanyTable()->saveAddresses($companyId, $request->getPost());
