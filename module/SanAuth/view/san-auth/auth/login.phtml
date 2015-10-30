@@ -1,33 +1,28 @@
 <form action="/auth/authenticate" method="post" id="login-form" name="login-form">
-    <?php if (isset($flashMessagesErrors) && count($flashMessagesErrors)) : ?>
-        <div class="flash-container">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-12">
-                        <?php foreach ($flashMessagesErrors as $msg) : ?>
-                            <div class="alert alert-flash alert-dismissable center alert-danger">
-                                <button type="button" class="close" aria-hidden="true">&times;</button>
-                                <strong>
-                                    <?php echo $msg; ?>
-                                </strong>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-            </div>
-        </div>
-    <?php endif; ?>
+    <?php
+        $fn = $form->get('u_email');
+        echo $this->formLabel($fn);
+        echo $this->formInput($fn->setAttributes(array('class'=>'form-control', "required" => "true")));
+    ?>
 
+    <?php
+        $fn = $form->get('u_password');
+        echo $this->formLabel($fn);
+        echo $this->formInput($fn->setAttributes(array('class'=>'form-control', "required" => "true")));
+    ?>
 
-    <label for="email">Email</label>
-    <input type="text" value="" name="u_email" id="email" />
-
-    <label for="password">Password</label>
-    <input type="password" value="" name="u_password" id="password" />
+    <?php
+        $fn = $form->get('captcha');
+        echo $this->formLabel($fn);
+    ?>
+    <div class="login-captcha-wrap">
+        <?php
+        echo $this->formElement($fn->setAttributes(array('class'=>'form-control', "required" => "true")));
+        ?>
+    </div>
 
     <input type="checkbox" value="1" name="u_remember_me" id="remember" class="checkbox" />
     <label for="remember" class="checkbox">Remember me on this computer</label>
-
     <div class="cboth"></div>
     <a href="/auth/forgotpassword" class="fleft">Forgot your password?</a>
     <input type="submit" value="Login &nbsp; &rarr;" class="button" />

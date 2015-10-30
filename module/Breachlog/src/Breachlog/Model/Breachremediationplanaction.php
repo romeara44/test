@@ -39,6 +39,7 @@ class Breachremediationplanaction
     public $brpa_target_date;
     public $brpa_active;
     public $brpa_create_date;
+    public $brpa_latest_action_date;
 
     public $_contact_name;
     public $_approver_name;
@@ -58,6 +59,7 @@ class Breachremediationplanaction
         $this->brpa_target_date     = (isset($data['brpa_target_date'])) ? $data['brpa_target_date'] : null;
         $this->brpa_active     = (isset($data['brpa_active'])) ? $data['brpa_active'] : null;
         $this->brpa_create_date     = (isset($data['brpa_create_date'])) ? $data['brpa_create_date'] : null;
+        $this->brpa_latest_action_date     = (isset($data['brpa_latest_action_date'])) ? $data['brpa_latest_action_date'] : null;
         $this->_contact_name     = (isset($data['_contact_name'])) ? $data['_contact_name'] : null;
         $this->_approver_name     = (isset($data['_approver_name'])) ? $data['_approver_name'] : null;
         $this->_brpa_target_date_formatted     = (isset($data['_brpa_target_date_formatted'])) ? $data['_brpa_target_date_formatted'] : null;

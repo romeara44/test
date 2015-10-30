@@ -209,7 +209,13 @@ $form->setAttribute('method', 'post');
     jQuery(function() {
         $('#verballog').validate();
 
-        $("#vl_date_of_request, #vl_date_of_birth, #vl_date_requested_from, #vl_date_requested_to, #vl_date_request_received, #vl_date_account_sent, #vl_date_patient_notified").datepicker({dateFormat: 'mm/dd/yy'});
+        $("#vl_date_of_request, #vl_date_of_birth, #vl_date_requested_from, #vl_date_requested_to, #vl_date_request_received, #vl_date_account_sent, #vl_date_patient_notified").datepicker({dateFormat: 'mm/dd/yy', 
+                        beforeShow: function() {
+                                setTimeout(function(){
+                                    $('.ui-datepicker').css('z-index', 9999);
+                                }, 0);
+                            }
+                        });
 
         $('.vl_is_extensions').click(function() {
             checkExtensions();

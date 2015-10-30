@@ -16,5 +16,5 @@ class MyAuthStorage extends Storage\Session
     public function forgetMe()
     {
         $this->session->getManager()->forgetMe();
-    } 
+    }
 }

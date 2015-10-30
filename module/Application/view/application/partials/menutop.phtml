@@ -2,12 +2,12 @@
 <ul>
     <?php foreach ($items as $item): ?>
         <li id="<?php echo isset($item['active']) ? 'current' : '' ?>" class="<?php echo (isset($item['disabled']) ? 'disabled ' : '')?><?php echo (isset($item['items']) ? 'drop-down' : '')?>">
-            <a href="<?php echo isset($item['items']) || (!isset($item['items']) && isset($item['disabled'])) ? 'javascript:;' : $item['url'] ?>"><?php echo $item['title'] ?></a>
+            <a class="<?php echo (isset($item['class']) ? $item['class'] . ' ' : '')?>" href="<?php echo isset($item['items']) || (!isset($item['items']) && isset($item['disabled'])) ? 'javascript:;' : $item['url'] ?>"><?php echo $item['title'] ?></a>
             <?php if(isset($item['items'])) {?>
                 <ul>
                     <?php foreach ($item['items'] as $value) {?>
                         <?php if(($value['url'] != '/company/edit' || ($value['url'] == '/company/edit' && $checkClientLimitCompany))): ?>
-                            <li <?php if(isset($value['disabled'])) {?> class="disabled" disabled="disabled"<?php }?>><a href="<?php echo isset($item['disabled']) ? 'javascript:;' : $value['url'] ?>"><?php echo $value['title'] ?></a></li>
+                            <li <?php if(isset($value['disabled'])) {?> class="disabled" disabled="disabled"<?php }?>><a class="<?php echo (isset($value['class']) ? $value['class'] . ' ' : '')?>" href="<?php echo isset($item['disabled']) ? 'javascript:;' : $value['url'] ?>"><?php echo $value['title'] ?></a></li>
                         <?php endif; ?>
                     <?php } ?>
                 </ul>

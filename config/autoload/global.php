@@ -31,7 +31,10 @@ return array(
         'locale' => 'pl_PL'
     ),
     'application_vars' => array(
-        'register_email' => 'Registration@Carosh.com'
+        'register_email' => 'Registration@Carosh.com',
+        'module_access_code_expiration' => 60 * 20,
+        'secure_db_key_file' => ROOT_PATH . '/../c147572b91c6719b26c5.dbkey',
+        'secure_file_key_file' => ROOT_PATH . '/../ccb3177cdb1f576a6d31.filekey'
     )
 );
 

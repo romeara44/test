@@ -46,7 +46,7 @@ body {
 #canvas {
 	width: 350px;
 	min-width: 0;
-	height: 450px;
+	height: 560px;
 	margin: 150px auto 0 auto;
 	margin: 80px auto 0 auto;
 	padding: 0;
@@ -65,7 +65,7 @@ body {
 #logo {
 	display: block;
 	width: 288px;
-	height: 128px;
+	height: 108px;
 	margin: 0 auto;
 	color: #ababab;
 	font-size: 32px;
@@ -79,7 +79,7 @@ body {
 #logo h1 {
 	display: block;
 	width: 288px;
-	padding: 35px 0 0 0;
+	padding: 25px 0 0 0;
 	color: #3b5e7d;
 	font-size: 60px;
 	font-weight: 800;
@@ -206,7 +206,7 @@ small {
 
 #login-form {
 	margin: 0;
-	padding: 25px 28px 0 32px;
+	padding: 20px 28px 0 32px;
 }
 
 #login-form label {
@@ -228,7 +228,7 @@ small {
 	float: none;
 	width: 268px;
 	height: 26px;
-	margin: 6px 0 18px 0;
+	margin: 6px 0 13px 0;
 	padding: 6px 8px;
 	color: #081c2f;
 	font-family: 'proxima-nova', 'Proxima Nova', 'Helvetica Neue', helvetica, arial, tahoma, verdana, sans-serif;
@@ -251,7 +251,7 @@ small {
 #login-form a.fleft {
     display: block;
 	float: left;
-	margin: 24px 0 0 0;
+	margin: 14px 0 0 0;
 	color: #718ca3;
 	font-size: 13px;
 	text-decoration: underline;
@@ -264,10 +264,14 @@ small {
 
 #login-form .button {
 	float: right;
-	margin: 18px 4px 0 0;
+	margin: 8px 4px 0 0;
 	padding: 0 32px;
 }
 
+#login-form .captcha-label {
+   width: 200px;
+   margin-bottom: 5px;
+}
 
 /* Forms */
 

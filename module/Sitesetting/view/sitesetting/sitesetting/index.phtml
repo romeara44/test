@@ -9,8 +9,8 @@
     <form action="/sitesetting" method="post" name="sitesetting" id="sitesetting">
         <?php if (is_object($ssObjs) && ($ssObjs->count())): ?> 
             <?php foreach ($ssObjs as $ssObj): ?>
-                <label for="<?php echo $ssObj->ss_name?>"><?php echo $ssObj->ss_title?></label>
-                <?php if($ssObj->ss_name == \Sitesetting\Model\Sitesetting::NUMBER_USERS_OF_COMPANY): ?>
+                <?php if(false && $ssObj->ss_name == \Sitesetting\Model\Sitesetting::NUMBER_USERS_OF_COMPANY): ?>
+                    <label for="<?php echo $ssObj->ss_name?>"><?php echo $ssObj->ss_title?></label>
                     <input type="hidden" name="<?php echo $ssObj->ss_name?>[ss_id]" value="<?php echo $ssObj->ss_id?>">
                     <select name="<?php echo $ssObj->ss_name?>[ss_value]" id="<?php echo $ssObj->ss_name?>">
                         <?php for($i = 3; $i < 12; $i += 3): ?>
@@ -18,6 +18,11 @@
                         <?php endfor; ?>
                         <option value="0" <?php if(!$ssObj->ss_value):?>selected <?php endif;?>>unlimited</option>
                     </select>
+                <?php endif; ?>
+                <?php if($ssObj->ss_name == \Sitesetting\Model\Sitesetting::FAILED_USER_LOGINS_LIMIT): ?>
+                    <label for="<?php echo $ssObj->ss_name?>"><?php echo $ssObj->ss_title?></label>
+                    <input type="hidden" name="<?php echo $ssObj->ss_name?>[ss_id]" value="<?php echo $ssObj->ss_id?>">
+                    <input type="text" name="<?php echo $ssObj->ss_name?>[ss_value]" value="<?php echo $ssObj->ss_value?>" id="<?php echo $ssObj->ss_name?>">
                 <?php endif; ?>
             <?php endforeach; ?>
         <?php endif; ?>

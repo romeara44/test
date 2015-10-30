@@ -33,6 +33,9 @@ class DisclosureRequestController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
         $identity = $this->getIdentity();
+        if (!$this->getUserTable()->checkModulesAccess('disclosures')) {
+            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+        }
         if (!in_array($identity['u_role_id'], array(1, 2, 3, 4, 5, 7))) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         } else if ($identity['u_first_login'] == 1) {

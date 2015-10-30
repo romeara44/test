@@ -39,6 +39,9 @@ class BreachremediationplanController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
         $identity = $this->getIdentity();
+        if (!$this->getUserTable()->checkModulesAccess('breach')) {
+            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+        }
         if (!in_array($identity['u_role_id'], array(1, 2, 3, 5))) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         } else if ($identity['u_first_login'] == 1) {
@@ -93,6 +96,15 @@ class BreachremediationplanController extends AbstractActionController
         return $this->regulationTable;
     }
 
+    public function getUserTable()
+    {
+        if (!isset($this->userTable)) {
+            $sm = $this->getServiceLocator();
+            $this->userTable = $sm->get('Admin\Model\UserTable');
+        }
+        return $this->userTable;
+    }
+    
     public function getIdentity()
     {
         $authService = new \Zend\Authentication\AuthenticationService();
@@ -178,8 +190,8 @@ class BreachremediationplanController extends AbstractActionController
                 $id = $this->getBreachremediationplanTable()->clonePlan($id);
 
 
-                $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_initials', $post['brp_initials']);
-                $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_initials_approver', $post['brp_initials_approver']);
+                $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_initials', $post['brp_initials'], true);
+                $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_initials_approver', $post['brp_initials_approver'], true);
 
                 $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_performed_u_id', $post['brp_performed_u_id']);
                 $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_approver_u_id', $post['brp_approver_u_id']);
@@ -196,7 +208,7 @@ class BreachremediationplanController extends AbstractActionController
                     } else {
                         $ymd1 = '';
                     }
-                    $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_incident_date', $ymd1);
+                    $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_incident_date', $ymd1, true);
 
                     $ymd2 = \DateTime::createFromFormat('m/d/Y', $post['brp_remediation_date']);
                     if (is_object($ymd2)) {
@@ -207,7 +219,7 @@ class BreachremediationplanController extends AbstractActionController
                     } else {
                         $ymd2 = '';
                     }
-                    $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_remediation_date', $ymd2);
+                    $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_remediation_date', $ymd2, true);
                 }
 
                 if ($post['signedoff'] == 1) {
@@ -224,7 +236,7 @@ class BreachremediationplanController extends AbstractActionController
                     $post['note_item_id'] = $id;
                     $note->exchangeArray($post);
                     $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-                    $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
+                    $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles(), false, 'notesFiles', true);
 
                     $this->flashMessenger()->addSuccessMessage('Plan saved');
                 }
@@ -340,7 +352,7 @@ class BreachremediationplanController extends AbstractActionController
             $noteData['note_item_id'] = $id;
             $note->exchangeArray($noteData);
             $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-            $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
+            $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles(), false, 'notesFiles', true);
         }
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Save files for breachlog action "' . $id . '" for breachlog "' . $brpId . '"');
@@ -457,8 +469,8 @@ class BreachremediationplanController extends AbstractActionController
         header('Expires: 0');
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
         header('Pragma: public');
-        ob_clean();
-        flush();
+        @ob_clean();
+        @flush();
         echo ($csvContent);
         exit;
 
@@ -564,7 +576,7 @@ class BreachremediationplanController extends AbstractActionController
                 $noteData['note_item_id'] = $brpaId;
                 $note->exchangeArray($noteData);
                 $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-                $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
+                $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles(), false, 'notesFiles', true);
 
                 /////////////////
                 $added = true;
@@ -728,5 +740,10 @@ class BreachremediationplanController extends AbstractActionController
         return $viewModel;
     }
 
-
+    public function encryptAction()
+    {
+        // $this->getBreachremediationplanTable()->encryptItems();
+        // $this->getBreachremediationplanactionTable()->encryptItems();
+        return true;
+    }
 }

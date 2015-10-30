@@ -33,6 +33,7 @@ class Note
     public $note_subitem_id;
     public $note_active;
     public $note_create_date;
+    public $note_encrypted;
     public $_note_create_date_format;
     public $_username;
     public $_files;
@@ -49,6 +50,7 @@ class Note
         $this->note_subitem_id     = (isset($data['note_subitem_id'])) ? $data['note_subitem_id'] : null;
         $this->note_active     = (isset($data['note_active'])) ? $data['note_active'] : null;
         $this->note_create_date     = (isset($data['note_create_date'])) ? $data['note_create_date'] : null;
+        $this->note_encrypted     = (isset($data['note_encrypted'])) ? $data['note_encrypted'] : null;
         $this->_username     = (isset($data['_username'])) ? $data['_username'] : null;
         $this->_files     = (isset($data['_files'])) ? $data['_files'] : null;
         $this->_note_create_date_format    = (isset($data['_note_create_date_format'])) ? $data['_note_create_date_format'] : null;
