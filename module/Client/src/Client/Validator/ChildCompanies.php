@@ -28,8 +28,8 @@ class ChildCompanies extends AbstractValidator {
             return true;
         }
 		$this->setValue($values);
-		//$company = $this->sl->get('Client\Model\CompanyTable')->getCompany($values);
-		if (in_array($this->model->c_id, $values) || $company->c_rel_type == \Client\Model\Company::RELATION_TYPE_CHILD) {
+		$parent_companies_ids = $this->sl->get('Client\Model\CompanyTable')->getParentCompaniesIds();
+		if (in_array($this->model->c_id, $values) || array_intersect($values, $parent_companies_ids)) {
 			$this->error(0);
         	return false;
 		}

@@ -394,16 +394,34 @@ class CompanyTable implements ServiceLocatorAwareInterface
         }
 
         if (in_array($identity['u_role_id'], array(User::ROLE_SALES_REP, User::ROLE_SENIOR_CONSULTANT, User::ROLE_ADMIN))) {
-            if($company->_c_child_c_ids) {
-                $company->_c_child_c_ids = array_unique($company->_c_child_c_ids);
-                $data = array(
-                    'c_parent_c_id' => $id,
-                    'c_rel_type' => \Client\Model\Company::RELATION_TYPE_CHILD,
-                );
-                foreach ($company->_c_child_c_ids as $_c_child_c_id) {
-                    if($_c_child_c_id) {
-                        $this->tableGateway->update($data, array('c_id' => $_c_child_c_id));
+            $data = array(
+                'c_parent_c_id' => 0,
+                'c_rel_type' => 0,
+            );
+            $data_where = array(
+                'c_parent_c_id' => $id,
+                'c_rel_type' => \Client\Model\Company::RELATION_TYPE_CHILD,
+            );
+            $this->tableGateway->update($data, $data_where);
+
+            if ($company->c_rel_type == \Client\Model\Company::RELATION_TYPE_PARENT) {
+                if($company->_c_child_c_ids) {
+                    $company->_c_child_c_ids = array_unique($company->_c_child_c_ids);
+                    $data = array(
+                        'c_parent_c_id' => $id,
+                        'c_rel_type' => \Client\Model\Company::RELATION_TYPE_CHILD,
+                    );
+                    foreach ($company->_c_child_c_ids as $_c_child_c_id) {
+                        if($_c_child_c_id) {
+                            $this->tableGateway->update($data, array('c_id' => $_c_child_c_id));
+                        }
                     }
+                }
+            } elseif ($company->c_rel_type == \Client\Model\Company::RELATION_TYPE_CHILD) {
+                if ($company->c_parent_c_id) {
+                    $data['c_rel_type'] = \Client\Model\Company::RELATION_TYPE_PARENT;
+                    $data['c_parent_c_id'] = 0;
+                    $this->tableGateway->update($data, array('c_id' => $company->c_parent_c_id));
                 }
             }
         }
@@ -651,14 +669,11 @@ class CompanyTable implements ServiceLocatorAwareInterface
         return true;
     }
 
-    public function getCompaniesForParent($c_id = 0)
+    public function getCompaniesForParent()
     {
         $select = $this->tableGateway->getSql()->select();
         $select->where('c_active = 1');        
         $select->where('c_rel_type != ' . \Client\Model\Company::RELATION_TYPE_CHILD);
-        if ($c_id) {
-            $select->where('c_id != ' . $c_id);
-        }
 
         $resultSet = $this->tableGateway->selectWith($select);
 
@@ -671,14 +686,11 @@ class CompanyTable implements ServiceLocatorAwareInterface
         return $result;
     }
 
-    public function getCompaniesForChild($c_id = 0)
+    public function getCompaniesForChild()
     {
         $select = $this->tableGateway->getSql()->select();
         $select->where('c_active = 1');        
         $select->where('c_rel_type != ' . \Client\Model\Company::RELATION_TYPE_PARENT);
-        if ($c_id) {
-            $select->where('c_id != ' . $c_id);
-        }
 
         $resultSet = $this->tableGateway->selectWith($select);
 
@@ -699,6 +711,23 @@ class CompanyTable implements ServiceLocatorAwareInterface
         if ($c_id) {
             $select->where('c_parent_c_id = ' . $c_id);
         }
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        $result = array();
+
+        foreach ($resultSet as $rs) {
+            $result[] = $rs->c_id;
+        }
+
+        return $result;
+    }
+
+    public function getParentCompaniesIds()
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('c_active = 1');        
+        $select->where('c_rel_type = ' . \Client\Model\Company::RELATION_TYPE_PARENT);
 
         $resultSet = $this->tableGateway->selectWith($select);
 

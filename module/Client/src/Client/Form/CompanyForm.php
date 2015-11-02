@@ -19,10 +19,12 @@ class CompanyForm extends Form
 
         $companyTable = $sl->get('Client\Model\CompanyTable');
         $parent_companies[0] = 'Please select';
-        foreach ($companyTable->getCompaniesForParent($c_id) as $key => $c) {
+        foreach ($companyTable->getCompaniesForParent() as $key => $c) {
             $parent_companies[$key] = $c;
         }
-
+        if ($c_id) {
+            unset($parent_companies[$c_id]);
+        }
         $this->add(array(
             'name' => 'c_parent_c_id',
             'type' => 'Zend\Form\Element\Select',
@@ -34,10 +36,12 @@ class CompanyForm extends Form
 
         $companyTable = $sl->get('Client\Model\CompanyTable');
         $child_companies[0] = 'Please select';
-        foreach ($companyTable->getCompaniesForChild($c_id) as $key => $c) {
+        foreach ($companyTable->getCompaniesForChild() as $key => $c) {
             $child_companies[$key] = $c;
         }
-
+        if ($c_id) {
+            unset($child_companies[$c_id]);
+        }
         $this->add(array(
             'name' => '_c_child_c_ids',
             'type' => 'Zend\Form\Element\Select',
