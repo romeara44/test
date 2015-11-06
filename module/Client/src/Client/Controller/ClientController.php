@@ -207,7 +207,11 @@ class ClientController extends AbstractActionController
                         if(!$post['u_role_id']) {
                             $post['u_role_id'] = $identity['u_role_id'] == \Admin\Model\User::ROLE_PARTIAL ? \Admin\Model\User::ROLE_PARTIAL : \Admin\Model\User::ROLE_CLIENT;
                         }
-                        $post['u_senior_consultant_u_id'] = $identity['u_id'];
+
+                        if(!$uId) {
+                            $post['u_senior_consultant_u_id'] = $identity['u_id'];
+                        }
+
                         $user->exchangeArray($post);
                         $user->u_sent_password = 0;
                         $uId = $this->getUserTable()->saveUser($user);
