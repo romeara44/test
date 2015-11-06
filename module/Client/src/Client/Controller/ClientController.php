@@ -17,6 +17,7 @@ use Note\Form\NoteForm;
 use Admin\Model\User;
 use Note\Model\Note;
 use Zend\Session\Container;
+use Zend\View\Model\JsonModel;
 
 class ClientController extends AbstractActionController
 {
@@ -206,7 +207,11 @@ class ClientController extends AbstractActionController
                         if(!$post['u_role_id']) {
                             $post['u_role_id'] = $identity['u_role_id'] == \Admin\Model\User::ROLE_PARTIAL ? \Admin\Model\User::ROLE_PARTIAL : \Admin\Model\User::ROLE_CLIENT;
                         }
-                        $post['u_senior_consultant_u_id'] = $identity['u_id'];
+
+                        if(!$uId) {
+                            $post['u_senior_consultant_u_id'] = $identity['u_id'];
+                        }
+
                         $user->exchangeArray($post);
                         $user->u_sent_password = 0;
                         $uId = $this->getUserTable()->saveUser($user);
@@ -295,7 +300,8 @@ class ClientController extends AbstractActionController
             'cId' => (int) $this->params('company'),
             'clientLimitMsg' => $clientLimitMsg,
             'setTrainingManagerMsg' => $setTrainingManagerMsg,
-            'checkClientLimitCompany' => $this->getCompanyTable()->checkClientLimitCompany()
+            'checkClientLimitCompany' => $this->getCompanyTable()->checkClientLimitCompany(),
+            'administrationAccess' => $this->getUserTable()->checkClientAdministrationAccess($userObj)
         );
     }
 
@@ -316,6 +322,35 @@ class ClientController extends AbstractActionController
         return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
     }
 
+    public function resetpasswordAction()
+    {
+        $id = (int) $this->params('id');
+
+        if ($id) {
+            if($this->getUserTable()->resetPassword($id)) {
+                $this->flashMessenger()->addSuccessMessage('Password reset succesfuly.');
+            } else {
+                $this->flashMessenger()->addErrorMessage('Password reset failure.');
+            }
+        }
+
+        return $this->redirect()->toRoute('client', array('controller' => 'client', 'action' => 'edit', 'id' => $id));
+    }
+
+    public function lockClientAction()
+    {
+        $result = false;
+
+        $id   = $this->params('id');
+        $lock = $this->params('lock');
+
+        if($id && $lock !== null) {
+            $result = (bool)$this->getUserTable()->lockUser($id, $lock);
+        }
+
+        return new JsonModel(array($result));
+    }
+
     public function deleteAction()
     {
         $id = $this->params('id');
@@ -326,7 +361,7 @@ class ClientController extends AbstractActionController
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_DELETE, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $id);
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete client "' . $id . '"');
-        
+
         return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
     }
 

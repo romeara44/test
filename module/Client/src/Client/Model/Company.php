@@ -33,6 +33,8 @@ class Company
     public $u_lastname;
     public $u_office_phone;
     public $_c_active;
+    public $_c_consultant_id;
+    public $_c_cur_consultants;
 
     protected $inputFilter;
 
@@ -58,6 +60,8 @@ class Company
         $this->c_users_limit     = (isset($data['c_users_limit'])) ? $data['c_users_limit'] : 0;
         $this->c_update_u_id     = (isset($data['c_update_u_id'])) ? $data['c_update_u_id'] : null;
         $this->_c_active     = (isset($data['_c_active'])) ? $data['_c_active'] : null;
+        $this->_c_consultant_id     = (isset($data['_c_consultant_id'])) ? $data['_c_consultant_id'] : null;
+        $this->_c_cur_consultants     = (isset($data['_c_cur_consultants'])) ? $data['_c_cur_consultants'] : null;
     }
 
     public function getArrayCopy()
@@ -119,7 +123,7 @@ class Company
             )));
 
             $inputFilter->add($factory->createInput(array(
-                'name'     => 'c_consultant_u_id',
+                'name'     => '_c_cur_consultants',
                 'required' => false,
             )));
 

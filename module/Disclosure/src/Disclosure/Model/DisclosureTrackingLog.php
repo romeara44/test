@@ -22,6 +22,7 @@ class DisclosureTrackingLog
     public $dtl_disclosed_by;
     public $dtl_extension_notification;
     public $dtl_copy_of_request;
+    public $dtl_create_u_id;
     public $dtl_active;
 
     protected $inputFilter;
@@ -42,6 +43,7 @@ class DisclosureTrackingLog
         $this->dtl_disclosed_by              = (isset($data['dtl_disclosed_by']))              ? $data['dtl_disclosed_by']              : null;
         $this->dtl_extension_notification    = (isset($data['dtl_extension_notification']))    ? $data['dtl_extension_notification']    : null;
         $this->dtl_copy_of_request           = (isset($data['dtl_copy_of_request']))           ? $data['dtl_copy_of_request']           : null;
+        $this->dtl_create_u_id               = (isset($data['dtl_create_u_id']))               ? $data['dtl_create_u_id']               : null;
         $this->dtl_active                    = (isset($data['dtl_active']))                    ? $data['dtl_active']                    : null;
     }
 

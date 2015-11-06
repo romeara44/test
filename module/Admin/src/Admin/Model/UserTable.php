@@ -91,7 +91,7 @@ class UserTable implements ServiceLocatorAwareInterface
         $select->where('u_active = 1');
         $select->where('(u_firstname LIKE "%' . $searchValue . '%" OR u_lastname LIKE "%' . $searchValue . '%")');
 
-        $select->columns(array('_id' => 'u_id', '_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("user")')));
+        $select->columns(array('_id' => 'u_id', '_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("user")'), new \Zend\Db\Sql\Expression('NULL')));
 
         $select->where('u_role_id <> 1'); // without admin
 
@@ -104,7 +104,7 @@ class UserTable implements ServiceLocatorAwareInterface
         $select->where('u_active = 1');
         $select->where('(u_firstname LIKE "%' . $searchValue . '%" OR u_lastname LIKE "%' . $searchValue . '%")');
 
-        $select->columns(array('_id' => 'u_id', '_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("contact")')));
+        $select->columns(array('_id' => 'u_id', '_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("contact")'), new \Zend\Db\Sql\Expression('NULL')));
 
         $select->where('u_role_id = 5'); // without admin
 
@@ -224,6 +224,7 @@ class UserTable implements ServiceLocatorAwareInterface
 
         if($identity['u_role_id'] == User::ROLE_ADMIN) {
             $data['u_grant_to_disclosures'] = $user->u_grant_to_disclosures ? $user->u_grant_to_disclosures : 0;
+            $data['u_grant_to_breach'] = $user->u_grant_to_breach ? $user->u_grant_to_breach : 0;
         }
 
         if (!(int) $user->u_state_id) {
@@ -313,18 +314,46 @@ class UserTable implements ServiceLocatorAwareInterface
         return $id;
     }
 
-    public function sendPasswordReminder($email)
+    public function sendPasswordForgotRequest($email)
     {
         if (!$this->checkIfUserExists($email)) {
             return false;
         }
 
-        $user = $this->getUserByEmail($email);
+        $adminId = null;
+        $user    = $this->getUserByEmail($email);
 
-        $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'forgotpassword', 'uId' => $user->u_id, 'link' => '<a style="color: #15c" href="http://' . $_SERVER['HTTP_HOST']  . '/auth/newpassword/' . $user->u_id . '/' . $user->u_hash . '">link</a>'));
+        if($user->u_company_id) {
+            $select = $this->tableGateway->getSql()->select();
+            $select->where('u_company_id_admin = ' . $user->u_company_id);
+            $select->where('u_active = 1');
 
-        return true;
+            $resultSet = $this->tableGateway->selectWith($select);
+            $row       = $resultSet->current();
+            if ($row) {
+                $adminId = $row->u_id;
+            }
+        }
 
+        if(!$adminId) {
+            $select = $this->tableGateway->getSql()->select();
+            $select->where('u_role_id = ' . User::ROLE_ADMIN);
+            $select->where('u_active = 1');
+
+            $resultSet = $this->tableGateway->selectWith($select);
+            $row       = $resultSet->current();
+            if ($row) {
+                $adminId = $row->u_id;
+            }
+        }
+
+        if($adminId) {
+            $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'forgot_password_request', 'uId' => $adminId, 'forgot_password_user' => $user));
+            $this->tableGateway->update(array('u_forgot_password' => 1), array('u_id' => $user->u_id));
+            return true;
+        }
+
+        return false;
     }
 
     public function setConfirmed($uId, $hash)
@@ -442,6 +471,7 @@ class UserTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
         $select->where('u_role_id IN (' . implode(',', $roles) . ')');
         $select->where('u_active = 1');
+        $select->order('u_role_id');
 
         $resultSet = $this->tableGateway->selectWith($select);
 
@@ -579,4 +609,231 @@ class UserTable implements ServiceLocatorAwareInterface
 
         return true;
     }
+
+    public function resetPassword($id)
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('u_id = ' . $id);
+
+        $user = $this->tableGateway->selectWith($select)->current();
+
+        if($user && $this->checkClientAdministrationAccess($user)) {
+            $password = sha1($user->u_email . time());
+            $password = substr($password, 0, 6);
+
+            $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'reset_password', 'uId' => $user->u_id, 'password' => $password));
+            $this->setNewPassword($user->u_id, $password);
+            $this->tableGateway->update(array('u_forgot_password' => 0), array('u_id' => $user->u_id));
+            
+            return true;
+        }
+
+        return false;
+    }
+
+    public function checkClientAdministrationAccess($user = null)
+    {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
+        return isset($user->u_id) &&
+              ( $identity['u_role_id'] == User::ROLE_ADMIN ||
+                ($identity['u_company_id_admin'] && $user->u_company_id == $identity['u_company_id_admin']) ||
+                ($user->u_senior_consultant_u_id && $user->u_senior_consultant_u_id == $identity['u_id'])
+              );
+    }
+
+    public function checkCompanyAdministrationAccess($company = null)
+    {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
+        return isset($company->c_id) &&
+              ( $identity['u_role_id'] == User::ROLE_ADMIN ||
+                ($identity['u_company_id_admin'] && $company->c_id == $identity['u_company_id_admin']) ||
+                ($company->c_consultant_u_id && $company->c_consultant_u_id == $identity['u_id'])
+              );
+    }
+
+    public function updateFailedLoginCount($user, $reset = false)
+    {
+        if($user->u_role_id != User::ROLE_ADMIN) {
+            $locked = 0;
+
+            if($reset) {
+                $data['u_locked'] = 0;
+                $data['u_failed_logins_count'] = $locked;
+                $data['u_locked_unlocked_date'] = date('Y-m-d H:i:s');
+            } else {
+                $data['u_failed_logins_count'] = ++$user->u_failed_logins_count;
+                $locked = (int) $user->u_failed_logins_count > $this->getServiceLocator()->get('Sitesetting\Model\SitesettingTable')->getValueByName(\Sitesetting\Model\Sitesetting::FAILED_USER_LOGINS_LIMIT);
+                if($locked) {
+                    $select = $this->tableGateway->getSql()->select();
+                    $whereStr = '(u_role_id = ' . User::ROLE_ADMIN;
+                    if($user->u_company_id) {
+                        $whereStr .= ' OR u_company_id_admin = ' . $user->u_company_id;
+                    }
+                    if($user->u_senior_consultant_u_id) {
+                        $whereStr .= ' OR u_id = ' . $user->u_senior_consultant_u_id;
+                    }
+                    $select->where($whereStr . ')');
+                    $select->where('u_active = 1');
+
+                    $resultSet = $this->tableGateway->selectWith($select);
+
+                    foreach ($resultSet as $rs) {
+                        $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'user_locked', 'uId' => $rs->u_id, 'locked_user' => $user));
+                    }
+
+                    $data['u_locked'] = $locked;
+                    $data['u_locked_unlocked_date'] = date('Y-m-d H:i:s');
+                }
+            }
+
+            $this->tableGateway->update($data, array('u_id' => $user->u_id));
+        }
+
+        return true;
+    }
+
+    public function getLockedCompanyUsers($companyId)
+    {
+        $select = new Select('users');
+        $resultSetPrototype = new ResultSet();
+        $resultSetPrototype->setArrayObjectPrototype(new User());
+        $paginatorAdapter = new DbSelect(
+            $select,
+            $this->tableGateway->getAdapter(),
+            $resultSetPrototype
+        );
+
+        $select->columns(array('u_id',
+                               'u_locked_unlocked_date',
+                               'u_locked',
+                               '_username' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)')
+                               )
+                        );
+
+        $select->where('u_company_id = ' . $companyId);
+        $select->where('u_active = 1');
+        $select->where('u_locked = 1');
+
+        $select->order('u_locked_unlocked_date DESC');
+
+        $paginator = new Paginator($paginatorAdapter);
+
+        return $paginator;
+    }
+
+    public function lockUser($id, $lock)
+    {
+        $user = $this->getUser($id);
+
+        if($this->checkClientAdministrationAccess($user)) {
+
+            $data['u_locked']               = $lock;
+            $data['u_failed_logins_count']  = 0;
+            $data['u_locked_unlocked_date'] = date('Y-m-d H:i:s');
+
+            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog(($lock ? 'Lock' : 'Unlock') . ' client "' . $id . '"');
+
+            return $this->tableGateway->update($data, array('u_id' => $id));
+        } else {
+            return false;
+        }
+    }
+
+    public function getModulesAccessCode($id)
+    {
+        $user = $this->getUser($id);
+
+        $application_vars = new \Zend\Session\Container('application_vars');
+        $expiration = $application_vars->storage['module_access_code_expiration'];
+
+        if((in_array($user->u_role_id, array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT))
+            || ($user->u_grant_to_breach || $user->u_grant_to_disclosures))
+            && $user->u_modules_access_code 
+            && $user->u_modules_access_code_created + $expiration > time()) {
+
+            return $user->u_modules_access_code;
+        } else {
+            $data['u_modules_access_code']         = null;
+            $data['u_modules_access_code_created'] = null;
+
+             $this->tableGateway->update($data, array('u_id' => $id));
+
+             return false;
+        }
+    }
+
+    public function sendModulesAccessCode($id)
+    {
+        $user = $this->getUser($id);
+
+        if($user && (in_array($user->u_role_id, array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT)) 
+                    || ($user->u_grant_to_breach || $user->u_grant_to_disclosures))
+            ) {
+            $modulesAccessCode = substr(sha1($user->u_email . time()), 0, 8);
+
+            $data['u_modules_access_code']         = $modulesAccessCode;
+            $data['u_modules_access_code_created'] = time();
+
+            $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey'         => 'send_modules_access_code',
+                                                                                                                        'addto'               => $user->u_email,
+                                                                                                                        'addToName'           => $user->u_firstname . ' ' . $user->u_lastname,
+                                                                                                                        'modules_access_code' => $modulesAccessCode
+                                                                                                                         ));
+
+            return $this->tableGateway->update($data, array('u_id' => $id));
+        } else {
+            return false;
+        }
+    }
+
+    public function getModulesAccess($id, $code)
+    {
+        $existsCode = $this->getModulesAccessCode($id);
+
+        if($existsCode && $existsCode == $code) {
+            $data['u_modules_access_code']         = null;
+            $data['u_modules_access_code_created'] = null;
+
+            $this->tableGateway->update($data, array('u_id' => $id));
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function checkModulesAccess($module)
+    {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
+        switch ($module) {
+            case 'breach':
+                $moduleAccessName = 'u_grant_to_breach';
+                break;
+            case 'disclosures':
+                $moduleAccessName = 'u_grant_to_disclosures';
+                break;
+            default:
+                return false;
+                break;
+        }
+
+        if($identity
+            && (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT))
+                || $identity[$moduleAccessName] == 1)
+            &&  $identity['has_modules_access'] == 1) {
+            return true;
+        }
+
+        return false;
+    }
+
 }

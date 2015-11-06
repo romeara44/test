@@ -40,6 +40,9 @@ class BreachlogController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
         $identity = $this->getIdentity();
+        if (!$this->getUserTable()->checkModulesAccess('breach')) {
+            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+        }
         if (!in_array($identity['u_role_id'], array(1, 2, 3, 5))) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         } else if ($identity['u_first_login'] == 1) {
@@ -301,7 +304,7 @@ class BreachlogController extends AbstractActionController
                     $noteData['note_item_id'] = $blId;
                     $note->exchangeArray($noteData);
                     $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-                    $noteId = $this->getNoteTable()->saveNote($note);
+                    $noteId = $this->getNoteTable()->saveNote($note, null, false, 'notesFiles', true);
                 }
                 
                 // save files
@@ -311,7 +314,7 @@ class BreachlogController extends AbstractActionController
                 $noteData['note_item_id'] = $blId;
                 $note->exchangeArray($noteData);
                 $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-                $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
+                $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles(), false, 'notesFiles', true);
                 
                 if((int)$id) {
                     $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update breachlog "' . $blId . '"');
@@ -388,6 +391,12 @@ class BreachlogController extends AbstractActionController
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete breachlog "' . $id . '"');
 
         return $this->redirect()->toRoute('breachlog', array('controller' => 'breachlog', 'action' => 'list'));
+    }
+
+    public function encryptAction()
+    {
+        //$this->getBreachlogTable()->encryptItems();
+        return true;
     }
 
     public function unarchiveAction()

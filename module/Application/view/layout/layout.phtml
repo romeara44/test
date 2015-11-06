@@ -72,7 +72,7 @@
             <?php if ($uRoleId): ?>
                 <div id="top-links">
                     Welcome, <?php echo $this->userName(); ?><br />
-                    <?php if (false && $uRoleId == \Admin\Model\User::ROLE_ADMIN): ?>
+                    <?php if ($uRoleId == \Admin\Model\User::ROLE_ADMIN): ?>
                         <a href="/sitesetting">Site Settings</a><br />
                     <?php endif ?>
                     <a href="/user/account">My Profile</a><br />
@@ -141,6 +141,24 @@
             </div>
         </div>
 
+        <div class="modules-access-box">
+            <h3>For access to this module you need enter code</h3>
+            <div>
+                <p style="overflow: hidden">
+                    <input type="text" name="code" id="moduleAccessCode" value="" />
+                    <label for="moduleAccessCode" class="error">Wrong or old code</label>
+                    <input type="hidden" name="url" id="moduleAccessUrl" value="" />
+                </p>
+                <div class="form-buttons">
+                    <p class="send-code-msg-ok">Code sent to your email</p>
+                    <a id="moduleAccessSubmit" href="javascript:;" class="form-button">Submit</a>
+                    <a id="moduleAccessSend" href="javascript:;" class="form-button">Send code to email</a>
+                    <a id="moduleAccessCancel" href="javascript:;" class="form-button">Cancel</a>
+                </div>
+            </div>
+        </div>
+
+
         <div class="activity-box">
             <p>You will be log out after <span id="secLeft">60</span> sec. Click <a id="resetActivity" href="javascript:">OK</a> to continue</p>
         </div>
@@ -176,6 +194,42 @@
                     clearInterval(secLeftInterval);
                     setCheckActivity();
                 });
+            });
+            $('a.with-access').click(function(e) {
+                e.preventDefault();
+                $('#moduleAccessUrl').val($(this).attr('href'));
+                $.get("/auth/checkaccessformodules", { }, function(data) {
+                    if(data.result === 1) {
+                        document.location.href = $('#moduleAccessUrl').val();
+                    } else if(data.result === 0) {
+                        $('#moduleAccessCode').removeClass('error').val('');
+                        $('label.error, .send-code-msg-ok').hide();
+                        $('.modules-access-box').show().animate({opacity: 1.0}, 3000);
+                    }
+                    
+                });
+            });
+            $('#moduleAccessSend').click(function(e) {
+                $this = $(this);
+                $.post("/auth/getaccessformodules", { 'action': 'send_code' }, function(data) {
+                    if(data.result === 1) {
+                       $('.send-code-msg-ok').show().animate({opacity: 1.0}, 3000).fadeOut(1000);
+                    }
+                    
+                });
+            });
+            $('#moduleAccessSubmit').click(function(e) {
+                $.post("/auth/getaccessformodules", { 'action': 'get_access', 'code': $('#moduleAccessCode').val() }, function(data) {
+                    if(data.result === 1) {
+                        document.location.href = $('#moduleAccessUrl').val();
+                    } else {
+                        $('#moduleAccessCode').addClass('error');
+                        $('label.error').fadeIn(300);
+                    }
+                });
+            });
+            $('#moduleAccessCancel').click(function(e) {
+                $('.modules-access-box').stop().fadeOut(500);
             });
         });
 

@@ -1,0 +1,32 @@
+<table cellpadding="0" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th style="width:135px">Locked Datetime</th>
+            <th style="width:50px">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->paginator as $pn): ?>
+            <tr>
+                <td>
+                    <a href="<?php echo $this->url('client', array('action' => 'edit', 'id' => $pn->u_id)); ?>" target="_blank"><?php echo $pn->_username ?></a>
+                </td>
+                <td>
+                    <?php echo $pn->u_locked_unlocked_date ?>
+                </td>
+                <td>
+                    <a class="unlockUser" href="<?php echo $this->url('client', array('action' => 'lockclient', 'id' => $pn->u_id, 'lock' => 0)); ?>">Unlock</a>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+<?php echo $this->paginationControl(
+    $this->paginator,
+    'sliding',
+    array('partial/paginator.phtml', 'company'),
+    array('route' => 'company', 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'customParams' => array('id' => $cId), 'search' => null, 'roleFilter' => 1, 'role' => 1, 'controller' => 'company', 'action' => 'lockedusers')
+);
+?>

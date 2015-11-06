@@ -91,7 +91,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         $select->where('a_active = 1');
         $select->where('c_name LIKE "%' . $searchValue . '%"');
 
-        $select->columns(array('_id' => new \Zend\Db\Sql\Expression('a_id')));
+        $select->columns(array('_id' => new \Zend\Db\Sql\Expression('a_id'), new \Zend\Db\Sql\Expression('NULL')));
         $select->join(array('c' => 'companies'), 'a_c_id = c_id', array('_name' => new \Zend\Db\Sql\Expression('c_name'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("assessment")')), 'left');
 
         if ($identity['u_role_id'] == \Admin\Model\User::ROLE_CONSULTANT) {

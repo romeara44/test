@@ -12,6 +12,7 @@ use Zend\Paginator\Adapter\DbSelect;
 use Zend\Paginator\Paginator;
 
 use Zend\Db\Sql\Expression;
+use DataCrypt\DbCrypt;
 
 class VerbalLogTable implements ServiceLocatorAwareInterface
 {
@@ -32,14 +33,43 @@ class VerbalLogTable implements ServiceLocatorAwareInterface
         return $this->serviceLocator;
     }
 
-    public function getVerbalLogs($paginated = false, $orderBy = null, $order = null, $identity = null, $searchValue = null, $roleFilter = null)
+    private function _getIdentity()
     {
         $authService = new \Zend\Authentication\AuthenticationService();
         $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
-        $identity = $authService->getIdentity();
+
+        return $authService->getIdentity();
+    }
+
+    public function getVerbalLogs($paginated = false, $orderBy = null, $order = null, $identity = null, $searchValue = null, $roleFilter = null)
+    {
+        $identity = $this->_getIdentity();
 
         if ($paginated) {
             $select = $this->tableGateway->getSql()->select();
+
+            $select->columns(array('vl_id'                    => 'vl_id',
+                                   'vl_date_of_request'       => DbCrypt::decryptField('vl_date_of_request'),
+                                   'vl_medical_record_number' => DbCrypt::decryptField('vl_medical_record_number'),
+                                   'vl_name'                  => DbCrypt::decryptField('vl_name'),
+                                   'vl_date_of_birth'         => DbCrypt::decryptField('vl_date_of_birth'),
+                                   'vl_address'               => DbCrypt::decryptField('vl_address'),
+                                   'vl_disclosure_address'    => DbCrypt::decryptField('vl_disclosure_address'),
+                                   'vl_date_requested_from'   => DbCrypt::decryptField('vl_date_requested_from'),
+                                   'vl_date_requested_to'     => DbCrypt::decryptField('vl_date_requested_to'),
+                                   'vl_is_fees'               => DbCrypt::decryptField('vl_is_fees'),
+                                   'vl_fees_charge'           => DbCrypt::decryptField('vl_fees_charge'),
+                                   'vl_date_request_received' => DbCrypt::decryptField('vl_date_request_received'),
+                                   'vl_date_account_sent'     => DbCrypt::decryptField('vl_date_account_sent'),
+                                   'vl_is_extensions'         => DbCrypt::decryptField('vl_is_extensions'),
+                                   'vl_extension_reason'      => DbCrypt::decryptField('vl_extension_reason'),
+                                   'vl_date_patient_notified' => DbCrypt::decryptField('vl_date_patient_notified'),
+                                   'vl_staff_member'          => DbCrypt::decryptField('vl_staff_member'),
+                                   'vl_create_u_id'           => 'vl_create_u_id',
+                                   'vl_active'                => 'vl_active'
+                                  )
+                                );
+
             if ($identity['u_role_id'] != User::ROLE_ADMIN) {
                 $select->where('vl_active = 1');
             }
@@ -62,20 +92,76 @@ class VerbalLogTable implements ServiceLocatorAwareInterface
             }
 
             $paginator = new Paginator($paginatorAdapter);
-// print_r($select->getSqlString());exit;
+
             return $paginator;
         }
 
-        $resultSet = $this->tableGateway->select();
+        $select = $this->tableGateway->getSql()->select();
 
-        return $resultSet;
+        $select->columns(array('vl_id'                    => 'vl_id',
+                               'vl_date_of_request'       => DbCrypt::decryptField('vl_date_of_request'),
+                               'vl_medical_record_number' => DbCrypt::decryptField('vl_medical_record_number'),
+                               'vl_name'                  => DbCrypt::decryptField('vl_name'),
+                               'vl_date_of_birth'         => DbCrypt::decryptField('vl_date_of_birth'),
+                               'vl_address'               => DbCrypt::decryptField('vl_address'),
+                               'vl_disclosure_address'    => DbCrypt::decryptField('vl_disclosure_address'),
+                               'vl_date_requested_from'   => DbCrypt::decryptField('vl_date_requested_from'),
+                               'vl_date_requested_to'     => DbCrypt::decryptField('vl_date_requested_to'),
+                               'vl_is_fees'               => DbCrypt::decryptField('vl_is_fees'),
+                               'vl_fees_charge'           => DbCrypt::decryptField('vl_fees_charge'),
+                               'vl_date_request_received' => DbCrypt::decryptField('vl_date_request_received'),
+                               'vl_date_account_sent'     => DbCrypt::decryptField('vl_date_account_sent'),
+                               'vl_is_extensions'         => DbCrypt::decryptField('vl_is_extensions'),
+                               'vl_extension_reason'      => DbCrypt::decryptField('vl_extension_reason'),
+                               'vl_date_patient_notified' => DbCrypt::decryptField('vl_date_patient_notified'),
+                               'vl_staff_member'          => DbCrypt::decryptField('vl_staff_member'),
+                               'vl_create_u_id'           => 'vl_create_u_id',
+                               'vl_active'                => 'vl_active'
+                              )
+                            );
+
+        if ($identity['u_role_id'] != User::ROLE_ADMIN) {
+            $select->where('vl_active = 1');
+        }
+
+        return $this->tableGateway->selectWith($select);
     }
 
     public function getVerbalLog($id)
     {
+        $identity = $this->_getIdentity();
+
         $id  = (int) $id;
-        $rowset = $this->tableGateway->select(array('vl_id' => $id));
-        $row = $rowset->current();
+
+        $select = $this->tableGateway->getSql()->select();
+
+        $select->columns(array('vl_id'                    => 'vl_id',
+                               'vl_date_of_request'       => DbCrypt::decryptField('vl_date_of_request'),
+                               'vl_medical_record_number' => DbCrypt::decryptField('vl_medical_record_number'),
+                               'vl_name'                  => DbCrypt::decryptField('vl_name'),
+                               'vl_date_of_birth'         => DbCrypt::decryptField('vl_date_of_birth'),
+                               'vl_address'               => DbCrypt::decryptField('vl_address'),
+                               'vl_disclosure_address'    => DbCrypt::decryptField('vl_disclosure_address'),
+                               'vl_date_requested_from'   => DbCrypt::decryptField('vl_date_requested_from'),
+                               'vl_date_requested_to'     => DbCrypt::decryptField('vl_date_requested_to'),
+                               'vl_is_fees'               => DbCrypt::decryptField('vl_is_fees'),
+                               'vl_fees_charge'           => DbCrypt::decryptField('vl_fees_charge'),
+                               'vl_date_request_received' => DbCrypt::decryptField('vl_date_request_received'),
+                               'vl_date_account_sent'     => DbCrypt::decryptField('vl_date_account_sent'),
+                               'vl_is_extensions'         => DbCrypt::decryptField('vl_is_extensions'),
+                               'vl_extension_reason'      => DbCrypt::decryptField('vl_extension_reason'),
+                               'vl_date_patient_notified' => DbCrypt::decryptField('vl_date_patient_notified'),
+                               'vl_staff_member'          => DbCrypt::decryptField('vl_staff_member'),
+                               'vl_create_u_id'           => 'vl_create_u_id',
+                               'vl_active'                => 'vl_active'
+                              )
+                            );
+
+        if ($identity['u_role_id'] != User::ROLE_ADMIN) {
+            $select->where('vl_active = 1');
+        }
+
+        $row = $this->tableGateway->selectWith($select)->current();
 
         if (!$row) {
             return false;
@@ -86,27 +172,25 @@ class VerbalLogTable implements ServiceLocatorAwareInterface
 
     public function saveVerbalLog(VerbalLog $verballog)
     {
-        $authService = new \Zend\Authentication\AuthenticationService();
-        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
-        $identity = $authService->getIdentity();
+        $identity = $this->_getIdentity();
 
         $data = array(
-            'vl_date_of_request'      => $verballog->vl_date_of_request,
-            'vl_medical_record_number' => $verballog->vl_medical_record_number,
-            'vl_name'                  => $verballog->vl_name,
-            'vl_date_of_birth'         => $verballog->vl_date_of_birth,
-            'vl_address'               => $verballog->vl_address,
-            'vl_disclosure_address'    => $verballog->vl_disclosure_address,
-            'vl_date_requested_from'   => $verballog->vl_date_requested_from,
-            'vl_date_requested_to'     => $verballog->vl_date_requested_to,
-            'vl_is_fees'               => $verballog->vl_is_fees,
-            'vl_fees_charge'           => $verballog->vl_fees_charge,
-            'vl_date_request_received' => $verballog->vl_date_request_received,
-            'vl_date_account_sent'     => $verballog->vl_date_account_sent,
-            'vl_is_extensions'         => $verballog->vl_is_extensions,
-            'vl_extension_reason'      => $verballog->vl_extension_reason,
-            'vl_date_patient_notified' => $verballog->vl_date_patient_notified,
-            'vl_staff_member'          => $verballog->vl_staff_member
+            'vl_date_of_request'       => DbCrypt::encryptValue($verballog->vl_date_of_request),
+            'vl_medical_record_number' => DbCrypt::encryptValue($verballog->vl_medical_record_number),
+            'vl_name'                  => DbCrypt::encryptValue($verballog->vl_name),
+            'vl_date_of_birth'         => DbCrypt::encryptValue($verballog->vl_date_of_birth),
+            'vl_address'               => DbCrypt::encryptValue($verballog->vl_address),
+            'vl_disclosure_address'    => DbCrypt::encryptValue($verballog->vl_disclosure_address),
+            'vl_date_requested_from'   => DbCrypt::encryptValue($verballog->vl_date_requested_from),
+            'vl_date_requested_to'     => DbCrypt::encryptValue($verballog->vl_date_requested_to),
+            'vl_is_fees'               => DbCrypt::encryptValue($verballog->vl_is_fees),
+            'vl_fees_charge'           => DbCrypt::encryptValue($verballog->vl_fees_charge),
+            'vl_date_request_received' => DbCrypt::encryptValue($verballog->vl_date_request_received),
+            'vl_date_account_sent'     => DbCrypt::encryptValue($verballog->vl_date_account_sent),
+            'vl_is_extensions'         => DbCrypt::encryptValue($verballog->vl_is_extensions),
+            'vl_extension_reason'      => DbCrypt::encryptValue($verballog->vl_extension_reason),
+            'vl_date_patient_notified' => DbCrypt::encryptValue($verballog->vl_date_patient_notified),
+            'vl_staff_member'          => DbCrypt::encryptValue($verballog->vl_staff_member)
         );
 
         $id = (int) $verballog->vl_id;
@@ -133,12 +217,13 @@ class VerbalLogTable implements ServiceLocatorAwareInterface
 
     public function deleteVerbalLog($id)
     {
-        $data['vl_id'] = $id;
+        $data['vl_id']     = $id;
         $data['vl_active'] = 0;
 
         $this->tableGateway->update($data, array('vl_id' => $id));
+
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_DELETE, \Application\Model\LogsTable::ITEM_TYPE_VL, $id);
-        
+
         return true;
     }
 
@@ -158,8 +243,9 @@ class VerbalLogTable implements ServiceLocatorAwareInterface
 
     public function unarchiveVerbalLog($id)
     {
-        $data['vl_id'] = $id;
+        $data['vl_id']     = $id;
         $data['vl_active'] = 1;
+
         $this->tableGateway->update($data, array('vl_id' => $id));
 
         return true;

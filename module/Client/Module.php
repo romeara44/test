@@ -85,6 +85,18 @@ class Module
                     $resultSetPrototype->setArrayObjectPrototype(new \Client\Model\CompanyRoles());
                     return new TableGateway('company_roles', $dbAdapter, null, $resultSetPrototype);
                 },
+
+                'Client\Model\CompanyConsultantsTable' =>  function($sm) {
+                    $tableGateway = $sm->get('CompanyConsultantsTableGateway');
+                    $table = new \Client\Model\CompanyConsultantsTable($tableGateway);
+                    return $table;
+                },
+                'CompanyConsultantsTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new \Client\Model\CompanyConsultants());
+                    return new TableGateway('company_consultants', $dbAdapter, null, $resultSetPrototype);
+                },
             ),
         );
     }

@@ -279,15 +279,17 @@ class RemediationplanController extends AbstractActionController
         if ($rpObj->rp_c_id) {
             $company = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getCompany($rpObj->rp_c_id);
             $userPrimary = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUser($company->c_primary_contact_u_id);
-            $userConsultant = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUser($company->c_consultant_u_id);
+            $userConsultants = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getByCompany($company->c_id);
 
             if (is_object($userPrimary)) {
                 $contacts[$userPrimary->u_id] = $userPrimary->u_firstname . ' ' . $userPrimary->u_lastname;
                 $contactsApr[$userPrimary->u_id] = $userPrimary->u_firstname . ' ' . $userPrimary->u_lastname;
             }
-            if (is_object($userConsultant)) {
-                $contacts[$userConsultant->u_id] = $userConsultant->u_firstname . ' ' . $userConsultant->u_lastname;
-                $contactsApr[$userConsultant->u_id] = $userConsultant->u_firstname . ' ' . $userConsultant->u_lastname;
+            if (is_object($userConsultants)) {
+                foreach ($userConsultants as $userConsultant) {
+                    $contacts[$userConsultant->_u_id] = $userConsultant->_u_firstname . ' ' . $userConsultant->_u_lastname;
+                    $contactsApr[$userConsultant->_u_id] = $userConsultant->_u_firstname . ' ' . $userConsultant->_u_lastname;
+                }
             }
         }
 

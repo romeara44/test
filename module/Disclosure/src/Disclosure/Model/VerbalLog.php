@@ -25,6 +25,7 @@ class VerbalLog
     public $vl_extension_reason;
     public $vl_date_patient_notified;
     public $vl_staff_member;
+    public $vl_create_u_id;
     public $vl_active;
 
     protected $inputFilter;
@@ -32,7 +33,7 @@ class VerbalLog
     public function exchangeArray($data)
     {
         $this->vl_id                    = (isset($data['vl_id']))                    ? $data['vl_id']                    : null;
-        $this->vl_date_of_request      = (isset($data['vl_date_of_request']))      ? $data['vl_date_of_request']      : null;
+        $this->vl_date_of_request       = (isset($data['vl_date_of_request']))       ? $data['vl_date_of_request']       : null;
         $this->vl_medical_record_number = (isset($data['vl_medical_record_number'])) ? $data['vl_medical_record_number'] : null;
         $this->vl_name                  = (isset($data['vl_name']))                  ? $data['vl_name']                  : null;
         $this->vl_date_of_birth         = (isset($data['vl_date_of_birth']))         ? $data['vl_date_of_birth']         : null;
@@ -45,9 +46,10 @@ class VerbalLog
         $this->vl_date_request_received = (isset($data['vl_date_request_received'])) ? $data['vl_date_request_received'] : null;
         $this->vl_date_account_sent     = (isset($data['vl_date_account_sent']))     ? $data['vl_date_account_sent']     : null;
         $this->vl_is_extensions         = (isset($data['vl_is_extensions']))         ? $data['vl_is_extensions']         : null;
-        $this->vl_extension_reason      = (isset($data['vl_extension_reason']))      ? $data['vl_extension_reason']   : null;
+        $this->vl_extension_reason      = (isset($data['vl_extension_reason']))      ? $data['vl_extension_reason']      : null;
         $this->vl_date_patient_notified = (isset($data['vl_date_patient_notified'])) ? $data['vl_date_patient_notified'] : null;
         $this->vl_staff_member          = (isset($data['vl_staff_member']))          ? $data['vl_staff_member']          : null;
+        $this->vl_create_u_id           = (isset($data['vl_create_u_id']))           ? $data['vl_create_u_id']           : null;
         $this->vl_active                = (isset($data['vl_active']))                ? $data['vl_active']                : null;
     }
 

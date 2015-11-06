@@ -139,7 +139,7 @@ class AdminController extends AbstractActionController
                 $post['u_confirmed'] = $uId ? $userObj->u_confirmed : null;
                 $post['u_company_id'] = $post['u_company_id'] ? $post['u_company_id'] : (is_object($userObj) ? $userObj->u_company_id : null);
 
-                if($post['u_role_id'] == \Admin\Model\User::ROLE_CLIENT && $userObj->u_role_id == \Admin\Model\User::ROLE_PARTIAL) {
+                if($post['u_role_id'] == \Admin\Model\User::ROLE_CLIENT && (!$userObj || $userObj->u_role_id == \Admin\Model\User::ROLE_PARTIAL)) {
                     $post['u_senior_consultant_u_id'] = $identity['u_id'];
                 }
 
