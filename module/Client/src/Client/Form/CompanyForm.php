@@ -8,6 +8,11 @@ class CompanyForm extends Form
     public function __construct($sl, $c_id = 0)
     {
         parent::__construct('user');
+
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
         $this->setAttribute('method', 'post');
 
         $this->add(array(
@@ -19,7 +24,7 @@ class CompanyForm extends Form
 
         $companyTable = $sl->get('Client\Model\CompanyTable');
         $parent_companies[0] = 'Please select';
-        foreach ($companyTable->getCompaniesForParent() as $key => $c) {
+        foreach ($companyTable->getCompaniesForParent($identity) as $key => $c) {
             $parent_companies[$key] = $c;
         }
         if ($c_id) {
@@ -36,7 +41,7 @@ class CompanyForm extends Form
 
         $companyTable = $sl->get('Client\Model\CompanyTable');
         $child_companies[0] = 'Please select';
-        foreach ($companyTable->getCompaniesForChild() as $key => $c) {
+        foreach ($companyTable->getCompaniesForChild($identity) as $key => $c) {
             $child_companies[$key] = $c;
         }
         if ($c_id) {
