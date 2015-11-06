@@ -120,7 +120,7 @@ class AssessmentController extends AbstractActionController
 
     public function getCompanyRolesTable()
     {
-        if (!$this->companyRolesTable) {
+        if (!isset($this->companyRolesTable)) {
             $sm = $this->getServiceLocator();
             $this->companyRolesTable = $sm->get('Client\Model\CompanyRolesTable');
         }
