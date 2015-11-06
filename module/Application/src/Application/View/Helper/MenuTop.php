@@ -295,44 +295,12 @@ class MenuTop extends AbstractHelper
                           'url' => '/breachremediationplan/list',
                         )
                 )
-            ),
-            array(
-                'title' => 'Assessments',
-                'url' => '/assessment/list',
-            ),
-            array(
-                'title' => 'Remediation Plans',
-                'url' => '/remediationplan/list',
-            ),
-            array(
-                'title' => 'Trainings',
-                'url' => '/traininglog/list',
-                'items' => array(
-                    array('title' => 'Training Logs',
-                          'url' => '/traininglog/list'
-                        ),
-                    array('title' => 'Security Reminder',
-                          'url' => '/securityreminder/list',
-                        )
-                )
-            ),
-            array(
-                'title' => 'Reporting',
-                'url' => '/reporting/auditbreach',
-                'items' => array(
-                    array('title' => 'Audit/Breach',
-                            'url' => '/reporting/auditbreach'
-                        ),
-                    array('title' => 'Plans Progress',
-                         'url' => '/reporting/planprogress',
-                        )
-                )
             )
         );
 
         if($identity['u_grant_to_breach']) {
             $this->items[] = array(
-                                'title' => 'Breach Management',
+                                'title' => 'Incident Response',
                                 'url' => '/breachlog/list',
                                 'class' => 'with-access',
                                 'items' => array(
@@ -431,56 +399,12 @@ class MenuTop extends AbstractHelper
                           'url' => '/company/edit',
                         )
                 )
-            ),
-            array(
-                'title' => 'Incident Response',
-                'url' => '/breachlog/list',
-                'items' => array(
-                    array('title' => 'Breach Logs',
-                          'url' => '/breachlog/list',
-                        ),
-                    array('title' => 'Breach Remediation Plans',
-                          'url' => '/breachremediationplan/list',
-                        )
-                )
-            ),
-            array(
-                'title' => 'Assessments',
-                'url' => '/assessment/list',
-            ),
-            array(
-                'title' => 'Remediation Plans',
-                'url' => '/remediationplan/list',
-            ),
-            array(
-                'title' => 'Trainings',
-                'url' => '/traininglog/list',
-                'items' => array(
-                    array('title' => 'Training Logs',
-                          'url' => '/traininglog/list'
-                        ),
-                    array('title' => 'Security Reminder',
-                          'url' => '/securityreminder/list',
-                        )
-                )
-            ),
-            array(
-                'title' => 'Reporting',
-                'url' => '/reporting/auditbreach',
-                'items' => array(
-                    array('title' => 'Audit/Breach',
-                            'url' => '/reporting/auditbreach'
-                        ),
-                    array('title' => 'Plans Progress',
-                         'url' => '/reporting/planprogress',
-                        )
-                )
             )
         );
 
             if($identity['u_grant_to_breach']) {
                 $this->items[] = array(
-                                    'title' => 'Breach Management',
+                                    'title' => 'Incident Response',
                                     'url' => '/breachlog/list',
                                     'class' => 'with-access',
                                     'items' => array(
