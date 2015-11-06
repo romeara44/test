@@ -423,6 +423,13 @@ $form->setAttribute('method', 'post');
                             $('#companyIdAdminWrap').css('display', 'none');
                             $('#companyIdAdmin').attr('disabled', true);
                         }
+                        <?php if (!$this->uId): ?>
+                        $('#u_address1').val(primaryAddress1);
+                        $('#u_address2').val(primaryAddress2);
+                        $('#u_city').val(primaryCity);
+                        $('#u_state_id').val(primaryState);
+                        $('#u_zip').val(primaryZip);
+                        <?php endif; ?>
                     }
                 }
             });

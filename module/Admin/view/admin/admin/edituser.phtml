@@ -165,7 +165,7 @@ $_options = array(0 => 'Current Month', 1 => 'Last Month', 2 => 'Last 3 Months',
                     <?php
                     $fn = $form->get('u_address1');
                     echo $this->formLabel($fn);
-                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id' => 'u_address1')));
                     echo $this->formElementErrors($fn);
                     ?>
                 </p>
@@ -173,7 +173,7 @@ $_options = array(0 => 'Current Month', 1 => 'Last Month', 2 => 'Last 3 Months',
                     <?php
                     $fn = $form->get('u_address2');
                     echo $this->formLabel($fn);
-                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id' => 'u_address2')));
                     echo $this->formElementErrors($fn);
                     ?>
                 </p>
@@ -181,14 +181,14 @@ $_options = array(0 => 'Current Month', 1 => 'Last Month', 2 => 'Last 3 Months',
                     <?php
                     $fn = $form->get('u_city');
                     echo $this->formLabel($fn);
-                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id' => 'u_city')));
                     echo $this->formElementErrors($fn);
                     ?>
                 </p>
                 <p>
                     <?php $fn = $form->get('u_state_id');
                     echo $this->formLabel($fn);
-                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control', 'id' => 'u_state_id')));
                     echo $this->formElementErrors($fn);
                     ?>
                 </p>
@@ -196,7 +196,7 @@ $_options = array(0 => 'Current Month', 1 => 'Last Month', 2 => 'Last 3 Months',
                     <?php
                     $fn = $form->get('u_zip');
                     echo $this->formLabel($fn);
-                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id' => 'u_zip')));
                     echo $this->formElementErrors($fn);
                     ?>
                 </p>
@@ -472,6 +472,28 @@ $_options = array(0 => 'Current Month', 1 => 'Last Month', 2 => 'Last 3 Months',
             }
         });
         jQuery('#accountType').change();
+        <?php if (!$this->uId): ?>
+        $('#u_company_id').change(function() {
+            var companyVal = $('#u_company_id').val();
+            $.getJSON("/company/getprimaryaddress/" + companyVal, {  }, function(data) {
+                if (companyVal) {
+                    if (data.address.adr_id) {
+                        primaryAddress1 = data.address.adr_address1;
+                        primaryAddress2 = data.address.adr_address2;
+                        primaryCity = data.address.adr_city;
+                        primaryState = data.address.adr_state_id;
+                        primaryZip = data.address.adr_zip;
+                        
+                        $('#u_address1').val(primaryAddress1);
+                        $('#u_address2').val(primaryAddress2);
+                        $('#u_city').val(primaryCity);
+                        $('#u_state_id').val(primaryState);
+                        $('#u_zip').val(primaryZip);
+                    }
+                }
+            });
+        });
+        <?php endif; ?>
     });
 
 </script>
