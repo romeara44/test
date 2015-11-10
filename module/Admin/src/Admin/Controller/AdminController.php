@@ -24,7 +24,7 @@ class AdminController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
         $identity = $this->getIdentity();
-        if (!in_array($identity['u_role_id'], array(1))) {
+        if (!in_array($identity['u_role_id'], array(1, 2, 3))) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
 
@@ -75,6 +75,10 @@ class AdminController extends AbstractActionController
         $page = $this->params()->fromRoute('page') ? (int) $this->params()->fromRoute('page') : 1;
         $roleFilter = $this->params()->fromRoute('roleFilter') ? (int) $this->params()->fromRoute('roleFilter') : 0;
 
+        $identity = $this->getIdentity();
+
+        $isConsultant = in_array($identity['u_role_id'], array(2, 3));
+
         $mappingSortCol = array(
             'id' => 'u_id',
             'name' => 'u_lastname',
@@ -83,7 +87,7 @@ class AdminController extends AbstractActionController
         );
 
         $sortCol = isset($mappingSortCol[$orderBy]) ? $mappingSortCol[$orderBy] : 'u_id';
-        $paginator = $this->getUserTable()->fetchAll(true, $sortCol, $order, $roleFilter);
+        $paginator = $this->getUserTable()->fetchAll(true, $sortCol, $order, $roleFilter, $isConsultant);
         $paginator->setCurrentPageNumber($page);
         $paginator->setItemCountPerPage(10);
 
@@ -93,7 +97,8 @@ class AdminController extends AbstractActionController
             'page' => $page,
             'paginator' => $paginator,
             'hasIdentity' => $this->hasIdentity(),
-            'roleFilter' => $roleFilter
+            'roleFilter' => $roleFilter,
+            'isConsultant' => $isConsultant
         ));
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open users list page');
@@ -121,6 +126,11 @@ class AdminController extends AbstractActionController
 
         if ((int) $id) {
             $userObj = $this->getUserTable()->getUser($id);
+            if(in_array($identity['u_role_id'], array(2, 3))) {
+                if(!in_array($userObj->u_role_id, array(USER::ROLE_CLIENT, USER::ROLE_PARTIAL, USER::ROLE_COMPANY_ADMIN))) {
+                    return $this->redirect()->toRoute('admin', array('controller' => 'admin', 'action' => 'users'));
+                }
+            }
         }
 
         $uRoleId = is_object($userObj) ? $userObj->u_role_id : null;

@@ -49,7 +49,7 @@ class UserTable implements ServiceLocatorAwareInterface
         return $resultSet;
     }*/
 
-    public function fetchAll($paginated = false, $orderBy = null, $order = null, $roleFilter = 0, $searchValue = null, $params = array())
+    public function fetchAll($paginated = false, $orderBy = null, $order = null, $roleFilter = 0, $isConsultant = false)
     {
         if ($paginated) {
             $select = new Select('users');
@@ -74,7 +74,11 @@ class UserTable implements ServiceLocatorAwareInterface
                 $select->where('u_role_id = ' . $roleFilter);
             }
 
-            $select->where('u_role_id <> ' . 1); // without admin
+            if(!$isConsultant) {
+                $select->where('u_role_id <> ' . 1); // without admin
+            } else {
+                $select->where('u_role_id IN (5, 7, 8)');
+            }
 
             $paginator = new Paginator($paginatorAdapter);
 
@@ -827,9 +831,9 @@ class UserTable implements ServiceLocatorAwareInterface
         }
 
         if($identity
-            && (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT))
+            && ($identity['has_modules_access'] == 1
                 || $identity[$moduleAccessName] == 1)
-            &&  $identity['has_modules_access'] == 1) {
+            ) {
             return true;
         }
 

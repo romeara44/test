@@ -531,7 +531,26 @@ class AssessmentTable implements ServiceLocatorAwareInterface
 
     public function duplicateAssessment($id)
     {
-        $cloneObj = $this->cloneAssessment($id, 0, 0, false, false, array(), true);
+        $a = $this->getAssessment($id);
+
+        $stepNum = 0;
+        $afterCreateAddresses = 0;
+
+        if($a->a_step5_finished) {
+            $stepNum = 5;
+        } else if($a->a_step4_finished) {
+            $stepNum = 4;
+        } else if($a->a_step3_finished) {
+            $stepNum = 3;
+        } else if($a->a_step2_finished) {
+            $stepNum = 2;
+        } else if($a->a_step1_finished) {
+            $stepNum = 1;
+            $addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
+            $afterCreateAddresses = $addresses->count() ? $id : 0;
+        }
+
+        $cloneObj = $this->cloneAssessment($id, $stepNum, 0, false, $afterCreateAddresses);
     }
 
     public function cloneAssessment($id, $stepNum = 1, $locationId = 0, $isNewAili = false, $afterCreateAddresses = false, $newAdressesKeysParam = array(), $duplicate = false)
@@ -539,10 +558,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         $a = $this->getAssessment($id);
 
         if (!$duplicate) {
-            if (($stepNum != 1) || (!$afterCreateAddresses && ($stepNum == 1))) {
-                // writable to false
-                $this->tableGateway->update(array('a_writable' => 0, 'a_status' => \Assessment\Model\Assessment::STATUS_CLOSED), array('a_id' => $id));
-            }
+            $this->tableGateway->update(array('a_writable' => 0, 'a_status' => \Assessment\Model\Assessment::STATUS_CLOSED), array('a_id' => $id));
         }
 
         // create new row
@@ -559,9 +575,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
 
         $a->a_status = \Assessment\Model\Assessment::STATUS_INPROGRESS;
 
-        if (($stepNum != 1) || (!$afterCreateAddresses && ($stepNum == 1))) {
-            $newId = $this->saveAssessment($a, 1, true);
-        }
+        $newId = $this->saveAssessment($a, 1, true);
 
         if (!$afterCreateAddresses && ($stepNum == 1)) {
             return $newId;
@@ -571,37 +585,30 @@ class AssessmentTable implements ServiceLocatorAwareInterface
 
         $addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
 
-        // step 1
-        if ($stepNum != 1) {
-            foreach ($addresses->buffer() as $address) {
-                $oldAddressId = $address->adr_id;
-                // save to address table
-                $address->adr_id = 0;
-                $address->adr_create_date = new \Zend\Db\Sql\Expression('NOW()');
+        foreach ($addresses->buffer() as $address) {
+            $oldAddressId = $address->adr_id;
+            // save to address table
+            $address->adr_id = 0;
+            $address->adr_create_date = new \Zend\Db\Sql\Expression('NOW()');
 
-                $addressTable = $this->getServiceLocator()->get('Client\Model\AddressTable');
-                $addressId = $addressTable->saveAddress($address);
+            $addressTable = $this->getServiceLocator()->get('Client\Model\AddressTable');
+            $addressId = $addressTable->saveAddress($address);
 
-                $newAdressesKeys[$oldAddressId] = $addressId;
+            $newAdressesKeys[$oldAddressId] = $addressId;
 
-                // save to address item table
-                $addressItem = new \Client\Model\AddressItem();
+            // save to address item table
+            $addressItem = new \Client\Model\AddressItem();
 
-                $addressItemData['cadr_type'] = $addressItem::ASSESSMENT_TYPE;
-                $addressItemData['cadr_c_id'] = $newId;
-                $addressItemData['cadr_adr_id'] = $addressId;
+            $addressItemData['cadr_type'] = $addressItem::ASSESSMENT_TYPE;
+            $addressItemData['cadr_c_id'] = $newId;
+            $addressItemData['cadr_adr_id'] = $addressId;
 
-                $addressItemTable = $this->getServiceLocator()->get('Client\Model\AddressItemTable');
-                $addressItem->exchangeArray($addressItemData);
+            $addressItemTable = $this->getServiceLocator()->get('Client\Model\AddressItemTable');
+            $addressItem->exchangeArray($addressItemData);
 
-                $addressItemId = $addressItemTable->saveAddressItem($addressItem);
-            }
-        } else {
-            $addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($afterCreateAddresses, \Client\Model\AddressItem::ASSESSMENT_TYPE);
-            $newAdressesKeys = $newAdressesKeysParam;
-            $newId = $id;
-            $id = $afterCreateAddresses;
+            $addressItemId = $addressItemTable->saveAddressItem($addressItem);
         }
+
 
         if (!$duplicate) {
             // step 2

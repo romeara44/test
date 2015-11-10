@@ -166,10 +166,7 @@ class MenuTop extends AbstractHelper
             ),
             array(
                 'title' => 'Users',
-                'url' => '/admin/users',
-                // 'items' => array(
-                //     array('title' => 'Add new user', 'url' => '/admin/adduser'),
-                // )
+                'url' => '/admin/users'
             ),
         );
     }
@@ -264,6 +261,10 @@ class MenuTop extends AbstractHelper
                          'url' => '/reporting/planprogress',
                         )
                 )
+            ),
+            array(
+                'title' => 'Users',
+                'url' => '/admin/users'
             )
         );
     }
@@ -282,18 +283,6 @@ class MenuTop extends AbstractHelper
                     array('title' => 'Business Associates',
                           'url' => '/businessassociate/list',
                     )
-                )
-            ),
-            array(
-                'title' => 'Incident Response',
-                'url' => '/breachlog/list',
-                'items' => array(
-                    array('title' => 'Breach Logs',
-                          'url' => '/breachlog/list',
-                        ),
-                    array('title' => 'Breach Remediation Plans',
-                          'url' => '/breachremediationplan/list',
-                        )
                 )
             )
         );
