@@ -7,11 +7,15 @@ use Zend\Form\Element\Captcha,
 
 class AuthForm extends Form
 {
-    public function __construct($urlcaptcha)
+    public $urlCaptcha = null;
+
+    public function __construct($urlCaptcha = null)
     {
         parent::__construct('auth');
         $this->setAttribute('method', 'post');
         $this->setAttribute('class', '');
+
+        $this->urlCaptcha = $urlCaptcha;
 
         $this->add(array(
             'name' => 'u_email',
@@ -40,32 +44,6 @@ class AuthForm extends Form
             )
         ));
 
-        $dirdata = $_SERVER['DOCUMENT_ROOT'] . '/data';
-
-        $captchaImage = new CaptchaImage(  array(
-                'font' => $dirdata . '/fonts/arial.ttf',
-                'width' => 250,
-                'height' => 70,
-                'dotNoiseLevel' => 100,
-                'lineNoiseLevel' => 5)
-        );
-
-        $captchaImage->setImgDir($dirdata . '/captcha');
-        $captchaImage->setImgUrl($urlcaptcha);
-
-        //add captcha element...
-        $this->add(array(
-            'type' => 'Zend\Form\Element\Captcha',
-            'name' => 'captcha',
-            'options' => array(
-                'label' => 'Please verify you are human:',
-                'label_attributes' => array(
-                    'class'  => 'captcha-label'
-                ),
-                'captcha' => $captchaImage,
-            ),
-        ));
-
         $this->add(array(
             'name' => 'submit',
             'attributes' => array(
@@ -74,5 +52,36 @@ class AuthForm extends Form
                 'id' => 'submitbutton',
             ),
         ));
+    }
+
+    public function addCaptcha()
+    {
+        if($this->urlCaptcha) {
+            $dirData = $_SERVER['DOCUMENT_ROOT'] . '/data';
+
+            $captchaImage = new CaptchaImage(  array(
+                    'font' => $dirData . '/fonts/arial.ttf',
+                    'width' => 250,
+                    'height' => 70,
+                    'dotNoiseLevel' => 100,
+                    'lineNoiseLevel' => 5)
+            );
+
+            $captchaImage->setImgDir($dirData . '/captcha');
+            $captchaImage->setImgUrl($this->urlCaptcha);
+
+            //add captcha element...
+            $this->add(array(
+                'type' => 'Zend\Form\Element\Captcha',
+                'name' => 'captcha',
+                'options' => array(
+                    'label' => 'Please verify you are human:',
+                    'label_attributes' => array(
+                        'class'  => 'captcha-label'
+                    ),
+                    'captcha' => $captchaImage,
+                ),
+            ));
+        }
     }
 }
