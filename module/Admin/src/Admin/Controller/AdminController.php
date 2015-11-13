@@ -127,7 +127,7 @@ class AdminController extends AbstractActionController
         if ((int) $id) {
             $userObj = $this->getUserTable()->getUser($id);
             if(in_array($identity['u_role_id'], array(2, 3))) {
-                if(!in_array($userObj->u_role_id, array(USER::ROLE_CLIENT, USER::ROLE_PARTIAL, USER::ROLE_COMPANY_ADMIN))) {
+                if(!in_array($userObj->u_role_id, array(USER::ROLE_CLIENT, USER::ROLE_PARTIAL, USER::ROLE_BUSINESS_ASSOCIATE))) {
                     return $this->redirect()->toRoute('admin', array('controller' => 'admin', 'action' => 'users'));
                 }
             }
@@ -135,7 +135,7 @@ class AdminController extends AbstractActionController
 
         $uRoleId = is_object($userObj) ? $userObj->u_role_id : null;
 
-        $form = new UserForm($this->getServiceLocator(), $uRoleId);
+        $form = new UserForm($this->getServiceLocator(), $uRoleId, $identity['u_role_id']);
 
         $request = $this->getRequest();
         if ($request->isPost()) {

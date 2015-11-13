@@ -77,7 +77,7 @@ class UserTable implements ServiceLocatorAwareInterface
             if(!$isConsultant) {
                 $select->where('u_role_id <> ' . 1); // without admin
             } else {
-                $select->where('u_role_id IN (5, 7, 8)');
+                $select->where('u_role_id IN (5, 6, 7)');
             }
 
             $paginator = new Paginator($paginatorAdapter);

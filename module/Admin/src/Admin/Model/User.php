@@ -17,7 +17,6 @@ class User
     const ROLE_CLIENT = 5;
     const ROLE_BUSINESS_ASSOCIATE = 6;
     const ROLE_PARTIAL = 7;
-    const ROLE_COMPANY_ADMIN = 8;
 
     /*
      * u_active
