@@ -1061,10 +1061,15 @@ class RemediationplanController extends AbstractActionController
     public function getCompanyUsersAction()
     {
         $cId = $this->params('id');
-
+        $res = array();
         $users = $this->getUserTable()->getUsersByCompany($cId);
-        
-        return new JsonModel($users);
-
+        foreach ($users as $user) {
+            $res[$user->u_id] = array('u_id' => $user->u_id, 'u_firstname' => $user->u_firstname, 'u_lastname' => $user->u_lastname);
+        }
+        $consultants = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getByCompany($cId);        
+        foreach ($consultants as $user) {
+            $res[$user->_u_id] = array('u_id' => $user->_u_id, 'u_firstname' => $user->_u_firstname, 'u_lastname' => $user->_u_lastname);
+        }
+        return new JsonModel($res);
     }
 }
