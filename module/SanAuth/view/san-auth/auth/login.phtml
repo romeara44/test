@@ -11,15 +11,17 @@
         echo $this->formInput($fn->setAttributes(array('class'=>'form-control', "required" => "true")));
     ?>
 
-    <?php
-        $fn = $form->get('captcha');
-        echo $this->formLabel($fn);
-    ?>
-    <div class="login-captcha-wrap">
+    <?php if($this->showCaptcha): ?>
         <?php
-        echo $this->formElement($fn->setAttributes(array('class'=>'form-control', "required" => "true")));
+            $fn = $form->get('captcha');
+            echo $this->formLabel($fn);
         ?>
-    </div>
+        <div class="login-captcha-wrap">
+            <?php
+            echo $this->formElement($fn->setAttributes(array('class'=>'form-control', "required" => "true")));
+            ?>
+        </div>
+    <?php endif; ?>
 
     <input type="checkbox" value="1" name="u_remember_me" id="remember" class="checkbox" />
     <label for="remember" class="checkbox">Remember me on this computer</label>

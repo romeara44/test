@@ -184,8 +184,12 @@ class AuthController extends AbstractActionController
 
     public function authenticateAction()
     {
+        $captchaContainer = new Container('captcha');
+
+        $showCaptcha = $captchaContainer->offsetExists('show');
+
         $form = new AuthForm($this->getRequest()->getBaseUrl() . '/data/captcha/');
-        
+
         $request = $this->getRequest();
 
         $flashMessagesErrors = array();
@@ -211,6 +215,8 @@ class AuthController extends AbstractActionController
                         } else {
                             $this->flashMessenger()->addErrorMessage('Wrong email or password. Please try again.');
                         }
+
+                        $captchaContainer->offsetSet('show', 1);
 
                         return $this->redirect()->toRoute('auth', array('controller' => 'auth', 'action' => 'authenticate'));
                     }
@@ -272,12 +278,15 @@ class AuthController extends AbstractActionController
 
                     $this->flashmessenger()->addSuccessMessage('Log in');
 
+                    $captchaContainer->offsetUnset('show');
+
                     return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
                 } else {
                     if(isset($user->u_id)) {
                         $this->getServiceLocator()->get('Admin\Model\UserTable')->updateFailedLoginCount($user);
                         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_AUTH_FAILED, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $user->u_id);
                     }
+                    $captchaContainer->offsetSet('show', 1);
                     $flashMessagesErrors[] = 'Wrong email or password. Please try again.';
                 }
             } else {
@@ -287,13 +296,21 @@ class AuthController extends AbstractActionController
                 } else {
                     $flashMessagesErrors[] = 'Wrong email or password. Please try again.';
                 }
+                $captchaContainer->offsetSet('show', 1);
             }
         }
-        
+
+        $showCaptcha = $captchaContainer->offsetExists('show');
+
+        if($showCaptcha) {
+            $form->addCaptcha();
+        }
+
         $view = new ViewModel;
 
         $view->setVariables(array(
             'form' => $form,
+            'showCaptcha' => $showCaptcha,
         ));
 
         $this->layout( 'layout/layout_login' );

@@ -6,7 +6,7 @@ use Admin\Model\RoleTable;
 
 class UserForm extends Form
 {
-    public function __construct($sl, $uRoleId = null)
+    public function __construct($sl, $uRoleId = null, $identityUid = null)
     {
         parent::__construct('user');
         $this->setAttribute('method', 'post');
@@ -21,7 +21,7 @@ class UserForm extends Form
         $roleTable = $sl->get('Admin\Model\RoleTable');
         $roles[''] = 'Please Select';
         $roles[0] = '---';
-        foreach ($roleTable->getRoles($uRoleId) as $key => $r) {
+        foreach ($roleTable->getRoles($uRoleId, $identityUid) as $key => $r) {
             $roles[$key] = $r;
         }
 

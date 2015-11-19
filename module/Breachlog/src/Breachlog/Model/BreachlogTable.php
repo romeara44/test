@@ -164,7 +164,7 @@ class BreachlogTable implements ServiceLocatorAwareInterface
                             );
 
         $select->where('bl_active = 1');
-        $select->where(DbCrypt::decryptField('bl_name') . ' LIKE "%' . $searchValue . '%"');
+        $select->where('bl_name' . ' LIKE "%' . $searchValue . '%"');
 
         $select->columns(array('_id' => 'bl_id', '_name' => 'bl_name', '_type' => new \Zend\Db\Sql\Expression('CONCAT("breachlog")'), new \Zend\Db\Sql\Expression('NULL')));
 

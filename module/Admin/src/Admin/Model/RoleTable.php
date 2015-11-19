@@ -30,12 +30,16 @@ class RoleTable implements ServiceLocatorAwareInterface
         return $this->serviceLocator;
     }
 
-    public function getRoles($uRoleId = null)
+    public function getRoles($uRoleId = null, $identityRoleid = null)
     {
         $select = $this->tableGateway->getSql()->select();
 
         if($uRoleId != \Admin\Model\User::ROLE_PARTIAL) {
-            $select->where('role_id <> 1');
+            if(in_array($identityRoleid, array(\Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_CONSULTANT))) {
+                $select->where('role_id IN (5, 6, 7)');
+            } else {
+                $select->where('role_id <> 1');
+            }
         } else {
             $select->where('role_id IN (5, 7)');
         }

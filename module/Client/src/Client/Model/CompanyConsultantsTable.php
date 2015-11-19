@@ -34,6 +34,8 @@ class CompanyConsultantsTable implements ServiceLocatorAwareInterface
 
     public function getByCompany($cId)
     {
+        if(!$cId) return array();
+
         $select = $this->tableGateway->getSql()->select();
         $select->join(array('u' => 'users'), 'u.u_id = cc_consultant_id', array( '_u_id'        => new \Zend\Db\Sql\Expression('u.u_id')
                                                                                , '_u_firstname' => new \Zend\Db\Sql\Expression('u.u_firstname')

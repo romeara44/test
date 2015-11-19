@@ -84,7 +84,7 @@ $form->setAttribute('method', 'post');
                         <input type="checkbox" name="is_primary_contact" <?php if(is_object($clientObj) && $clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $userObj->u_id) :?>checked="checked"<?php endif; ?> id="primaryContact" class="checkbox" value="1" />
                         <label for="primaryContact" class="checkbox">Primary Contact</label>
                     <?php endif; ?>
-                    <?php if (!$uId || $userObj->u_role_id == 5): ?>
+                    <?php if (!$uId || $userObj->u_role_id < \Admin\Model\User::ROLE_PARTIAL): ?>
                         <span id="companyIdAdminWrap" <?php if(!(in_array($identity['u_role_id'], array(1, 2)) || (is_object($clientObj) && $clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $identity['u_id']))) :?>style="display:none"<?php endif; ?>>
                             <input type="checkbox" name="u_company_id_admin" <?php if(is_object($userObj) && $userObj->u_company_id_admin && $userObj->u_company_id_admin == $userObj->u_company_id):?>checked <?php endif; ?> id="companyIdAdmin" class="checkbox" value="<?php echo $userObj ? $userObj->u_company_id_admin : '' ?>"
                             <?php if(!(in_array($identity['u_role_id'], array(1, 2)) || (is_object($clientObj) && $clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $identity['u_id']))) :?> disabled="true"<?php endif; ?> />
@@ -94,7 +94,7 @@ $form->setAttribute('method', 'post');
                 </p>
                 <p style="padding: 2px 0 12px 0; line-height: 14px; border-top: 0;">
                     <label>&nbsp;</label>
-                    <?php if ((!$uId || $userObj->u_role_id == 5) && $identity['u_role_id'] == 1): ?>
+                    <?php if ((!$uId || $userObj->u_role_id < \Admin\Model\User::ROLE_PARTIAL) && $identity['u_role_id'] == 1): ?>
                         <input type="checkbox" name="u_grant_to_disclosures" <?php if(is_object($userObj) && $userObj->u_grant_to_disclosures):?>checked <?php endif; ?> id="grantToDisclosures"  class="checkbox" value="1"/>
                             <label for="grantToDisclosures" class="checkbox">Grant To Disclosures</label>
                     <?php endif; ?>
@@ -103,7 +103,7 @@ $form->setAttribute('method', 'post');
                 </p>
                 <p style="padding: 2px 0 12px 0; line-height: 14px; border-top: 0;">
                     <label>&nbsp;</label>
-                    <?php if ((!$uId || $userObj->u_role_id == 5) && $identity['u_role_id'] == 1): ?>
+                    <?php if ((!$uId || $userObj->u_role_id < \Admin\Model\User::ROLE_PARTIAL) && $identity['u_role_id'] == 1): ?>
                         <input type="checkbox" name="u_grant_to_breach" <?php if(is_object($userObj) && $userObj->u_grant_to_breach):?>checked <?php endif; ?> id="grantToBreach" class="checkbox" value="1"/>
                             <label for="grantToBreach" class="checkbox">Grant To Breach</label>
                     <?php endif; ?>
@@ -448,6 +448,13 @@ $form->setAttribute('method', 'post');
                             $('#companyIdAdminWrap').css('display', 'none');
                             $('#companyIdAdmin').attr('disabled', true);
                         }
+                        <?php if (!$this->uId): ?>
+                        $('#u_address1').val(primaryAddress1);
+                        $('#u_address2').val(primaryAddress2);
+                        $('#u_city').val(primaryCity);
+                        $('#u_state_id').val(primaryState);
+                        $('#u_zip').val(primaryZip);
+                        <?php endif; ?>
                     }
                 }
             });

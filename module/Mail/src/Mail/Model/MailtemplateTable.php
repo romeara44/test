@@ -224,10 +224,15 @@ class MailtemplateTable
             ));*/
 
         $options
-            ->setHost('localhost')
-            ->setName('localhost')
+            ->setHost('smtp.sendgrid.net')
+            ->setConnectionClass('login')
+            ->setName('smtp.sendgrid.net')
             ->setConnectionConfig(array(
-                'port' => 25
+                'auth' => 'login',
+                'username' => 'HIPAASuite',
+                'password' => '1948Box13',
+                'ssl' => 'tls',
+                'port' => 587
             ));
 
         // GMAIL options
