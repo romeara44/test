@@ -8,6 +8,15 @@ use Zend\InputFilter\InputFilterInterface;
 
 class Company
 {
+    const RELATION_TYPE_PARENT = 1;
+    const RELATION_TYPE_CHILD = 2;
+
+    const PARENT_TYPE_OPERATION = 1;
+    const PARENT_TYPE_HOLDING = 2;
+
+    const CHILD_TYPE_AS_COMPANY = 1;
+    const CHILD_TYPE_LOCATION_ONLY = 2;
+
     public $c_id;
     public $c_name;
     public $c_email;
@@ -35,6 +44,13 @@ class Company
     public $_c_active;
     public $_c_consultant_id;
     public $_c_cur_consultants;
+    
+    public $c_rel_type;
+    public $c_type;
+    public $c_parent_type;
+    public $c_child_type;
+    public $c_parent_c_id;
+    public $_c_child_c_ids;
 
     protected $inputFilter;
 
@@ -62,6 +78,12 @@ class Company
         $this->_c_active     = (isset($data['_c_active'])) ? $data['_c_active'] : null;
         $this->_c_consultant_id     = (isset($data['_c_consultant_id'])) ? $data['_c_consultant_id'] : null;
         $this->_c_cur_consultants     = (isset($data['_c_cur_consultants'])) ? $data['_c_cur_consultants'] : null;
+        $this->c_parent_c_id     = (isset($data['c_parent_c_id'])) ? $data['c_parent_c_id'] : null;
+        $this->c_rel_type     = (isset($data['c_rel_type'])) ? $data['c_rel_type'] : null;
+        $this->c_type     = (isset($data['c_type'])) ? $data['c_type'] : null;
+        $this->c_parent_type     = (isset($data['c_parent_type'])) ? $data['c_parent_type'] : null;
+        $this->c_child_type     = (isset($data['c_child_type'])) ? $data['c_child_type'] : null;
+        $this->_c_child_c_ids     = (isset($data['_c_child_c_ids'])) ? $data['_c_child_c_ids'] : null;
     }
 
     public function getArrayCopy()
@@ -125,6 +147,49 @@ class Company
             $inputFilter->add($factory->createInput(array(
                 'name'     => '_c_cur_consultants',
                 'required' => false,
+            )));
+
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'c_rel_type',
+                'required' => false,
+            )));
+
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'c_parent_type',
+                'required' => false,
+            )));
+
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'c_child_type',
+                'required' => false,
+            )));
+
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'c_parent_c_id',
+                'required' => false,
+                'validators' => array(
+                    array(
+                        'name'    => '\Client\Validator\ParentCompany',
+                        'options' => array(
+                            'model'      => $this,
+                            'sl' => $sl,
+                        ),
+                    ),
+                ),
+            )));
+
+            $inputFilter->add($factory->createInput(array(
+                'name'     => '_c_child_c_ids',
+                'required' => false,
+                'validators' => array(
+                    array(
+                        'name'    => '\Client\Validator\ChildCompanies',
+                        'options' => array(
+                            'model'      => $this,
+                            'sl' => $sl,
+                        ),
+                    ),
+                ),
             )));
 
             $this->inputFilter = $inputFilter;

@@ -304,6 +304,13 @@ class CompanyTable implements ServiceLocatorAwareInterface
         }
         $companyConsultantsTable = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable');
 
+        if ($row->c_rel_type == \Client\Model\Company::RELATION_TYPE_PARENT) {
+            $row->c_parent_type = $row->c_type;
+            $row->_c_child_c_ids = $this->getChildCompaniesIds($id);
+        } elseif ($row->c_rel_type == \Client\Model\Company::RELATION_TYPE_CHILD) {
+            $row->c_child_type = $row->c_type;
+        }        
+
         return $row;
     }
 
@@ -324,6 +331,17 @@ class CompanyTable implements ServiceLocatorAwareInterface
             'c_primary_adr_id' => $company->c_primary_adr_id,
             'c_update_u_id' => $company->c_update_u_id,
         );
+
+        if (in_array($identity['u_role_id'], array(User::ROLE_SALES_REP, User::ROLE_SENIOR_CONSULTANT, User::ROLE_ADMIN))) {
+            $data['c_rel_type'] = $company->c_rel_type;
+            if ($company->c_rel_type == \Client\Model\Company::RELATION_TYPE_PARENT) {
+                $data['c_type'] = $company->c_parent_type;        
+                $data['c_parent_c_id'] = 0;    
+            } elseif ($company->c_rel_type == \Client\Model\Company::RELATION_TYPE_CHILD) {
+                $data['c_type'] = $company->c_child_type;
+                $data['c_parent_c_id'] = $company->c_parent_c_id;
+            }
+        }
 
         $id = (int) $company->c_id;
 
@@ -371,6 +389,39 @@ class CompanyTable implements ServiceLocatorAwareInterface
                     if($_c_cur_consultant) {
                         $companyConsultantsTable->saveCompanyConsultants(array('cc_company_id' => $id, 'cc_consultant_id' => $_c_cur_consultant));
                     }
+                }
+            }
+        }
+
+        if (in_array($identity['u_role_id'], array(User::ROLE_SALES_REP, User::ROLE_SENIOR_CONSULTANT, User::ROLE_ADMIN))) {
+            $data = array(
+                'c_parent_c_id' => 0,
+                'c_rel_type' => 0,
+            );
+            $data_where = array(
+                'c_parent_c_id' => $id,
+                'c_rel_type' => \Client\Model\Company::RELATION_TYPE_CHILD,
+            );
+            $this->tableGateway->update($data, $data_where);
+
+            if ($company->c_rel_type == \Client\Model\Company::RELATION_TYPE_PARENT) {
+                if($company->_c_child_c_ids) {
+                    $company->_c_child_c_ids = array_unique($company->_c_child_c_ids);
+                    $data = array(
+                        'c_parent_c_id' => $id,
+                        'c_rel_type' => \Client\Model\Company::RELATION_TYPE_CHILD,
+                    );
+                    foreach ($company->_c_child_c_ids as $_c_child_c_id) {
+                        if($_c_child_c_id) {
+                            $this->tableGateway->update($data, array('c_id' => $_c_child_c_id));
+                        }
+                    }
+                }
+            } elseif ($company->c_rel_type == \Client\Model\Company::RELATION_TYPE_CHILD) {
+                if ($company->c_parent_c_id) {
+                    $data['c_rel_type'] = \Client\Model\Company::RELATION_TYPE_PARENT;
+                    $data['c_parent_c_id'] = 0;
+                    $this->tableGateway->update($data, array('c_id' => $company->c_parent_c_id));
                 }
             }
         }
@@ -618,4 +669,128 @@ class CompanyTable implements ServiceLocatorAwareInterface
         return true;
     }
 
+    public function getCompaniesForParent($identity)
+    {
+        $select = $this->tableGateway->getSql()->select();
+
+        $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = c_id', array('cc_consultant_id'), 'left');
+        
+        if ($identity['u_role_id'] == User::ROLE_SALES_REP) {
+            $select->where('c_owner_u_id = ' . $identity['u_id']);
+        } elseif (in_array($identity['u_role_id'], array(User::ROLE_CONSULTANT))) {
+            $select->where('c_owner_u_id = ' . $identity['u_id'] . ' OR cc.cc_consultant_id = ' . $identity['u_id']);
+        } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
+            $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
+            $ids[] = $identity['u_id'];
+            $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR cc.cc_consultant_id IN (' . implode(',', $ids) . '))');
+        } else if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
+            if($identity['u_company_id_admin']) {
+                $select->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR c_id = ' . $identity['u_company_id_admin'] . ')');
+            } else {
+                $select->where('c_owner_u_id = ' . $identity['u_id']);
+            }
+        }
+
+        $select->columns(array('c_id', 'c_name'));
+        if ($identity['u_role_id'] == User::ROLE_ADMIN) {
+            $select->where('c_active IN (0, 1)');
+        } else {
+            $select->where('c_active = 1');
+        }
+
+        $select->group('c_id');
+
+        $select->where('c_rel_type != ' . \Client\Model\Company::RELATION_TYPE_CHILD);
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        $result = array();
+
+        foreach ($resultSet as $rs) {
+            $result[$rs->c_id] = $rs->c_name;
+        }
+
+        return $result;
+    }
+
+    public function getCompaniesForChild($identity)
+    {
+        $select = $this->tableGateway->getSql()->select();
+        
+        $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = c_id', array('cc_consultant_id'), 'left');
+        
+        if ($identity['u_role_id'] == User::ROLE_SALES_REP) {
+            $select->where('c_owner_u_id = ' . $identity['u_id']);
+        } elseif (in_array($identity['u_role_id'], array(User::ROLE_CONSULTANT))) {
+            $select->where('c_owner_u_id = ' . $identity['u_id'] . ' OR cc.cc_consultant_id = ' . $identity['u_id']);
+        } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
+            $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
+            $ids[] = $identity['u_id'];
+            $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR cc.cc_consultant_id IN (' . implode(',', $ids) . '))');
+        } else if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
+            if($identity['u_company_id_admin']) {
+                $select->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR c_id = ' . $identity['u_company_id_admin'] . ')');
+            } else {
+                $select->where('c_owner_u_id = ' . $identity['u_id']);
+            }
+        }
+
+        $select->columns(array('c_id', 'c_name'));
+        if ($identity['u_role_id'] == User::ROLE_ADMIN) {
+            $select->where('c_active IN (0, 1)');
+        } else {
+            $select->where('c_active = 1');
+        }
+
+        $select->group('c_id');
+
+        $select->where('c_rel_type != ' . \Client\Model\Company::RELATION_TYPE_PARENT);
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        $result = array();
+
+        foreach ($resultSet as $rs) {
+            $result[$rs->c_id] = $rs->c_name;
+        }
+
+        return $result;
+    }
+
+    public function getChildCompaniesIds($c_id = 0)
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('c_active = 1');        
+        $select->where('c_rel_type = ' . \Client\Model\Company::RELATION_TYPE_CHILD);
+        if ($c_id) {
+            $select->where('c_parent_c_id = ' . $c_id);
+        }
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        $result = array();
+
+        foreach ($resultSet as $rs) {
+            $result[] = $rs->c_id;
+        }
+
+        return $result;
+    }
+
+    public function getParentCompaniesIds()
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('c_active = 1');        
+        $select->where('c_rel_type = ' . \Client\Model\Company::RELATION_TYPE_PARENT);
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        $result = array();
+
+        foreach ($resultSet as $rs) {
+            $result[] = $rs->c_id;
+        }
+
+        return $result;
+    }
 }

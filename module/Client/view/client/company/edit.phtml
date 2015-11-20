@@ -45,6 +45,44 @@ $form->setAttribute('method', 'post');
 
             <?php if (in_array($this->roleId, array(\Admin\Model\User::ROLE_SALES_REP, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_ADMIN))): ?>
                 <p>
+                    <?php $fn = $form->get('c_rel_type');
+                    echo $this->formLabel($fn);
+                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control', 'id' => 'c_rel_type')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p id="c_rel_type_1">
+                    <?php $fn = $form->get('c_parent_type');
+                    echo $this->formLabel($fn);
+                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p id="c_rel_type_2">
+                    <?php $fn = $form->get('c_child_type');
+                    echo $this->formLabel($fn);
+                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p id="c_parent_c_id">
+                    <?php $fn = $form->get('c_parent_c_id');
+                    echo $this->formLabel($fn);
+                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p id="c_child_c_ids">
+                    <?php $fn = $form->get('_c_child_c_ids');
+                    echo $this->formLabel($fn);
+                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+            <?php endif; ?>
+
+            <?php if (in_array($this->roleId, array(\Admin\Model\User::ROLE_SALES_REP, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_ADMIN))): ?>
+                <p>
                     <?php $fn = $form->get('_c_cur_consultants');
                     echo $this->formLabel($fn);
                     echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
@@ -57,7 +95,7 @@ $form->setAttribute('method', 'post');
                     </p>
                 <?php endif;?>
                 <h2>Company Information</h2>
-            <?php endif; ?>
+            <?php endif; ?>            
 
             <p>
                 <?php
@@ -122,7 +160,7 @@ $form->setAttribute('method', 'post');
                     echo $this->formElementErrors($fn);
                     ?>
                 </p>
-            <? endif; ?>
+            <?php endif; ?>
 
             <?php if ($this->cId): ?>
                 <?php $counter = 1;
@@ -212,9 +250,11 @@ $form->setAttribute('method', 'post');
                 </div>
             <?php endif; ?>
 
+            <?php if (in_array($this->roleId, array(\Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_ADMIN))): ?>
             <p>
                 <a id="addLocationButton" href="javascript:" onclick="return addLocation()" class="button"><i class="fa fa-plus-circle"></i> Add Additional Location</a>
             </p>
+            <?php endif; ?>
 
             <div class="cboth"></div>
             <div class="form-buttons">
@@ -506,6 +546,30 @@ $form->setAttribute('method', 'post');
 
         counterLocation++;
     }
+
+    function changed_company_rel_type(){
+        var val = $('#c_rel_type').val();
+        if(val == <?php echo \Client\Model\Company::RELATION_TYPE_PARENT; ?>) {
+            $('#c_rel_type_1').show();
+            $('#c_rel_type_2').hide();
+            $('#c_parent_c_id').hide();
+            $('#c_child_c_ids').show();
+        } else if (val == <?php echo \Client\Model\Company::RELATION_TYPE_CHILD; ?>) {
+            $('#c_rel_type_1').hide();
+            $('#c_rel_type_2').show();
+            $('#c_parent_c_id').show();
+            $('#c_child_c_ids').hide();
+        } else {
+            $('#c_rel_type_1').hide();
+            $('#c_rel_type_2').hide();
+            $('#c_parent_c_id').hide();
+            $('#c_child_c_ids').hide();
+        }
+    }
+
+    changed_company_rel_type();
+
+    $('#c_rel_type').change(function() {changed_company_rel_type();});
 
 </script>
 

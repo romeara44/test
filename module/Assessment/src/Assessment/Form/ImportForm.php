@@ -33,6 +33,10 @@ class ImportForm extends Form
             foreach ($companyClients as $client) {
                 $clients[$client->u_id] = $client->u_firstname . ' ' . $client->u_lastname;
             }
+            $consultants = $sl->get('Client\Model\CompanyConsultantsTable')->getByCompany($post['rp_c_id']);        
+            foreach ($consultants as $client) {
+                $clients[$client->_u_id] = $client->_u_firstname . ' ' . $client->_u_lastname;
+            }
         }
 
         $this->add(array(
