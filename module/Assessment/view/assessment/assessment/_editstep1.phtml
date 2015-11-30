@@ -104,12 +104,12 @@ $form->setAttribute('method', 'post');
                                 <label for="exists_adr_name[<?php echo $address->adr_id ?>]">Location Name</label>
                                 <input id="adr1<?php echo $counter ?>" type="text" value="<?php echo $address->adr_name ?>" class="form-control" name="exists_adr_name[<?php echo $address->adr_id ?>]">
                             </p>
-
+                            <ul style="display: none" id="adr11"><li>Value is required and can't be empty</li></ul>
                             <p>
                                 <label for="exists_adr_address1[<?php echo $address->adr_id ?>]">Address 1</label>
                                 <input type="text" value="<?php echo $address->adr_address1 ?>" class="form-control" name="exists_adr_address1[<?php echo $address->adr_id ?>]">
                             </p>
-
+                            <ul style="display: none" id="adr12"><li>Value is required and can't be empty</li></ul>
                             <p>
                                 <label for="exists_adr_address2[<?php echo $address->adr_id ?>]">Address 2</label>
                                 <input type="text" value="<?php echo $address->adr_address2 ?>" class="form-control" name="exists_adr_address2[<?php echo $address->adr_id ?>]">
@@ -119,7 +119,7 @@ $form->setAttribute('method', 'post');
                                 <label for="exists_adr_city[<?php echo $address->adr_id ?>]">City</label>
                                 <input type="text" value="<?php echo $address->adr_city ?>" class="form-control" name="exists_adr_city[<?php echo $address->adr_id ?>]">
                             </p>
-
+                            <ul style="display: none" id="adr13"><li>Value is required and can't be empty</li></ul>
                             <p>
                                 <?php $fn = $form->get('adr_state_id[]');
                                 $fn->setValue($address->adr_state_id);
@@ -127,12 +127,12 @@ $form->setAttribute('method', 'post');
                                 echo $this->formLabel($fn);
                                 echo $this->formSelect($fn->setAttributes(array('class'=>'form-control'))); ?>
                             </p>
-
+                            <ul style="display: none" id="adr14"><li>Value is required and can't be empty</li></ul>
                             <p>
                                 <label for="exists_adr_zip[<?php echo $address->adr_id ?>]">ZIP Code</label>
                                 <input type="text" value="<?php echo $address->adr_zip ?>" class="form-control" name="exists_adr_zip[<?php echo $address->adr_id ?>]">
                             </p>
-
+                            <ul style="display: none" id="adr15"><li>Value is required and can't be empty</li></ul>
                             <p>
                                 <label for="exists_adr_phone[<?php echo $address->adr_id ?>]">Phone</label>
                                 <input type="text" value="<?php echo $address->adr_phone ?>" class="phone" name="exists_adr_phone[<?php echo $address->adr_id ?>]">
@@ -296,42 +296,181 @@ $form->setAttribute('method', 'post');
         $('#location input[name="adr_zip[]"]').mask("99999");
 
         $('#saveAndContinue').click(function() {
-            <?php if (!$this->aId): ?>
-            if ((($('#assessmentType').val() == 1) && (($('#location input[name="adr_name[]"]').val() != '') && ($('#location input[name="adr_address1[]"]').val() != '') && ($('#location input[name="adr_city[]"]').val() != '') && ($('#location #adr14Select').val() >= 1) && ($('#location input[name="adr_zip[]"]').val() != '') && ($('#a_c_id').val() >= 1) && ($('#assessmentType').val() >= 1))) || ($('#assessmentType').val() == 2)) {
+            if (validate()) {
                 $('#setStep').val(2);
                 $('#assessment').submit();
-            } else {
-                $('#a_c_id').val() < 1 ? $('#s1').show() : $('#s1').hide();
-                $('#assessmentType').val() < 1 ? $('#sa1').show() : $('#sa1').hide();
-                $('#location input[name="adr_name[]"]').val() == '' ? $('#adr11').show() : $('#adr11').hide();
-                $('#location input[name="adr_address1[]"]').val() == '' ? $('#adr12').show() : $('#adr12').hide();
-                $('#location input[name="adr_city[]"]').val() == '' ? $('#adr13').show() : $('#adr13').hide();
-                $('#location #adr14Select').val() < 1 ? $('#adr14').show() : $('#adr14').hide();
-                $('#location input[name="adr_zip[]"]').val() == '' ? $('#adr15').show() : $('#adr15').hide();
             }
-            <?php else: ?>
-                $('#setStep').val(2);
-                $('#assessment').submit();
-            <?php endif; ?>
         });
 
-        $('#save').click(function() {
-            <?php if (!$this->aId): ?>
-            if ((($('#assessmentType').val() == 1) && (($('#location input[name="adr_name[]"]').val() != '') && ($('#location input[name="adr_address1[]"]').val() != '') && ($('#location input[name="adr_city[]"]').val() != '') && ($('#location #adr14Select').val() >= 1) && ($('#location input[name="adr_zip[]"]').val() != '') && ($('#a_c_id').val() >= 1) && ($('#assessmentType').val() >= 1))) || ($('#assessmentType').val() == 2)) {
-                    $('#assessment').submit();
+        <?php if ($this->aId): ?>
+        function validate() {
+            var valid = 1;
+            
+            $('input[name^="exists_adr_name["]').each(function(i, v) {
+                var elem = $(v);
+                if (elem.val() == '') {
+                    valid = 0;
+                    elem.closest('p').next('ul').show();
                 } else {
-                    $('#a_c_id').val() < 1 ? $('#s1').show() : $('#s1').hide();
-                    $('#assessmentType').val() < 1 ? $('#sa1').show() : $('#sa1').hide();
-                    $('#location input[name="adr_name[]"]').val() == '' ? $('#adr11').show() : $('#adr11').hide();
-                    $('#location input[name="adr_address1[]"]').val() == '' ? $('#adr12').show() : $('#adr12').hide();
-                    $('#location input[name="adr_city[]"]').val() == '' ? $('#adr13').show() : $('#adr13').hide();
-                    $('#location #adr14Select').val() < 1 ? $('#adr14').show() : $('#adr14').hide();
-                    $('#location input[name="adr_zip[]"]').val() == '' ? $('#adr15').show() : $('#adr15').hide();
-            }
-            <?php else: ?>
-                $('#assessment').submit();
-            <?php endif; ?>
+                    elem.closest('p').next('ul').hide();
+                }
+            });
+            $('input[name^="exists_adr_address1["]').each(function(i, v) {
+                var elem = $(v);
+                if (elem.val() == '') {
+                    valid = 0;
+                    elem.closest('p').next('ul').show();
+                } else {
+                    elem.closest('p').next('ul').hide();
+                }
+            });
+            $('input[name^="exists_adr_city["]').each(function(i, v) {
+                var elem = $(v);
+                if (elem.val() == '') {
+                    valid = 0;
+                    elem.closest('p').next('ul').show();
+                } else {
+                    elem.closest('p').next('ul').hide();
+                }
+            });
+            $('select[name^="exists_adr_state_id["]').each(function(i, v) {
+                var elem = $(v);
+                if (elem.val() < 1) {
+                    valid = 0;
+                    elem.closest('p').next('ul').show();
+                } else {
+                    elem.closest('p').next('ul').hide();
+                }
+            });
+            $('input[name^="exists_adr_zip["]').each(function(i, v) {
+                var elem = $(v);
+                if (elem.val() == '') {
+                    valid = 0;
+                    elem.closest('p').next('ul').show();
+                } else {
+                    elem.closest('p').next('ul').hide();
+                }
+            });
 
+            $('input[name="adr_name[]"]').each(function(i, v) {
+                var elem = $(v);
+                if (elem.val() == '') {
+                    valid = 0;
+                    elem.closest('p').next('ul').show();
+                } else {
+                    elem.closest('p').next('ul').hide();
+                }
+            });
+            $('input[name="adr_address1[]"]').each(function(i, v) {
+                var elem = $(v);
+                if (elem.val() == '') {
+                    valid = 0;
+                    elem.closest('p').next('ul').show();
+                } else {
+                    elem.closest('p').next('ul').hide();
+                }
+            });
+            $('input[name="adr_city[]"]').each(function(i, v) {
+                var elem = $(v);
+                if (elem.val() == '') {
+                    valid = 0;
+                    elem.closest('p').next('ul').show();
+                } else {
+                    elem.closest('p').next('ul').hide();
+                }
+            });
+            $('select[name="adr_state_id[]"]').each(function(i, v) {
+                var elem = $(v);
+                if (elem.val() < 1) {
+                    valid = 0;
+                    elem.closest('p').next('ul').show();
+                } else {
+                    elem.closest('p').next('ul').hide();
+                }
+            });
+            $('input[name="adr_zip[]"]').each(function(i, v) {
+                var elem = $(v);
+                if (elem.val() == '') {
+                    valid = 0;
+                    elem.closest('p').next('ul').show();
+                } else {
+                    elem.closest('p').next('ul').hide();
+                }
+            });
+            return valid;
+        }
+        <?php else : ?>
+        function validate() {
+            var valid = 1;
+            if ($('#a_c_id').val() < 1) {
+                valid = 0;
+                $('#s1').show();
+            } else {
+                $('#s1').hide();
+            }
+            if ($('#assessmentType').val() < 1) {
+                valid = 0;
+                $('#sa1').show();
+            } else {
+                $('#sa1').hide();
+            }
+            
+            if ($('#assessmentType').val() == 1) {
+
+                $('input[name="adr_name[]"]').each(function(i, v) {
+                    var elem = $(v);
+                    if (elem.val() == '') {
+                        valid = 0;
+                        elem.closest('p').next('ul').show();
+                    } else {
+                        elem.closest('p').next('ul').hide();
+                    }
+                });
+                $('input[name="adr_address1[]"]').each(function(i, v) {
+                    var elem = $(v);
+                    if (elem.val() == '') {
+                        valid = 0;
+                        elem.closest('p').next('ul').show();
+                    } else {
+                        elem.closest('p').next('ul').hide();
+                    }
+                });
+                $('input[name="adr_city[]"]').each(function(i, v) {
+                    var elem = $(v);
+                    if (elem.val() == '') {
+                        valid = 0;
+                        elem.closest('p').next('ul').show();
+                    } else {
+                        elem.closest('p').next('ul').hide();
+                    }
+                });
+                $('select[name="adr_state_id[]"]').each(function(i, v) {
+                    var elem = $(v);
+                    if (elem.val() < 1) {
+                        valid = 0;
+                        elem.closest('p').next('ul').show();
+                    } else {
+                        elem.closest('p').next('ul').hide();
+                    }
+                });
+                $('input[name="adr_zip[]"]').each(function(i, v) {
+                    var elem = $(v);
+                    if (elem.val() == '') {
+                        valid = 0;
+                        elem.closest('p').next('ul').show();
+                    } else {
+                        elem.closest('p').next('ul').hide();
+                    }
+                });
+            }
+            return valid;
+        }
+        <?php endif; ?>
+
+        $('#save').click(function() {
+            if (validate()) {
+                $('#assessment').submit();
+            }
         });
 
         //Conditional logic for assesment type
