@@ -90,7 +90,12 @@ class MailtemplateTable
             if (isset($params['password'])) {
                 $mt->mt_text = str_replace('<password>', $params['password'], $mt->mt_text);
                 $mt->mt_text = str_replace('<Full Name>', $addToName, $mt->mt_text);
-                $mt->mt_text = str_replace('<Admin Name>', $identity['u_firstname'] . ' ' . $identity['u_lastname'], $mt->mt_text);
+                if ($identity) {
+                    $mt->mt_text = str_replace('<Admin Name>', $identity['u_firstname'] . ' ' . $identity['u_lastname'], $mt->mt_text);    
+                } else {
+                    $mt->mt_text = str_replace('<Admin Name>', $addToName, $mt->mt_text);  
+                }
+                
                 if ($user->u_role_id == \Admin\Model\User::ROLE_CLIENT) {
                     $mt->mt_text = str_replace('<Consultant Name>', $identity['u_firstname'] . ' ' . $identity['u_lastname'], $mt->mt_text);
                 } else {
