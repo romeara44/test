@@ -110,6 +110,20 @@ class Assessment
                     'required' => false,
                 )));
 
+            } else {
+                $inputFilter->add($factory->createInput(array(
+                    'name'     => 'a_c_id',
+                    'required' => true,
+                    'validators' => array(
+                        array(
+                            'name'    => '\Assessment\Validator\NonParentHoldingTypeCompany',
+                            'options' => array(
+                                'model'      => $this,
+                                'sl' => $sl,
+                            ),
+                        ),
+                    ),
+                )));
             }
 
             $this->inputFilter = $inputFilter;

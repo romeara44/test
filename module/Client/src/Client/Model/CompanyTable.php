@@ -222,7 +222,7 @@ class CompanyTable implements ServiceLocatorAwareInterface
 
         $select = $this->tableGateway->getSql()->select();
         $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = c_id', array('cc_consultant_id'), 'left');
-        $select->where('c_active = 1');
+        $select->where('c_active = 1 AND !(c_rel_type = ' . \Client\Model\Company::RELATION_TYPE_PARENT . ' AND c_type = ' . \Client\Model\Company::PARENT_TYPE_HOLDING . ')');
         if ($identity['u_role_id'] == \Admin\Model\User::ROLE_SALES_REP) {
             $select->where('c_owner_u_id = ' . $identity['u_id']);
         } elseif (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_CONSULTANT))) {

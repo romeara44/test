@@ -49,7 +49,7 @@ class AssessmentQuestionTable implements ServiceLocatorAwareInterface
         return $row->ar_name;
     }
 
-    public function getQuestions($type = \Assessment\Model\Assessment::TYPE_SECURITY_RISK, $aRole = 1, $aId = 0, $location = 0)
+    public function getQuestions($type = \Assessment\Model\Assessment::TYPE_SECURITY_RISK, $aRole = 1, $aId = 0, $location = 0, $aObj = null)
     {
         $addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($aId, \Client\Model\AddressItem::ASSESSMENT_TYPE);
 
@@ -63,6 +63,13 @@ class AssessmentQuestionTable implements ServiceLocatorAwareInterface
         }
 
         $additionalAddress = ($adrId != $location) && $adrId && $location ? true : false;
+
+        if ($aObj) {
+            $company = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getCompany($aObj->a_c_id);
+            if ($company->c_rel_type == \Client\Model\Company::RELATION_TYPE_CHILD && $company->c_type == \Client\Model\Company::CHILD_TYPE_LOCATION_ONLY) {
+                $additionalAddress = true;
+            }
+        }
 
         //die;
         $select = $this->tableGateway->getSql()->select();
