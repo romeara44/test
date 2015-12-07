@@ -331,7 +331,7 @@ class UserTable implements ServiceLocatorAwareInterface
             return $this->resetPassword($user->u_id);
         }
 
-        if($user->u_company_id) {
+        if($user->u_company_id && $user->u_company_id != $user->u_company_id_admin) {
             $select = $this->tableGateway->getSql()->select();
             $select->where('u_company_id_admin = ' . $user->u_company_id);
             $select->where('u_active = 1');
