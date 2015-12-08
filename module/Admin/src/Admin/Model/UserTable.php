@@ -667,9 +667,8 @@ class UserTable implements ServiceLocatorAwareInterface
 
     public function updateFailedLoginCount($user, $reset = false)
     {
+        $locked = 0;
         if($user->u_role_id != User::ROLE_ADMIN) {
-            $locked = 0;
-
             if($reset) {
                 $data['u_locked'] = 0;
                 $data['u_failed_logins_count'] = $locked;
@@ -703,7 +702,7 @@ class UserTable implements ServiceLocatorAwareInterface
             $this->tableGateway->update($data, array('u_id' => $user->u_id));
         }
 
-        return true;
+        return $locked;
     }
 
     public function getLockedCompanyUsers($companyId)

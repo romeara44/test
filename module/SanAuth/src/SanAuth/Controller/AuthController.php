@@ -283,11 +283,16 @@ class AuthController extends AbstractActionController
                     return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
                 } else {
                     if(isset($user->u_id)) {
-                        $this->getServiceLocator()->get('Admin\Model\UserTable')->updateFailedLoginCount($user);
-                        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_AUTH_FAILED, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $user->u_id);
+                        if ($this->getServiceLocator()->get('Admin\Model\UserTable')->updateFailedLoginCount($user)) {
+                            $flashMessagesErrors[] = 'You are locked. Please contact admin.';
+                            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_AUTH_LOCKED, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $user->u_id);
+                        } else {
+                            $flashMessagesErrors[] = 'Wrong email or password. Please try again.';
+                            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_AUTH_FAILED, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $user->u_id);
+                        }
+                        
                     }
-                    $captchaContainer->offsetSet('show', 1);
-                    $flashMessagesErrors[] = 'Wrong email or password. Please try again.';
+                    $captchaContainer->offsetSet('show', 1);                    
                 }
             } else {
                 if(count($form->getMessages('captcha'))) {
