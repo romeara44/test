@@ -49,7 +49,13 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
                 $select->where('rp_active = 1');
 
                 if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
-                    $select->where('rp_consultant_u_id = ' . $identity['u_id']);
+                    $whereStr = '(rp_consultant_u_id = ' . $identity['u_id'];
+                    $companies_ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getCompaniesIdsForConsultant($identity['u_id']);
+                    if ($companies_ids) {
+                        $whereStr .= ' OR rp_c_id IN(' . implode(',', $companies_ids) . ')';
+                    }
+                    
+                    $select->where($whereStr . ')');
                 } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
                     $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
                     $ids[] = $identity['u_id'];

@@ -64,4 +64,19 @@ class CompanyConsultantsTable implements ServiceLocatorAwareInterface
         return $this->tableGateway->lastInsertValue;;
     }
 
+    public function getCompaniesIdsForConsultant($u_id)
+    {
+        if(!$u_id) return array();
+
+        $select = $this->tableGateway->getSql()->select();
+        $select->where("cc_consultant_id =" . $u_id);
+
+        $res = $this->tableGateway->selectWith($select);
+        $companies = array();
+        foreach ($res as $row) {
+            $companies[] = $row->cc_company_id;
+        }
+        return $companies;
+    }
+
 }
