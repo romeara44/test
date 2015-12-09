@@ -678,6 +678,8 @@ class UserTable implements ServiceLocatorAwareInterface
                 $locked = (int) $user->u_failed_logins_count >= $this->getServiceLocator()->get('Sitesetting\Model\SitesettingTable')->getValueByName(\Sitesetting\Model\Sitesetting::FAILED_USER_LOGINS_LIMIT);
                 if($locked) {
                     $select = $this->tableGateway->getSql()->select();
+                    $select->columns(array('u_id'));
+                    $select->quantifier('DISTINCT');
                     $whereStr = '(u_role_id = ' . User::ROLE_ADMIN;
                     if($user->u_company_id) {
                         $whereStr .= ' OR u_company_id_admin = ' . $user->u_company_id;
