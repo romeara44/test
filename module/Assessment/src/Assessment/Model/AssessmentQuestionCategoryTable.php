@@ -41,12 +41,21 @@ class AssessmentQuestionCategoryTable implements ServiceLocatorAwareInterface
         return $resultSet;
     }
 
-    public function getCategoriesByType($type = 1)
+    public function getCategoriesByType($type = 1, $additional_location = 0, $company = null)
     {
         $select = $this->tableGateway->getSql()->select();
         $select->where('aq_type = ' . $type);
         $select->where('aq_active = 1');
 
+        if ($company) {
+            if ($company->c_rel_type == \Client\Model\Company::RELATION_TYPE_CHILD && $company->c_type == \Client\Model\Company::CHILD_TYPE_LOCATION_ONLY) {
+                $additional_location = 1;
+            }
+        }
+
+        if ($additional_location) {
+            $select->where('aqc_additional_location = 1');
+        }
         $select->join(array('aq' => 'assessments_questions'), 'aq_aqc_id = aqc_id', array('*'));
 
         $select->group('aqc_id');

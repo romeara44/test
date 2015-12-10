@@ -927,14 +927,14 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         $rpDb = $this->getServiceLocator()->get('Assessment\Model\RemediationplanTable');
         $rpDb->setServiceLocator($this->getServiceLocator());
         
-        $catsDb = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionCategoryTable');
-        $cats = $catsDb->getCategoriesByType($a->a_type);
+        $catsDb = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionCategoryTable');        
 
         $company = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getCompany($a->a_c_id);
+        $approval_authority_role = $this->getServiceLocator()->get('Client\Model\CompanyRolesTable')->getCompanyRoleByCompanyAndRole($a->a_c_id, 9);
 
         $addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($aId, \Client\Model\AddressItem::ASSESSMENT_TYPE);
         foreach ($addresses->buffer() as $addressKey => $address) {
-
+            $cats = $catsDb->getCategoriesByType($a->a_type, $addressKey, $company);
             if ($a->a_security_a_id) {
                 $this->getServiceLocator()->get('Assessment\Model\RemediationplanTable')->setServiceLocator($this->getServiceLocator());
                 $rp = $this->getServiceLocator()->get('Assessment\Model\RemediationplanTable')->getRemediationplanByAId($a->a_security_a_id);
@@ -962,7 +962,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
                 }
                 $rpaData['rpa_rp_id'] = $rpId;
                 $rpaData['rpa_contact_u_id'] = $arlc[$cat->aqc_ar_id];
-                $rpaData['rpa_approver_u_id'] = $company->c_primary_contact_u_id;
+                $rpaData['rpa_approver_u_id'] = $approval_authority_role->cr_u_id;
 
                 $rpaData['rpa_threat'] = $task;
                 $rpaData['rpa_risk_score'] = $answerScore->_score;

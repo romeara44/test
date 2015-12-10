@@ -147,5 +147,22 @@ class CompanyRolesTable implements ServiceLocatorAwareInterface
         return $row->cr_id;
     }
 
+    public function getCompanyRoleByCompanyAndRole($cId, $rId)
+    {
+        $cId  = (int) $cId;
+        $rId  = (int) $rId;
 
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('cr_c_id = ' . $cId);
+        $select->where('cr_ar_id = ' . $rId);
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        $row = $resultSet->current();
+        if (!$row) {
+            return false;
+        }
+
+        return $row;
+    }
 }

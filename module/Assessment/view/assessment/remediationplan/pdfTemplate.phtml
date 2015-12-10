@@ -119,24 +119,24 @@
 <div class="cboth"></div>
 
 
-<p style="border: 0;"><strong>Reviewed and approved by <?php echo $this->rpObj->_approver_name?></strong></p>
+<p style="border: 0;"><strong>Reviewed and approved by <?php echo $this->approver_name?></strong></p>
 <p style="border: 0;">
     <label>Initials: <?php echo $this->rpObj->rp_initials_approver ?></label>
 </p>
 <p style="border: 0;">
-    <label>Date: <?php echo $this->rpObj->rp_approved_date ? $this->rpObj->_rp_approved_date_formatted : ''?></label>
+    <label>Date: <?php echo $this->rpObj->rp_approved_date ? $this->rpObj->_rp_approved_date_formatted : date('m/d/Y'); ?></label>
 </p>
 
 
 <div class="cboth"></div>
 
 
-<p style="border: 0;"><strong>Agreed to and accepted by <?php echo $this->rpObj->_accepter_name?></strong></p>
+<p style="border: 0;"><strong>Agreed to and accepted by <?php echo $this->accepter_name?></strong></p>
 <p style="border: 0;">
     <label>Initials: <?php echo $this->rpObj->rp_initials ?></label>
 </p>
 <p style="border: 0;">
-    <label>Date: <?php echo $this->rpObj->rp_accepted_date ? $this->rpObj->_rp_accepted_date_formatted : '' ?></label>
+    <label>Date: <?php echo $this->rpObj->rp_accepted_date ? $this->rpObj->_rp_accepted_date_formatted : date('m/d/Y'); ?></label>
 </p>
 
 

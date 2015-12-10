@@ -333,6 +333,31 @@ class RemediationplanController extends AbstractActionController
 
             $renderer = $this->getServiceLocator()->get('Zend\View\Renderer\RendererInterface');
 
+            $approverAccepter = $this->getRemediationplanTable()->getApproverAccepter($rpObj->rp_id);
+            $approver_name = '';
+            if ($rpObj->_approver_name) {
+                $approver_name = $rpObj->_approver_name;
+            } else {
+                foreach ($approverAccepter as $contact) {
+                    if ($contact->_u_id == $rpObj->rp_approver_u_id || (!$rpObj->rp_approver_u_id && in_array(9, $contact->_ar_id))) {
+                        $approver_name = $contact->_u_name;
+                        break;
+                    }
+                }
+            }
+
+            $accepter_name = '';
+            if ($rpObj->_accepter_name) {
+                $accepter_name = $rpObj->_accepter_name;
+            } else {
+                foreach ($approverAccepter as $contact) {
+                    if ($contact->_u_id == $rpObj->rp_accepter_u_id || (!$rpObj->rp_accepter_u_id && in_array(10, $contact->_ar_id))) {
+                        $accepter_name = $contact->_u_name;
+                        break;
+                    }
+                }
+            }
+
             $model = new ViewModel(array(
                 'id' => $id,
                 'formNote' => $formNote,
@@ -341,7 +366,9 @@ class RemediationplanController extends AbstractActionController
                 'actions' => $actions,
                 'writable' => $rpObj->rp_writable,
                 'noteTable' => $noteTable,
-                'isPdf' => true
+                'isPdf' => true,
+                'approver_name' => $approver_name,
+                'accepter_name' => $accepter_name,
             ));
             $model->setTemplate('remediationplan/pdfTemplate');
 
@@ -479,8 +506,38 @@ class RemediationplanController extends AbstractActionController
             }
         }
 
-        $csvList[] = 'Initials';
-        $csvList[] = $rpObj->rp_initials;
+        $approverAccepter = $this->getRemediationplanTable()->getApproverAccepter($rpObj->rp_id);
+        $approver_name = '';
+        if ($rpObj->_approver_name) {
+            $approver_name = $rpObj->_approver_name;
+        } else {
+            foreach ($approverAccepter as $contact) {
+                if ($contact->_u_id == $rpObj->rp_approver_u_id || (!$rpObj->rp_approver_u_id && in_array(9, $contact->_ar_id))) {
+                    $approver_name = $contact->_u_name;
+                    break;
+                }
+            }
+        }
+
+        $accepter_name = '';
+        if ($rpObj->_accepter_name) {
+            $accepter_name = $rpObj->_accepter_name;
+        } else {
+            foreach ($approverAccepter as $contact) {
+                if ($contact->_u_id == $rpObj->rp_accepter_u_id || (!$rpObj->rp_accepter_u_id && in_array(10, $contact->_ar_id))) {
+                    $accepter_name = $contact->_u_name;
+                    break;
+                }
+            }
+        }
+
+        $csvList[] = array('Reviewed and approved by', $approver_name);
+        $csvList[] = array('Initials:', $rpObj->rp_initials_approver);
+        $csvList[] = array('Date:', $rpObj->rp_approved_date ? $rpObj->_rp_approved_date_formatted : date('m/d/Y'));
+
+        $csvList[] = array('Agreed to and accepted by', $accepter_name);
+        $csvList[] = array('Initials:', $rpObj->rp_initials);
+        $csvList[] = array('Date:', $rpObj->rp_accepted_date ? $rpObj->_rp_accepted_date_formatted : date('m/d/Y'));
 
         $csvContent = '';
         foreach ($csvList as $row) {
