@@ -1,0 +1,14 @@
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_parent_aq_id` = '1' WHERE `assessments_questions`.`aq_id` = 2;
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_parent_aq_id` = '1' WHERE `assessments_questions`.`aq_id` = 3;
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_parent_aq_id` = '1' WHERE `assessments_questions`.`aq_id` = 4;
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_parent_aq_id` = '110', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 111;
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_parent_aq_id` = '110', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 112;
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_parent_aq_id` = '110', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 113;
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_parent_aq_id` = '220', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 221;
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_parent_aq_id` = '220', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 222;
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_parent_aq_id` = '220', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 223;
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_parent_aq_id` = '220', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 224;
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_parent_aq_id` = '225', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 226;
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_parent_aq_id` = '225', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 227;
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_parent_aq_id` = '225', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 228;
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_parent_aq_id` = '225', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 229;
