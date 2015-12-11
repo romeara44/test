@@ -1,0 +1,6 @@
+UPDATE `hipaacar_app`.`assessments_questions_categories` SET `aqc_additional_location` = '1' WHERE `assessments_questions_categories`.`aqc_id` = 2;
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_parent_aq_id` = '5', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 6;
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_parent_aq_id` = '5', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 7;
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_parent_aq_id` = '5', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 8;
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_parent_aq_id` = '5', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 9;
+UPDATE `hipaacar_app`.`assessments_questions` SET `aq_parent_aq_id` = '5', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 10;
