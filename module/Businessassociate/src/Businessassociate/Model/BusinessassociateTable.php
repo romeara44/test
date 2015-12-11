@@ -44,7 +44,6 @@ class BusinessassociateTable implements ServiceLocatorAwareInterface
             );
 
             if ($identity['u_role_id'] == User::ROLE_ADMIN) {
-                $select->where('ba_active = 0');
             } else {
                 $select->where('ba_active = 1');
                 if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {

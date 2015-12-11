@@ -177,7 +177,10 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
             $selectRP->where('rp_c_id = ' . $identity['u_company_id']);
         }
 
-        $selectRP->where('rp_active = 1');
+        if ($identity['u_role_id'] != \Admin\Model\User::ROLE_ADMIN) {
+            $selectRP->where('rp_active = 1');
+        }
+        
 
         if($company) {
             $selectRP->where('rp_c_id = ' . $company);

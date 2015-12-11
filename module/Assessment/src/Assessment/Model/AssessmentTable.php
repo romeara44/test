@@ -46,7 +46,6 @@ class AssessmentTable implements ServiceLocatorAwareInterface
             );
 
             if ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN) {
-                $select->where('a_active = 0');
             } else {
                 $select->where('a_active = 1');
                 if ($identity['u_role_id'] == \Admin\Model\User::ROLE_CONSULTANT) {
