@@ -1,0 +1,1 @@
+UPDATE `hipaacar_app`.`assessments_questions_categories` SET `aqc_additional_location` = '0' WHERE `assessments_questions_categories`.`aqc_id` = 19;
