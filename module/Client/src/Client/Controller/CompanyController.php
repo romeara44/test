@@ -29,6 +29,7 @@ class CompanyController extends AbstractActionController
 
     public function onDispatch(\Zend\Mvc\MvcEvent $e)
     {
+        $this->layout()->searchRoleFilter = 'company';
         $container = new Container('activity');
         $container->activity = time();
         $this->layout()->flashMessagesSuccess = $this->flashMessenger()->getSuccessMessages();

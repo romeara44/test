@@ -28,6 +28,7 @@ class ClientController extends AbstractActionController
 
     public function onDispatch(\Zend\Mvc\MvcEvent $e)
     {
+        $this->layout()->searchRoleFilter = 'contact';
         $container = new Container('activity');
         $container->activity = time();
         $this->layout()->flashMessagesSuccess = $this->flashMessenger()->getSuccessMessages();
@@ -107,6 +108,10 @@ class ClientController extends AbstractActionController
         $order = $this->params()->fromRoute('order') ? $this->params()->fromRoute('order') : 'DESC';
         $page = $this->params()->fromRoute('page') ? (int) $this->params()->fromRoute('page') : 1;
         $roleFilter = $this->params()->fromRoute('roleFilter') ? (int) $this->params()->fromRoute('roleFilter') : 0;
+
+        if ($roleFilter == 1) {
+            $this->layout()->searchRoleFilter = 'company';
+        }
 
         $mappingSortCol = array(
             'id' => '_id',

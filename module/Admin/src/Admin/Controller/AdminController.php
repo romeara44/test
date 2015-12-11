@@ -14,6 +14,7 @@ class AdminController extends AbstractActionController
 
     public function onDispatch(\Zend\Mvc\MvcEvent $e)
     {
+        $this->layout()->searchRoleFilter = 'user';
         $container = new Container('activity');
         $container->activity = time();
         $this->layout()->flashMessagesSuccess = $this->flashMessenger()->getSuccessMessages();

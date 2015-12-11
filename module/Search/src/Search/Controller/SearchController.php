@@ -68,7 +68,12 @@ class SearchController extends AbstractActionController
             $post = $request->getPost();
             $query = $post['search'];
             $query = str_replace(' ', '-', $query);
-            return $this->redirect()->toRoute('search', array('controller' => 'search', 'action' => 'search', 'searchValue' => $query));
+            if (empty($post['roleFilter'])) {
+                return $this->redirect()->toRoute('search', array('controller' => 'search', 'action' => 'search', 'searchValue' => $query));    
+            } else {
+                return $this->redirect()->toRoute('search', array('controller' => 'search', 'action' => 'search', 'searchValue' => $query, 'roleFilter' => $post['roleFilter']));
+            }
+            
         }
 
         $query = $this->params('searchValue');

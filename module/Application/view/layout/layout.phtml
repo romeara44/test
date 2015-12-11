@@ -81,6 +81,7 @@
                     <?php if (!in_array($uRoleId, array(5, 6, 7))): ?>
                         <div id="top-search">
                             <form id="formLogin" method="POST" action="/search/search">
+                                <input type="hidden" name="roleFilter" value="<?php echo empty($this->searchRoleFilter) ? '' : $this->searchRoleFilter; ?>">
                                 <a href="javascript:" onclick="$('#formLogin').submit()" id="search-button"></a>
                                 <input type="text" name="search" id="search" value="<?php echo (isset($this->query) && $this->query != '') ? $query : 'Search' ?>" onfocus="if (this.value=='Search') this.value='';" onblur="if (this.value=='') this.value='Search';" />
                             </form>

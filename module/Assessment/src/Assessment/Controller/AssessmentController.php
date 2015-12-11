@@ -38,6 +38,7 @@ class AssessmentController extends AbstractActionController
 
     public function onDispatch(\Zend\Mvc\MvcEvent $e)
     {
+        $this->layout()->searchRoleFilter = 'assessment';
         $container = new Container('activity');
         $container->activity = time();
         $this->layout()->flashMessagesSuccess = $this->flashMessenger()->getSuccessMessages();
