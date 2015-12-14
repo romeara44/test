@@ -1,0 +1,39 @@
+INSERT INTO `assessments_questions` (`aq_id`, `aq_parent_aq_id`, `aq_aqc_id`, `aq_type`, `aq_title`, `aq_text`, `aq_order`, `aq_active`, `aq_create_date`, `aq_update_date`) VALUES (554, NULL, '15', '1', 'Does the practice conduct an accurare and thorough assessment of the potential risks and vulnerabilities to the confidentiality, integerety, and availability if electronic protected health information held by the practice', NULL, '554', '1', '2015-12-14 11:23:36', NULL);
+
+INSERT INTO `assessments_questions` (`aq_id`, `aq_parent_aq_id`, `aq_aqc_id`, `aq_type`, `aq_title`, `aq_text`, `aq_order`, `aq_active`, `aq_create_date`, `aq_update_date`) VALUES (555, '554', '15', '1', 'Has the practice  performed an external (i.e. internet) server and network vulnerability scan on your internet-facing devices in the past year', NULL, '555', '1', '2015-12-14 11:23:36', NULL);
+
+INSERT INTO `assessments_questions` (`aq_id`, `aq_parent_aq_id`, `aq_aqc_id`, `aq_type`, `aq_title`, `aq_text`, `aq_order`, `aq_active`, `aq_create_date`, `aq_update_date`) VALUES (556, '554', '15', '1', 'Were there any Critical and/or HIGH risk vulnerabilities discovered in the vulnerability scans', NULL, '556', '1', '2015-12-14 11:23:36', NULL);
+
+INSERT INTO `assessments_questions_options` (`aqo_id`, `aqo_aq_id`, `aqo_title`, `aqo_order`, `aqo_risk_score`, `aqo_active`, `aqo_create_date`, `aqo_update_date`) VALUES ('1634', '554', 'Yes', '1', '0.00', '1', '2015-12-14 11:23:36', '0000-00-00 00:00:00.000000');
+
+INSERT INTO `assessments_questions_options` (`aqo_id`, `aqo_aq_id`, `aqo_title`, `aqo_order`, `aqo_risk_score`, `aqo_active`, `aqo_create_date`, `aqo_update_date`) VALUES ('1635', '554', 'No', '2', '0.00', '1', '2015-12-14 11:23:36', '0000-00-00 00:00:00.000000');
+
+INSERT INTO `assessments_questions_options` (`aqo_id`, `aqo_aq_id`, `aqo_title`, `aqo_order`, `aqo_risk_score`, `aqo_active`, `aqo_create_date`, `aqo_update_date`) VALUES ('1636', '554', 'N/A', '3', '0.00', '1', '2015-12-14 11:23:36', '0000-00-00 00:00:00.000000');
+
+INSERT INTO `assessments_questions_options` (`aqo_id`, `aqo_aq_id`, `aqo_title`, `aqo_order`, `aqo_risk_score`, `aqo_active`, `aqo_create_date`, `aqo_update_date`) VALUES ('1637', '555', 'Yes', '1', '0.00', '1', '2015-12-14 11:23:36', '0000-00-00 00:00:00.000000');
+
+INSERT INTO `assessments_questions_options` (`aqo_id`, `aqo_aq_id`, `aqo_title`, `aqo_order`, `aqo_risk_score`, `aqo_active`, `aqo_create_date`, `aqo_update_date`) VALUES ('1638', '555', 'No', '2', '0.00', '1', '2015-12-14 11:23:36', '0000-00-00 00:00:00.000000');
+
+INSERT INTO `assessments_questions_options` (`aqo_id`, `aqo_aq_id`, `aqo_title`, `aqo_order`, `aqo_risk_score`, `aqo_active`, `aqo_create_date`, `aqo_update_date`) VALUES ('1639', '555', 'N/A', '3', '0.00', '1', '2015-12-14 11:23:36', '0000-00-00 00:00:00.000000');
+
+INSERT INTO `assessments_questions_options` (`aqo_id`, `aqo_aq_id`, `aqo_title`, `aqo_order`, `aqo_risk_score`, `aqo_active`, `aqo_create_date`, `aqo_update_date`) VALUES ('1640', '556', 'Yes', '1', '0.00', '1', '2015-12-14 11:23:36', '0000-00-00 00:00:00.000000');
+
+INSERT INTO `assessments_questions_options` (`aqo_id`, `aqo_aq_id`, `aqo_title`, `aqo_order`, `aqo_risk_score`, `aqo_active`, `aqo_create_date`, `aqo_update_date`) VALUES ('1641', '556', 'No', '2', '0.00', '1', '2015-12-14 11:23:36', '0000-00-00 00:00:00.000000');
+
+INSERT INTO `assessments_questions_options` (`aqo_id`, `aqo_aq_id`, `aqo_title`, `aqo_order`, `aqo_risk_score`, `aqo_active`, `aqo_create_date`, `aqo_update_date`) VALUES ('1642', '556', 'N/A', '3', '0.00', '1', '2015-12-14 11:23:36', '0000-00-00 00:00:00.000000');
+
+UPDATE `assessments_questions` SET `aq_title` = 'Is ePHI data, in transit, encrypted using a FIPS 190-2 (HIPAA) compliant method protecting it from unauthorizws access during transmission', `aq_update_date` = NULL, `aq_order` = '217' WHERE `assessments_questions`.`aq_id` = 219;
+
+INSERT INTO `assessments_questions` (`aq_id`, `aq_parent_aq_id`, `aq_aqc_id`, `aq_type`, `aq_title`, `aq_text`, `aq_order`, `aq_active`, `aq_create_date`, `aq_update_date`) VALUES (557, '215', '43', '1', 'Do wireless networks  have adequate authentication in place for wireless divices and ePHI data in transit using a FIPS 180-2 (HIPAA) compliant method', NULL, '218', '1', '2015-12-14 11:23:36', NULL);
+
+INSERT INTO `assessments_questions_options` (`aqo_id`, `aqo_aq_id`, `aqo_title`, `aqo_order`, `aqo_risk_score`, `aqo_active`, `aqo_create_date`, `aqo_update_date`) VALUES ('1643', '557', 'Yes', '1', '0.00', '1', '2015-12-14 11:23:36', '0000-00-00 00:00:00.000000');
+
+INSERT INTO `assessments_questions_options` (`aqo_id`, `aqo_aq_id`, `aqo_title`, `aqo_order`, `aqo_risk_score`, `aqo_active`, `aqo_create_date`, `aqo_update_date`) VALUES ('1644', '557', 'No', '2', '0.00', '1', '2015-12-14 11:23:36', '0000-00-00 00:00:00.000000');
+
+INSERT INTO `assessments_questions_options` (`aqo_id`, `aqo_aq_id`, `aqo_title`, `aqo_order`, `aqo_risk_score`, `aqo_active`, `aqo_create_date`, `aqo_update_date`) VALUES ('1645', '557', 'N/A', '3', '0.00', '1', '2015-12-14 11:23:36', '0000-00-00 00:00:00.000000');
+
+UPDATE `assessments_questions` SET `aq_order` = '219', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 217;
+
+UPDATE `assessments_questions` SET `aq_order` = '220', `aq_update_date` = NULL WHERE `assessments_questions`.`aq_id` = 218;
+
+UPDATE `assessments_questions_categories` SET `aqc_additional_location` = '1' WHERE `assessments_questions_categories`.`aqc_id` = 43;
