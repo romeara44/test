@@ -69,10 +69,6 @@
                 </td>
             </tr>
         <?php endif; ?>
-        <?php $notesTaskAtt = $this->noteTable->getNotes($rpa->rpa_id, \Note\Model\Note::NOTE_RPA, 0, 'file'); ?>
-        <?php $notesTaskAssessments = $this->noteTable->getNotesForRemedTask($rpa->rpa_id, $adrId, 'file'); ?>
-        <?php $notesTaskAttText = $this->noteTable->getNotes($rpa->rpa_id, \Note\Model\Note::NOTE_RPA, 0, 'text'); ?>
-        <?php $notesTaskAssessmentsText = $this->noteTable->getNotesForRemedTask($rpa->rpa_id, $adrId, 'text'); ?>
 
         <tr>
             <td class="tdSmall"><?php echo \Assessment\Model\Remediationplanaction::$levelsNames[$rpa->rpa_risk_level] ?></td>
@@ -89,29 +85,6 @@
             <td><?php echo $rpa->_approver_name ?></td>
             <td><?php echo $rpa->_rpa_target_date_formatted ?></td>
         </tr>
-
-            <tr class="expandable" id="notes<?php echo $rpa->rpa_id ?>">
-                <td>&nbsp;</td>
-                    <?php $colspan = 2; ?>
-                    <?php foreach (array('Task notes' => $notesTaskAttText, 'Questions notes' => $notesTaskAssessmentsText) as $keyAtt => $notesTask): ?>
-                        <td colspan="<?php echo $colspan ?>">
-                            <?php if (is_object($notesTask) && ($notesTask->count())): ?>
-                                <div>
-                                    <div><strong><?php echo $keyAtt ?>:</strong></div>
-                                    <div>
-                                        <?php $notesTask->buffer() ?>
-                                        <?php foreach ($notesTask as $note): ?>
-                                            <?php if ($note->note_text != ''): ?>
-                                                <div><?php echo $note->note_text ?></div>
-                                            <?php endif; ?>
-                                        <?php endforeach; ?>
-                                    </div>
-                                </div>
-                            <?php endif; ?>
-                        </td>
-                        <?php $colspan = 5; ?>
-                    <?php endforeach; ?>
-            </tr>
     <?php endforeach; ?>
     </tbody>
 </table>
