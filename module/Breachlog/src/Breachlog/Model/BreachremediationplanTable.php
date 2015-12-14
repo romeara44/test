@@ -13,6 +13,7 @@ use Zend\Paginator\Adapter\DbSelect;
 use Zend\Paginator\Paginator;
 use Breachlog\Model\Breachremediationplan;
 use DataCrypt\DbCrypt;
+use Zend\Db\Sql\Predicate\PredicateSet;
 
 class BreachremediationplanTable implements ServiceLocatorAwareInterface
 {
@@ -81,16 +82,8 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
             if ($identity['u_role_id'] == User::ROLE_ADMIN) {
                 $select->where('(' . DbCrypt::decryptField('brp_status', false) . ' = 30 AND brp_active = 1) || (brp_active = 0)');
             } else {
-                $select->where('brp_active = 1');
-
                 if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
-                    $whereStr = '(brp_consultant_u_id = ' . $identity['u_id'];
-                    $companies_ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getCompaniesIdsForConsultant($identity['u_id']);
-                    if ($companies_ids) {
-                        $whereStr .= ' OR brp_c_id IN(' . implode(',', $companies_ids) . ')';
-                    }
-                    
-                    $select->where($whereStr . ')');
+                    $select->where('brp_consultant_u_id = ' . $identity['u_id']);
                 } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
                     $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
                     $ids[] = $identity['u_id'];
@@ -98,6 +91,12 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
                 } elseif ($identity['u_role_id'] == User::ROLE_CLIENT) {
                     $select->where('brp_c_id = ' . $identity['u_company_id']);
                 }
+
+                $companies_ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getCompaniesIdsForConsultant($identity['u_id']);
+                if ($companies_ids) {
+                    $select->where(array('brp_c_id' => $companies_ids), PredicateSet::OP_OR);
+                }
+                $select->where('brp_active = 1');
             }
 
             $select->join(array('c' => 'companies'), 'brp_c_id = c_id', array('_client_name' => 'c_name'), 'left');

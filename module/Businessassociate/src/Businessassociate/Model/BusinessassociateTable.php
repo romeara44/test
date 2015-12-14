@@ -11,6 +11,7 @@ use Zend\Db\ResultSet\ResultSet;
 use Zend\Db\Sql\Select;
 use Zend\Paginator\Adapter\DbSelect;
 use Zend\Paginator\Paginator;
+use Zend\Db\Sql\Predicate\PredicateSet;
 
 class BusinessassociateTable implements ServiceLocatorAwareInterface
 {
@@ -45,15 +46,8 @@ class BusinessassociateTable implements ServiceLocatorAwareInterface
 
             if ($identity['u_role_id'] == User::ROLE_ADMIN) {
             } else {
-                $select->where('ba_active = 1');
                 if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
-                    $whereStr = '(ba_consultant_u_id = ' . $identity['u_id'];
-                    $companies_ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getCompaniesIdsForConsultant($identity['u_id']);
-                    if ($companies_ids) {
-                        $whereStr .= ' OR ba_c_id IN(' . implode(',', $companies_ids) . ')';
-                    }
-                    
-                    $select->where($whereStr . ')');
+                    $select->where('ba_consultant_u_id = ' . $identity['u_id']);
                 } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
                     $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
                     $ids[] = $identity['u_id'];
@@ -61,6 +55,12 @@ class BusinessassociateTable implements ServiceLocatorAwareInterface
                 } elseif ($identity['u_role_id'] == User::ROLE_CLIENT && $identity['u_company_id']) {
                     $select->where('ba_c_id = ' . $identity['u_company_id']);
                 }
+
+                $companies_ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getCompaniesIdsForConsultant($identity['u_id']);
+                if ($companies_ids) {
+                    $select->where(array('ba_c_id' => $companies_ids), PredicateSet::OP_OR);
+                }
+                $select->where('ba_active = 1');
             }
 
             $select->join(array('u' => 'users'), 'ba_contact_u_id = u_id', array('_contact_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)')), 'left');

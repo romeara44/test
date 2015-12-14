@@ -12,6 +12,7 @@ use Zend\Db\Sql\Select;
 use Zend\Paginator\Adapter\DbSelect;
 use Zend\Paginator\Paginator;
 use DataCrypt\DbCrypt;
+use Zend\Db\Sql\Predicate\PredicateSet;
 
 class BreachlogTable implements ServiceLocatorAwareInterface
 {
@@ -79,15 +80,8 @@ class BreachlogTable implements ServiceLocatorAwareInterface
 
             if ($identity['u_role_id'] == User::ROLE_ADMIN) {
             } else {
-                $select->where('bl_active = 1');
                 if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
-                    $whereStr = '(bl_consultant_u_id = ' . $identity['u_id'];
-                    $companies_ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getCompaniesIdsForConsultant($identity['u_id']);
-                    if ($companies_ids) {
-                        $whereStr .= ' OR bl_c_id IN(' . implode(',', $companies_ids) . ')';
-                    }
-                    
-                    $select->where($whereStr . ')');
+                    $select->where('bl_consultant_u_id = ' . $identity['u_id']);
                 } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
                     $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
                     $ids[] = $identity['u_id'];
@@ -95,6 +89,12 @@ class BreachlogTable implements ServiceLocatorAwareInterface
                 } elseif ($identity['u_role_id'] == User::ROLE_CLIENT && $identity['u_company_id']) {
                     $select->where('bl_c_id = ' . $identity['u_company_id']);
                 }
+
+                $companies_ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getCompaniesIdsForConsultant($identity['u_id']);
+                if ($companies_ids) {
+                    $select->where(array('bl_c_id' => $companies_ids), PredicateSet::OP_OR);
+                }
+                $select->where('bl_active = 1');
             }
 
             $select->join(array('c' => 'companies'), 'bl_c_id = c_id', array('_client_name' => 'c_name'), 'left');
