@@ -97,8 +97,8 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
         $select->where('rp_active = 1');
         $select->where('c_name LIKE "%' . $searchValue . '%"');
 
-        $select->columns(array('_id' => new \Zend\Db\Sql\Expression('rp_id'), new \Zend\Db\Sql\Expression('NULL')));
-        $select->join(array('c' => 'companies'), 'rp_c_id = c_id', array('_name' => new \Zend\Db\Sql\Expression('c_name'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("remediationplan")')), 'left');
+        $select->columns(array('_id' => new \Zend\Db\Sql\Expression('rp_id'), '_name' => new \Zend\Db\Sql\Expression('c_name'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("remediationplan")'), new \Zend\Db\Sql\Expression('NULL')));
+        $select->join(array('c' => 'companies'), 'rp_c_id = c_id', array(), 'left');
 
         if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
             $select->where('rp_consultant_u_id = ' . $identity['u_id']);
