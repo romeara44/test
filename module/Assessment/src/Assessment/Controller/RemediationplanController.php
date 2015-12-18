@@ -1026,6 +1026,7 @@ class RemediationplanController extends AbstractActionController
             if ($importForm->isValid() && $checkFillCompanyRoles) {
 
                 $post['rp_remediation_date'] = \DateTime::createFromFormat('m/d/Y', $post['rp_remediation_date'])->format('Y-m-d');
+                $post['rp_incident_date'] = \DateTime::createFromFormat('m/d/Y', $post['rp_incident_date'])->format('Y-m-d');
 
                 $csvFile = $request->getFiles('files');
 
@@ -1094,6 +1095,7 @@ class RemediationplanController extends AbstractActionController
                         $data['rp_c_id']             = $post['rp_c_id'];
                         $data['rp_performed_u_id']   = $post['rp_performed_u_id'];
                         $data['rp_remediation_date'] = $post['rp_remediation_date'];
+                        $data['rp_incident_date'] = $post['rp_incident_date'];
                         $data['actions']             = $remediationPlanActions;
 
                         $rpId = $this->getRemediationplanTable()->importRemediationplan($data);

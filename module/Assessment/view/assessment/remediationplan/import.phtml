@@ -56,6 +56,15 @@
             ?>
         </p>
 
+        <p>
+            <?php
+                $fn = $form->get('rp_incident_date');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'rp_incident_date', 'readonly' => 'readonly')));
+                echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
         <p style="border: 0;">
             <strong style="line-height: 30px;">CSV File</strong><br />
             <a id="browseFile" href="javascript:" class="button importRemediationBtn"><i class="fa fa-plus-circle"></i> Browse Files...</a>
@@ -86,7 +95,7 @@
 <script type="text/javascript">
 $(document).ready(function() {
     // $('#importForm').validate();
-
+    $( "#rp_incident_date" ).datepicker({dateFormat: 'mm/dd/yy'});
     $( "#rp_remediation_date" ).datepicker({dateFormat: 'mm/dd/yy'});
 
     var browseFilesCounter = 0;

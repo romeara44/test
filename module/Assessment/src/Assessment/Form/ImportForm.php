@@ -77,6 +77,16 @@ class ImportForm extends Form
         ));
 
         $this->add(array(
+            'name' => 'rp_incident_date',
+            'attributes' => array(
+                'type'  => 'text',
+            ),
+            'options' => array(
+                'label' => 'Assessment Date',
+            )
+        ));
+
+        $this->add(array(
             'name' => 'submit',
             'attributes' => array(
                 'type'  => 'submit',

@@ -122,7 +122,7 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
                 <?php endif; ?>
                 <td class="<?php echo $classBold ?>"><?php echo \Assessment\Model\Remediationplan::$statusesNames[$rp->rp_status]  ?></td>
                 <td class="<?php echo $classBold ?>"><?php echo \Assessment\Model\Assessment::$typesNames[$rp->rp_type] ?></td>
-                <td class="<?php echo $classBold ?>"><?php echo $rp->rp_a_id ? (($rp->rp_incident_date != '0000-00-00') ? $this->formatDateA($rp->rp_incident_date) : '') : '-'?></td>
+                <td class="<?php echo $classBold ?>"><?php echo $rp->rp_incident_date ? $this->formatDateA($rp->rp_incident_date) : '-'?></td>
                 <td style="white-space: nowrap;" class="aright <?php echo $classBold ?>">
                     <?php if ($rp->rp_status != \Assessment\Model\Remediationplan::STATUS_CLOSED) : ?>
                     <a class="<?php echo $classBold ?>" href="/remediationplan/edit/<?php echo $rp->rp_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;

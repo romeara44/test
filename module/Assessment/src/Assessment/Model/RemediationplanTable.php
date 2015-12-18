@@ -410,6 +410,7 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
             'rp_type' => 1,
             'rp_performed_u_id' => $data['rp_performed_u_id'],
             'rp_remediation_date' => $data['rp_remediation_date'],
+            'rp_incident_date' => $data['rp_incident_date'],
             'rp_status' => Remediationplan::STATUS_OPEN,
         );
 
