@@ -69,18 +69,14 @@
 <div class="col5"  style="float: left;">
     <p><strong>ASSESSMENT DATE:</strong><br />
         <?php if ($this->writable): ?>
-            <?php if($this->rpObj->rp_incident_date): ?>
             <span id="toggle-edit-show-2">
-                <?php echo $this->rpObj->_rp_incident_date_formatted; ?> &nbsp;<a href="" title="Edit"><i class="fa fa-pencil"></i></a>
+                <?php echo $this->rpObj->rp_incident_date ? $this->rpObj->_rp_incident_date_formatted : ''; ?> &nbsp;<a href="" title="Edit"><i class="fa fa-pencil"></i></a>
             </span>
             <span id="toggle-edit-2">
-                <input type="text" id="rp_incident_date" readonly="readonly" class="w175" value="<?php echo ($this->rpObj->rp_incident_date != '0000-00-00') ? $this->rpObj->_rp_incident_date_formatted : '' ?>" />
+                <input type="text" id="rp_incident_date" name="rp_incident_date" readonly="readonly" class="w175" value="<?php echo $this->rpObj->rp_incident_date ? $this->rpObj->_rp_incident_date_formatted : '' ?>" />
             </span>
-        <?php else :?>
-            -
-        <?php endif;?>
         <?php else: ?>
-            <?php echo ($this->rpObj->rp_incident_date != '0000-00-00') ? $this->rpObj->_rp_incident_date_formatted : '' ?>
+            <?php echo $this->rpObj->rp_incident_date ? $this->rpObj->_rp_incident_date_formatted : '' ?>
         <?php endif; ?>
     </p>
 </div>
@@ -91,7 +87,7 @@
             <?php echo ($this->rpObj->rp_remediation_date != '0000-00-00') ? $this->rpObj->_rp_remediation_date_formatted : '' ?> &nbsp;<a href="" title="Edit"><i class="fa fa-pencil"></i></a>
         </span>
             <span id="toggle-edit-3">
-            <input type="text" id="rp_remediation_date" readonly="readonly" class="w175" value="<?php echo ($this->rpObj->rp_remediation_date != '0000-00-00') ? $this->rpObj->_rp_remediation_date_formatted : '' ?>" />
+            <input type="text" id="rp_remediation_date" name="rp_remediation_date" readonly="readonly" class="w175" value="<?php echo ($this->rpObj->rp_remediation_date != '0000-00-00') ? $this->rpObj->_rp_remediation_date_formatted : '' ?>" />
         </span>
         <?php else: ?>
             <?php echo ($this->rpObj->rp_remediation_date != '0000-00-00') ? $this->rpObj->_rp_remediation_date_formatted : '' ?>

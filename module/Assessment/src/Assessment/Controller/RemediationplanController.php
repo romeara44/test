@@ -215,6 +215,12 @@ class RemediationplanController extends AbstractActionController
 
                 $fieldValues['rp_approved_date'] = \DateTime::createFromFormat('m/d/Y', $post['rp_approved_date'])->format('Y-m-d');
                 $fieldValues['rp_accepted_date'] = \DateTime::createFromFormat('m/d/Y', $post['rp_accepted_date'])->format('Y-m-d');
+                if (!empty($post['rp_incident_date'])) {
+                    $fieldValues['rp_incident_date'] = \DateTime::createFromFormat('m/d/Y', $post['rp_incident_date'])->format('Y-m-d');
+                }
+                if (!empty($post['rp_remediation_date'])) {
+                    $fieldValues['rp_remediation_date'] = \DateTime::createFromFormat('m/d/Y', $post['rp_remediation_date'])->format('Y-m-d');
+                }
 
                 $this->getRemediationplanTable()->setFieldValues($id, $fieldValues);
 
