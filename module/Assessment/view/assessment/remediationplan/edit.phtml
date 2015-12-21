@@ -69,9 +69,9 @@
 <div class="col5"  style="float: left;">
     <p><strong>ASSESSMENT DATE:</strong><br />
         <?php if ($this->writable): ?>
-            <?php if($this->rpObj->rp_a_id): ?>
+            <?php if($this->rpObj->rp_incident_date): ?>
             <span id="toggle-edit-show-2">
-                <?php echo ($this->rpObj->rp_incident_date != '0000-00-00') ? $this->rpObj->_rp_incident_date_formatted : '' ?> &nbsp;<a href="" title="Edit"><i class="fa fa-pencil"></i></a>
+                <?php echo $this->rpObj->_rp_incident_date_formatted; ?> &nbsp;<a href="" title="Edit"><i class="fa fa-pencil"></i></a>
             </span>
             <span id="toggle-edit-2">
                 <input type="text" id="rp_incident_date" readonly="readonly" class="w175" value="<?php echo ($this->rpObj->rp_incident_date != '0000-00-00') ? $this->rpObj->_rp_incident_date_formatted : '' ?>" />
