@@ -106,7 +106,7 @@ class Module
                 'BreachRemediationPlanRegulationTableGateway' => function ($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $resultSetPrototype = new ResultSet();
-                    $resultSetPrototype->setArrayObjectPrototype(new \Breachlog\Model\BreachRemediationPlanRegulation());
+                    $resultSetPrototype->setArrayObjectPrototype(new \Breachlog\Model\BreachremediationplanRegulation());
                     return new TableGateway('breach_remediation_plans_regulations', $dbAdapter, null, $resultSetPrototype);
                 },
 

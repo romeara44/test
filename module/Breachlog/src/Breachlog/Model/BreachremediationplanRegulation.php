@@ -6,7 +6,7 @@ use Zend\InputFilter\InputFilter;
 use Zend\InputFilter\InputFilterAwareInterface;
 use Zend\InputFilter\InputFilterInterface;
 
-class BreachRemediationPlanRegulation
+class BreachremediationplanRegulation
 {
 
     public $brprg_id;
