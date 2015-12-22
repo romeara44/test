@@ -100,7 +100,7 @@ class Module
 
                 'Breachlog\Model\BreachRemediationPlanRegulationTable' =>  function($sm) {
                     $tableGateway = $sm->get('BreachRemediationPlanRegulationTableGateway');
-                    $table = new \Breachlog\Model\BreachRemediationPlanRegulationTable($tableGateway);
+                    $table = new \Breachlog\Model\BreachremediationplanRegulationTable($tableGateway);
                     return $table;
                 },
                 'BreachRemediationPlanRegulationTableGateway' => function ($sm) {

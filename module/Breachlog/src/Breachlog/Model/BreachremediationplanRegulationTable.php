@@ -13,7 +13,7 @@ use Zend\Db\Sql\Delete;
 
 use Zend\Db\Sql\Expression;
 
-class BreachRemediationPlanRegulationTable implements ServiceLocatorAwareInterface
+class BreachremediationplanRegulationTable implements ServiceLocatorAwareInterface
 {
     protected $tableGateway;
     protected $serviceLocator;
