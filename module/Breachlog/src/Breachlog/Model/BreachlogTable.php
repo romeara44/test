@@ -331,7 +331,7 @@ class BreachlogTable implements ServiceLocatorAwareInterface
             'bl_description'          => DbCrypt::encryptValue($bl->bl_description),
             'bl_initials_approver'    => DbCrypt::encryptValue($bl->bl_initials_approver),
             'bl_initials'             => DbCrypt::encryptValue($bl->bl_initials),
-            'bl_reportable'           => DbCrypt::encryptValue($bl->bl_reportable),
+            'bl_reportable'           => 0,//DbCrypt::encryptValue($bl->bl_reportable),
             'bl_approver_u_id'        => $bl->bl_approver_u_id,
             'bl_accepter_u_id'        => $bl->bl_accepter_u_id
         );
