@@ -169,10 +169,12 @@ class BreachlogTable implements ServiceLocatorAwareInterface
                               )
                             );
 
-        $select->where('bl_active = 1');
-        $select->where('bl_name' . ' LIKE "%' . $searchValue . '%"');
+        if ($identity['u_role_id'] != User::ROLE_ADMIN) {
+            $select->where('bl_active = 1');
+        }
+        $select->where(DbCrypt::decryptField('bl_name', false) . ' LIKE "%' . $searchValue . '%"');
 
-        $select->columns(array('_id' => 'bl_id', '_name' => 'bl_name', '_type' => new \Zend\Db\Sql\Expression('CONCAT("breachlog")'), new \Zend\Db\Sql\Expression('NULL')));
+        $select->columns(array('_id' => 'bl_id', '_name' => DbCrypt::decryptField('bl_name'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("breachlog")'), new \Zend\Db\Sql\Expression('NULL')));
 
         if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
             $select->where('bl_consultant_u_id = ' . $identity['u_id']);

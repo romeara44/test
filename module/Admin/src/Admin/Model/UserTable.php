@@ -92,6 +92,7 @@ class UserTable implements ServiceLocatorAwareInterface
     public function getSearchResultsUsersSelect($searchValue, $identity)
     {
         $select = $this->tableGateway->getSql()->select();
+        
         $select->where('u_active = 1');
         $select->where('(u_firstname LIKE "%' . $searchValue . '%" OR u_lastname LIKE "%' . $searchValue . '%")');
 
@@ -105,8 +106,9 @@ class UserTable implements ServiceLocatorAwareInterface
     public function getSearchResultsSelect($searchValue, $identity)
     {
         $select = $this->tableGateway->getSql()->select();
+        $select->join(array('compa' => 'companies'), 'u_company_id = compa.c_id', array(), 'left');
         $select->where('u_active = 1');
-        $select->where('(u_firstname LIKE "%' . $searchValue . '%" OR u_lastname LIKE "%' . $searchValue . '%")');
+        $select->where('(u_firstname LIKE "%' . $searchValue . '%" OR u_lastname LIKE "%' . $searchValue . '%" OR compa.c_name LIKE "%' . $searchValue . '%")');
 
         $select->columns(array('_id' => 'u_id', '_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("contact")'), new \Zend\Db\Sql\Expression('NULL')));
 
