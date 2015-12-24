@@ -102,12 +102,10 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
             $select->join(array('c' => 'companies'), 'brp_c_id = c_id', array('_client_name' => 'c_name'), 'left');
             $select->join(array('u' => 'users'), 'brp_approver_u_id = u.u_id', array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)')), 'left');
 
-            $order = $order ? $order : 'ASC';
-
-            $orders[] = 'brp_version_index ' . $order;
-            $orders[] = 'brp_id ASC';
             if ($orderBy) {
-                $orders[] = $orderBy . ' ' . $order;
+                $orders = $orderBy . ' ' . $order;
+            } else {
+                $orders = 'brp_id DESC';
             }
 
             $select->order($orders);

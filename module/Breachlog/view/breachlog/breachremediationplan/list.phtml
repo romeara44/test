@@ -88,7 +88,7 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
 
             ?>
             <tr>
-                <td class="<?php echo $classBold ?>"><?php echo $rowId ?></td>
+                <td class="<?php echo $classBold ?>"><?php echo $brp->brp_id ?></td>
                 <?php if (!$isClientRole): ?>
                     <td class="<?php echo $classBold ?>" style="padding-left: <?php echo $paddingVersion ?>px"><?php if ($isVersion): ?><i class="fa fa-code-fork"></i> &nbsp; <?php endif ?><a href="/breachremediationplan/edit/<?php echo $brp->brp_id ?>"><?php echo stripslashes($brp->_client_name) ?></a></td>
                 <?php endif; ?>
