@@ -80,7 +80,7 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
 
 
             if ($identity['u_role_id'] == User::ROLE_ADMIN) {
-                $select->where('(' . DbCrypt::decryptField('brp_status', false) . ' = 30 AND brp_active = 1) || (brp_active = 0)');
+                //$select->where('(' . DbCrypt::decryptField('brp_status', false) . ' = 30 AND brp_active = 1) || (brp_active = 0)');
             } else {
                 if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
                     $select->where('brp_consultant_u_id = ' . $identity['u_id']);
@@ -343,7 +343,7 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         $select->join(array('u' => 'users'), 'brp_approver_u_id = u_id', array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)'), '_brp_incident_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(' . DbCrypt::decryptField('brp_incident_date', false) . ', "%m/%d/%Y")'), '_brp_remediation_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(' . DbCrypt::decryptField('brp_remediation_date', false) . ', "%m/%d/%Y")')), 'left');
         $select->join(array('u2' => 'users'), 'brp_consultant_u_id = u2.u_id', array('_consultant_name' => new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)')), 'left');
         $select->join(array('u3' => 'users'), 'brp_performed_u_id = u3.u_id', array('_performed_name' => new \Zend\Db\Sql\Expression('CONCAT(u3.u_firstname, " ", u3.u_lastname)')), 'left');
-        $select->join(array('u4' => 'users'), 'brp_approver_u_id = u4.u_id', array('_accepter_name' => new \Zend\Db\Sql\Expression('CONCAT(u4.u_firstname, " ", u4.u_lastname)')), 'left');
+        $select->join(array('u4' => 'users'), 'brp_accepter_u_id = u4.u_id', array('_accepter_name' => new \Zend\Db\Sql\Expression('CONCAT(u4.u_firstname, " ", u4.u_lastname)')), 'left');
 
         $resultSet = $this->tableGateway->selectWith($select);
 

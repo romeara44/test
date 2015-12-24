@@ -376,7 +376,7 @@
             <?php endif; ?>
         <?php endif; ?>
 
-        <?php if ($this->isAdmin): ?>
+        <?php if ($this->isAdmin && $brpObj->brp_status != \Breachlog\Model\Breachremediationplan::STATUS_OPEN): ?>
             <?php $deleteUrl = '/breachremediationplan/reopen/' . $brpObj->brp_id; ?>
             <a href="#confirmation-box-modal" onclick="$('#confirmation-box-modal h3').html('Are you sure you want to re-open this plan ?'); $('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="form-button confirmation-modal">Re-Open Plan</a>
             <div class="fleft">or</div>

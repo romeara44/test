@@ -116,6 +116,8 @@ class BreachlogquestionTable implements ServiceLocatorAwareInterface
 
             $blSize = (int) $bl->bl_size;
 
+            $approval_authority_role = $this->getServiceLocator()->get('Client\Model\CompanyRolesTable')->getCompanyRoleByCompanyAndRole($bl->bl_c_id, 9);
+
             foreach (Breachremediationplanaction::$tasks as $taskKey => $task) {
 
                 if (($taskKey == 9) && ($blSize <= 500)) {
@@ -126,6 +128,7 @@ class BreachlogquestionTable implements ServiceLocatorAwareInterface
 
                 $brpaData['brpa_brp_id']       = $brpId;
                 $brpaData['brpa_contact_u_id'] = $bl->bl_consultant_u_id;
+                $brpaData['brpa_approver_u_id'] = $approval_authority_role->cr_u_id;
                 $brpaData['brpa_task']         = $task;
                 $brpaData['brpa_action_plan']  = '';
                 $brpaData['brpa_status']       = 0;

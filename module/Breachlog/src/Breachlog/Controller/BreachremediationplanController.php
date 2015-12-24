@@ -376,18 +376,18 @@ class BreachremediationplanController extends AbstractActionController
         $csvList[] = '';
         $csvList[] = array(
             'Task',
-            'Action Plan',
             'Status',
             'Assignee',
+            'Approver',
             'Target Date',
         );
         $csvList[] = '';
         foreach ($actions as $brpa) {
             $csvList[] = array(
                 $brpa->brpa_task,
-                $brpa->brpa_action_plan,
                 \Breachlog\Model\Breachremediationplanaction::$statusesNames[$brpa->brpa_status],
                 $brpa->_contact_name,
+                $brpa->_approver_name,
                 ($brpa->brpa_target_date != '0000-00-00') ? substr($brpa->brpa_target_date, 0, 10) : '',
             );
 
@@ -431,9 +431,6 @@ class BreachremediationplanController extends AbstractActionController
             }
         }
 
-        $csvList[] = 'Initials:';
-        $csvList[] = $brpObj->brp_initials;
-
         if($brpObj->_brp_cur_regulations) {
             $regulations = $this->getRegulationTable()->getRegulations();
             if($regulations) {
@@ -451,6 +448,18 @@ class BreachremediationplanController extends AbstractActionController
                 }
             }
         }
+
+        $csvList[] = 'Reviewed and approved by:';
+        $csvList[] = $brpObj->_approver_name;
+
+        $csvList[] = 'Initials:';
+        $csvList[] = $brpObj->brp_initials_approver;
+
+        $csvList[] = 'Agreed to and accepted by:';
+        $csvList[] = $brpObj->_accepter_name;
+
+        $csvList[] = 'Initials:';
+        $csvList[] = $brpObj->brp_initials;
 
         $csvContent = '';
         foreach ($csvList as $row) {
