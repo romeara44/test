@@ -86,7 +86,7 @@
                     echo $this->formTextarea($fn);
                     echo $this->formElementErrors($fn);
                 else:
-                    echo '<span style="width: 450px; float: left">' . $this->rpaObj->rpa_threat . '</span>';
+                    echo '<span style="width: 450px; float: left">' . ($this->rpaObj ? $this->rpaObj->rpa_threat : '') . '</span>';
                 endif;
                 ?>
             </p>
@@ -98,7 +98,7 @@
                     echo $this->formTextarea($fn);
                     echo $this->formElementErrors($fn);
                 else:
-                    echo '<span style="width: 450px; float: left">' . $this->rpaObj->rpa_action_plan . '</span>';
+                    echo '<span style="width: 450px; float: left">' . ($this->rpaObj ? $this->rpaObj->rpa_action_plan : '') . '</span>';
                 endif;
                 ?>
             </p>
@@ -140,7 +140,7 @@
                 <?php
                 $fn = $formTask->get('rpa_target_date');
                 echo $this->formLabel($fn);
-                echo $this->formText($fn->setAttributes(array('id' => 'rpa_target_date', 'readonly' => 'readonly', 'value' => $this->rpaObj->_rpa_target_date_formatted)));
+                echo $this->formText($fn->setAttributes(array('id' => 'rpa_target_date', 'readonly' => 'readonly', 'value' => $this->rpaObj ? $this->rpaObj->_rpa_target_date_formatted : '')));
                 echo $this->formElementErrors($fn);
                 ?>
             </p>

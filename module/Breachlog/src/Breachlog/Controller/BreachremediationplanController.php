@@ -539,6 +539,7 @@ class BreachremediationplanController extends AbstractActionController
 
         $brpObj = $this->getBreachremediationplanTable()->getBreachremediationplan($brpId);
         $notes = null;
+        $brpaObj = false;
         if ($id) {
             $brpaObj = $this->getBreachremediationplanactionTable()->getBreachremediationplanaction($id);
             $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_BRPA);
@@ -614,7 +615,7 @@ class BreachremediationplanController extends AbstractActionController
             'added' => $added,
             'notes' => $notes,
             'writable' => is_object($brpObj) ? $brpObj->brp_writable : false,
-            'brpaObj' => is_object($brpaObj) ? $brpaObj : false,
+            'brpaObj' => $brpaObj,
         ));
 
         $viewModel->setTemplate('breachlog/breachremediationplan/modaltemplate.phtml');

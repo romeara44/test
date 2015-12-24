@@ -624,6 +624,7 @@ class RemediationplanController extends AbstractActionController
 
         $rpObj = $this->getRemediationplanTable()->getRemediationplan($rpId);
         $notes = null;
+        $rpaObj = false;
         if ($id) {
             $rpaObj = $this->getRemediationplanactionTable()->getRemediationplanaction($id);
             $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_RPA);
