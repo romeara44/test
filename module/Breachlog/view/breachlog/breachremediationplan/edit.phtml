@@ -22,6 +22,7 @@
             <span id="toggle-edit-show-1">
                 <?php echo $this->brpObj->_performed_name ?> &nbsp;<a href="" title="Edit"><i class="fa fa-pencil"></i></a>
             </span>
+            <?php if (!$this->isPdf): ?>
             <span id="toggle-edit-1">
                 <select id="brp_performed_u_id" id="" class="w175">
                     <option value="">Please Select</option>
@@ -31,6 +32,7 @@
                     <?php endforeach; ?>
                 </select>
             </span>
+            <?php endif; ?>
         <?php else: ?>
             <?php echo $this->brpObj->_performed_name ?>
         <?php endif; ?>
@@ -43,6 +45,7 @@
             <span id="toggle-edit-show-4">
                 <?php echo $this->brpObj->_approver_name ?> &nbsp;<a href="" title="Edit"><i class="fa fa-pencil"></i></a>
             </span>
+            <?php if (!$this->isPdf): ?>
             <span id="toggle-edit-4">
                 <select id="brp_approver_u_id" id="" class="w175">
                     <option value="">Please Select</option>
@@ -52,6 +55,7 @@
                     <?php endforeach; ?>
                 </select>
             </span>
+            <?php endif; ?>
         <?php else: ?>
             <?php echo $this->brpObj->_approver_name ?>
         <?php endif; ?>
@@ -63,9 +67,11 @@
             <span id="toggle-edit-show-2">
                 <?php echo ($this->brpObj->brp_incident_date != '0000-00-00') ? $this->brpObj->_brp_incident_date_formatted : '' ?> &nbsp;<a href="" title="Edit"><i class="fa fa-pencil"></i></a>
             </span>
+            <?php if (!$this->isPdf): ?>
             <span id="toggle-edit-2">
                 <input type="text" id="brp_incident_date" class="w175" readonly="readonly" value="<?php echo ($this->brpObj->brp_incident_date != '0000-00-00') ? $this->brpObj->_brp_incident_date_formatted : '' ?>" />
             </span>
+            <?php endif; ?>
         <?php else: ?>
             <?php echo ($this->brpObj->brp_incident_date != '0000-00-00') ? $this->brpObj->_brp_incident_date_formatted : '' ?>
         <?php endif; ?>
@@ -77,9 +83,11 @@
         <span id="toggle-edit-show-3">
             <?php echo ($this->brpObj->brp_remediation_date != '0000-00-00') ? $this->brpObj->_brp_remediation_date_formatted : '' ?> &nbsp;<a href="" title="Edit"><i class="fa fa-pencil"></i></a>
         </span>
+        <?php if (!$this->isPdf): ?>
         <span id="toggle-edit-3">
             <input type="text" id="brp_remediation_date" class="w175" readonly="readonly" value="<?php echo ($this->brpObj->brp_remediation_date != '0000-00-00') ? $this->brpObj->_brp_remediation_date_formatted : '' ?>" />
         </span>
+        <?php endif; ?>
     <?php else: ?>
         <?php echo ($this->brpObj->brp_remediation_date != '0000-00-00') ? $this->brpObj->_brp_remediation_date_formatted : '' ?>
     <?php endif; ?>
