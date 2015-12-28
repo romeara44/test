@@ -1,0 +1,2 @@
+UPDATE `assessments_questions_categories` SET aqc_action_plan = REPLACE(aqc_action_plan, 'malcious', 'malicious');
+UPDATE `remediation_plans_actions` SET rpa_action_plan = REPLACE(rpa_action_plan, 'malcious', 'malicious');
