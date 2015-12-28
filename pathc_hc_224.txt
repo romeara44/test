@@ -1,0 +1,1 @@
+UPDATE `assessments_questions_categories` SET `aqc_action_plan` = 'The organization needs to implement policies and procedures for guarding against malicious software entering the practice''s computer systems to become compliant ' WHERE `assessments_questions_categories`.`aqc_id` = 14;
