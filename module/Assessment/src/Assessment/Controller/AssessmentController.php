@@ -492,7 +492,7 @@ class AssessmentController extends AbstractActionController
 
                 $newCreatedRpId = $this->getAssessmentTable()->checkStepFinished($id, 5);
                 if ($newCreatedRpId) {
-                    return $this->redirect()->toRoute('remediationplan', array('controller' => 'remediationplan', 'action' => 'edit', 'id' => $newCreatedRpId));
+                    return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'list'));
                 }
             }
 
@@ -536,14 +536,80 @@ class AssessmentController extends AbstractActionController
 
                     if ($step == 1) {
                         return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => $post['setStep'], 'location' => $adrId));
-                    } elseif ((($post['setStep'] == 5) && ($currentAdrId == $lastAdrId)) || ($step == 5)) {
+                    } elseif ((($post['setStep'] == 5) && ($currentAdrId == $lastAdrId || $lastAdrId == 0)) || ($step == 5)) {
                         $adrId = (int) $this->params('adrId');
                         $adrId = isset($adrId) ? $adrId : $adrIdB;
                         if (!$adrId) {
                             $adrId = $adrIdB;
                         }
                         if ($assessmentRole == 6) {
-                            return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => $post['setStep'], 'locationRole' => $nextAdrId . '_1'));
+                            if ($nextAdrId) {
+                                return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => $post['setStep'], 'locationRole' => $nextAdrId . '_1'));    
+                            } else {
+                                $assessmentsRoles = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type, true);
+                                $checkSteps = $this->getAssessmentTable()->checkSteps($id, $addresses, $assessmentsRoles);
+                                foreach ($checkSteps as $step => $finished_array) {
+                                    if ($step == 1) continue;
+                                    if ($step == 5) {
+                                        foreach ($finished_array as $location => $finished_array2) {
+                                            foreach ($finished_array2 as $assessmentRole => $finished) {
+                                                if (!$finished) {
+                                                    return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => $step, 'locationRole' => $location . '_' . $assessmentRole));
+                                                    
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        foreach ($finished_array as $location => $finished_value) {
+                                            if (!$finished_value) {
+                                                return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => $step, 'location' => $location));
+                                                                                                
+                                            }
+                                            
+                                        }
+                                    }
+                                    
+                                }
+                            }
+                            
+                        } elseif ($assessmentRole == 0) {
+                            $assessmentsRoles = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type, true);
+                            $checkSteps = $this->getAssessmentTable()->checkSteps($id, $addresses, $assessmentsRoles);
+                            foreach ($checkSteps as $step => $finished_array) {
+                                if ($step == 5) {
+                                    foreach ($finished_array as $location => $finished_array2) {
+                                        foreach ($finished_array2 as $assessmentRole => $finished) {
+                                            if (!$finished) {
+                                                return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => $step, 'locationRole' => $location . '_' . $assessmentRole));
+                                                
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            foreach ($checkSteps as $step => $finished_array) {
+                                if ($step == 1) continue;
+                                if ($step == 5) {
+                                    foreach ($finished_array as $location => $finished_array2) {
+                                        foreach ($finished_array2 as $assessmentRole => $finished) {
+                                            if (!$finished) {
+                                                return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => $step, 'locationRole' => $location . '_' . $assessmentRole));
+                                                
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    foreach ($finished_array as $location => $finished_value) {
+                                        if (!$finished_value) {
+                                            return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => $step, 'location' => $location));
+                                                                                            
+                                        }
+                                        
+                                    }
+                                }
+                                
+                            }
+                            return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'list'));
                         } else {
                             return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => $post['setStep'], 'locationRole' => $adrId . '_' . ($assessmentRole + 1)));
                         }
