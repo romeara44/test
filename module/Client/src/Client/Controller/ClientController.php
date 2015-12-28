@@ -177,7 +177,7 @@ class ClientController extends AbstractActionController
         if ((int) $id) {
             $userObj = $this->getUserTable()->getUser($id);
             if($userObj->u_first_login == 1) {
-                $this->getUserTable()->unSetFirstLogin($id);
+                //$this->getUserTable()->unSetFirstLogin($id);
             }
             $clientObj = $this->getCompanyTable()->getCompany($userObj->u_company_id);
             $primaryAddressObj = $this->getAddressTable()->getAddress($clientObj->c_primary_adr_id);
