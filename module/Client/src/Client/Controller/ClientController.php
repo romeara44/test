@@ -203,7 +203,7 @@ class ClientController extends AbstractActionController
                     $iisTrainingManager = isset($post['is_training_manager']) ? 1 : 0;
                     $curTrainingManager = $this->getCompanyTable()->getTrainingManager($post['u_company_id']);
 
-                    if($iisTrainingManager && $post['u_company_id'] && $curTrainingManager) {
+                    if($iisTrainingManager && $post['u_company_id'] && $curTrainingManager && (int)$curTrainingManager != (int)$id) {
                         $setTrainingManagerMsg = 'Company already has training manager!';
                         $setTrainingManager = false;
                     }
