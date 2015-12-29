@@ -80,21 +80,34 @@ class BreachlogTable implements ServiceLocatorAwareInterface
 
             if ($identity['u_role_id'] == User::ROLE_ADMIN) {
             } else {
+                $where_str = '';
                 if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
-                    $select->where('bl_consultant_u_id = ' . $identity['u_id']);
+                    $where_str .= 'bl_consultant_u_id = ' . $identity['u_id'];
                 } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
                     $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
                     $ids[] = $identity['u_id'];
-                    $select->where('bl_consultant_u_id IN (' . implode(',', $ids) . ')');
+                    $where_str .= 'bl_consultant_u_id IN (' . implode(',', $ids) . ')';
                 } elseif ($identity['u_role_id'] == User::ROLE_CLIENT && $identity['u_company_id']) {
-                    $select->where('bl_c_id = ' . $identity['u_company_id']);
+                    $where_str .= 'bl_c_id = ' . $identity['u_company_id'];
                 }
 
                 $companies_ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getCompaniesIdsForConsultant($identity['u_id']);
                 if ($companies_ids) {
-                    $select->where(array('bl_c_id' => $companies_ids), PredicateSet::OP_OR);
+                  if ($where_str) {
+                    $where_str = '(' . $where_str . ' OR bl_c_id IN (' . implode(',', $companies_ids) . '))';
+                  } else {
+                    $where_str = 'bl_c_id IN (' . implode(',', $companies_ids) . ')';
+                  }
+                    
                 }
-                $select->where('bl_active = 1');
+                if ($where_str) {
+                    $where_str .= ' AND bl_active = 1';
+                } else {
+                    $where_str = 'bl_active = 1';
+                }
+                
+
+                $select->where($where_str);
             }
 
             $select->join(array('c' => 'companies'), 'bl_c_id = c_id', array('_client_name' => 'c_name'), 'left');
@@ -146,45 +159,48 @@ class BreachlogTable implements ServiceLocatorAwareInterface
     {
         $select = $this->tableGateway->getSql()->select();
 
-        $select->columns(array('bl_id'                   => 'bl_id',
-                               'bl_consultant_u_id'      => 'bl_consultant_u_id',
-                               'bl_create_u_id'          => 'bl_create_u_id',
-                               'bl_update_u_id'          => 'bl_update_u_id',
-                               'bl_c_id'                 => 'bl_c_id',
-                               'bl_name'                 => DbCrypt::decryptField('bl_name'),
-                               'bl_date_of_occurrence'   => DbCrypt::decryptField('bl_date_of_occurrence'),
-                               'bl_size'                 => DbCrypt::decryptField('bl_size'),
-                               'bl_description'          => DbCrypt::decryptField('bl_description'),
-                               'bl_reportable'           => DbCrypt::decryptField('bl_reportable'),
-                               'bl_create_date'          => DbCrypt::decryptField('bl_create_date'),
-                               'bl_update_date'          => DbCrypt::decryptField('bl_update_date'),
-                               'bl_invest_led_by'        => DbCrypt::decryptField('bl_invest_led_by'),
-                               'bl_date_invest_start'    => DbCrypt::decryptField('bl_date_invest_start'),
-                               'bl_date_invest_complete' => DbCrypt::decryptField('bl_date_invest_complete'),
-                               'bl_initials_approver'    => DbCrypt::decryptField('bl_initials_approver'),
-                               'bl_initials'             => DbCrypt::decryptField('bl_initials'),
-                               'bl_approver_u_id'        => 'bl_approver_u_id',
-                               'bl_accepter_u_id'        => 'bl_accepter_u_id',
-                               'bl_active'               => 'bl_active'
-                              )
-                            );
-
-        if ($identity['u_role_id'] != User::ROLE_ADMIN) {
-            $select->where('bl_active = 1');
-        }
-        $select->where(DbCrypt::decryptField('bl_name', false) . ' LIKE "%' . $searchValue . '%"');
-
         $select->columns(array('_id' => 'bl_id', '_name' => DbCrypt::decryptField('bl_name'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("breachlog")'), new \Zend\Db\Sql\Expression('NULL')));
 
-        if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
-            $select->where('bl_consultant_u_id = ' . $identity['u_id']);
-        } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
-            $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
-            $ids[] = $identity['u_id'];
-            $select->where('bl_consultant_u_id IN (' . implode(',', $ids) . ')');
-        } elseif ($identity['u_role_id'] == User::ROLE_CLIENT) {
-            $select->where('bl_c_id = ' . $identity['u_company_id']);
+        $select->join(array('c' => 'companies'), 'bl_c_id = c_id', array(), 'left');
+
+        $where_str = '';
+        if ($identity['u_role_id'] == User::ROLE_ADMIN) {
+        } else {
+            
+            if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
+                $where_str .= 'bl_consultant_u_id = ' . $identity['u_id'];
+            } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
+                $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
+                $ids[] = $identity['u_id'];
+                $where_str .= 'bl_consultant_u_id IN (' . implode(',', $ids) . ')';
+            } elseif ($identity['u_role_id'] == User::ROLE_CLIENT && $identity['u_company_id']) {
+                $where_str .= 'bl_c_id = ' . $identity['u_company_id'];
+            }
+
+            $companies_ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getCompaniesIdsForConsultant($identity['u_id']);
+            if ($companies_ids) {
+              if ($where_str) {
+                $where_str = '(' . $where_str . ' OR bl_c_id IN (' . implode(',', $companies_ids) . '))';
+              } else {
+                $where_str = 'bl_c_id IN (' . implode(',', $companies_ids) . ')';
+              }
+                
+            }
+            if ($where_str) {
+                $where_str .= ' AND bl_active = 1';
+            } else {
+                $where_str = 'bl_active = 1';
+            }
+                        
         }
+
+        if ($where_str) {
+            $where_str .= ' AND (' . DbCrypt::decryptField('bl_name', false) . ' LIKE "%' . $searchValue . '%" OR c.c_name LIKE "%' . $searchValue . '%")';
+        } else {
+            $where_str = DbCrypt::decryptField('bl_name', false) . ' LIKE "%' . $searchValue . '%" OR c.c_name LIKE "%' . $searchValue . '%"';
+        }
+
+        $select->where($where_str);
 
         return $select;
     }
