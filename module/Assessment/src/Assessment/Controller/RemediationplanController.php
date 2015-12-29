@@ -274,6 +274,7 @@ class RemediationplanController extends AbstractActionController
         $rpObj = $this->getRemediationplanTable()->getRemediationplan($id);
         $rpObj->_client_name = stripslashes($rpObj->_client_name);
         $actions = $this->getRemediationplanactionTable()->getRemediationplanactions($id, $sortCol, $order);
+        $actions->buffer();
 
         $noteTable = $this->getNoteTable();
 
