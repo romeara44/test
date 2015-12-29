@@ -82,11 +82,11 @@ $identity = $authService->getIdentity();
                 <td style="white-space: nowrap;"><?php echo $ba->ba_office_phone ?></td>
                 <td style="white-space: nowrap;" class="aright">
                     <a href="/businessassociate/edit/<?php echo $ba->ba_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
-                    <?php if ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
-                        <a href="/businessassociate/unarchive/<?php echo $ba->ba_id ?>" class="">Unarchive</a>
-                    <?php else: ?>
+                    <?php if ($ba->ba_active): ?>
                         <?php $deleteUrl = '/businessassociate/delete/' . $ba->ba_id; ?>
                         <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
+                    <?php elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
+                        <a href="/businessassociate/unarchive/<?php echo $ba->ba_id ?>" class="">Unarchive</a>
                     <?php endif; ?>
                 </td>
             </tr>

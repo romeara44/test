@@ -663,8 +663,8 @@ class CompanyTable implements ServiceLocatorAwareInterface
         $this->getServiceLocator()->get('Assessment\Model\RemediationplanTable')->deleteRemediationplansByCompanyId($id, 1);
         $this->getServiceLocator()->get('Traininglog\Model\TraininglogTable')->deleteTraininglogsByCompanyId($id, 1);
         $this->getServiceLocator()->get('Securityreminder\Model\SecurityreminderTable')->deleteSecurityremindersByCompanyId($id, 1);
-        $this->getServiceLocator()->get('Disclosure\Model\DisclosureRequestTable')->deleteDisclosureTrackingLogsByCompanyId($id, 1);
-        $this->getServiceLocator()->get('Disclosure\Model\DisclosureTrackingLogTable')->deleteDisclosureTrackingLogsByCompanyId($id, 1);
+        //$this->getServiceLocator()->get('Disclosure\Model\DisclosureRequestTable')->deleteDisclosureTrackingLogsByCompanyId($id, 1);
+        //$this->getServiceLocator()->get('Disclosure\Model\DisclosureTrackingLogTable')->deleteDisclosureTrackingLogsByCompanyId($id, 1);
         $this->getServiceLocator()->get('Disclosure\Model\VerbalLogTable')->deleteVerbalLogsByCompanyId($id, 1);
 
         return true;

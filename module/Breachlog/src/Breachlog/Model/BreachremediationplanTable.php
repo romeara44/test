@@ -82,21 +82,31 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
             if ($identity['u_role_id'] == User::ROLE_ADMIN) {
                 //$select->where('(' . DbCrypt::decryptField('brp_status', false) . ' = 30 AND brp_active = 1) || (brp_active = 0)');
             } else {
+              $where_str = '';
                 if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
-                    $select->where('brp_consultant_u_id = ' . $identity['u_id']);
+                    $where_str .= 'brp_consultant_u_id = ' . $identity['u_id'];
                 } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
                     $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
                     $ids[] = $identity['u_id'];
-                    $select->where('brp_consultant_u_id IN (' . implode(',', $ids) . ')');
+                    $where_str .= 'brp_consultant_u_id IN (' . implode(',', $ids) . ')';
                 } elseif ($identity['u_role_id'] == User::ROLE_CLIENT) {
-                    $select->where('brp_c_id = ' . $identity['u_company_id']);
+                    $where_str .= 'brp_c_id = ' . $identity['u_company_id'];
                 }
 
                 $companies_ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getCompaniesIdsForConsultant($identity['u_id']);
                 if ($companies_ids) {
-                    $select->where(array('brp_c_id' => $companies_ids), PredicateSet::OP_OR);
+                    if ($where_str) {
+                        $where_str = '(' . $where_str . ' OR brp_c_id IN (' . implode(',', $companies_ids) . '))';
+                      } else {
+                        $where_str = 'brp_c_id IN (' . implode(',', $companies_ids) . ')';
+                      }
                 }
-                $select->where('brp_active = 1');
+                if ($where_str) {
+                    $where_str .= ' AND brp_active = 1';
+                } else {
+                    $where_str = 'brp_active = 1';
+                }
+                $select->where($where_str);
             }
 
             $select->join(array('c' => 'companies'), 'brp_c_id = c_id', array('_client_name' => 'c_name'), 'left');

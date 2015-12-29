@@ -64,11 +64,11 @@ $identity = $authService->getIdentity();
                 <td><?php echo $vl->vl_address ?></td>
                 <td style="white-space: nowrap;" class="aright">
                     <a href="/verballog/edit/<?php echo $vl->vl_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
-                    <?php if ($vl->vl_active == 0): ?>
-                        <a href="/verballog/unarchive/<?php echo $vl->vl_id  ?>" class="">Unarchive</a>
-                    <?php else: ?>
+                    <?php if ($vl->vl_active): ?>
                         <?php $deleteUrl = '/verballog/delete/' . $vl->vl_id; ?>
                         <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
+                    <?php elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
+                        <a href="/verballog/unarchive/<?php echo $vl->vl_id  ?>" class="">Unarchive</a>
                     <?php endif; ?>
                 </td>
             </tr>

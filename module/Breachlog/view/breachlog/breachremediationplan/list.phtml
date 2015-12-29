@@ -97,11 +97,11 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
                 <td style="white-space: nowrap;" class="aright <?php echo $classBold ?>">
                     <a class="<?php echo $classBold ?>" href="/breachremediationplan/edit/<?php echo $brp->brp_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
                     <?php if (!$isClientRole): ?>
-                        <?php if (($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN) && ($brp->brp_active == 0)): ?>
-                            <a href="/breachremediationplan/unarchive/<?php echo $brp->brp_id ?>" class="">Unarchive</a>
-                        <?php else: ?>
+                        <?php if ($brp->brp_active): ?>
                             <?php $deleteUrl = '/breachremediationplan/delete/' . $brp->brp_id; ?>
                             <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete <?php echo $classBold ?>"><i class="fa fa-trash-o"></i></a>
+                        <?php elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
+                            <a href="/breachremediationplan/unarchive/<?php echo $brp->brp_id ?>" class="">Unarchive</a>
                         <?php endif; ?>
                     <?php endif; ?>
                 </td>

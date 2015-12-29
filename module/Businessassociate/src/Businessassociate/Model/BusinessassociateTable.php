@@ -46,21 +46,33 @@ class BusinessassociateTable implements ServiceLocatorAwareInterface
 
             if ($identity['u_role_id'] == User::ROLE_ADMIN) {
             } else {
+                $where_str = '';
                 if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
-                    $select->where('ba_consultant_u_id = ' . $identity['u_id']);
+                    $where_str .= 'ba_consultant_u_id = ' . $identity['u_id'];
                 } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
                     $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
                     $ids[] = $identity['u_id'];
-                    $select->where('ba_consultant_u_id IN (' . implode(',', $ids) . ')');
+                    $where_str .= 'ba_consultant_u_id IN (' . implode(',', $ids) . ')';
                 } elseif ($identity['u_role_id'] == User::ROLE_CLIENT && $identity['u_company_id']) {
-                    $select->where('ba_c_id = ' . $identity['u_company_id']);
+                    $where_str .= 'ba_c_id = ' . $identity['u_company_id'];
                 }
 
                 $companies_ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getCompaniesIdsForConsultant($identity['u_id']);
                 if ($companies_ids) {
-                    $select->where(array('ba_c_id' => $companies_ids), PredicateSet::OP_OR);
+                    if ($where_str) {
+                        $where_str = '(' . $where_str . ' OR ba_c_id IN (' . implode(',', $companies_ids) . '))';
+                      } else {
+                        $where_str = 'ba_c_id IN (' . implode(',', $companies_ids) . ')';
+                      }
                 }
-                $select->where('ba_active = 1');
+                if ($where_str) {
+                    $where_str .= ' AND ba_active = 1';
+                } else {
+                    $where_str = 'ba_active = 1';
+                }
+                
+
+                $select->where($where_str);
             }
 
             $select->join(array('u' => 'users'), 'ba_contact_u_id = u_id', array('_contact_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)')), 'left');

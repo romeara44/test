@@ -79,11 +79,11 @@ $identity = $authService->getIdentity();
                         <i class="fa fa-paperclip"></i> &nbsp;
                     <?php endif; ?>
                     <a href="/traininglog/edit/<?php echo $tl->tl_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
-                    <?php if ($tl->tl_active == 0): ?>
-                        <a href="/traininglog/unarchive/<?php echo $tl->tl_id  ?>" class="">Unarchive</a>
-                    <?php else: ?>
+                    <?php if ($tl->tl_active): ?>
                         <?php $deleteUrl = '/traininglog/delete/' . $tl->tl_id; ?>
-                        <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
+                        <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>                        
+                    <?php elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
+                        <a href="/traininglog/unarchive/<?php echo $tl->tl_id  ?>" class="">Unarchive</a>
                     <?php endif; ?>
                 </td>
             </tr>

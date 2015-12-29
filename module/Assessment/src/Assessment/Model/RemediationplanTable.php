@@ -47,24 +47,34 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
 
             if ($identity['u_role_id'] == User::ROLE_ADMIN) {
             } else {
+                $where_str = '';
                 if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
-                    $select->where('rp_consultant_u_id = ' . $identity['u_id']);
+                    $where_str .= 'rp_consultant_u_id = ' . $identity['u_id'];
                 } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
                     $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
                     $ids[] = $identity['u_id'];
-                    $select->where('rp_consultant_u_id IN (' . implode(',', $ids) . ')');
+                    $where_str .= 'rp_consultant_u_id IN (' . implode(',', $ids) . ')';
                 } elseif ($identity['u_role_id'] == User::ROLE_CLIENT && $identity['u_company_id']) {
                     $companies = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getClientCompanies($identity['u_id']);
                     $companies[] = $identity['u_company_id'];
 
-                    $select->where('rp_c_id IN (' . implode(',', $companies) . ') ');
+                    $where_str .= 'rp_c_id IN (' . implode(',', $companies) . ') ';
                 }
 
                 $companies_ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getCompaniesIdsForConsultant($identity['u_id']);
                 if ($companies_ids) {
-                    $select->where(array('rp_c_id' => $companies_ids), PredicateSet::OP_OR);
+                    if ($where_str) {
+                        $where_str = '(' . $where_str . ' OR rp_c_id IN (' . implode(',', $companies_ids) . '))';
+                      } else {
+                        $where_str = 'rp_c_id IN (' . implode(',', $companies_ids) . ')';
+                      }
                 }
-                $select->where('rp_active = 1');
+                if ($where_str) {
+                    $where_str .= ' AND rp_active = 1';
+                } else {
+                    $where_str = 'rp_active = 1';
+                }
+                $select->where($where_str);
             }
 
 

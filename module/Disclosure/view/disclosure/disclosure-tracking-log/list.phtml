@@ -72,11 +72,11 @@ $identity = $authService->getIdentity();
                 <td><?php echo $dtl->dtl_name_of_requestor ?></td>
                 <td style="white-space: nowrap;" class="aright">
                     <a href="/disclosuretrackinglog/edit/<?php echo $dtl->dtl_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
-                    <?php if ($dtl->dtl_active == 0): ?>
-                        <a href="/disclosuretrackinglog/unarchive/<?php echo $dtl->dtl_id  ?>" class="">Unarchive</a>
-                    <?php else: ?>
+                    <?php if ($dtl->dtl_active): ?>
                         <?php $deleteUrl = '/disclosuretrackinglog/delete/' . $dtl->dtl_id; ?>
                         <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
+                    <?php elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
+                        <a href="/disclosuretrackinglog/unarchive/<?php echo $dtl->dtl_id  ?>" class="">Unarchive</a>
                     <?php endif; ?>
                 </td>
             </tr>

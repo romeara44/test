@@ -63,8 +63,11 @@ class UserTable implements ServiceLocatorAwareInterface
 
             $select->join(array('r' => 'roles'), 'role_id = u_role_id', array('_rolename' => 'role_name'), 'left');
 
-           // $select->where('u_active = 1');
-
+            /*if ($identity['u_role_id'] == User::ROLE_ADMIN) {
+                $select->where('u_active = 1');
+            }
+           
+*/
             if ($orderBy) {
                 $order = $order ? $order : 'ASC';
                 $select->order($orderBy . ' ' . $order);

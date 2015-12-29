@@ -72,11 +72,11 @@ $identity = $authService->getIdentity();
                 <td><?php echo $dr->dr_staff_member ?></td>
                 <td style="white-space: nowrap;" class="aright">
                     <a href="/disclosurerequest/edit/<?php echo $dr->dr_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
-                    <?php if ($dr->dr_active == 0): ?>
-                        <a href="/disclosurerequest/unarchive/<?php echo $dr->dr_id  ?>" class="">Unarchive</a>
-                    <?php else: ?>
+                    <?php if ($dr->dr_active): ?>
                         <?php $deleteUrl = '/disclosurerequest/delete/' . $dr->dr_id; ?>
                         <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
+                    <?php elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
+                        <a href="/disclosurerequest/unarchive/<?php echo $dr->dr_id  ?>" class="">Unarchive</a>
                     <?php endif; ?>
                 </td>
             </tr>

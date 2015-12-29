@@ -48,21 +48,31 @@ class AssessmentTable implements ServiceLocatorAwareInterface
 
             if ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN) {
             } else {
+                $where_str = '';
                 if ($identity['u_role_id'] == \Admin\Model\User::ROLE_CONSULTANT) {
-                    $select->where('a_owner_u_id = ' . $identity['u_id']);
+                    $where_str .= 'a_owner_u_id = ' . $identity['u_id'];
                 } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
                     $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
                     $ids[] = $identity['u_id'];
-                    $select->where('a_consultant_u_id IN (' . implode(',', $ids) . ')');
+                    $where_str .= 'a_consultant_u_id IN (' . implode(',', $ids) . ')';
                 } elseif ($identity['u_role_id'] == User::ROLE_CLIENT && $identity['u_company_id']) {
-                    $select->where('a_c_id = ' . $identity['u_company_id']);
+                    $where_str .= 'a_c_id = ' . $identity['u_company_id'];
                 }
 
                 $companies_ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getCompaniesIdsForConsultant($identity['u_id']);
                 if ($companies_ids) {
-                    $select->where(array('a_c_id' => $companies_ids), PredicateSet::OP_OR);
+                    if ($where_str) {
+                        $where_str = '(' . $where_str . ' OR a_c_id IN (' . implode(',', $companies_ids) . '))';
+                      } else {
+                        $where_str = 'a_c_id IN (' . implode(',', $companies_ids) . ')';
+                      }
                 }
-                $select->where('a_active = 1');
+                if ($where_str) {
+                    $where_str .= ' AND a_active = 1';
+                } else {
+                    $where_str = 'a_active = 1';
+                }
+                $select->where($where_str);
             }
 
             $select->join(array('c' => 'companies'), 'a_c_id = c_id', array('_client_name' => 'c_name'), 'left');
