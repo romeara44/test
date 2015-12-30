@@ -1,0 +1,1 @@
+UPDATE `assessments_questions` SET `aq_title` = 'Is there a risk that staff will not know or will not have access to the practice''s policies and procedures' WHERE `aq_id` = 238;
