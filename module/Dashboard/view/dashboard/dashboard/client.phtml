@@ -4,7 +4,12 @@
     <div class="cboth"></div>
 </div>
 
-<p>Welcome paragraph will go here...</p>
-
+<p>Welcome to HIPAA SUITE.
+<?php if (in_array($usRoleId, array(5, 6))): ?>
+<?php $sl = $this->getHelperPluginManager()->getServiceLocator(); ?>
+<?php $uConsultant = $this->getConsultant($sl); ?>
+<p>Your Consultant is <?php echo is_object($uConsultant) ? $uConsultant->u_firstname : '' ?> <?php echo is_object($uConsultant) ? $uConsultant->u_lastname : ''?>&nbsp;
+	<?php echo is_object($uConsultant) ? $uConsultant->u_office_phone : '' ?> &nbsp;<a href="mailto:<?php echo is_object($uConsultant) ? $uConsultant->u_email : ''?>"><?php echo is_object($uConsultant) ? $uConsultant->u_email : '' ?></a>
+<?php endif; ?>
 
 <div class="cboth"><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /></div>
