@@ -41,8 +41,11 @@ class GetConsultant extends AbstractHelper
             $userTable = $sl->get('Admin\Model\UserTable');
             $user = $userTable->getUser($ba->ba_consultant_u_id);
         } elseif ($identity['u_role_id'] == 5) {
-            $userTable = $sl->get('Admin\Model\UserTable');
-            $user = $userTable->getUser($identity['u_senior_consultant_u_id']);
+            $company_consultants = $sl->get('Client\Model\CompanyConsultantsTable')->getByCompany($identity['u_company_id']);
+            foreach ($company_consultants as $value) {
+                $user = $sl->get('Admin\Model\UserTable')->getUser($value->cc_consultant_id);
+                break;
+            }            
         }
 
         return $user;
