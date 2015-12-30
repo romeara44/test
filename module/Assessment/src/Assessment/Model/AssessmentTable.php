@@ -506,7 +506,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
 
             foreach ($addresses->buffer() as $address) {
                 foreach ($assessmentsRoles->buffer() as $ar) {
-                    $questions = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionTable')->getQuestions($a->a_type, $ar->ar_id, $a->a_id, $address->adr_id);
+                    $questions = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionTable')->getQuestions($a->a_type, $ar->ar_id, $a->a_id, $address->adr_id, $a);
                     if (!(int) $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionAnswerTable')->checkStep($id, $address->adr_id, $ar->ar_id, $questions)) {
                         $value = 0;
                         break;
@@ -822,7 +822,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
 
         foreach ($addresses->buffer() as $address) {
             foreach ($assessmentsRoles->buffer() as $ar) {
-                $questions = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionTable')->getQuestions($a->a_type, $ar->ar_id, $a->a_id, $address->adr_id);
+                $questions = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionTable')->getQuestions($a->a_type, $ar->ar_id, $a->a_id, $address->adr_id, $a);
                 $steps[5][$address->adr_id][$ar->ar_id] = (int) $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionAnswerTable')->checkStep($id, $address->adr_id, $ar->ar_id, $questions);
             }
         }
