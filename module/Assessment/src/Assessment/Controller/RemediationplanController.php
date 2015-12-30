@@ -952,6 +952,10 @@ class RemediationplanController extends AbstractActionController
         $output = array();
         parse_str($values, $output);
 
+        if (!empty($output['rpa_target_date'])) {
+            $output['rpa_target_date'] = \DateTime::createFromFormat('m/d/Y', $output['rpa_target_date'])->format('Y-m-d');
+        }
+
         $rpa = new Remediationplanaction();
 
         $rpa->exchangeArray($output);
