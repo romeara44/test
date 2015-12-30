@@ -99,24 +99,40 @@ class AssessmentTable implements ServiceLocatorAwareInterface
     public function getSearchResultsSelect($searchValue, $identity)
     {
         $select = $this->tableGateway->getSql()->select();
-        $select->where('a_active = 1');
+
         $select->where('c_name LIKE "%' . $searchValue . '%"');
 
         $select->columns(array('_id' => new \Zend\Db\Sql\Expression('a_id'), '_name' => new \Zend\Db\Sql\Expression('c_name'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("assessment")'), new \Zend\Db\Sql\Expression('NULL')));
         $select->join(array('c' => 'companies'), 'a_c_id = c_id', array(), 'left');
 
+        $where_str = '';
         if ($identity['u_role_id'] == \Admin\Model\User::ROLE_CONSULTANT) {
-            $select->where('a_owner_u_id = ' . $identity['u_id']);
-        }
-
-        if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
-            $select->where('a_consultant_u_id = ' . $identity['u_id']);
+            $where_str .= 'a_owner_u_id = ' . $identity['u_id'];
         } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
             $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
             $ids[] = $identity['u_id'];
-            $select->where('a_consultant_u_id IN (' . implode(',', $ids) . ')');
-        } elseif ($identity['u_role_id'] == User::ROLE_CLIENT) {
-            $select->where('a_c_id = ' . $identity['u_company_id']);
+            $where_str .= 'a_consultant_u_id IN (' . implode(',', $ids) . ')';
+        } elseif ($identity['u_role_id'] == User::ROLE_CLIENT && $identity['u_company_id']) {
+            $where_str .= 'a_c_id = ' . $identity['u_company_id'];
+        }
+
+        $companies_ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getCompaniesIdsForConsultant($identity['u_id']);
+        if ($companies_ids) {
+            if ($where_str) {
+                $where_str = '(' . $where_str . ' OR a_c_id IN (' . implode(',', $companies_ids) . '))';
+              } else {
+                $where_str = 'a_c_id IN (' . implode(',', $companies_ids) . ')';
+              }
+        }
+        if ($identity['u_role_id'] != User::ROLE_ADMIN) {
+            if ($where_str) {
+                $where_str .= ' AND a_active = 1';
+            } else {
+                $where_str = 'a_active = 1';
+            }
+        }
+        if ($where_str) {
+            $select->where($where_str);
         }
 
         return $select;
