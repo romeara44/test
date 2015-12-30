@@ -125,7 +125,6 @@ class BreachremediationplanController extends AbstractActionController
 
     public function listAction()
     {
-        $breachRemediationPlanRegulationTable = $this->getServiceLocator()->get('Breachlog\Model\BreachRemediationPlanRegulationTable');
         $orderBy = $this->params()->fromRoute('order_by') ? $this->params()->fromRoute('order_by') : 'id';
         $order = $this->params()->fromRoute('order') ? $this->params()->fromRoute('order') : 'DESC';
         $page = $this->params()->fromRoute('page') ? (int) $this->params()->fromRoute('page') : 1;
