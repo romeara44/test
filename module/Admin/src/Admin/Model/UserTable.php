@@ -110,12 +110,45 @@ class UserTable implements ServiceLocatorAwareInterface
     {
         $select = $this->tableGateway->getSql()->select();
         $select->join(array('compa' => 'companies'), 'u_company_id = compa.c_id', array(), 'left');
-        $select->where('u_active = 1');
+        $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = compa.c_id', array(), 'left');
+
+        if($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
+            $select->where('u_senior_consultant_u_id = ' . $identity['u_id']);
+        } elseif($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
+            if($identity['u_company_id_admin']) {
+                $select->where('(u_senior_consultant_u_id = ' . $identity['u_id'] . ' OR u_company_id = ' . $identity['u_company_id_admin'] . ') AND u_id != ' . $identity['u_id']);
+            } else {
+                 $select->where('u_senior_consultant_u_id = ' . $identity['u_id']);
+            }
+        }
+
+        if ($identity['u_role_id'] == User::ROLE_SALES_REP) {
+            $select->where('c_owner_u_id = ' . $identity['u_id']);
+        } elseif (in_array($identity['u_role_id'], array(User::ROLE_CONSULTANT))) {
+            $select->where('c_owner_u_id = ' . $identity['u_id'] . ' OR cc.cc_consultant_id = ' . $identity['u_id']);
+        } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
+            $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
+            $ids[] = $identity['u_id'];
+            $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR cc.cc_consultant_id IN (' . implode(',', $ids) . '))');
+        } else if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
+            if($identity['u_company_id_admin']) {
+                $select->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR c_id = ' . $identity['u_company_id_admin'] . ')');
+            } else {
+                $select->where('c_owner_u_id = ' . $identity['u_id']);
+            }
+        }
+        
         $select->where('(u_firstname LIKE "%' . $searchValue . '%" OR u_lastname LIKE "%' . $searchValue . '%" OR compa.c_name LIKE "%' . $searchValue . '%")');
 
         $select->columns(array('_id' => 'u_id', '_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("contact")'), new \Zend\Db\Sql\Expression('NULL')));
 
-        $select->where('u_role_id = 5'); // without admin
+        //$select->where('u_role_id = 5'); // without admin
+
+        if ($identity['u_role_id'] != User::ROLE_ADMIN) {
+            $select->where('u_active = 1');
+        }
+
+        $select->group('u_id');
 
         return $select;
     }

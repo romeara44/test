@@ -162,20 +162,30 @@ class CompanyTable implements ServiceLocatorAwareInterface
     public function getSearchResultsSelect($searchValue, $identity)
     {
         $select = $this->tableGateway->getSql()->select();
-        $select->where('c_active = 1');
+
         $select->where('c_name LIKE "%' . $searchValue . '%"');
 
-        $select->columns(array('_id' => 'c_id', '_name' => 'c_name', '_type' => new \Zend\Db\Sql\Expression('CONCAT("company")')));
-        $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = c_id', array('cc_consultant_id'), 'left');
+        $select->columns(array('_id' => 'c_id', '_name' => 'c_name', '_type' => new \Zend\Db\Sql\Expression('CONCAT("company")'), new \Zend\Db\Sql\Expression('NULL')));
+        $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = c_id', array(), 'left');
 
         if ($identity['u_role_id'] == \Admin\Model\User::ROLE_SALES_REP) {
             $select->where('c_owner_u_id = ' . $identity['u_id']);
         } elseif (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_CONSULTANT))) {
-            $select->where('c_owner_u_id = ' . $identity['u_id'] . ' OR cc_consultant_id = ' . $identity['u_id']);
+            $select->where('c_owner_u_id = ' . $identity['u_id'] . ' OR cc.cc_consultant_id = ' . $identity['u_id']);
         } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
             $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
             $ids[] = $identity['u_id'];
-            $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR cc_consultant_id IN (' . implode(',', $ids) . '))');
+            $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR cc.cc_consultant_id IN (' . implode(',', $ids) . '))');
+        } else if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
+            if($identity['u_company_id_admin']) {
+                $select->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR c_id = ' . $identity['u_company_id_admin'] . ')');
+            } else {
+                $select->where('c_owner_u_id = ' . $identity['u_id']);
+            }
+        }
+
+        if ($identity['u_role_id'] != User::ROLE_ADMIN) {
+            $select->where('c_active = 1');
         }
 
         $select->group('c_id');
