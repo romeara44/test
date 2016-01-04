@@ -58,8 +58,8 @@ class SecurityreminderTable implements ServiceLocatorAwareInterface
             }
 
             $select->join(array('dt' => 'distribution_types'), 'sr_dt_id = dt_id', array('_dt_type' => 'dt_type'), 'inner');
-            $select->join(array('n' => 'notes'), new \Zend\Db\Sql\Expression('sr_id = n.note_item_id'), array('_sr_comment' => new \Zend\Db\Sql\Expression('n.note_text')), 'left');
-            $select->join(array('n2' => 'notes'), new \Zend\Db\Sql\Expression('sr_id = n2.note_item_id AND n2.note_text =""'), array('_sr_attachment' => new \Zend\Db\Sql\Expression('n2.note_id')), 'left');
+            $select->join(array('n' => 'notes'), new \Zend\Db\Sql\Expression('sr_id = n.note_item_id AND n.note_text !="" AND n.note_item_type = ' . \Note\Model\Note::NOTE_SRC), array('_sr_comment' => new \Zend\Db\Sql\Expression('n.note_text')), 'left');
+            $select->join(array('n2' => 'notes'), new \Zend\Db\Sql\Expression('sr_id = n2.note_item_id AND n2.note_text ="" AND n2.note_item_type = ' . \Note\Model\Note::NOTE_SRC), array('_sr_attachment' => new \Zend\Db\Sql\Expression('n2.note_id')), 'left');
             $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('sr_create_u_id = u.u_id'), array(), 'left');
             $select->join(array('u2' => 'users'), new \Zend\Db\Sql\Expression('sr_developed_by_u_id = u2.u_id'), array('_developed_by_name' => new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)')), 'left');
 
