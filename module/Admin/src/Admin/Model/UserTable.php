@@ -210,9 +210,13 @@ class UserTable implements ServiceLocatorAwareInterface
         return $row;
     }
 
-    public function getUserByEmail($email)
+    public function getUserByEmail($email, $company_id = null)
     {
-        $rowset = $this->tableGateway->select(array('u_email' => $email));
+        $params = array('u_email' => $email);
+        if ($company_id) {
+            $params['u_company_id'] = $company_id;
+        }
+        $rowset = $this->tableGateway->select($params);
         $row = $rowset->current();
         if (!$row) {
             return false;
@@ -387,7 +391,7 @@ class UserTable implements ServiceLocatorAwareInterface
 
         if($adminId) {
             $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'forgot_password_request', 'uId' => $adminId, 'forgot_password_user' => $user));
-            $this->tableGateway->update(array('u_forgot_password' => 1), array('u_id' => $user->u_id));
+            //$this->tableGateway->update(array('u_forgot_password' => 1), array('u_id' => $user->u_id));
             return true;
         }
 
@@ -417,11 +421,15 @@ class UserTable implements ServiceLocatorAwareInterface
         return true;
     }
 
-    public function checkIfUserExists($email, $uId = 0)
+    public function checkIfUserExists($email, $uId = 0, $u_company_id = 0)
     {
         $select = $this->tableGateway->getSql()->select();
         $select->where('u_email = "' . $email . '"');
         $select->where('u_active = 1');
+
+        if ($u_company_id) {
+            $select->where('u_company_id = ' . $u_company_id);
+        }
 
         if ($uId) {
             $select->where('u_id <> ' . $uId);
@@ -449,9 +457,14 @@ class UserTable implements ServiceLocatorAwareInterface
 
     public function setNewPassword($uid, $password)
     {
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('u_id = ' . $uid);
+
+        $user = $this->tableGateway->selectWith($select)->current();
+
         $data['u_password'] = sha1($password);
         $data['u_sent_password'] = 1;
-        $this->tableGateway->update($data, array('u_id' => $uid));
+        $this->tableGateway->update($data, array('u_email' => $user->u_email));
 
         return true;
     }
@@ -661,7 +674,7 @@ class UserTable implements ServiceLocatorAwareInterface
 
             $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'reset_password', 'uId' => $user->u_id, 'password' => $password));
             $this->setNewPassword($user->u_id, $password);
-            $this->tableGateway->update(array('u_forgot_password' => 0), array('u_id' => $user->u_id));
+            //$this->tableGateway->update(array('u_forgot_password' => 0), array('u_id' => $user->u_id));
             
             return true;
         }
@@ -731,7 +744,7 @@ class UserTable implements ServiceLocatorAwareInterface
                 }
             }
 
-            $this->tableGateway->update($data, array('u_id' => $user->u_id));
+            $this->tableGateway->update($data, array('u_email' => $user->u_email));
         }
 
         return $locked;

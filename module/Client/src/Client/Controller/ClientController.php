@@ -189,11 +189,10 @@ class ClientController extends AbstractActionController
             if (!$noteform) {
                 $user = new User();
                 $uId = is_object($userObj) ? $userObj->u_id : 0;
-
-                $form->setInputFilter($user->getClientInputFilter($this->getServiceLocator(), $id, $uId));
-                $form->setData($request->getPost());
-
                 $post = $request->getPost();
+                $form->setInputFilter($user->getClientInputFilter($this->getServiceLocator(), $id, $uId, $post));
+                $form->setData($post);
+                
                 if($form->isValid()) {
                     if(!$id && $post['u_company_id'] && !$this->getUserTable()->checkCompanyLimitClient($post['u_company_id'])) {
                         $clientLimitMsg = 'You cannot create more than ' . $this->getServiceLocator()->get('Client\Model\CompanyTable')->getUsersLimit($post['u_company_id']) . ' user for company.';

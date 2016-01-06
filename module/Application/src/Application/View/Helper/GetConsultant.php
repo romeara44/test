@@ -28,6 +28,7 @@ class GetConsultant extends AbstractHelper
 
     public function __invoke($sl)
     {
+        $user = '';
         if (!$this->hasIdentity()) {
             return '';
         }

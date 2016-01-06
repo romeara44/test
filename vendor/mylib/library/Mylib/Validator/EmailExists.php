@@ -14,6 +14,7 @@ class EmailExists extends \Zend\Validator\AbstractValidator
     const EXISTS            = 'emailExists';
     private $sl;
     private $uId;
+    private $post;
     /**
      * @var array
      */
@@ -22,18 +23,19 @@ class EmailExists extends \Zend\Validator\AbstractValidator
     );
 
 
-    public function __construct($sl, $uId = 0)
+    public function __construct($sl, $uId = 0, $post = null)
     {
         $this->sl = $sl;
         $this->uId = (int) $uId;
+        $this->post = $post;
         parent::__construct();
     }
 
     public function isValid($value)
     {
         $usersTable = $this->sl->get('Admin\Model\UserTable');
-
-        $exist = $usersTable->checkIfUserExists($value, $this->uId);
+        $u_company_id = empty($this->post['u_company_id']) ? 0 : (int)$this->post['u_company_id'];
+        $exist = $usersTable->checkIfUserExists($value, $this->uId, $u_company_id);
         if ($exist) {
             $this->error(self::EXISTS);
             return false;

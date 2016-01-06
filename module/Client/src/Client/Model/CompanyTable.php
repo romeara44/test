@@ -814,4 +814,12 @@ class CompanyTable implements ServiceLocatorAwareInterface
 
         return $result;
     }
+
+    public function getCompaniesByUserEmail($email)
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->join(array('u' => 'users'), 'u.u_company_id = c_id', array(), 'right');
+        $select->where('u_email = "' . $email . '"');
+        return $this->tableGateway->selectWith($select);
+    }
 }

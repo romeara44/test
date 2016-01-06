@@ -284,7 +284,7 @@ class User
         return $this->inputFilter;
     }
 
-    public function getClientInputFilter($sl, $isEdit = false, $uId = 0)
+    public function getClientInputFilter($sl, $isEdit = false, $uId = 0, $post = null)
     {
         if (!$this->inputFilter) {
             $inputFilter = new InputFilter();
@@ -357,7 +357,7 @@ class User
             )));
 
             //if (!$isEdit) {
-                $ee = new \Mylib\Validator\EmailExists($sl, $uId);
+                $ee = new \Mylib\Validator\EmailExists($sl, $uId, $post);
 
                 $inputFilter->add($factory->createInput(array(
                     'name'     => 'u_email',
