@@ -94,7 +94,7 @@ $form->setAttribute('method', 'post');
 
         <p id="_tl_trainer_name_wrap" style="border: 0;display: none">
             <label for="_tl_trainer_name">Trainer Name</label>
-            <input type="text" name="_tl_trainer_name" id="_tl_trainer_name" value="<?php echo $tlObj->_tl_trainer_name?>" required disabled="disabled">
+            <input type="text" name="_tl_trainer_name" id="_tl_trainer_name" value="<?php echo $this->tlObj ? $this->tlObj->_tl_trainer_name : ''; ?>" required disabled="disabled">
         </p>
 
         <p>

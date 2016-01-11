@@ -199,12 +199,11 @@ class TraininglogController extends AbstractActionController
 
             $ymds['tl_conducted_date'] = \DateTime::createFromFormat('m/d/Y', $post['tl_conducted_date']);
             $ymds['tl_hire_date']      = \DateTime::createFromFormat('m/d/Y', $post['tl_hire_date']);
-            
             foreach($ymds as $ymdKey => $ymd) {
                 if (is_object($ymd)) {
                     $post[$ymdKey] = $ymd->format('Y-m-d');
                 } else {
-                    $post[$ymdKey] = '';
+                    $post[$ymdKey] = '0000-00-00';
                 }
             }
             
