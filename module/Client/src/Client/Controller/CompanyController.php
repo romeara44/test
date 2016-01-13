@@ -208,24 +208,24 @@ class CompanyController extends AbstractActionController
                 }
                 return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
             } else {
+                $post = $request->getPost();
+                $post['c_owner_u_id'] = $identity['u_id'];
+                $post['c_update_u_id'] = $identity['u_id'];
 
+                if (!$id) {
+                    $post['c_primary_contact_u_id'] = $identity['u_id'];
+                }
+                    
                 $company = new Company();
-                $company->exchangeArray($request->getPost());
-                $form->setData($request->getPost());
+                $company->exchangeArray($post);
+                $form->setData($post);
                 $form->setInputFilter($company->getInputFilter($this->getServiceLocator(), $id));                
 
-                if ($form->isValid()) {
-                    $post = $request->getPost();
-                    $post['c_owner_u_id'] = $identity['u_id'];
-                    $post['c_update_u_id'] = $identity['u_id'];
-
-                    if (!$id) {
-                        $post['c_primary_contact_u_id'] = $identity['u_id'];
-                    }
+                if ($form->isValid()) {                    
                     
                     $this->getCompanyTable()->setServiceLocator($this->getServiceLocator());
                     $companyId = $this->getCompanyTable()->saveCompany($company);
-                    $this->getCompanyTable()->saveAddresses($companyId, $request->getPost());
+                    $this->getCompanyTable()->saveAddresses($companyId, $post);
 
                     $this->flashMessenger()->addSuccessMessage('Company saved');
 

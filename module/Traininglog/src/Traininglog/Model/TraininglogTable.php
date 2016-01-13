@@ -69,6 +69,7 @@ class TraininglogTable implements ServiceLocatorAwareInterface
             $select->join(array('tr' => 'trainers'), new \Zend\Db\Sql\Expression('CONCAT(tl_trainer_type, "_", tl_trainer_id) = CONCAT("trainer", "_", tr.tr_id)'), array(), 'left');
             $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('CONCAT(tl_trainer_type, "_", tl_trainer_id) = CONCAT("user", "_", u.u_id)'), array(), 'left');
             $select->join(array('u2' => 'users'), new \Zend\Db\Sql\Expression('tl_create_u_id = u2.u_id'), array(), 'left');
+            $select->join(array('c' => 'companies'), 'tl_company_id = c_id', array('_tl_company_name' => 'c_name'), 'left');
 
             if ($orderBy) {
                 $order = $order ? $order : 'ASC';
@@ -208,6 +209,7 @@ class TraininglogTable implements ServiceLocatorAwareInterface
         $identity = $authService->getIdentity();
 
         $data = array(
+            'tl_company_id'     => $traininglog->tl_company_id,
             'tl_title'          => $traininglog->tl_title,
             'tl_tlt_id'         => $traininglog->tl_tlt_id,
             'tl_conducted_date' => $traininglog->tl_conducted_date,

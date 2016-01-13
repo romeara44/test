@@ -8,6 +8,8 @@ use Zend\InputFilter\InputFilterInterface;
 
 class Traininglog
 {
+    public $tl_company_id;
+    public $_tl_company_name;
     public $tl_id;
     public $tl_title;
     public $tl_tlt_id;
@@ -35,6 +37,8 @@ class Traininglog
 
     public function exchangeArray($data)
     {
+        $this->tl_company_id           = (isset($data['tl_company_id']))           ? $data['tl_company_id']           : null;
+        $this->_tl_company_name           = (isset($data['_tl_company_name']))           ? $data['_tl_company_name']           : null;
         $this->tl_id               = (isset($data['tl_id']))               ? $data['tl_id']               : null;
         $this->tl_title            = (isset($data['tl_title']))            ? $data['tl_title']            : null;
         $this->tl_tlt_id           = (isset($data['tl_tlt_id']))           ? $data['tl_tlt_id']           : null;
@@ -68,6 +72,14 @@ class Traininglog
         if (!$this->inputFilter) {
             $inputFilter = new InputFilter();
             $factory     = new InputFactory();
+
+            $inputFilter->add($factory->createInput(array(
+                'name'     => 'tl_company_id',
+                'required' => true,
+                'filters'  => array(
+                    array('name' => 'Int'),
+                ),
+            )));
 
             $inputFilter->add($factory->createInput(array(
                 'name'     => 'tl_id',

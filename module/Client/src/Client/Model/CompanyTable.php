@@ -351,6 +351,9 @@ class CompanyTable implements ServiceLocatorAwareInterface
             'c_website' => $company->c_website,
             'c_primary_adr_id' => $company->c_primary_adr_id,
             'c_update_u_id' => $company->c_update_u_id,
+            'c_rel_type'    => 0,
+            'c_type'    => 0,
+            'c_parent_c_id'    => 0,
         );
 
         if (in_array($identity['u_role_id'], array(User::ROLE_SALES_REP, User::ROLE_SENIOR_CONSULTANT, User::ROLE_ADMIN))) {
@@ -369,7 +372,7 @@ class CompanyTable implements ServiceLocatorAwareInterface
         if (!$id) {
             $data['c_owner_u_id'] = $company->c_owner_u_id;
             $ownerContact         = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUser($company->c_owner_u_id);
-            if(in_array($ownerContact->u_role_id, array(User::ROLE_CLIENT, User::ROLE_PARTIAL))) {
+            if($ownerContact && in_array($ownerContact->u_role_id, array(User::ROLE_CLIENT, User::ROLE_PARTIAL))) {
                 $data['c_users_limit'] = self::DEFAULT_USERS_LIMUT;
             } else {
                 $data['c_users_limit'] = 0;

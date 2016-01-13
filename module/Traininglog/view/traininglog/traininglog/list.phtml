@@ -56,7 +56,7 @@ $identity = $authService->getIdentity();
                     Trainer <i class="fa <?php echo $classSort ?>"></i>
                 </a>
             </th>
-
+            <th>Company</th>
             <th>Regulation</th>
             <th>Attendees</th>
             <th>Comments</th>
@@ -71,6 +71,7 @@ $identity = $authService->getIdentity();
                 <td><?php echo ($tl->tl_conducted_date != '0000-00-00') ? $this->formatDateA($tl->tl_conducted_date) : '' ?></td>
                 <td><?php echo ($tl->tl_hire_date != '0000-00-00') ? $this->formatDateA($tl->tl_hire_date) : '-' ?></td>
                 <td><?php echo $tl->_tl_trainer_name ?></td>
+                <td><?php echo $tl->_tl_company_name ?></td>
                 <td><?php echo $this->textHelper($tl->_tl_regulation, 20); ?></td>
                 <td><?php echo $this->textHelper($tl->tl_attendees, 20); ?></td>
                 <td><?php echo $this->textHelper($tl->_tl_comment, 20); ?></td>

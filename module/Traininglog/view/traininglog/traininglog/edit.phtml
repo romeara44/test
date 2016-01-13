@@ -37,6 +37,14 @@ $form->setAttribute('method', 'post');
             $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
             $identity = $authService->getIdentity();
         ?>
+
+        <p>
+            <?php $fn = $form->get('tl_company_id');
+            echo $this->formLabel($fn);
+            echo $this->formSelect($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
         
         <p>
             <?php $fn = $form->get('tl_title');

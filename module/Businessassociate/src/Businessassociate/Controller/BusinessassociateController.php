@@ -29,6 +29,7 @@ class BusinessassociateController extends AbstractActionController
     protected $userTable;
     protected $noteTable;
     protected $mailtemplateTable;
+    protected $companyRolesTable;
 
     public function onDispatch(\Zend\Mvc\MvcEvent $e)
     {

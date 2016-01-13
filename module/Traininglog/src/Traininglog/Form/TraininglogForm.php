@@ -14,6 +14,26 @@ class TraininglogForm extends Form
         $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
         $identity = $authService->getIdentity();
 
+        $companies = array();
+        
+        $companyTable = $sl->get('Client\Model\CompanyTable');
+        foreach ($companyTable->getCompaniesPairs() as $key => $r) {
+            $companies[$key] = $r;
+        }
+
+        if(count($companies) != 1) {
+            $companies = array('' => 'Please select') + $companies;
+        }
+
+        $this->add(array(
+            'name' => 'tl_company_id',
+            'type' => 'Zend\Form\Element\Select',
+            'options' => array(
+                'label' => 'Company',
+                'value_options' => $companies
+            ),
+        ));
+
         $this->add(array(
             'name' => 'tl_title',
             'attributes' => array(

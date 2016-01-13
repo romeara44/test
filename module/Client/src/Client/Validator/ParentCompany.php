@@ -24,7 +24,7 @@ class ParentCompany extends AbstractValidator {
     );
 
 	public function isValid($value) {
-        if ($this->model->c_rel_type == \Client\Model\Company::RELATION_TYPE_PARENT) {
+        if (!$value || $this->model->c_rel_type == \Client\Model\Company::RELATION_TYPE_PARENT) {
             return true;
         }
 		$this->setValue($value);
