@@ -42,7 +42,7 @@ class ClientController extends AbstractActionController
         } else if ($identity['u_first_login'] == 1) {
             return $this->redirect()->toRoute('user', array('controller' => 'user', 'action' => 'acceptprivacyterms'));
         } else if($identity['u_role_id'] == 5 && !$identity['u_company_id_admin']) {
-            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+            //return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
 
         return parent::onDispatch($e);

@@ -76,7 +76,7 @@ class CompanyTable implements ServiceLocatorAwareInterface
                     if($identity['u_company_id_admin']) {
                         $select->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR c_id = ' . $identity['u_company_id_admin'] . ' OR u_senior_consultant_u_id = ' . $identity['u_id'] . ' OR u_company_id = ' . $identity['u_company_id_admin'] . ')');
                     } else {
-                        $select->where('(c_owner_u_id = ' . $identity['u_id'] . 'OR u_senior_consultant_u_id = ' . $identity['u_id'] . ')');
+                        $select->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR u_senior_consultant_u_id = ' . $identity['u_id'] . ')');
                     }
                 }
             } else {
@@ -824,5 +824,19 @@ class CompanyTable implements ServiceLocatorAwareInterface
         $select->join(array('u' => 'users'), 'u.u_company_id = c_id', array(), 'right');
         $select->where('u_email = "' . $email . '"');
         return $this->tableGateway->selectWith($select);
+    }
+
+    public function getClientCompany($id)
+    {
+        $id  = (int) $id;
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('c_id = ' . $id);
+        $select->where('c_active = 1');
+        $row = $this->tableGateway->selectWith($select)->current();
+
+        if (!$row) {
+            return false;
+        }
+        return $row;
     }
 }
