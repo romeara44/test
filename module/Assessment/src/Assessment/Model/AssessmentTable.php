@@ -261,11 +261,16 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         if ($id == 0) {
             if ($data['a_type'] == 2) { // if privacy
                 $aSec = $this->isPrivacyCreatePossible($data['a_c_id']);
-                if ((int) $aSec->a_parent_a_id){
-                    $data['a_security_a_id'] = $aSec->a_parent_a_id;
+                if ($aSec) {
+                    if ((int) $aSec->a_parent_a_id){
+                        $data['a_security_a_id'] = $aSec->a_parent_a_id;
+                    } else {
+                        $data['a_security_a_id'] = $aSec->a_id;
+                    }
                 } else {
-                    $data['a_security_a_id'] = $aSec->a_id;
+                    $data['a_security_a_id'] = 0;
                 }
+                
             }
 
             $this->tableGateway->insert($data);
@@ -854,7 +859,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
     {
         $select = $this->tableGateway->getSql()->select();
         $select->where('a_c_id = ' . $cId);
-        $select->where('a_type = 1');
+        $select->where('a_type = 2');
         $select->where('DATE_FORMAT(a_create_date, "%Y") = "' . date("Y") . '"');
 
         $select->order('a_id DESC');
