@@ -265,13 +265,13 @@ class AssessmentController extends AbstractActionController
                 
                 if ($form->isValid() && $checkFillCompanyRoles) {
                     $isPrivacy = $post['a_type'] == 2;
-                    if ($isNew && $isPrivacy) {
+                    /*if ($isNew && $isPrivacy) {
                         $isPossible = $this->getAssessmentTable()->isPrivacyCreatePossible($post['a_c_id']);
                         if (!$isPossible) {
                             $this->flashMessenger()->addErrorMessage('You can\'t add privacy assessment for this company');
                             return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'list'));
                         }
-                    }
+                    }*/
 
                     $valid = true;
                     $post['a_owner_u_id'] = $identity['u_id'];
@@ -700,6 +700,7 @@ class AssessmentController extends AbstractActionController
             $viewParams['assessmentRoleName'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getRoleNameById($assessmentRole);
 
             $viewParams['questions'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionTable')->getQuestions($aObj->a_type, $assessmentRole, $aObj->a_id, $location, $aObj);
+           // var_dump($viewParams['questions']);die();
             if ($location) {
                 $viewParams['answers'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionAnswerTable')->getAqas($id, $location, $assessmentRole);
             } else {
