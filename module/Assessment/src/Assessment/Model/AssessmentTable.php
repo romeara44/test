@@ -870,7 +870,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
 
         $row = $resultSet->current();
 
-        $addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($row->a_id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
+        $addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($cId, \Client\Model\AddressItem::COMPANY_TYPE);
 
         foreach ($addresses->buffer() as $address) {
             $oldAddressId = $address->adr_id;
@@ -979,6 +979,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
             $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_ADD, \Application\Model\LogsTable::ITEM_TYPE_RP, $rpId);
 
             $arlc = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->getArlcByLocation($aId, $address->adr_id);
+
             foreach ($cats->buffer() as $catKey => $cat) {
 
                 $rpa = new Remediationplanaction();
@@ -991,7 +992,14 @@ class AssessmentTable implements ServiceLocatorAwareInterface
                     continue;
                 }
                 $rpaData['rpa_rp_id'] = $rpId;
-                $rpaData['rpa_contact_u_id'] = $arlc[$cat->aqc_ar_id];
+
+                if (empty($arlc[$cat->aqc_ar_id])) {
+                    //$contact_role = $this->getServiceLocator()->get('Client\Model\CompanyRolesTable')->getCompanyRoleByCompanyAndRole($a->a_c_id, $cat->aqc_ar_id);
+                    $rpaData['rpa_contact_u_id'] = 0;
+                } else {
+                    $rpaData['rpa_contact_u_id'] = $arlc[$cat->aqc_ar_id];
+                }
+                
                 $rpaData['rpa_approver_u_id'] = $approval_authority_role->cr_u_id;
 
                 $rpaData['rpa_threat'] = $task;
