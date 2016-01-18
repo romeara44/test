@@ -840,7 +840,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
         $select->where('a_c_id = ' . $cId);
         $select->where('a_type = 1');
-        $select->where('DATE_FORMAT(a_create_date, "%Y") = "' . date("Y") . '"');
+        //$select->where('DATE_FORMAT(a_create_date, "%Y") = "' . date("Y") . '"');
 
         $select->where('a_active = 1');
         $select->order('a_id DESC');
