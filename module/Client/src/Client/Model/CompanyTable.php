@@ -175,7 +175,13 @@ class CompanyTable implements ServiceLocatorAwareInterface
 
         $select->where('c_name LIKE "%' . $searchValue . '%"');
 
-        $select->columns(array('_id' => 'c_id', '_name' => 'c_name', '_type' => new \Zend\Db\Sql\Expression('CONCAT("company")'), new \Zend\Db\Sql\Expression('NULL')));
+        $select->columns(array('_id' => 'c_id',
+                               '_name' => 'c_name',
+                               '_type' => new \Zend\Db\Sql\Expression('CONCAT("company")'),
+                               new \Zend\Db\Sql\Expression('NULL'),
+                               new \Zend\Db\Sql\Expression('NULL')
+                               )
+                        );
         $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = c_id', array(), 'left');
 
         if ($identity['u_role_id'] == User::ROLE_SALES_REP) {

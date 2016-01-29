@@ -55,7 +55,6 @@ class SearchTable implements ServiceLocatorAwareInterface
                 case 'user':
                     $select = $this->getServiceLocator()->get('Admin\Model\UserTable')->getSearchResultsUsersSelect($searchValue, $identity);
                     break;
-                
                 default:
                     $select = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getSearchResultsSelect($searchValue, $identity);
                     break;

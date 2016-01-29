@@ -107,7 +107,13 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
         
         $select->where('c_name LIKE "%' . $searchValue . '%"');
 
-        $select->columns(array('_id' => new \Zend\Db\Sql\Expression('rp_id'), '_name' => new \Zend\Db\Sql\Expression('c_name'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("remediationplan")'), new \Zend\Db\Sql\Expression('NULL')));
+        $select->columns(array('_id' => new \Zend\Db\Sql\Expression('rp_id'),
+                               '_name' => new \Zend\Db\Sql\Expression('c_name'),
+                               '_type' => new \Zend\Db\Sql\Expression('CONCAT("remediationplan")'),
+                               '_status' => new \Zend\Db\Sql\Expression('rp_status'),
+                               '_date' => new \Zend\Db\Sql\Expression('rp_create_date'),
+                               )
+                        );
         $select->join(array('c' => 'companies'), 'rp_c_id = c_id', array(), 'left');
 
         $where_str = '';

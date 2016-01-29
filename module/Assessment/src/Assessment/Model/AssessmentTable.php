@@ -102,7 +102,13 @@ class AssessmentTable implements ServiceLocatorAwareInterface
 
         $select->where('c_name LIKE "%' . $searchValue . '%"');
 
-        $select->columns(array('_id' => new \Zend\Db\Sql\Expression('a_id'), '_name' => new \Zend\Db\Sql\Expression('c_name'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("assessment")'), new \Zend\Db\Sql\Expression('NULL')));
+        $select->columns(array('_id' => new \Zend\Db\Sql\Expression('a_id'),
+                               '_name' => new \Zend\Db\Sql\Expression('c_name'),
+                               '_type' => new \Zend\Db\Sql\Expression('CONCAT("assessment")'),
+                               '_status' => new \Zend\Db\Sql\Expression('a_status'),
+                               '_date' => new \Zend\Db\Sql\Expression('a_create_date')
+                               )
+                        );
         $select->join(array('c' => 'companies'), 'a_c_id = c_id', array(), 'left');
 
         $where_str = '';
