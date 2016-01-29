@@ -76,7 +76,7 @@ class TraininglogTable implements ServiceLocatorAwareInterface
                 $select->order($orderBy . ' ' . $order);
             }
             if($identity['u_company_id']) {
-                $select->where("u2.u_company_id = " . $identity['u_company_id']);
+                $select->where("(u2.u_company_id = " . $identity['u_company_id'] . " OR tl_company_id = " . $identity['u_company_id'] . ')');
             } else {
                 $select->where("u2.u_company_id IS NULL ");
             }
@@ -198,7 +198,7 @@ class TraininglogTable implements ServiceLocatorAwareInterface
         }
 
         natcasesort($result);
-
+// print_r($result);exit;
         return $result;
     }
 
