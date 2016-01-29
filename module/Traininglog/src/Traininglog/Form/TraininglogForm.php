@@ -5,7 +5,7 @@ use Zend\Form\Form;
 
 class TraininglogForm extends Form
 {
-    public function __construct($sl)
+    public function __construct($sl, $tlObj = null)
     {
         parent::__construct('user');
         $this->setAttribute('method', 'post');
@@ -112,9 +112,10 @@ class TraininglogForm extends Form
             ),
         ));
 
+        $tlCId = is_object($tlObj) ? $tlObj->tl_company_id : null;
         $traininglogTable = $sl->get('Traininglog\Model\TraininglogTable');
         $trainers[''] = 'Please Select';
-        foreach ($traininglogTable->getTrainers() as $key => $r) {
+        foreach ($traininglogTable->getTrainers($tlCId) as $key => $r) {
             $trainers[$key] = $r;
         }
 

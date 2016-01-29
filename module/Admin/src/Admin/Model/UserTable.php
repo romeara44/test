@@ -900,4 +900,31 @@ class UserTable implements ServiceLocatorAwareInterface
         return false;
     }
 
+    public function getUsersForTrainersList($cId)
+    {
+        $company = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getCompany($cId);
+
+        $select = $this->tableGateway->getSql()->select();
+        $select->join(array('cc' => 'company_consultants'), 'cc.cc_consultant_id = u_id', array(), 'left');
+
+        $uIds = array();
+
+        if($company->c_consultant_u_id) {
+            $uIds[] = $company->c_consultant_u_id;
+        }
+        if($company->c_training_manager_u_id) {
+            $uIds[] = $company->c_training_manager_u_id;
+        }
+
+        if($uIds) {
+            $select->where('(cc.cc_company_id = ' . $company->c_id . ' OR u_id IN (' . implode(',', $uIds) . '))');
+        } else {
+            $select->where('cc.cc_company_id = ' . $company->c_id);
+        }
+
+        $select->where('u_active = 1');
+
+        return $this->tableGateway->selectWith($select);
+    }
+
 }

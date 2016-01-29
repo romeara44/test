@@ -175,31 +175,43 @@ class TraininglogTable implements ServiceLocatorAwareInterface
         return $row;
     }
 
-    public function getTrainers()
+    public function getTrainers($cId = null)
     {
         $authService = new \Zend\Authentication\AuthenticationService();
         $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
         $identity = $authService->getIdentity();
 
-        $result = array();
+        $resultUsers = array();
+        $resultTrainers = array();
 
         $users    = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUsersByCompany($identity['u_company_id']);
         $trainers = $this->getServiceLocator()->get('Traininglog\Model\TrainerTable')->getTrainersByCompany($identity['u_company_id']);
 
-        foreach ($users as $key => $user) {
-            $result['user_' . $user->u_id] = $user->u_firstname . ' ' . $user->u_lastname;
+        if($cId) {
+            $selectedCompanyUsers = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUsersForTrainersList($cId);
+        } else {
+            $selectedCompanyUsers = [];
         }
+
+        foreach ($users as $key => $user) {
+            $resultUsers['user_' . $user->u_id] = $user->u_firstname . ' ' . $user->u_lastname;
+        }
+        foreach ($selectedCompanyUsers as $key => $user) {
+            $resultUsers['user_' . $user->u_id] = $user->u_firstname . ' ' . $user->u_lastname;
+        }
+
+        natcasesort($resultUsers);
 
         if($trainers->count() > 0) {
             foreach ($trainers as $key => $trainer) {
-                $result['trainer_' . $trainer->tr_id] = $trainer->tr_name;
+                $resultTrainers['trainer_' . $trainer->tr_id] = $trainer->tr_name;
             }
 
         }
 
-        natcasesort($result);
-// print_r($result);exit;
-        return $result;
+        natcasesort($resultTrainers);
+
+        return $resultUsers + $resultTrainers;
     }
 
     public function saveTraininglog(Traininglog $traininglog)
