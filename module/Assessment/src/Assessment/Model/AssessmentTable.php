@@ -79,11 +79,12 @@ class AssessmentTable implements ServiceLocatorAwareInterface
 
             $order = $order ? $order : 'ASC';
 
-            $orders[] = 'a_version_index ' . $order;
-            $orders[] = 'a_id ASC';
             if ($orderBy) {
                 $orders[] = $orderBy . ' ' . $order;
             }
+
+            $orders[] = 'a_version_index ' . $order;
+            $orders[] = 'a_id ASC';
 
             $select->order($orders);
 

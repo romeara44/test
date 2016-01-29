@@ -82,7 +82,7 @@ class AdminController extends AbstractActionController
 
         $mappingSortCol = array(
             'id' => 'u_id',
-            'name' => 'u_lastname',
+            'name' => '_name',
             'role' => 'u_role_id',
             'status' => 'u_status',
         );

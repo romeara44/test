@@ -85,11 +85,12 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
 
             $order = $order ? $order : 'ASC';
 
-            $orders[] = 'rp_version_index ' . $order;
-            $orders[] = 'rp_id ASC';
             if ($orderBy) {
                 $orders[] = $orderBy . ' ' . $order;
             }
+
+            $orders[] = 'rp_version_index ' . $order;
+            $orders[] = 'rp_id ASC';
 
             $select->order($orders);
 

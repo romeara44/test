@@ -153,7 +153,7 @@ class BreachlogController extends AbstractActionController
         $mappingSortCol = array(
             'id' => 'bl_id',
             'name' => 'bl_name',
-            'cId' => 'bl_c_id',
+            'cName' => 'c_name',
             'date' => 'bl_date_of_occurrence',
             'reportable' => 'bl_reportable'
         );
