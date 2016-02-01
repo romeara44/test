@@ -28,9 +28,9 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
             </th>
 
             <?php if (!$isClientRole): ?>
-                <?php $classSort = ($order_by == 'cId') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+                <?php $classSort = ($order_by == 'cName') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
                 <th>
-                    <a href="<?php echo $this->url('remediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'cId', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    <a href="<?php echo $this->url('remediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'cName', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
                         Client <i class="fa <?php echo $classSort ?>"></i>
                     </a>
                 </th>

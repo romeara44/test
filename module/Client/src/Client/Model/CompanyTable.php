@@ -55,7 +55,7 @@ class CompanyTable implements ServiceLocatorAwareInterface
 
             $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = c_id', array('cc_consultant_id'), 'left');
             if (in_array($typeItems, array('all', 'contacts'))) {
-                $select->join(array('u' => 'users'), 'u_company_id = c_id', array('u_id', 'u_firstname', 'u_lastname', 'u_office_phone', '_name' => 'u_lastname', '_id' => 'u_id', '_c_active' => new \Zend\Db\Sql\Expression('u.u_active')), 'left');
+                $select->join(array('u' => 'users'), 'u_company_id = c_id', array('u_id', 'u_firstname', 'u_lastname', 'u_office_phone', '_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)'), '_id' => 'u_id', '_c_active' => new \Zend\Db\Sql\Expression('u.u_active')), 'left');
                 if ($identity['u_role_id'] == User::ROLE_ADMIN) {
                     $select->where('u_active IN (0, 1)');
                 } else {
@@ -175,7 +175,13 @@ class CompanyTable implements ServiceLocatorAwareInterface
 
         $select->where('c_name LIKE "%' . $searchValue . '%"');
 
-        $select->columns(array('_id' => 'c_id', '_name' => 'c_name', '_type' => new \Zend\Db\Sql\Expression('CONCAT("company")'), new \Zend\Db\Sql\Expression('NULL')));
+        $select->columns(array('_id' => 'c_id',
+                               '_name' => 'c_name',
+                               '_type' => new \Zend\Db\Sql\Expression('CONCAT("company")'),
+                               new \Zend\Db\Sql\Expression('NULL'),
+                               new \Zend\Db\Sql\Expression('NULL')
+                               )
+                        );
         $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = c_id', array(), 'left');
 
         if ($identity['u_role_id'] == User::ROLE_SALES_REP) {

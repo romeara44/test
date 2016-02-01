@@ -33,7 +33,7 @@ $identity = $authService->getIdentity();
             </th>
             <?php $classSort = ($order_by == 'patient_name') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
-                <a href="<?php echo $this->url('disclosuretrackinglog', array('action' => 'list', 'page' => $page, 'patient_name' => 'type', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                <a href="<?php echo $this->url('disclosuretrackinglog', array('action' => 'list', 'page' => $page, 'order_by' => 'patient_name', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
                     Patient Name <i class="fa <?php echo $classSort ?>"></i>
                 </a>
             </th>

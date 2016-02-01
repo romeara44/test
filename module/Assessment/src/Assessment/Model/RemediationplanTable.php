@@ -81,15 +81,25 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
             $select->join(array('c' => 'companies'), 'rp_c_id = c_id', array('_client_name' => 'c_name'), 'left');
             $select->join(array('as' => 'assessments'), 'rp_a_id = a_id', array('a_security_a_id', 'a_version_index', 'a_version_index_item'), 'left');
             $select->join(array('u' => 'users'), 'rp_approver_u_id = u_id', array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)')), 'left');
-            ///////////////
+            $select->columns(array( '*'
+                                  , '_status' => new \Zend\Db\Sql\Expression('CASE remediation_plans.rp_status 
+                                                                                   WHEN ' . Remediationplan::STATUS_NEW . ' THEN "' . Remediationplan::$statusesNames[Remediationplan::STATUS_NEW] . '"
+                                                                                   WHEN ' . Remediationplan::STATUS_OPEN . ' THEN "' . Remediationplan::$statusesNames[Remediationplan::STATUS_OPEN] . '"
+                                                                                   WHEN ' . Remediationplan::STATUS_SIGNED_OFF . ' THEN "' . Remediationplan::$statusesNames[Remediationplan::STATUS_SIGNED_OFF] . '"
+                                                                                   WHEN ' . Remediationplan::STATUS_CLOSED . ' THEN "' . Remediationplan::$statusesNames[Remediationplan::STATUS_CLOSED] . '"
+                                                                                   END')
+                                  , '_type' => new \Zend\Db\Sql\Expression('IF(remediation_plans.rp_type = ' . Assessment::TYPE_SECURITY_RISK . ', "' . Assessment::$typesNames[Assessment::TYPE_SECURITY_RISK] . '", "' . Assessment::$typesNames[Assessment::TYPE_PRIVACY_RISK] . '")')
+                                  )
+                            );
 
             $order = $order ? $order : 'ASC';
 
-            $orders[] = 'rp_version_index ' . $order;
-            $orders[] = 'rp_id ASC';
             if ($orderBy) {
                 $orders[] = $orderBy . ' ' . $order;
             }
+
+            $orders[] = 'rp_version_index ' . $order;
+            $orders[] = 'rp_id ASC';
 
             $select->order($orders);
 
@@ -107,7 +117,13 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
         
         $select->where('c_name LIKE "%' . $searchValue . '%"');
 
-        $select->columns(array('_id' => new \Zend\Db\Sql\Expression('rp_id'), '_name' => new \Zend\Db\Sql\Expression('c_name'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("remediationplan")'), new \Zend\Db\Sql\Expression('NULL')));
+        $select->columns(array('_id' => new \Zend\Db\Sql\Expression('rp_id'),
+                               '_name' => new \Zend\Db\Sql\Expression('c_name'),
+                               '_type' => new \Zend\Db\Sql\Expression('CONCAT("remediationplan")'),
+                               '_status' => new \Zend\Db\Sql\Expression('rp_status'),
+                               '_date' => new \Zend\Db\Sql\Expression('rp_create_date'),
+                               )
+                        );
         $select->join(array('c' => 'companies'), 'rp_c_id = c_id', array(), 'left');
 
         $where_str = '';

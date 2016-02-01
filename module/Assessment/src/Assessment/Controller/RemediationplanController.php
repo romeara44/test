@@ -146,10 +146,10 @@ class RemediationplanController extends AbstractActionController
 
         $mappingSortCol = array(
             'id' => 'rp_id',
-            'status' => 'rp_status',
-            'type' => 'rp_type',
+            'status' => '_status',
+            'type' => '_type',
             'date' => 'rp_incident_date',
-            'cId' => 'rp_c_id',
+            'cName' => 'c_name',
         );
 
         $sortCol = isset($mappingSortCol[$orderBy]) ? $mappingSortCol[$orderBy] : 'rp_id';

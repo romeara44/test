@@ -50,9 +50,9 @@
                     Account Type <i class="fa <?php echo $classSort ?>"></i>
                 </th>
 
-                <?php $classSort = ($order_by == 'status') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+                <?php $classSort = ($order_by == 'active') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
                 <th>
-                    <a href="<?php echo $this->url('admin', array('action' => 'users', 'page' => $page, 'order_by' => 'status', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    <a href="<?php echo $this->url('admin', array('action' => 'users', 'page' => $page, 'order_by' => 'active', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
                     Status <i class="fa <?php echo $classSort ?>"></i>
                 <th>Phone</th>
                 <th>&nbsp;</th>

@@ -173,7 +173,6 @@ class TraininglogController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
 
-        $form     = new TraininglogForm($this->getServiceLocator());
         $formNote = new NoteForm($this->getServiceLocator());
 
         $notes = null;
@@ -188,6 +187,8 @@ class TraininglogController extends AbstractActionController
             $comments          = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_TLC);
         }
         
+        $form = new TraininglogForm($this->getServiceLocator(), $tlObj);
+
         $request = $this->getRequest();
         if ($request->isPost()) {
             $tl = new Traininglog();
@@ -335,6 +336,15 @@ class TraininglogController extends AbstractActionController
 
         return $this->redirect()->toRoute('traininglog', array('controller' => 'traininglog', 'action' => 'list'));
 
+    }
+
+    public function gettrainersAction()
+    {
+        $cId = $this->params('id');
+
+        $trainers = $this->getTraininglogTable()->getTrainers($cId);
+
+        return new JsonModel($trainers);
     }
 
 }

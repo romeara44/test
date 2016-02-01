@@ -76,14 +76,20 @@ class AssessmentTable implements ServiceLocatorAwareInterface
             }
 
             $select->join(array('c' => 'companies'), 'a_c_id = c_id', array('_client_name' => 'c_name'), 'left');
+            $select->columns(array( '*'
+                                  , '_status' => new \Zend\Db\Sql\Expression('IF(assessments.a_status = ' . Assessment::STATUS_INPROGRESS . ', "' . Assessment::$statusesNames[Assessment::STATUS_INPROGRESS] . '", "' . Assessment::$statusesNames[Assessment::STATUS_CLOSED] . '")')
+                                  , '_type' => new \Zend\Db\Sql\Expression('IF(assessments.a_type = ' . Assessment::TYPE_SECURITY_RISK . ', "' . Assessment::$typesNames[Assessment::TYPE_SECURITY_RISK] . '", "' . Assessment::$typesNames[Assessment::TYPE_PRIVACY_RISK] . '")')
+                                  )
+                            );
 
             $order = $order ? $order : 'ASC';
 
-            $orders[] = 'a_version_index ' . $order;
-            $orders[] = 'a_id ASC';
             if ($orderBy) {
                 $orders[] = $orderBy . ' ' . $order;
             }
+
+            $orders[] = 'a_version_index ' . $order;
+            $orders[] = 'a_id ASC';
 
             $select->order($orders);
 
@@ -102,7 +108,13 @@ class AssessmentTable implements ServiceLocatorAwareInterface
 
         $select->where('c_name LIKE "%' . $searchValue . '%"');
 
-        $select->columns(array('_id' => new \Zend\Db\Sql\Expression('a_id'), '_name' => new \Zend\Db\Sql\Expression('c_name'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("assessment")'), new \Zend\Db\Sql\Expression('NULL')));
+        $select->columns(array('_id' => new \Zend\Db\Sql\Expression('a_id'),
+                               '_name' => new \Zend\Db\Sql\Expression('c_name'),
+                               '_type' => new \Zend\Db\Sql\Expression('CONCAT("assessment")'),
+                               '_status' => new \Zend\Db\Sql\Expression('a_status'),
+                               '_date' => new \Zend\Db\Sql\Expression('a_create_date')
+                               )
+                        );
         $select->join(array('c' => 'companies'), 'a_c_id = c_id', array(), 'left');
 
         $where_str = '';

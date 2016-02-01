@@ -62,7 +62,11 @@ class UserTable implements ServiceLocatorAwareInterface
             );
 
             $select->join(array('r' => 'roles'), 'role_id = u_role_id', array('_rolename' => 'role_name'), 'left');
-
+            $select->columns(array( '*'
+                                  , '_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)')
+                                  , '_active' => new \Zend\Db\Sql\Expression('IF(u_active = ' . User::STATUS_ACTIVE . ', "Active", "Archived")')
+                                  )
+                            );
             /*if ($identity['u_role_id'] == User::ROLE_ADMIN) {
                 $select->where('u_active = 1');
             }
@@ -99,7 +103,13 @@ class UserTable implements ServiceLocatorAwareInterface
         $select->where('u_active = 1');
         $select->where('(u_firstname LIKE "%' . $searchValue . '%" OR u_lastname LIKE "%' . $searchValue . '%")');
 
-        $select->columns(array('_id' => 'u_id', '_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("user")'), new \Zend\Db\Sql\Expression('NULL')));
+        $select->columns(array('_id' => 'u_id',
+                               '_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'),
+                               '_type' => new \Zend\Db\Sql\Expression('CONCAT("user")'),
+                               new \Zend\Db\Sql\Expression('NULL'),
+                               new \Zend\Db\Sql\Expression('NULL')
+                               )
+                        );
 
         $select->where('u_role_id <> 1'); // without admin
 
@@ -132,7 +142,13 @@ class UserTable implements ServiceLocatorAwareInterface
         
         $select->where('(u_firstname LIKE "%' . $searchValue . '%" OR u_lastname LIKE "%' . $searchValue . '%" OR compa.c_name LIKE "%' . $searchValue . '%")');
 
-        $select->columns(array('_id' => 'u_id', '_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("contact")'), new \Zend\Db\Sql\Expression('NULL')));
+        $select->columns(array('_id' => 'u_id',
+                               '_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'),
+                               '_type' => new \Zend\Db\Sql\Expression('CONCAT("contact")'), 
+                               '_status' => new \Zend\Db\Sql\Expression('NULL'),
+                               '_date' => new \Zend\Db\Sql\Expression('NULL')
+                               )
+                        );
 
         //$select->where('u_role_id = 5'); // without admin
 
@@ -886,6 +902,33 @@ class UserTable implements ServiceLocatorAwareInterface
         }
 
         return false;
+    }
+
+    public function getUsersForTrainersList($cId)
+    {
+        $company = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getCompany($cId);
+
+        $select = $this->tableGateway->getSql()->select();
+        $select->join(array('cc' => 'company_consultants'), 'cc.cc_consultant_id = u_id', array(), 'left');
+
+        $uIds = array();
+
+        if($company->c_consultant_u_id) {
+            $uIds[] = $company->c_consultant_u_id;
+        }
+        if($company->c_training_manager_u_id) {
+            $uIds[] = $company->c_training_manager_u_id;
+        }
+
+        if($uIds) {
+            $select->where('(cc.cc_company_id = ' . $company->c_id . ' OR u_id IN (' . implode(',', $uIds) . '))');
+        } else {
+            $select->where('cc.cc_company_id = ' . $company->c_id);
+        }
+
+        $select->where('u_active = 1');
+
+        return $this->tableGateway->selectWith($select);
     }
 
 }
