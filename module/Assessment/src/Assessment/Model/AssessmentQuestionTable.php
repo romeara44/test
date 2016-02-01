@@ -79,7 +79,7 @@ class AssessmentQuestionTable implements ServiceLocatorAwareInterface
         $select->join(array('aqo' => 'assessments_questions_options'), 'aqo_aq_id = aq_id', array('*', '_options' => new \Zend\Db\Sql\Expression('GROUP_CONCAT(CONCAT(aqo_id, "::", aqo_title) ORDER BY aqo_order)')), 'left');
         $select->join(array('aqc' => 'assessments_questions_categories'), 'aq_aqc_id = aqc_id', array('*'), 'left');
 
-        if ($additionalAddress) {
+        if ($additionalAddress && $type == \Assessment\Model\Assessment::TYPE_SECURITY_RISK) {
             $select->where('aqc_additional_location = 1');
         }
 

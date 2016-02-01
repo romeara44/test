@@ -80,14 +80,14 @@ $form->setAttribute('method', 'post');
             <?php if($identity['u_role_id'] != \Admin\Model\User::ROLE_PARTIAL) :?>
                 <p style="padding: 2px 0 12px 0; line-height: 14px; border-top: 0;">
                     <label>&nbsp;</label>
-                    <?php if(in_array($identity['u_role_id'], array(1, 2))) :?>
+                    <?php if(in_array($identity['u_role_id'], array(1, 2, 3))) :?>
                         <input type="checkbox" name="is_primary_contact" <?php if(is_object($clientObj) && $clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $userObj->u_id) :?>checked="checked"<?php endif; ?> id="primaryContact" class="checkbox" value="1" />
                         <label for="primaryContact" class="checkbox">Primary Contact</label>
                     <?php endif; ?>
                     <?php if (!$uId || $userObj->u_role_id < \Admin\Model\User::ROLE_PARTIAL): ?>
-                        <span id="companyIdAdminWrap" <?php if(!(in_array($identity['u_role_id'], array(1, 2)) || (is_object($clientObj) && $clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $identity['u_id']))) :?>style="display:none"<?php endif; ?>>
+                        <span id="companyIdAdminWrap" <?php if(!(in_array($identity['u_role_id'], array(1, 2, 3)) || (is_object($clientObj) && $clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $identity['u_id']))) :?>style="display:none"<?php endif; ?>>
                             <input type="checkbox" name="u_company_id_admin" <?php if(is_object($userObj) && $userObj->u_company_id_admin && $userObj->u_company_id_admin == $userObj->u_company_id):?>checked <?php endif; ?> id="companyIdAdmin" class="checkbox" value="<?php echo $userObj ? $userObj->u_company_id_admin : '' ?>"
-                            <?php if(!(in_array($identity['u_role_id'], array(1, 2)) || (is_object($clientObj) && $clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $identity['u_id']))) :?> disabled="true"<?php endif; ?> />
+                            <?php if(!(in_array($identity['u_role_id'], array(1, 2, 3)) || (is_object($clientObj) && $clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $identity['u_id']))) :?> disabled="true"<?php endif; ?> />
                             <label for="companyIdAdmin" class="checkbox">Company Admin</label>
                         </span>
                     <?php endif; ?>
