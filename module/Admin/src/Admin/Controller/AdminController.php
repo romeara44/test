@@ -83,8 +83,8 @@ class AdminController extends AbstractActionController
         $mappingSortCol = array(
             'id' => 'u_id',
             'name' => '_name',
-            'role' => 'u_role_id',
-            'status' => 'u_status',
+            'role' => 'role_name',
+            'active' => '_active',
         );
 
         $sortCol = isset($mappingSortCol[$orderBy]) ? $mappingSortCol[$orderBy] : 'u_id';

@@ -76,6 +76,11 @@ class AssessmentTable implements ServiceLocatorAwareInterface
             }
 
             $select->join(array('c' => 'companies'), 'a_c_id = c_id', array('_client_name' => 'c_name'), 'left');
+            $select->columns(array( '*'
+                                  , '_status' => new \Zend\Db\Sql\Expression('IF(assessments.a_status = ' . Assessment::STATUS_INPROGRESS . ', "' . Assessment::$statusesNames[Assessment::STATUS_INPROGRESS] . '", "' . Assessment::$statusesNames[Assessment::STATUS_CLOSED] . '")')
+                                  , '_type' => new \Zend\Db\Sql\Expression('IF(assessments.a_type = ' . Assessment::TYPE_SECURITY_RISK . ', "' . Assessment::$typesNames[Assessment::TYPE_SECURITY_RISK] . '", "' . Assessment::$typesNames[Assessment::TYPE_PRIVACY_RISK] . '")')
+                                  )
+                            );
 
             $order = $order ? $order : 'ASC';
 

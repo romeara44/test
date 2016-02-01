@@ -156,8 +156,8 @@ class AssessmentController extends AbstractActionController
         $mappingSortCol = array(
             'id' => 'a_id',
             'cName' => 'c_name',
-            'status' => 'a_status',
-            'type' => 'a_type',
+            'status' => '_status',
+            'type' => '_type',
             'date' => 'a_create_date',
         );
 

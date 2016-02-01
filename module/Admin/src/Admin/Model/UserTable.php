@@ -62,7 +62,11 @@ class UserTable implements ServiceLocatorAwareInterface
             );
 
             $select->join(array('r' => 'roles'), 'role_id = u_role_id', array('_rolename' => 'role_name'), 'left');
-            $select->columns(array('*', '_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)')));
+            $select->columns(array( '*'
+                                  , '_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)')
+                                  , '_active' => new \Zend\Db\Sql\Expression('IF(u_active = ' . User::STATUS_ACTIVE . ', "Active", "Archived")')
+                                  )
+                            );
             /*if ($identity['u_role_id'] == User::ROLE_ADMIN) {
                 $select->where('u_active = 1');
             }
