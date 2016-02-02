@@ -994,22 +994,33 @@ class AssessmentTable implements ServiceLocatorAwareInterface
             $arlc = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->getArlcByLocation($aId, $address->adr_id);
 
             foreach ($cats->buffer() as $catKey => $cat) {
-
                 $rpa = new Remediationplanaction();
 
                 $answerScore = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionAnswerTable')->getAnswersScore($aId, $cat->aqc_id, $address->adr_id);
+                $tack = $cat->aqc_citation;
 
-                $task = $cat->aqc_citation . '-' . $cat->aqc_specification . ' - ' . $cat->aqc_description;
+                if ($cat->aqc_specification) {
+                    if ($task) {
+                        $task .= '-';
+                    }
+                    $task .= $cat->aqc_specification;
+                }
+                if ($cat->aqc_description) {
+                    if ($task) {
+                        $task .= '-';
+                    }
+                    $task .= $cat->aqc_description;
+                }
 
-                if (($task == '- - ') || ($task == '- -') || ($task == '')) {
+                if ($task == '') {
                     continue;
                 }
                 $rpaData['rpa_rp_id'] = $rpId;
 
                 if (empty($arlc[$cat->aqc_ar_id])) {
-                    $contact_role = $this->getServiceLocator()->get('Client\Model\CompanyRolesTable')->getCompanyRoleByCompanyAndRole($a->a_c_id, $cat->aqc_ar_id);
-//                    var_dump($contact_role);die();
-                    $rpaData['rpa_contact_u_id'] = $contact_role->cr_u_id;
+                    //$contact_role = $this->getServiceLocator()->get('Client\Model\CompanyRolesTable')->getCompanyRoleByCompanyAndRole($a->a_c_id, $cat->aqc_ar_id);
+                    
+                    $rpaData['rpa_contact_u_id'] = 0;//$contact_role->cr_u_id;
                 } else {
                     $rpaData['rpa_contact_u_id'] = $arlc[$cat->aqc_ar_id];
                 }
@@ -1048,7 +1059,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
 
                 $this->getServiceLocator()->get('Assessment\Model\RemediationplanactionTable')->setServiceLocator($this->getServiceLocator());
                 $rpaId = $this->getServiceLocator()->get('Assessment\Model\RemediationplanactionTable')->saveRemediationplanaction($rpa);
-            }
+            }die();
         }
 
         return $rpId;

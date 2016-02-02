@@ -460,7 +460,7 @@ class RemediationplanController extends AbstractActionController
 
             $rpa->rpa_threat = str_replace('Â', '', $rpa->rpa_threat);
             $rpa->rpa_threat = str_replace('§', utf8_decode('§'), $rpa->rpa_threat);
-
+            $rpa->rpa_threat = trim($rpa->rpa_threat, '-');
             //echo $rpa->rpa_threat;
             //die;
             $csvList[] = array(
