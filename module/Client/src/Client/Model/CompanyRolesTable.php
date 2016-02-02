@@ -16,7 +16,7 @@ use Zend\Db\Sql\Expression;
 
 class CompanyRolesTable implements ServiceLocatorAwareInterface
 {
-    const ROLES_COUNT = 9;
+    const ROLES_COUNT = 10;
 
     protected $tableGateway;
     protected $serviceLocator;

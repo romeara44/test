@@ -1018,9 +1018,12 @@ class AssessmentTable implements ServiceLocatorAwareInterface
                 $rpaData['rpa_rp_id'] = $rpId;
 
                 if (empty($arlc[$cat->aqc_ar_id])) {
-                    //$contact_role = $this->getServiceLocator()->get('Client\Model\CompanyRolesTable')->getCompanyRoleByCompanyAndRole($a->a_c_id, $cat->aqc_ar_id);
-                    
-                    $rpaData['rpa_contact_u_id'] = 0;//$contact_role->cr_u_id;
+                    $role = $this->getServiceLocator()->get('Client\Model\CompanyRolesTable')->getCompanyRoleByCompanyAndRole($a->a_c_id, $cat->aqc_ar_id);
+                    if ($role) {
+                        $rpaData['rpa_contact_u_id'] = $role->cr_u_id;
+                    } else {
+                        $rpaData['rpa_contact_u_id'] = 0;
+                    }                    
                 } else {
                     $rpaData['rpa_contact_u_id'] = $arlc[$cat->aqc_ar_id];
                 }
