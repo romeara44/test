@@ -904,6 +904,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
             $addressItem->exchangeArray($addressItemData);
 
             $addressItemId = $addressItemTable->saveAddressItem($addressItem);
+            break;
         }
 
         return true;
