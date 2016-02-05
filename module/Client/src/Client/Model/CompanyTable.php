@@ -845,4 +845,17 @@ class CompanyTable implements ServiceLocatorAwareInterface
         }
         return $row;
     }
+
+    public function getCompanyLocations($id)
+    {
+        $locations = [];
+
+        $id  = (int) $id;
+        $addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($id);
+
+        foreach ($addresses as $r) {
+            $locations[$r->adr_id] = $r->adr_name;
+        }
+        return $locations;
+    }
 }

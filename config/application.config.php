@@ -23,7 +23,8 @@ return array(
         'Securityreminder',
         'Sitesetting',
         'Disclosure',
-        'Reporting'
+        'Reporting',
+        'Itassetinventory'
         ),
     'module_listener_options' => array(
         'module_paths' => array(

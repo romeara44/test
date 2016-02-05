@@ -24,6 +24,8 @@ class Note
     const NOTE_TLC = 14;
     const NOTE_SRM = 15;
     const NOTE_SRC = 16;
+    const NOTE_IAIR = 17;
+    const NOTE_IAIN = 18;
 
     public $note_id;
     public $note_text;

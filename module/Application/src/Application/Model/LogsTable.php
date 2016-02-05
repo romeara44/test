@@ -29,6 +29,7 @@ class LogsTable
     const TYPE_AUTH_SUCCESS = 11;
     const TYPE_AUTH_FAILED = 12;
     const TYPE_AUTH_LOCKED = 13;
+    const TYPE_UNARCHIVE = 14;
 
     const ITEM_TYPE_COMPANY = 1;
     const ITEM_TYPE_CLIENT = 2;
@@ -43,6 +44,7 @@ class LogsTable
     const ITEM_TYPE_DR = 11;
     const ITEM_TYPE_DTL = 12;
     const ITEM_TYPE_VL = 13;
+    const ITEM_TYPE_IAI = 14;
 
     protected $tableGateway;
     protected $serviceLocator;
