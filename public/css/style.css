@@ -1155,6 +1155,7 @@ table thead tr th, table tr th {
 
 table.traininglogs thead tr th, table.traininglogs tr th {
 	font-size: 14px;
+	white-space: normal
 }
 
 table thead tr th .fa, table tr th .fa { margin-left: 6px; }
