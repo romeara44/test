@@ -89,9 +89,11 @@ class SearchController extends AbstractActionController
         $mappingSortCol = array(
             'type' => '_type',
             'name' => '_name',
+            'date' => '_date',
+            'status' => '_status',
         );
 
-        $sortCol = isset($mappingSortCol[$orderBy]) ? $mappingSortCol[$orderBy] : 'type';
+        $sortCol = isset($mappingSortCol[$orderBy]) ? $mappingSortCol[$orderBy] : '_type';
 
         $this->getSearchTable()->setServiceLocator($this->getServiceLocator());
 
