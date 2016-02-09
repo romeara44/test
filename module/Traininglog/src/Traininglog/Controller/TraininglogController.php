@@ -207,7 +207,8 @@ class TraininglogController extends AbstractActionController
                     $post[$ymdKey] = '0000-00-00';
                 }
             }
-            
+            $tl->tl_company_id           = (isset($post['tl_company_id']))           ? $post['tl_company_id']           : null;
+            $form = new TraininglogForm($this->getServiceLocator(), $tl);
             $form->setInputFilter($tl->getInputFilter($this->getServiceLocator(), $id));
             $form->setData($post);
 

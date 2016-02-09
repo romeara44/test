@@ -997,7 +997,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
                 $rpa = new Remediationplanaction();
 
                 $answerScore = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionAnswerTable')->getAnswersScore($aId, $cat->aqc_id, $address->adr_id);
-                $tack = $cat->aqc_citation;
+                $task = $cat->aqc_citation;
 
                 if ($cat->aqc_specification) {
                     if ($task) {
