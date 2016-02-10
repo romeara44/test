@@ -1062,7 +1062,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
 
                 $this->getServiceLocator()->get('Assessment\Model\RemediationplanactionTable')->setServiceLocator($this->getServiceLocator());
                 $rpaId = $this->getServiceLocator()->get('Assessment\Model\RemediationplanactionTable')->saveRemediationplanaction($rpa);
-            }die();
+            }
         }
 
         return $rpId;

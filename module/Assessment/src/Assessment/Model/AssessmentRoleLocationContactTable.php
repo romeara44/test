@@ -59,7 +59,7 @@ class AssessmentRoleLocationContactTable implements ServiceLocatorAwareInterface
 
         $resultSet = $this->tableGateway->selectWith($select);
 
-        return count($resultSet) == 9 ? true : false;
+        return count($resultSet) == 10 ? true : false;
     }
 
     public function getArlcByLocation($aId, $adrId)
