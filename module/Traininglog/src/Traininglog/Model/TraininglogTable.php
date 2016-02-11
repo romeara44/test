@@ -71,6 +71,7 @@ class TraininglogTable implements ServiceLocatorAwareInterface
             $select->join(array('u2' => 'users'), new \Zend\Db\Sql\Expression('tl_create_u_id = u2.u_id'), array(), 'left');
             $select->join(array('c' => 'companies'), 'tl_company_id = c.c_id', array('_tl_company_name' => 'c_name'), 'left');
             $select->join(array('c2' => 'companies'), 'u2.u_company_id = c2.c_id', array(), 'left');
+            $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = tl_company_id', array(), 'left');
 
             if ($orderBy) {
                 $order = $order ? $order : 'ASC';
@@ -78,29 +79,16 @@ class TraininglogTable implements ServiceLocatorAwareInterface
             }
 
             if ($identity['u_role_id'] != User::ROLE_ADMIN) {
-                if($identity['u_company_id']) {
-                    if($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
-                        $select->where("(u2.u_company_id = " . $identity['u_company_id'] 
-                                       . " OR tl_company_id = " . $identity['u_company_id'] 
-                                       . " OR u2.u_senior_consultant_u_id = " . $identity['u_id'] 
-                                       . " OR c2.c_consultant_u_id = " . $identity['u_id'] . ')');
-                    } else if($identity['u_role_id'] == User::ROLE_CONSULTANT) {
-                        $select->where("(u2.u_company_id = " . $identity['u_company_id'] 
-                                       . " OR tl_company_id = " . $identity['u_company_id'] 
-                                       . " OR c2.c_consultant_u_id = " . $identity['u_id'] . ')');
-                    } else {
-                        $select->where("(u2.u_company_id = " . $identity['u_company_id'] . " OR tl_company_id = " . $identity['u_company_id'] . ')');
-                    }
+                if($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
+                    $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
+                    $ids[] = $identity['u_id'];
+                    $select->where('(tl_create_u_id IN (' . implode(',', $ids) . ') OR cc.cc_consultant_id IN (' . implode(',', $ids) . '))');
+                } elseif ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
+                    $select->where("(tl_create_u_id = " . $identity['u_id']
+                                   . ' OR cc_consultant_id = ' . $identity['u_id']
+                                   . ')');
                 } else {
-                    if($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
-                        $select->where("(tl_create_u_id = " . $identity['u_id'] . " OR u2.u_senior_consultant_u_id = " . $identity['u_id'] . ')');
-                    } elseif ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
-                        $select->where("(tl_create_u_id = " . $identity['u_id'] 
-                                       . " OR u2.u_senior_consultant_u_id = " . $identity['u_id']
-                                       . " OR c2.c_consultant_u_id = " . $identity['u_id'] . ')');
-                    } else {
-                        $select->where('tl_create_u_id = ' . $identity['u_id']);
-                    }
+                    $select->where('tl_create_u_id = ' . $identity['u_id']);
                 }
             }
 
