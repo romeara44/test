@@ -394,6 +394,7 @@ $form->setAttribute('method', 'post');
                         $.each(data, function(index, value) {
                             html += '<option value="' + index + '">' + value + '</option>';
                         });
+                        html += '<option value="-1">Other</option>';
                         $('#_tl_trainer').html(html);
                     }
                 });
