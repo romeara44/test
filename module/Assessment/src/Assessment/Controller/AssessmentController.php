@@ -292,8 +292,8 @@ class AssessmentController extends AbstractActionController
                         //$this->getAssessmentTable()->copyAdressesToPrivacy($isPossible->a_id, $aId);
                     } else {
 
-                        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update assessment "' . $id . '" step 1');
-                        $newAdressesKeys = $this->getAssessmentTable()->saveAddresses($id, $request->getPost());
+                        //$this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update assessment "' . $id . '" step 1');
+                        //$newAdressesKeys = $this->getAssessmentTable()->saveAddresses($id, $request->getPost());
                     }
 
 

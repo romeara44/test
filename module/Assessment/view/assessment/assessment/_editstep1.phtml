@@ -83,7 +83,7 @@ $form->setAttribute('method', 'post');
 
         <div class="cboth"></div>
 
-        <div id="step1">
+        <div id="step1" style="display:none">
 
             <h2>Step 1 of 5 - Enter Locations</h2>
 
@@ -296,7 +296,7 @@ $form->setAttribute('method', 'post');
         $('#location input[name="adr_zip[]"]').mask("99999");
 
         $('#saveAndContinue').click(function() {
-            if (validate()) {
+            if (validate_new()) {
                 $('#setStep').val(2);
                 $('#assessment').submit();
             }
@@ -465,10 +465,27 @@ $form->setAttribute('method', 'post');
             }
             return valid;
         }
+
+        function validate_new() {
+            var valid = 1;
+            if ($('#a_c_id').val() < 1) {
+                valid = 0;
+                $('#s1').show();
+            } else {
+                $('#s1').hide();
+            }
+            if ($('#assessmentType').val() < 1) {
+                valid = 0;
+                $('#sa1').show();
+            } else {
+                $('#sa1').hide();
+            }
+            return valid;
+        }
         <?php endif; ?>
 
         $('#save').click(function() {
-            if (validate()) {
+            if (validate_new()) {
                 $('#assessment').submit();
             }
         });
@@ -476,10 +493,10 @@ $form->setAttribute('method', 'post');
         //Conditional logic for assesment type
         jQuery('#assessmentType').change(function(){
             if(jQuery(this).val() == 2) {
-                jQuery('#step1').hide();
+                //jQuery('#step1').hide();
                 $('#inviteClientLinkP').hide();
             } else {
-                jQuery('#step1').show();
+                //jQuery('#step1').show();
                 $('#inviteClientLinkP').show();
             }
         });
