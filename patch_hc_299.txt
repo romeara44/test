@@ -1,0 +1,18 @@
+update remediation_plans_actions rpa
+inner join remediation_plans rp ON rpa_rp_id = rp_id
+set rpa.rpa_risk_score = COALESCE(
+(SELECT SUM(aqo_risk_score) AS _score FROM assessments_questions_answers INNER JOIN assessments_questions AS aq ON aq_id = aqa_aq_id INNER JOIN assessments_questions_categories AS aqc ON aq_aqc_id = aqc_id INNER JOIN assessments_questions_options AS aqo ON aqa_aqo_id = aqo_id WHERE aq_aqc_id = rpa_aqc_id AND aqa_a_id = rp_a_id AND aqa_adr_id = rpa_adr_id)
+, 0),
+rpa.rpa_risk_level = (if (
+COALESCE(
+(select aqa_aqo_id from (SELECT SUM(aqo_risk_score), aqa_aqo_id FROM assessments_questions_answers INNER JOIN assessments_questions AS aq ON aq_id = aqa_aq_id INNER JOIN assessments_questions_categories AS aqc ON aq_aqc_id = aqc_id INNER JOIN assessments_questions_options AS aqo ON aqa_aqo_id = aqo_id WHERE aq_aqc_id = rpa.rpa_aqc_id AND aqa_a_id = rp.rp_a_id AND aqa_adr_id = rpa.rpa_adr_id) t)
+, 0) = 3, 3, 
+if(COALESCE(
+(SELECT SUM(aqo_risk_score) AS _score FROM assessments_questions_answers INNER JOIN assessments_questions AS aq ON aq_id = aqa_aq_id INNER JOIN assessments_questions_categories AS aqc ON aq_aqc_id = aqc_id INNER JOIN assessments_questions_options AS aqo ON aqa_aqo_id = aqo_id WHERE aq_aqc_id = rpa_aqc_id AND aqa_a_id = rp_a_id AND aqa_adr_id = rpa_adr_id)
+, 0) >= 6 AND COALESCE(
+(SELECT SUM(aqo_risk_score) AS _score FROM assessments_questions_answers INNER JOIN assessments_questions AS aq ON aq_id = aqa_aq_id INNER JOIN assessments_questions_categories AS aqc ON aq_aqc_id = aqc_id INNER JOIN assessments_questions_options AS aqo ON aqa_aqo_id = aqo_id WHERE aq_aqc_id = rpa_aqc_id AND aqa_a_id = rp_a_id AND aqa_adr_id = rpa_adr_id)
+, 0) < 10, 1, 
+if(COALESCE(
+(SELECT SUM(aqo_risk_score) AS _score FROM assessments_questions_answers INNER JOIN assessments_questions AS aq ON aq_id = aqa_aq_id INNER JOIN assessments_questions_categories AS aqc ON aq_aqc_id = aqc_id INNER JOIN assessments_questions_options AS aqo ON aqa_aqo_id = aqo_id WHERE aq_aqc_id = rpa_aqc_id AND aqa_a_id = rp_a_id AND aqa_adr_id = rpa_adr_id)
+, 0) >= 10, 2, 0))))
+where rpa_id=6387
