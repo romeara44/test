@@ -906,7 +906,7 @@ class UserTable implements ServiceLocatorAwareInterface
 
     public function getUsersForTrainersList($cId)
     {
-        $company = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getCompany($cId);
+        $company = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getClientCompany($cId);
 
         $select = $this->tableGateway->getSql()->select();
         $select->join(array('cc' => 'company_consultants'), 'cc.cc_consultant_id = u_id', array(), 'left');

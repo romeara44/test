@@ -119,7 +119,7 @@ class TraininglogForm extends Form
             $trainers[$key] = $r;
         }
 
-        $trainers['-1'] = 'Other';
+        $trainers['-1'] = 'Other';        
 
         $this->add(array(
             'name' => '_tl_trainer',
