@@ -1,0 +1,18 @@
+update remediation_plans_actions
+INNER JOIN assessments_questions_categories ON remediation_plans_actions.rpa_aqc_id = assessments_questions_categories.aqc_id
+set rpa_action_plan=aqc_action_plan
+WHERE rpa_action_plan =  ""
+OR rpa_action_plan IS NULL 
+
+update remediation_plans_actions
+INNER JOIN assessments_questions_categories ON remediation_plans_actions.rpa_aqc_id = assessments_questions_categories.aqc_id
+set rpa_policy=aqc_policy
+WHERE rpa_policy =  ""
+OR rpa_policy IS NULL
+
+update remediation_plans_actions rpa
+INNER JOIN remediation_plans rp ON rp.rp_id = rpa.rpa_rp_id
+INNER JOIN assessments_questions_categories aqc ON rpa.rpa_aqc_id = aqc.aqc_id
+INNER JOIN company_roles cr ON (aqc.aqc_ar_id = cr.cr_ar_id and rp.rp_c_id = cr.cr_c_id)
+set rpa_contact_u_id=cr_u_id
+where (rpa_contact_u_id is null or rpa_contact_u_id = 0) and (cr_u_id is not null or cr_u_id != 0)
