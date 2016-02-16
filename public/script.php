@@ -1,5 +1,5 @@
 <?php
-$mysqli = new mysqli("localhost", "root", "root", "hipaa_stagine");
+$mysqli = new mysqli("localhost", "hipaacar_app", "w5v#yTgCfe", "hipaacar_app");
 
 if ($mysqli->connect_errno) {
     printf("cannot connect %s\n", $mysqli->connect_error);
