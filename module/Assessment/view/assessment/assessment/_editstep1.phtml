@@ -83,7 +83,7 @@ $form->setAttribute('method', 'post');
 
         <div class="cboth"></div>
 
-        <div id="step1" style="display:none">
+        <div id="step1" <?php if (!$this->aId): ?>style="display:none"<?php endif; ?>>
 
             <h2>Step 1 of 5 - Enter Locations</h2>
 
@@ -296,7 +296,7 @@ $form->setAttribute('method', 'post');
         $('#location input[name="adr_zip[]"]').mask("99999");
 
         $('#saveAndContinue').click(function() {
-            if (validate_new()) {
+            if (validate()) {
                 $('#setStep').val(2);
                 $('#assessment').submit();
             }
@@ -414,78 +414,12 @@ $form->setAttribute('method', 'post');
             } else {
                 $('#sa1').hide();
             }
-            
-            if ($('#assessmentType').val() == 1) {
-
-                $('input[name="adr_name[]"]').each(function(i, v) {
-                    var elem = $(v);
-                    if (elem.val() == '') {
-                        valid = 0;
-                        elem.closest('p').next('ul').show();
-                    } else {
-                        elem.closest('p').next('ul').hide();
-                    }
-                });
-                $('input[name="adr_address1[]"]').each(function(i, v) {
-                    var elem = $(v);
-                    if (elem.val() == '') {
-                        valid = 0;
-                        elem.closest('p').next('ul').show();
-                    } else {
-                        elem.closest('p').next('ul').hide();
-                    }
-                });
-                $('input[name="adr_city[]"]').each(function(i, v) {
-                    var elem = $(v);
-                    if (elem.val() == '') {
-                        valid = 0;
-                        elem.closest('p').next('ul').show();
-                    } else {
-                        elem.closest('p').next('ul').hide();
-                    }
-                });
-                $('select[name="adr_state_id[]"]').each(function(i, v) {
-                    var elem = $(v);
-                    if (elem.val() < 1) {
-                        valid = 0;
-                        elem.closest('p').next('ul').show();
-                    } else {
-                        elem.closest('p').next('ul').hide();
-                    }
-                });
-                $('input[name="adr_zip[]"]').each(function(i, v) {
-                    var elem = $(v);
-                    if (elem.val() == '') {
-                        valid = 0;
-                        elem.closest('p').next('ul').show();
-                    } else {
-                        elem.closest('p').next('ul').hide();
-                    }
-                });
-            }
-            return valid;
-        }
-
-        function validate_new() {
-            var valid = 1;
-            if ($('#a_c_id').val() < 1) {
-                valid = 0;
-                $('#s1').show();
-            } else {
-                $('#s1').hide();
-            }
-            if ($('#assessmentType').val() < 1) {
-                valid = 0;
-                $('#sa1').show();
-            } else {
-                $('#sa1').hide();
-            }
             return valid;
         }
         <?php endif; ?>
 
         $('#save').click(function() {
-            if (validate_new()) {
+            if (validate()) {
                 $('#assessment').submit();
             }
         });
