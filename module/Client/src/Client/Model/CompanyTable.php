@@ -249,7 +249,7 @@ class CompanyTable implements ServiceLocatorAwareInterface
 
         $select = $this->tableGateway->getSql()->select();
         $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = c_id', array('cc_consultant_id'), 'left');
-        $select->where('c_active = 1 AND !(c_rel_type = ' . \Client\Model\Company::RELATION_TYPE_PARENT . ' AND c_type = ' . \Client\Model\Company::PARENT_TYPE_HOLDING . ')');
+        $select->where('c_active = 1');
         if ($identity['u_role_id'] == \Admin\Model\User::ROLE_SALES_REP) {
             $select->where('c_owner_u_id = ' . $identity['u_id']);
         } elseif (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_CONSULTANT))) {
@@ -259,11 +259,15 @@ class CompanyTable implements ServiceLocatorAwareInterface
             $ids[] = $identity['u_id'];
             $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR cc_consultant_id IN (' . implode(',', $ids) . '))');
         } else if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
+            $where_str = '(c_owner_u_id = ' . $identity['u_id'];
             if($identity['u_company_id_admin']) {
-                $select->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR c_id = ' . $identity['u_company_id_admin'] . ')');
-            } else {
-                $select->where('c_owner_u_id = ' . $identity['u_id']);
+                $where_str .= ' OR c_id = ' . $identity['u_company_id_admin'];
             }
+            if($identity['u_company_id']) {
+                $where_str .= ' OR c_id = ' . $identity['u_company_id'];
+            }
+            $where_str .= ')';
+            $select->where($where_str);
         }
 
         $select->group('c_id');
