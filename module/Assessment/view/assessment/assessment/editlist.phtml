@@ -5,10 +5,19 @@
 </div>
 
 <p></p>
-
+<?php if ($this->aObj->a_type == 1): ?>
+<ul>
+<?php foreach ($this->addresses->buffer() as $key => $address): ?>
+    <li>
+    <a href="javascript:void(0)" data-key="<?php echo $key; ?>" class="panel-tabs"><?php echo $address->adr_name ?></a>
+    </li>
+<?php endforeach; ?>
+</ul>
+<?php foreach ($this->addresses->buffer() as $key => $address): ?>
+<div id="panel_<?php echo $key; ?>" class="panel" <?php echo ($key ? 'style="display:none"' : ''); ?> >
 <table cellpadding="0" cellspacing="0" style="width: 450px; margin: 0 auto;">
     <thead>
-    <?php if ($this->aObj->a_type == 1): ?>
+    
         <tr>
             <th width="60">&nbsp;</th>
             <th>Step 1</th>
@@ -29,7 +38,7 @@
             <th>Step 2</th>
         </tr>
 
-        <?php foreach ($this->addresses->buffer() as $address): ?>
+        <?php //foreach ($this->addresses->buffer() as $address): ?>
             <tr>
                 <?php
                 $stepClass = $this->checkSteps[2][$address->adr_id] ? 'fa-check' : 'fa-times';
@@ -38,48 +47,14 @@
                 <td class="acenter"><i style="<?php echo $color ?>" class="fa <?php echo $stepClass ?>"></i></td>
                 <td><a href="/assessment/edit/<?php echo $this->aObj->a_id; ?>/step/2/location/<?php echo $address->adr_id ?>">Assign <?php echo $address->adr_name ?> Roles</a></td>
             </tr>
-        <?php endforeach; ?>
-
-        <tr>
-            <th>&nbsp;</th>
-            <th>Step 3</th>
-        </tr>
-
-        <?php foreach ($this->addresses->buffer() as $address): ?>
-            <tr>
-                <?php
-                $stepClass = $this->checkSteps[3][$address->adr_id] ? 'fa-check' : 'fa-times';
-                $color = $this->checkSteps[3][$address->adr_id] ? '' : 'color: #aaa';
-                ?>
-
-                <td class="acenter"><i style="<?php echo $color ?>" class="fa <?php echo $stepClass ?>"></i></td>
-                <td><a href="/assessment/edit/<?php echo $this->aObj->a_id; ?>/step/3/location/<?php echo $address->adr_id ?>">Inventory <?php echo $address->adr_name ?> Assets</a></td>
-            </tr>
-        <?php endforeach; ?>
-
-        <tr>
-            <th>&nbsp;</th>
-            <th>Step 4</th>
-        </tr>
-
-        <?php foreach ($this->addresses->buffer() as $address): ?>
-            <tr>
-                <?php
-                $stepClass = $this->checkSteps[4][$address->adr_id] ? 'fa-check' : 'fa-times';
-                $color = $this->checkSteps[4][$address->adr_id] ? '' : 'color: #aaa';
-                ?>
-                <td class="acenter"><i style="<?php echo $color ?>" class="fa <?php echo $stepClass ?>"></i></td>
-                <td><a href="/assessment/edit/<?php echo $this->aObj->a_id; ?>/step/4/location/<?php echo $address->adr_id ?>">Business Associates for <?php echo $address->adr_name ?></a></td>
-            </tr>
-        <?php endforeach; ?>
-    <?php endif; ?>
+        <?php //endforeach; ?>
 
     <tr>
         <th>&nbsp;</th>
         <th><?php if ($this->aObj->a_type == 1): ?>Step 5<?php else: ?>Assessment Interview<?php endif; ?></th>
     </tr>
 
-    <?php foreach ($this->addresses->buffer() as $address): ?>
+    <?php //foreach ($this->addresses->buffer() as $address): ?>
         <tr>
             <td class="acenter">&nbsp;</td>
             <td><em><?php echo $address->adr_name ?></em></td>
@@ -96,11 +71,53 @@
             </tr>
         <?php endforeach; ?>
 
-    <?php endforeach; ?>
+    <?php //endforeach; ?>
 
 
     </tbody>
 </table>
+</div>
+<?php endforeach; ?>
+<?php else: ?>
+<table cellpadding="0" cellspacing="0" style="width: 450px; margin: 0 auto;">
+    <thead>
 
+    <tr>
+        <th>&nbsp;</th>
+        <th>Assessment Interview</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php //foreach ($this->addresses->buffer() as $address): ?>
+        <tr>
+            <td class="acenter">&nbsp;</td>
+            <td><em><?php echo $address->adr_name ?></em></td>
+        </tr>
+
+        <?php foreach ($this->assessmentsRoles->buffer() as $ar): ?>
+            <tr>
+                <?php
+                $stepClass = $this->checkSteps[5][$address->adr_id][$ar->ar_id] ? 'fa-check' : 'fa-times';
+                $color = $this->checkSteps[5][$address->adr_id][$ar->ar_id] ? '' : 'color: #aaa';
+                ?>
+                <td class="acenter"><i class="fa <?php echo $stepClass ?>" style="color: #777;"></i></td>
+                <td><a href="/assessment/edit/<?php echo $this->aObj->a_id; ?>/step/5/locationRole/<?php echo $address->adr_id ?>_<?php echo $ar['ar_id'] ?>"><?php echo $ar->ar_name ?></a></td>
+            </tr>
+        <?php endforeach; ?>
+
+    <?php //endforeach; ?>
+
+
+    </tbody>
+</table>
+<?php endif; ?>
 <div class="cboth"><br /></div>
 
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        $('.panel-tabs').click(function() {
+            $('.panel').hide();
+            $('#panel_' + $(this).data('key')).show();
+        });
+    });
+</script>
