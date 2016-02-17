@@ -87,6 +87,18 @@ class TraininglogTable implements ServiceLocatorAwareInterface
                     $select->where("(tl_create_u_id = " . $identity['u_id']
                                    . ' OR cc_consultant_id = ' . $identity['u_id']
                                    . ')');
+                } elseif ($identity['u_role_id'] == User::ROLE_CLIENT) {
+                    if ($identity['u_company_id']) {
+                        $ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getConsultantsIdsForCompany($identity['u_company_id']);
+                        if ($ids) {
+                            $select->where('(tl_create_u_id = ' . $identity['u_id'] .
+                                ' OR (tl_company_id = ' . $identity['u_company_id'] . ' AND tl_create_u_id IN (' . implode(',', $ids) . ')))');
+                        } else {
+                            $select->where('tl_create_u_id = ' . $identity['u_id']);
+                        }
+                    } else {
+                        $select->where('tl_create_u_id = ' . $identity['u_id']);
+                    }
                 } else {
                     $select->where('tl_create_u_id = ' . $identity['u_id']);
                 }
