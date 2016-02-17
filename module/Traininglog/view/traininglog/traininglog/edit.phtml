@@ -186,7 +186,6 @@ $form->setAttribute('method', 'post');
         <div id="filesToUploadBox_training">
 
         </div>
-                <?php if ($this->tlId && is_object($comments) && ($comments->count())): ?>
             <?php foreach ($trainingMaterials as $note): ?>
                 <div class="note">
                     <strong><?php echo $note->_username ?></strong> <small> on <?php echo $note->_note_create_date_format ?></small><br />
@@ -210,7 +209,6 @@ $form->setAttribute('method', 'post');
                     </p>
                 </div>
             <?php endforeach; ?>
-        <?php endif; ?>
         <div class="cboth"></div>
 
         <p>

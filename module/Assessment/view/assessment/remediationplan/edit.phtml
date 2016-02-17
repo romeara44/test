@@ -276,7 +276,7 @@
         ?>
         <?php
         $fn = $formNote->get('note_item_type');
-        $fn->setValue(4);
+        $fn->setValue(\Note\Model\Note::NOTE_RP);
         echo $this->formHidden($fn);
         ?>
         <?php
