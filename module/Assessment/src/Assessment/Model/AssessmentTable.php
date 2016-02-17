@@ -189,6 +189,16 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         return ($row->_client_name);
     }
 
+    public function getForImport()
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('a_type = ' . Assessment::TYPE_SECURITY_RISK);
+        
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        return $resultSet;
+    }
+
     public function getAssessment($id)
     {
         $authService = new \Zend\Authentication\AuthenticationService();
@@ -829,7 +839,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         foreach ($addresses->buffer() as $address) {
             $steps[2][$address->adr_id] = (int) $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->checkStep($id, $address->adr_id);
         }
-
+/*
         foreach ($addresses->buffer() as $address) {
             $steps[3][$address->adr_id] = (int) $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationItemTable')->checkStep($id, $address->adr_id);
         }
@@ -837,7 +847,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         foreach ($addresses->buffer() as $address) {
             $steps[4][$address->adr_id] = (int) $this->getServiceLocator()->get('Assessment\Model\AssessmentBusinessAssociateLocationTable')->checkStep($id, $address->adr_id);
         }
-
+*/
         foreach ($addresses->buffer() as $address) {
             foreach ($assessmentsRoles->buffer() as $ar) {
                 $questions = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionTable')->getQuestions($a->a_type, $ar->ar_id, $a->a_id, $address->adr_id, $a);

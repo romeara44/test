@@ -329,4 +329,45 @@ class ItassetinventoryController extends AbstractActionController
 
         return new JsonModel($locations);
     }
+
+    public function importAction() {
+        $assessments = $this->getServiceLocator()->get('Assessment\Model\AssessmentTable')->getForImport();
+        $i = $j = 0;
+        $non_imported_assessments_ids = [];
+        foreach ($assessments as $assessment) {
+            $i++;
+            $ass_addresses = $this->getAddressTable()->getAddresses($assessment->a_id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
+            $comp_addresses = $this->getAddressTable()->getAddresses($assessment->a_c_id, \Client\Model\AddressItem::COMPANY_TYPE);
+            if (count($ass_addresses) != count($comp_addresses)) {
+                $non_imported_assessments_ids[] = $assessment->a_id;
+                continue;
+            }
+
+            foreach ($ass_addresses as $ass_address) {
+                $flag = 0;
+                foreach ($comp_addresses as $comp_address) {
+                    if ($ass_address->adr_address1 != $comp_address->adr_address1) {                        
+                        $flag = 1;
+                        break;
+                    }
+                }
+                if ($flag) {
+                    $non_imported_assessments_ids[] = $assessment->a_id;
+                    break;
+                }
+                $notes = $this->getNoteTable()->getNotes($assessment->a_id, \Note\Model\Note::NOTE_AILI, $ass_address->adr_id);
+                $assessmentsInv = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryTable')->getAssessmentsInventory();
+                $ailiItems = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationItemTable')->getAiliByLocation($assessment->a_id, $ass_address->adr_id);
+                $reportFiles = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationReportTable')->getAilrByLocation($assessment->a_id, $ass_address->adr_id);
+
+                //var_dump($notes);
+                var_dump($assessmentsInv);
+                //var_dump($ailiItems);
+                //var_dump($reportFiles);
+                
+            }
+            
+        }
+        echo "$i $j";die();
+    }
 }

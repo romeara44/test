@@ -9,12 +9,13 @@
 <ul>
 <?php foreach ($this->addresses->buffer() as $key => $address): ?>
     <li>
-    <a href="javascript:void(0)" data-key="<?php echo $key; ?>" class="panel-tabs"><?php echo $this->aObj->_client_name . ' - ' . $address->adr_name ?></a>
+    <a href="/assessment/editlist/<?php echo $this->aObj->a_id; ?><?php echo '/location/' . $address->adr_id; ?>" data-key="<?php echo $key; ?>" class="panel-tabs"><?php echo $this->aObj->_client_name . ' - ' . $address->adr_name ?></a>
     </li>
 <?php endforeach; ?>
 </ul>
 <?php foreach ($this->addresses->buffer() as $key => $address): ?>
-<div id="panel_<?php echo $key; ?>" class="panel" <?php echo ($key ? 'style="display:none"' : ''); ?> >
+<?php if ($location == 0) { $location = $address->adr_id; } ?>
+<?php if ($location != $address->adr_id) continue; ?>
 <table cellpadding="0" cellspacing="0" style="width: 450px; margin: 0 auto;">
     <thead>
     
@@ -67,7 +68,7 @@
                 $color = $this->checkSteps[5][$address->adr_id][$ar->ar_id] ? '' : 'color: #aaa';
                 ?>
                 <td class="acenter"><i class="fa <?php echo $stepClass ?>" style="color: #777;"></i></td>
-                <td><a href="/assessment/edit/<?php echo $this->aObj->a_id; ?>/step/5/locationRole/<?php echo $address->adr_id ?>_<?php echo $ar['ar_id'] ?>"><?php echo $ar->ar_name ?></a></td>
+                <td><a href="/assessment/edit/<?php echo $this->aObj->a_id; ?>/step/3/locationRole/<?php echo $address->adr_id ?>_<?php echo $ar['ar_id'] ?>"><?php echo $ar->ar_name ?></a></td>
             </tr>
         <?php endforeach; ?>
 
@@ -76,7 +77,6 @@
 
     </tbody>
 </table>
-</div>
 <?php endforeach; ?>
 <?php else: ?>
 <table cellpadding="0" cellspacing="0" style="width: 450px; margin: 0 auto;">
@@ -101,7 +101,7 @@
                 $color = $this->checkSteps[5][$address->adr_id][$ar->ar_id] ? '' : 'color: #aaa';
                 ?>
                 <td class="acenter"><i class="fa <?php echo $stepClass ?>" style="color: #777;"></i></td>
-                <td><a href="/assessment/edit/<?php echo $this->aObj->a_id; ?>/step/5/locationRole/<?php echo $address->adr_id ?>_<?php echo $ar['ar_id'] ?>"><?php echo $ar->ar_name ?></a></td>
+                <td><a href="/assessment/edit/<?php echo $this->aObj->a_id; ?>/step/3/locationRole/<?php echo $address->adr_id ?>_<?php echo $ar['ar_id'] ?>"><?php echo $ar->ar_name ?></a></td>
             </tr>
         <?php endforeach; ?>
 
@@ -112,12 +112,3 @@
 </table>
 <?php endif; ?>
 <div class="cboth"><br /></div>
-
-<script type="text/javascript">
-    jQuery(document).ready(function() {
-        $('.panel-tabs').click(function() {
-            $('.panel').hide();
-            $('#panel_' + $(this).data('key')).show();
-        });
-    });
-</script>
