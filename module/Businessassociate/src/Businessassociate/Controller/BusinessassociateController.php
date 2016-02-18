@@ -491,4 +491,34 @@ class BusinessassociateController extends AbstractActionController
 
         return $this->redirect()->toRoute('businessassociate', array('controller' => 'businessassociate', 'action' => 'list'));
     }
+
+    public function importAction() {
+        $non_imported_assessments_ids = [];
+        $assessments = $this->getServiceLocator()->get('Assessment\Model\AssessmentTable')->getForImport();
+        foreach ($assessments as $assessment) {var_dump($assessment);
+            $flag = 1;
+            $ass_addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($assessment->a_id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
+            foreach ($ass_addresses as $key => $ass_address) {var_dump($ass_address);
+                $notes = $this->getNoteTable()->getNotes($assessment->a_id, \Note\Model\Note::NOTE_ABAL, $ass_address->adr_id);
+                $abals = $this->getServiceLocator()->get('Assessment\Model\AssessmentBusinessAssociateLocationTable')->getAbalsByLocation($assessment->a_id, $ass_address->adr_id);
+                //$reportFiles = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationReportTable')->getReportsFiles($assessment->a_id, $ass_address->adr_id, 5);
+                foreach ($abals as $abal) {var_dump($abal);
+                    if (!$abal->abal_ba_id) continue;
+                    if (!$this->getBusinessassociateTable()->getBusinessassociate($abal->abal_ba_id)) continue;
+                    foreach ($notes as $note) {var_dump($note);continue;
+                        $note_dest = new Note;
+                        $note_dest->note_item_type = \Note\Model\Note::NOTE_BUSINESSASSOCIATE;
+                        $note_dest->note_item_id = $abal->abal_ba_id;
+                        if (!$this->getNoteTable()->copyNote($note, $note_dest)) {
+                            $flag = 0;
+                        }
+                    }                    
+                }        
+            }
+            if (!$flag) {
+                $non_imported_assessments_ids[] = $assessment->a_id;
+            }
+        }
+        var_dump($non_imported_assessments_ids);die();
+    }
 }

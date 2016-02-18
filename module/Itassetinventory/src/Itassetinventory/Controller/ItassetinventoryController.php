@@ -337,24 +337,44 @@ class ItassetinventoryController extends AbstractActionController
         foreach ($assessments as $assessment) {
             $i++;
             $ass_addresses = $this->getAddressTable()->getAddresses($assessment->a_id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
+            $ass_addresses_arr = [];
+            foreach ($ass_addresses as $value) {
+                $ass_addresses_arr[] = $value;
+            }
             $comp_addresses = $this->getAddressTable()->getAddresses($assessment->a_c_id, \Client\Model\AddressItem::COMPANY_TYPE);
-            if (count($ass_addresses) != count($comp_addresses)) {
+            $comp_addresses_arr = [];
+            foreach ($comp_addresses as $value) {
+                $comp_addresses_arr[] = $value;
+            }
+            //var_dump($ass_addresses_arr, $comp_addresses_arr);die();
+            if (count($ass_addresses_arr) != count($comp_addresses_arr)) {
                 $non_imported_assessments_ids[] = $assessment->a_id;
                 continue;
             }
 
-            foreach ($ass_addresses as $ass_address) {
-                $flag = 0;
-                foreach ($comp_addresses as $comp_address) {
-                    if ($ass_address->adr_address1 != $comp_address->adr_address1) {                        
-                        $flag = 1;
-                        break;
-                    }
-                }
-                if ($flag) {
-                    $non_imported_assessments_ids[] = $assessment->a_id;
+            $flag = 0;
+            foreach ($ass_addresses_arr as $key => $ass_address) {
+                if ($ass_addresses_arr[$key]->adr_address1 != $comp_addresses_arr[$key]->adr_address1) {                        
+                    $flag = 1;
                     break;
                 }
+            }
+            if ($flag) {
+                $non_imported_assessments_ids[] = $assessment->a_id;
+                continue;
+            }
+            
+            foreach ($ass_addresses_arr as $key => $ass_address) {
+                $iai = new ItAssetInventory();
+                $iai->iai_c_id = $assessment->a_c_id;
+                $iai->iai_location_id = $comp_addresses_arr[$key]->adr_id;
+                $iai->iai_type_id = \Itassetinventory\Model\ItAssetInventoryItemTypeTable::TYPE_MANUAL_ENTRY;
+                $iai->iai_c_id = $assessment->a_c_id;
+                $ailiItems = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationItemTable')->getAiliByLocation($assessment->a_id, $ass_address->adr_id);
+                var_dump($ailiItems);die();
+            }
+
+            /*
                 $notes = $this->getNoteTable()->getNotes($assessment->a_id, \Note\Model\Note::NOTE_AILI, $ass_address->adr_id);
                 $assessmentsInv = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryTable')->getAssessmentsInventory();
                 $ailiItems = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationItemTable')->getAiliByLocation($assessment->a_id, $ass_address->adr_id);
@@ -364,8 +384,8 @@ class ItassetinventoryController extends AbstractActionController
                 var_dump($assessmentsInv);
                 //var_dump($ailiItems);
                 //var_dump($reportFiles);
-                
-            }
+                */
+            
             
         }
         echo "$i $j";die();
