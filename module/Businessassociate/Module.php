@@ -60,6 +60,18 @@ class Module
                         $resultSetPrototype->setArrayObjectPrototype(new \Businessassociate\Model\Businessassociateanswer());
                         return new TableGateway('business_associates_answers', $dbAdapter, null, $resultSetPrototype);
                     },
+
+                'Businessassociate\Model\BusinessassociatereportTable' =>  function($sm) {
+                    $tableGateway = $sm->get('BusinessassociatereportTableGateway');
+                    $table = new \Businessassociate\Model\BusinessassociatereportTable($tableGateway);
+                    return $table;
+                },
+                'BusinessassociatereportTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new \Businessassociate\Model\Businessassociatereport());
+                    return new TableGateway('business_associates_reports', $dbAdapter, null, $resultSetPrototype);
+                },
             ),
         );
     }
