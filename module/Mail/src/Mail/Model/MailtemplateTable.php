@@ -259,7 +259,7 @@ class MailtemplateTable
         $transport = new SmtpTransport();
         $transport->setOptions($options);
 
-        if($_SERVER['SERVER_ADDR'] == '127.0.0.1') {
+        if($_SERVER['SERVER_ADDR'] !== '127.0.0.1') {
             // Setup File transport
             $transport = new FileTransport();
             $options   = new FileOptions(array(
