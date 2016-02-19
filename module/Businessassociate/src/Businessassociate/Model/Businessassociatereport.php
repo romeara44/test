@@ -14,6 +14,8 @@ class Businessassociatereport
     public $bar_create_u_id;
     public $bar_create_date;
 
+    public $_filename;
+
     protected $inputFilter;
 
     public function exchangeArray($data)
@@ -23,6 +25,8 @@ class Businessassociatereport
         $this->bar_f_id     = (isset($data['bar_f_id'])) ? $data['bar_f_id'] : null;
         $this->bar_create_u_id     = (isset($data['bar_create_u_id'])) ? $data['bar_create_u_id'] : null;
         $this->bar_create_date     = (isset($data['bar_create_date'])) ? $data['bar_create_date'] : null;
+
+        $this->_filename     = (isset($data['_filename'])) ? $data['_filename'] : null;
     }
 
     public function getArrayCopy()

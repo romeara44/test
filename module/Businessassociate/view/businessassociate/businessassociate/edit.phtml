@@ -458,10 +458,28 @@ $form->setAttribute('method', 'post');
         </div>
 
         <div id="tab3">
-            <h3>Add a note about this Business Associate</h3>
+            <h3>Add reports and note about this Business Associate</h3>
 
             <form action="/businessassociate/edit/<?php echo $this->baId ?>" name="" id="" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="noteform" value="1" />
+
+                <h5 style="padding-top: 22px;">Report files</h5>
+                <?php foreach ($reportFiles as $_file): ?>
+                    <?php
+                    $_fileName = $_file->_filename;
+                    $_fileId = $_file->bar_f_id;
+                    ?>
+                    <span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/ba_report/<?php echo $_file->bar_ba_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+
+                <?php endforeach; ?>
+                <p>
+                    <a id="browseReportFile" href="javascript:" class="button"><i class="fa fa-plus-circle"></i> Upload report...</a>
+                </p>
+
+                <div class="cboth"></div>
+                <div id="filesReportsToUploadBox">
+
+                </div>
 
                 <?php
                 $fn = $formNote->get('note_id');
@@ -534,7 +552,9 @@ $form->setAttribute('method', 'post');
                     </div>
                 <?php endforeach; ?>
             <?php endif; ?>
+            
         </div>
+
     <?php endif; ?>
 
     </div>
@@ -572,6 +592,14 @@ $form->setAttribute('method', 'post');
             $('#filesToUploadBox' + baqId).append('<input type="file" name="notesFiles[' + baqId + '][]" id="file' + baqId + '_' + browseFilesCounterObj[baqId] + '" />');
 
             $('#file' + baqId + '_' + browseFilesCounterObj[baqId]).click();
+        });
+
+        var browseReportsFilesCounter = 0;
+        $('#browseReportFile').click(function() {
+            $('#filesReportsToUploadBox').append('<input type="file" name="report[]" id="fileReport' + browseReportsFilesCounter + '" /><div class="cboth"></div>');
+
+            $('#fileReport' + browseReportsFilesCounter).click();
+            browseReportsFilesCounter++;
         });
     });
 

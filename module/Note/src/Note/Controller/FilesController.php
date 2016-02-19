@@ -121,6 +121,12 @@ class FilesController extends AbstractActionController
             }
             $filename = $file->f_name;
             $filetype = $file->f_type;
+        } elseif ($type == 'ba_report') {
+            $file = $this->getFileTable()->getFile($fId);
+
+            $filepath = $docRoot . '/data/ba_reports/' . $noteId . '/' . $fId;
+            $filename = $file->f_name;
+            $filetype = $file->f_type;
         }
 
         $tmpfile = $docRoot . '/data/tmp/' . $filename;
