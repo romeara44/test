@@ -322,16 +322,16 @@ class NoteTable implements ServiceLocatorAwareInterface
             $f_id_dest = $filesTable->saveFile($dataFile);
             if (!$f_id_dest) return false;
 
+            if (!copy($notesFolder . '/' . $note_source->note_id . '/' . $f_id_source, $notesFolder . '/' . $note_dest->note_id . '/' . $f_id_dest)) {
+                return false;
+            }
+
             $notesDataFile = array();
             $notesDataFile['nf_f_id'] = $f_id_dest;
             $notesDataFile['nf_note_id'] = $note_dest->note_id;
 
             $nf_id = $notesFilesTable->saveFile($notesDataFile);
-            if (!$nf_id) return false;
-
-            if (!copy($notesFolder . '/' . $note_source->note_id . '/' . $f_id_source, $notesFolder . '/' . $note_dest->note_id . '/' . $f_id_dest)) {
-                return false;
-            }
+            if (!$nf_id) return false;            
         }
 
         return $note_dest->note_id;

@@ -72,6 +72,10 @@ class BusinessassociatereportTable implements ServiceLocatorAwareInterface
         $f_id_dest = $filesTable->saveFile($dataFile);
         if (!$f_id_dest) return false;
 
+        if (!copy($reportsFolder . '/' . $ailr->ailr_a_id . '/' . $ailr->ailr_f_id, $ba_reportsFolder . '/' . $ba_id . '/' . $f_id_dest)) {
+            return false;
+        }
+
         $barDataFile = array();
         $barDataFile['bar_ba_id'] = $ba_id;
         $barDataFile['bar_f_id'] = $f_id_dest;
@@ -81,11 +85,7 @@ class BusinessassociatereportTable implements ServiceLocatorAwareInterface
         $this->tableGateway->insert($barDataFile);
         $bar_id = $this->tableGateway->lastInsertValue;
 
-        if (!$bar_id) return false;
-
-        if (!copy($reportsFolder . '/' . $ailr->ailr_a_id . '/' . $ailr->ailr_f_id, $ba_reportsFolder . '/' . $ba_id . '/' . $f_id_dest)) {
-            return false;
-        }
+        if (!$bar_id) return false;        
 
         return $bar_id;
     }
