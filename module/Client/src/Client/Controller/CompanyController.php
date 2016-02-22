@@ -438,4 +438,18 @@ class CompanyController extends AbstractActionController
         return $view;
     }
 
+    public function getAddressesAction()
+    {
+        $id = (int) $this->params('id');
+
+        $addresses = $this->getAddressTable()->getAddresses($id, \Client\Model\AddressItem::COMPANY_TYPE);
+
+        $res = array();
+
+        foreach ($addresses as $address) {
+            $res[] = $address;
+        }
+
+        return $this->getResponse()->setContent(json_encode(array('addresses' => $res)));
+    }
 }

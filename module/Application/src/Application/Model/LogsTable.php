@@ -45,6 +45,7 @@ class LogsTable
     const ITEM_TYPE_DTL = 12;
     const ITEM_TYPE_VL = 13;
     const ITEM_TYPE_IAI = 14;
+    const ITEM_TYPE_PSC = 15;
 
     protected $tableGateway;
     protected $serviceLocator;

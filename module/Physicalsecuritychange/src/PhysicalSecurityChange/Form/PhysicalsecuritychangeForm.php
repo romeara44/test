@@ -36,10 +36,10 @@ class PhysicalsecuritychangeForm extends Form
 
         $locations = array();
         
-        if ($pscObj->psc_c_id) {
+        if (!empty($pscObj->psc_c_id)) {
             $comp_addresses = $sl->get('Client\Model\AddressTable')->getAddresses($pscObj->psc_c_id, \Client\Model\AddressItem::COMPANY_TYPE);
             foreach ($comp_addresses as $addr) {
-                $locations[$addr->cadr_id] = 'Location' . $addr->cadr_id;
+                $locations[$addr->adr_id] = 'Location ' . $addr->adr_id;
             }
         }        
 

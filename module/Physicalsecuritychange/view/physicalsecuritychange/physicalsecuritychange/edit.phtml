@@ -15,7 +15,7 @@ $form->setAttribute('method', 'post');
 
 
     <div class="page-title">
-        <h1 class="fleft"><?php if($this->psc_id) {?>Edit <?php } else {?>Add New <?php }?>Security Change</h1>
+        <h1 class="fleft"><?php if($this->pscId) {?>Edit <?php } else {?>Add New <?php }?>Security Change</h1>
         <div class="cboth"></div>
     </div>
 
@@ -55,9 +55,9 @@ $form->setAttribute('method', 'post');
         </p>
         
         <p>
-            <?php $fn = $form->get('psc_adr_id');
+            <?php $fn = $form->get('psc_change_type');
             echo $this->formLabel($fn);
-            echo $this->formSelect($fn->setAttributes(array('id'=>'location', 'class'=>'form-control required')));
+            echo $this->formSelect($fn->setAttributes(array('id'=>'type', 'class'=>'form-control required')));
             echo $this->formElementErrors($fn);
             ?>
         </p>
@@ -85,7 +85,7 @@ $form->setAttribute('method', 'post');
         
         <div class="cboth"></div>
         
-        <?php if ($this->psc_id && is_object($comments) && ($comments->count())): ?>
+        <?php if ($this->pscId && is_object($comments) && ($comments->count())): ?>
             <?php foreach ($comments as $note): ?>
                 <div class="note">
                     <strong><?php echo $note->_username ?></strong> <small> on <?php echo $note->_note_create_date_format ?></small><br />
@@ -151,13 +151,14 @@ $form->setAttribute('method', 'post');
             if(cId != undefined && cId != '') {
                 $.ajax({
                     type:"GET",
-                    url:"/traininglog/gettrainers/" + cId,
+                    url:"/company/getAddresses/" + cId,
+                    dataType: 'json',
                     success: function(data){
                         var html = '<option value="">Please Select</option>';
                         $.each(data, function(index, value) {
-                            html += '<option value="' + index + '">' + value + '</option>';
+                            html += '<option value="' + value[0].adr_id + '">Location ' + value[0].adr_id + '</option>';
                         });
-                        $('#_tl_trainer').html(html);
+                        $('#location').html(html);
                     }
                 });
             }

@@ -136,7 +136,6 @@ class PhysicalsecuritychangeController extends AbstractActionController
         $request = $this->getRequest();
 
         $id = (int) $this->params('id');
-        $noteform = $request->isPost() && (int) $request->getPost('noteform');
 
         if (!$this->hasIdentity()) {
             $this->flashMessenger()->addErrorMessage('You must log in');
@@ -145,72 +144,36 @@ class PhysicalsecuritychangeController extends AbstractActionController
 
         $formNote = new NoteForm($this->getServiceLocator());
 
-        $notes = null;
-        $tlObj = null;
+        $pscObj = null;
 
         $comments          = null;
-        $trainingMaterials = null;
         
         if ((int) $id) {
-            $tlObj             = $this->getTraininglogTable()->getTraininglog($id);
-            $trainingMaterials = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_TLT);
-            $comments          = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_TLC);
+            $pscObj             = $this->getPhysicalsecuritychangeTable()->getPhysicalsecuritychange($id);
+            $comments          = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_PSC);
         }
         
-        $form = new TraininglogForm($this->getServiceLocator(), $tlObj);
+        $form = new PhysicalsecuritychangeForm($this->getServiceLocator(), $pscObj);
 
         $request = $this->getRequest();
         if ($request->isPost()) {
-            $tl = new Traininglog();
+            $psc = new Physicalsecuritychange();
             $post = $request->getPost();
-
-            if($post['_tl_trainer'] != '-1') {
-                list($post['tl_trainer_type'], $post['tl_trainer_id']) = explode('_', $post['_tl_trainer']);
-            }
-
-            $ymds['tl_conducted_date'] = \DateTime::createFromFormat('m/d/Y', $post['tl_conducted_date']);
-            $ymds['tl_hire_date']      = \DateTime::createFromFormat('m/d/Y', $post['tl_hire_date']);
-            foreach($ymds as $ymdKey => $ymd) {
-                if (is_object($ymd)) {
-                    $post[$ymdKey] = $ymd->format('Y-m-d');
-                } else {
-                    $post[$ymdKey] = '0000-00-00';
-                }
-            }
             
-            $form->setInputFilter($tl->getInputFilter($this->getServiceLocator(), $id));
+            $form->setInputFilter($psc->getInputFilter($this->getServiceLocator(), $id));
             $form->setData($post);
 
             if ($form->isValid()) {
-                $tl->exchangeArray($post);
-                $this->getTraininglogTable()->setServiceLocator($this->getServiceLocator());
-                $attendeesFile = $request->getFiles('attendees');
-                if(isset($attendeesFile[0]['tmp_name']) && $attendeesFile[0]['tmp_name']) {
-                    if (($handle = fopen($attendeesFile[0]['tmp_name'], "r")) !== FALSE) {
-                        while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                           $tl->tl_attendees .= implode(', ', $data) . "\r\n";
-                        }
-                        fclose($handle);
-                    }
-                }
-
-                $tlId = $this->getTraininglogTable()->saveTraininglog($tl);
+                $psc->exchangeArray($post);
+                
+                $pscId = $this->PhysicalsecuritychangeTable()->savePhysicalsecuritychange($psc);
 
                 if((int)$id) {
-                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update trainiglog "' . $tlId . '"');
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update Physicalsecuritychange "' . $pscId . '"');
                 } else {
-                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Add new trainiglog "' . $tlId . '"');
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Add new Physicalsecuritychange "' . $pscId . '"');
                 }
-
-                // save files
-                $note = new Note();
-                $noteData['note_text'] = '';
-                $noteData['note_item_type'] = \Note\Model\Note::NOTE_TLT;
-                $noteData['note_item_id'] = $tlId;
-                $note->exchangeArray($noteData);
-                $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-                $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles(), false, 'training');
-
+/*
                 // save text note
                 if($post['note_text'])
                 {
@@ -221,35 +184,33 @@ class PhysicalsecuritychangeController extends AbstractActionController
                     $note->exchangeArray($noteData);
                     $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
                     $noteId = $this->getNoteTable()->saveNote($note);
-                }
+                }*/
                 
                 // save files
                 $note = new Note();
-                $noteData['note_text'] = '';
-                $noteData['note_item_type'] = \Note\Model\Note::NOTE_TLC;
-                $noteData['note_item_id'] = $tlId;
+                $noteData['note_text'] = $post['note_text'];
+                $noteData['note_item_type'] = \Note\Model\Note::NOTE_PSC;
+                $noteData['note_item_id'] = $pscId;
                 $note->exchangeArray($noteData);
                 $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-                $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles(), false, 'comments');
+                $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
                 
-                return $this->redirect()->toRoute('traininglog', array('controller' => 'traininglog', 'action' => 'list'));
+                return $this->redirect()->toRoute('physicalsecuritychange', array('controller' => 'physicalsecuritychange', 'action' => 'list'));
             } else {
 
                 if ((int) $id) {
-                    $form->bind($tlObj);
-                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open edit trainiglog "' . $id . '" page');
+                    $form->bind($pscObj);
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open edit physicalsecuritychange "' . $id . '" page');
                 } else {
-                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open add new trainiglog page');
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open add new physicalsecuritychange page');
                 }
             }
 
         } else {
-            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_BREACHLOG, $id);
+            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_PSC, $id);
 
             if ((int) $id) {
-                $tlObj->tl_conducted_date = ($tlObj->tl_conducted_date != '0000-00-00') ? $tlObj->tl_conducted_date : '';
-                $tlObj->tl_hire_date      = ($tlObj->tl_hire_date != '0000-00-00') ? $tlObj->tl_hire_date : '';
-                $form->bind($tlObj);
+                $form->bind($pscObj);
             }
         }
 
@@ -257,8 +218,7 @@ class PhysicalsecuritychangeController extends AbstractActionController
             'form' => $form,
             'comments' => $comments,
             'formNote' => $formNote,
-            'tlId' => $id,
-            'tlObj' => $tlObj,
+            'pscId' => $id,
         );
     }
 

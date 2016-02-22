@@ -92,4 +92,16 @@ class PhysicalsecuritychangeTable implements ServiceLocatorAwareInterface
 
         return $resultSet;
     }
+
+    public function getPhysicalsecuritychange($id)
+    {
+        $id  = (int) $id;
+        $rowset = $this->tableGateway->select(array('psc_id' => $id));
+        $row = $rowset->current();
+        if (!$row) {
+            return false;
+        }
+        
+        return $row;
+    }
 }
