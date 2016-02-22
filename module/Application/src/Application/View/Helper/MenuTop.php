@@ -147,10 +147,15 @@ class MenuTop extends AbstractHelper
                 )
             ),
             array(
-                'title' => 'Disclosures',
-                'url' => '/disclosurerequest/list',
-                'class' => 'with-access',
+                'title' => 'Forms and Logs',
+                'url' => '/itassetinventory/list',
                 'items' => array(
+                    array('title' => 'IT Asset Inventory',
+                            'url' => '/itassetinventory/list',
+                        ),
+                    array('title' => 'Physical Security Changes',
+                            'url' => '/physicalsecuritychange/list',
+                        ),
                     array('title' => 'Requests',
                             'url' => '/disclosurerequest/list',
                             'class' => 'with-access'
@@ -245,21 +250,26 @@ class MenuTop extends AbstractHelper
                 )
             ),
             array(
-                'title' => 'Disclosures',
-                'url' => '/disclosurerequest/list',
-                'class' => 'with-access',
+                'title' => 'Forms and Logs',
+                'url' => '/itassetinventory/list',
                 'items' => array(
+                    array('title' => 'IT Asset Inventory',
+                            'url' => '/itassetinventory/list',
+                        ),
+                    array('title' => 'Physical Security Changes',
+                            'url' => '/physicalsecuritychange/list',
+                        ),
                     array('title' => 'Requests',
                             'url' => '/disclosurerequest/list',
                             'class' => 'with-access'
                         ),
                     array('title' => 'Disclosure Tracking Logs',
                          'url' => '/disclosuretrackinglog/list',
-                         'class' => 'with-access'
+                         'class' => 'with-access',
                         ),
                     array('title' => 'Verbal Logs',
                          'url' => '/verballog/list',
-                         'class' => 'with-access'
+                         'class' => 'with-access',
                         )
                 )
             ),
@@ -374,24 +384,54 @@ class MenuTop extends AbstractHelper
                             )
                         );
 
-        if($identity['u_grant_to_disclosures'] || $is_company_admin || $is_primary_contact) {
+        if ($is_company_admin || $is_primary_contact) {
             $this->items[] = array(
-                                'title' => 'Disclosures',
-                                'url' => '/disclosurerequest/list',
-                                'class' => 'with-access',
-                                'items' => array(
-                                    array('title' => 'Requests',
-                                            'url' => '/disclosurerequest/list',
-                                            'class' => 'with-access'
-                                        ),
-                                    array('title' => 'Disclosure Tracking Logs',
-                                         'url' => '/disclosuretrackinglog/list',
-                                         'class' => 'with-access'
-                                        ),
-                                    array('title' => 'Verbal Logs',
-                                         'url' => '/verballog/list',
-                                         'class' => 'with-access'
-                                        )
+                                    'title' => 'Forms and Logs',
+                                    'url' => '/itassetinventory/list',
+                                    'items' => array(
+                                        array('title' => 'IT Asset Inventory',
+                                                'url' => '/itassetinventory/list',
+                                            ),
+                                        array('title' => 'Physical Security Changes',
+                                                'url' => '/physicalsecuritychange/list',
+                                            )
+                                )
+                            );
+            if($identity['u_grant_to_disclosures']) {
+                $this->items[count($this->items) - 1]['items'] = array_merge($this->items[count($this->items) - 1]['items'],
+                                    array(
+                                        array('title' => 'Requests',
+                                                'url' => '/disclosurerequest/list',
+                                                'class' => 'with-access'
+                                            ),
+                                        array('title' => 'Disclosure Tracking Logs',
+                                             'url' => '/disclosuretrackinglog/list',
+                                             'class' => 'with-access',
+                                            ),
+                                        array('title' => 'Verbal Logs',
+                                             'url' => '/verballog/list',
+                                             'class' => 'with-access',
+                                            )
+                                    )
+                                );
+            }
+        } else if($identity['u_grant_to_disclosures']) {
+            $this->items[] = array(
+                                    'title' => 'Disclosure Requests',
+                                    'url' => '/disclosurerequest/list',
+                                    'items' => array(
+                                       array('title' => 'Requests',
+                                                'url' => '/disclosurerequest/list',
+                                                'class' => 'with-access'
+                                            ),
+                                        array('title' => 'Disclosure Tracking Logs',
+                                             'url' => '/disclosuretrackinglog/list',
+                                             'class' => 'with-access',
+                                            ),
+                                        array('title' => 'Verbal Logs',
+                                             'url' => '/verballog/list',
+                                             'class' => 'with-access',
+                                            )
                                 )
                             );
         }
@@ -478,24 +518,33 @@ class MenuTop extends AbstractHelper
                                                     )
                                                 );
 
+        $this->items[] = array(
+                                'title' => 'Forms and Logs',
+                                'url' => '/itassetinventory/list',
+                                'items' => array(
+                                    array('title' => 'IT Asset Inventory',
+                                            'url' => '/itassetinventory/list',
+                                        ),
+                                    array('title' => 'Physical Security Changes',
+                                            'url' => '/physicalsecuritychange/list',
+                                        )
+                            )
+                        );
 
         if($identity['u_grant_to_disclosures']) {
-            $this->items[] = array(
-                                'title' => 'Disclosures',
-                                'url' => '/disclosurerequest/list',
-                                'class' => 'with-access',
-                                'items' => array(
+            $this->items[count($this->items) - 1]['items'] = array_merge($this->items[count($this->items) - 1]['items'],
+                                array(
                                     array('title' => 'Requests',
                                             'url' => '/disclosurerequest/list',
                                             'class' => 'with-access'
                                         ),
                                     array('title' => 'Disclosure Tracking Logs',
                                          'url' => '/disclosuretrackinglog/list',
-                                         'class' => 'with-access'
+                                         'class' => 'with-access',
                                         ),
                                     array('title' => 'Verbal Logs',
                                          'url' => '/verballog/list',
-                                         'class' => 'with-access'
+                                         'class' => 'with-access',
                                         )
                                 )
                             );

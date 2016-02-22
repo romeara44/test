@@ -1,0 +1,58 @@
+<table cellpadding="0" cellspacing="0" class="it-inventory-items-table" id="IaiiTableType<?php echo $type_id?>">
+    <thead>
+        <tr>
+            <th width="5%">ID</th>
+            <th width="25%">Name</th>
+            <th width="30%">OS & Service Pack</th>
+            <th width="25%"><span class="fleft" style="line-height: 34px;">Description</span></th>
+            <th width="5%"></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="display: none" id="IaiiTableRowType<?php echo $type_id?>">
+            <td></td>
+            <td>
+                <input type="text" id="<?php echo $type_id?>iaii_name" name="_items[<?php echo $type_id?>][new][iaii_name][]" disabled="disabled" class="required" value="" />
+                <input type="hidden" name="_items[<?php echo $type_id?>][new][iaii_iaiit_id][]" disabled="disabled" value="<?php echo $type_id?>">
+            </td>
+            <td><input type="text" name="_items[<?php echo $type_id?>][new][iaii_model][]" disabled="disabled" class="" value="" /></td>
+            <td><input type="text" name="_items[<?php echo $type_id?>][new][iaii_description][]" disabled="disabled" class="" value="" /></td>
+            <td class="acenter">
+                <a title="Delete" class="i-delete deleteIaiiTableRow" href="javascript:;"><i class="fa fa-trash-o"></i></a>
+            </td>
+        </tr>
+        <?php $counter = 0;?>
+        <?php foreach ($items as $item): ?>
+            <tr>
+                <td>
+                    <?php echo ++$counter ?>.
+                    <input type="hidden" name="_items[<?php echo $type_id?>][exists][<?php echo $item->iaii_id?>][iaii_id]" value="<?php echo $item->iaii_id?>">
+                </td>
+                <td>
+                    <input type="text" id="<?php echo $type_id?>iaii_name<?php echo $counter ?>" name="_items[<?php echo $type_id?>][exists][<?php echo $item->iaii_id?>][iaii_name]" class=" required" value="<?php echo $item->iaii_name ?>" />
+                    <input type="hidden" name="_items[<?php echo $type_id?>][exists][<?php echo $item->iaii_id?>][iaii_iaiit_id]" value="<?php echo $type_id?>"/>
+                </td>
+                <td><input type="text" name="_items[<?php echo $type_id?>][exists][<?php echo $item->iaii_id?>][iaii_model]" id="" class="" value="<?php echo $item->iaii_model ?>" /></td>
+                <td><input type="text" name="_items[<?php echo $type_id?>][exists][<?php echo $item->iaii_id?>][iaii_description]" id="" class="" value="<?php echo $item->iaii_description ?>" /></td>
+                <td class="acenter">
+                    <a title="Delete" class="i-delete deleteIaiiTableRow" href="javascript:;" class=""><i class="fa fa-trash-o"></i></a>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        <?php if(!$items): ?>
+            <tr>
+                <td><?php echo ++$counter ?>.</td>
+                <td>
+                    <input type="text" id="<?php echo $type_id?>iaii_name<?php echo $counter ?>" name="_items[<?php echo $type_id?>][new][iaii_name][]" class="required" value="" />
+                    <input type="hidden" name="_items[<?php echo $type_id?>][new][iaii_iaiit_id][]" value="<?php echo $type_id?>">
+                </td>
+                <td><input type="text" name="_items[<?php echo $type_id?>][new][iaii_model][]" class="" value="" /></td>
+                <td><input type="text" name="_items[<?php echo $type_id?>][new][iaii_description][]" class="" value="" /></td>
+                <td class="acenter">
+                    <a title="Delete" class="i-delete deleteIaiiTableRow" href="javascript:;"><i class="fa fa-trash-o"></i></a>
+                </td>
+            </tr>
+        <?php endif; ?>
+    </tbody>
+</table>
+<a href="javascript:;" class="button buttonAdd" onclick="AddIaiiTableRow(<?php echo $type_id?>)"><i class="fa fa-plus-circle"></i> Add</a>

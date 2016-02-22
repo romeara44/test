@@ -189,6 +189,16 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         return ($row->_client_name);
     }
 
+    public function getForImport()
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('a_type = ' . Assessment::TYPE_SECURITY_RISK);
+        //$select->where('a_id = 183');
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        return $resultSet;
+    }
+
     public function getAssessment($id)
     {
         $authService = new \Zend\Authentication\AuthenticationService();
@@ -295,9 +305,9 @@ class AssessmentTable implements ServiceLocatorAwareInterface
             if (!(int) $a->a_version_index) {
                 $this->tableGateway->update(array('a_version_index' => $id), array('a_id' => $id));
             }
-            if ($data['a_type'] == 2) { // if privacy
-                $this->copyAdresses($id, $data['a_c_id']);
-            }
+            //if ($data['a_type'] == 2) { // if privacy
+                $this->copyAdresses($id, $data['a_c_id'], $data['a_type']);
+            //}
         } else {
             if ($this->getAssessment($id)) {
                 $data['a_update_date'] = new \Zend\Db\Sql\Expression('NOW()');
@@ -552,6 +562,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
 
         if ($a['a_type'] == 1) {
             for ($i = 1; $i <= 5; $i++) {
+                if ($i == 3 || $i == 4) continue;
                 if (!$a['a_step' . $i . '_finished']) {
                     $stepsAllFinished = 0;
                 }
@@ -828,7 +839,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         foreach ($addresses->buffer() as $address) {
             $steps[2][$address->adr_id] = (int) $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->checkStep($id, $address->adr_id);
         }
-
+/*
         foreach ($addresses->buffer() as $address) {
             $steps[3][$address->adr_id] = (int) $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationItemTable')->checkStep($id, $address->adr_id);
         }
@@ -836,7 +847,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         foreach ($addresses->buffer() as $address) {
             $steps[4][$address->adr_id] = (int) $this->getServiceLocator()->get('Assessment\Model\AssessmentBusinessAssociateLocationTable')->checkStep($id, $address->adr_id);
         }
-
+*/
         foreach ($addresses->buffer() as $address) {
             foreach ($assessmentsRoles->buffer() as $ar) {
                 $questions = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionTable')->getQuestions($a->a_type, $ar->ar_id, $a->a_id, $address->adr_id, $a);
@@ -867,11 +878,11 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         return $row;
     }
 
-    public function copyAdresses($aId, $cId)
+    public function copyAdresses($aId, $cId, $a_type = 2)
     {
-        $select = $this->tableGateway->getSql()->select();
+        /*$select = $this->tableGateway->getSql()->select();
         $select->where('a_c_id = ' . $cId);
-        $select->where('a_type = 2');
+        $select->where('a_type = ' . $a_type);
         $select->where('DATE_FORMAT(a_create_date, "%Y") = "' . date("Y") . '"');
 
         $select->order('a_id DESC');
@@ -880,14 +891,15 @@ class AssessmentTable implements ServiceLocatorAwareInterface
 
         $resultSet = $this->tableGateway->selectWith($select);
 
-        $row = $resultSet->current();
+        $row = $resultSet->current();*/
 
         $addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($cId, \Client\Model\AddressItem::COMPANY_TYPE);
-
+        $i = 1;
         foreach ($addresses->buffer() as $address) {
             $oldAddressId = $address->adr_id;
             // save to address table
             $address->adr_id = 0;
+            $address->adr_name = 'Location ' . $i++;
             $address->adr_create_date = new \Zend\Db\Sql\Expression('NOW()');
 
             $addressTable = $this->getServiceLocator()->get('Client\Model\AddressTable');
@@ -904,7 +916,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
             $addressItem->exchangeArray($addressItemData);
 
             $addressItemId = $addressItemTable->saveAddressItem($addressItem);
-            break;
+            if ($a_type == 2)  break;
         }
 
         return true;

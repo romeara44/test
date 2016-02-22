@@ -23,7 +23,9 @@ return array(
         'Securityreminder',
         'Sitesetting',
         'Disclosure',
-        'Reporting'
+        'Reporting',
+        'Itassetinventory',
+        'Physicalsecuritychange'
         ),
     'module_listener_options' => array(
         'module_paths' => array(

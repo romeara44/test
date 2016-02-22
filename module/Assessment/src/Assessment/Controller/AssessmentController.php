@@ -185,17 +185,19 @@ class AssessmentController extends AbstractActionController
         $request = $this->getRequest();
 
         $id = (int) $this->params('id');
+        $location = (int) $this->params('location');
 
         if (!$id) return;
 
         $aObj = $this->getAssessmentTable()->getAssessment($id);
         $addresses = $this->getAddressTable()->getAddresses($id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
         $assessmentsRoles = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type, true);
-
+//var_dump($aObj);die();
         $viewParams['aObj'] = $aObj;
         $viewParams['addresses'] = $addresses;
         $viewParams['assessmentsRoles'] = $assessmentsRoles;
         $viewParams['checkSteps'] = $this->getAssessmentTable()->checkSteps($id, $addresses, $assessmentsRoles);
+        $viewParams['location'] = $location;
 
         $viewModel = new ViewModel($viewParams);
 
@@ -218,7 +220,7 @@ class AssessmentController extends AbstractActionController
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_ASSESSMENT, $id);
 
-        if ($step == 5) {
+        if ($step == 3) {
             $locationRole = explode('_', $this->params('locationRole'));
             $location = isset($locationRole[0]) ? $locationRole[0] : 0;
             $assessmentRole = isset($locationRole[1]) ? $locationRole[1] : 0;
@@ -288,12 +290,13 @@ class AssessmentController extends AbstractActionController
                         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Add new assessment "' . $id . '" step 1');
                     }
 
-                    if ($isNew && $isPrivacy) {
+                    if (!$isNew && !$isPrivacy) {
+                        $this->getAssessmentTable()->saveAddresses($id, $request->getPost());
                         //$this->getAssessmentTable()->copyAdressesToPrivacy($isPossible->a_id, $aId);
                     } else {
 
-                        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update assessment "' . $id . '" step 1');
-                        $newAdressesKeys = $this->getAssessmentTable()->saveAddresses($id, $request->getPost());
+                        //$this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update assessment "' . $id . '" step 1');
+                        //$newAdressesKeys = $this->getAssessmentTable()->saveAddresses($id, $request->getPost());
                     }
 
 
@@ -324,161 +327,6 @@ class AssessmentController extends AbstractActionController
                 }
                 $this->getAssessmentTable()->checkStepFinished($id, 2);
             } elseif ($step == 3) {
-                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update assessment "' . $id . '" step 3');
-                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_UPLOADED_INVENTORY, \Application\Model\LogsTable::ITEM_TYPE_ASSESSMENT, $id);
-                $valid = true;
-                $post = $request->getPost();
-
-                if (isset($post['aili_ai_id'])) {
-                    $aili = new AssessmentInventoryLocationItem();
-
-                    for ($i = 1; $i <= 4; $i++) {
-                        $aiId = $i;
-                        $dataAili = array();
-                        if (isset($post['aili_name' . $aiId])) {
-                            if ($post['aili_name' . $aiId] != '') {
-                                $dataAili['aili_a_id'] = $id;
-                                $dataAili['aili_adr_id'] = $post['aili_adr_id'];
-                                $dataAili['aili_ai_id'] = $aiId;
-
-                                $dataAili['aili_name'] = $post['aili_name' . $aiId];
-                                $dataAili['aili_model'] = $post['aili_model' . $aiId];
-                                $dataAili['aili_description'] = $post['aili_description' . $aiId];
-
-                                $aili->exchangeArray($dataAili);
-                                $idAili = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationItemTable')->saveAili($aili);
-                            }
-                        }
-                    }
-
-                    if (isset($post['isNew']) && $post['isNew']) {
-                        return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => 3, 'location' => $post['aili_adr_id']));
-                    }
-
-                    if (isset($post['aili_name_exists'])) {
-
-                        foreach ($post['aili_name_exists'] as $ailiId => $ailiItem) {
-                            $aili = new AssessmentInventoryLocationItem();
-                            $dataAili = array();
-
-                            $existsAili = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationItemTable')->getAili($ailiId);
-                            $dataAili['aili_id'] = $ailiId;
-                            $dataAili['aili_adr_id'] = $post['aili_adr_id'];
-                            $dataAili['aili_a_id'] = $id;
-                            $dataAili['aili_ai_id'] = $existsAili->aili_ai_id;
-
-                            $dataAili['aili_name'] = $ailiItem;
-                            if (isset($post['aili_model_exists'][$ailiId])) {
-                                $dataAili['aili_model'] = $post['aili_model_exists'][$ailiId];
-                            }
-                            if (isset($post['aili_description_exists'][$ailiId])) {
-                                $dataAili['aili_description'] = $post['aili_description_exists'][$ailiId];
-                            }
-
-                            $aili->exchangeArray($dataAili);
-                            $idAili = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationItemTable')->saveAili($aili);
-                        }
-                    }
-
-                    // save reports files
-                    $pp = $post['aili_adr_id'];
-                    $idAili = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationReportTable')->saveAilr($id, $pp, $request->getFiles());
-                  
-                    $noteData['note_item_id'] = $id;
-                    $noteData['note_subitem_id'] = $post['aili_adr_id'];
-                    $noteData['note_item_type'] = $post['note_item_type'];
-                    
-                    // save text note
-                    if($post['note_text'])
-                    {
-                        $note = new Note();
-                        $noteData['note_text'] = $post['note_text'];
-                        $note->exchangeArray($noteData);
-                        $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-                        $noteId = $this->getNoteTable()->saveNote($note);
-                    }
-                   
-                    // save file note
-                    $note = new Note();
-                    $noteData['note_text'] = '';
-                    $note->exchangeArray($noteData);
-                    $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-                    $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
-                }
-                $this->getAssessmentTable()->checkStepFinished($id, 3);
-            } elseif ($step == 4) {
-                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update assessment "' . $id . '" step 4');
-                $valid = true;
-                $post = $request->getPost();
-
-                $abal = new AssessmentBusinessAssociateLocation();
-
-                if ($post['isNew']) {
-
-                    if (is_numeric($post['abal_ba_id'])) {
-                        $dataAbal['abal_a_id'] = $id;
-                        $dataAbal['abal_adr_id'] = $post['abal_adr_id'];//!(int) $post['setStep'] ? $cloneObj[1][$post['abal_adr_id']] : $post['abal_adr_id'];
-                        $dataAbal['abal_ba_id'] = $post['abal_ba_id'];
-
-                        $abal->exchangeArray($dataAbal);
-                        $idAbal = $this->getServiceLocator()->get('Assessment\Model\AssessmentBusinessAssociateLocationTable')->saveAbal($abal);
-                    }
-
-                    return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => 4, 'location' => $post['abal_adr_id']));
-                }
-
-                if (is_numeric($post['abal_ba_id'])) {
-                    $dataAbal['abal_a_id'] = $id;
-                    $dataAbal['abal_adr_id'] = $post['abal_adr_id'];
-                    $dataAbal['abal_ba_id'] = $post['abal_ba_id'];
-
-                    $abal->exchangeArray($dataAbal);
-                    $idAbal = $this->getServiceLocator()->get('Assessment\Model\AssessmentBusinessAssociateLocationTable')->saveAbal($abal);
-                }
-
-                if (isset($post['abal_ba_id_exists'])) {
-
-                    foreach ($post['abal_ba_id_exists'] as $abalId => $abalItem) {
-                        $abal = new AssessmentBusinessAssociateLocation();
-                        $dataAbal = array();
-
-                        $dataAbal['abal_adr_id'] = $post['abal_adr_id'];
-                        $dataAbal['abal_a_id'] = $id;
-                        $dataAbal['abal_id'] = $abalId;
-                        $dataAbal['abal_ba_id'] = $abalItem;
-
-                        $abal->exchangeArray($dataAbal);
-                        $idAbal = $this->getServiceLocator()->get('Assessment\Model\AssessmentBusinessAssociateLocationTable')->saveAbal($abal);
-                    }
-                }
-                // save reports files
-                $pp = $post['abal_adr_id'];
-                $idAili = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationReportTable')->saveAilr($id, $pp, $request->getFiles());
-                
-                $noteData['note_item_id'] = $id;
-                $noteData['note_subitem_id'] = $post['abal_adr_id'];
-                $noteData['note_item_type'] = $post['note_item_type'];
-                
-                // save text note
-                if($post['note_text'])
-                {
-                    $note = new Note();
-                    $noteData['note_text'] = $post['note_text'];
-                    $note->exchangeArray($noteData);
-                    $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-                    $noteId = $this->getNoteTable()->saveNote($note);
-                }
-               
-                // save file note
-                $note = new Note();
-                $noteData['note_text'] = '';
-                $note->exchangeArray($noteData);
-                $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-                $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
-
-                $this->getAssessmentTable()->checkStepFinished($id, 4);
-                //return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => 4, 'location' => $post['aili_adr_id']));
-            } elseif ($step == 5) {
                 $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update assessment "' . $id . '" step 5');
                 //$id = $this->getAssessmentTable()->cloneAssessment($id);
 
@@ -501,7 +349,7 @@ class AssessmentController extends AbstractActionController
 
                 if ($isPrivacy) {
                     if ($post['setStep']) {
-                        return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => 5));
+                        return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => 3));
                     }
                 }
 
@@ -536,7 +384,7 @@ class AssessmentController extends AbstractActionController
 
                     if ($step == 1) {
                         return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => $post['setStep'], 'location' => $adrId));
-                    } elseif ((($post['setStep'] == 5) && ($currentAdrId == $lastAdrId || $lastAdrId == 0)) || ($step == 5)) {
+                    } elseif ((($post['setStep'] == 3) && ($currentAdrId == $lastAdrId || $lastAdrId == 0)) || ($step == 3)) {
                         $adrId = (int) $this->params('adrId');
                         $adrId = isset($adrId) ? $adrId : $adrIdB;
                         if (!$adrId) {
@@ -548,13 +396,13 @@ class AssessmentController extends AbstractActionController
                             } else {
                                 $assessmentsRoles = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type, true);
                                 $checkSteps = $this->getAssessmentTable()->checkSteps($id, $addresses, $assessmentsRoles);
-                                foreach ($checkSteps as $step => $finished_array) {
-                                    if ($step == 1) continue;
-                                    if ($step == 5) {
+                                foreach ($checkSteps as $step1 => $finished_array) {
+                                    if ($step1 == 1) continue;
+                                    if ($step1 == 5) {
                                         foreach ($finished_array as $location => $finished_array2) {
-                                            foreach ($finished_array2 as $assessmentRole => $finished) {
+                                            foreach ($finished_array2 as $assesRole => $finished) {
                                                 if (!$finished) {
-                                                    return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => $step, 'locationRole' => $location . '_' . $assessmentRole));
+                                                    return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => 3, 'locationRole' => $location . '_' . $assesRole));
                                                     
                                                 }
                                             }
@@ -562,7 +410,7 @@ class AssessmentController extends AbstractActionController
                                     } else {
                                         foreach ($finished_array as $location => $finished_value) {
                                             if (!$finished_value) {
-                                                return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => $step, 'location' => $location));
+                                                return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => $step1, 'location' => $location));
                                                                                                 
                                             }
                                             
@@ -575,39 +423,17 @@ class AssessmentController extends AbstractActionController
                         } elseif ($assessmentRole == 0) {
                             $assessmentsRoles = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type, true);
                             $checkSteps = $this->getAssessmentTable()->checkSteps($id, $addresses, $assessmentsRoles);
-                            foreach ($checkSteps as $step => $finished_array) {
-                                if ($step == 5) {
+                            foreach ($checkSteps as $step1 => $finished_array) {
+                                if ($step1 == 5) {
                                     foreach ($finished_array as $location => $finished_array2) {
-                                        foreach ($finished_array2 as $assessmentRole => $finished) {
+                                        foreach ($finished_array2 as $assesRole => $finished) {
                                             if (!$finished) {
-                                                return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => $step, 'locationRole' => $location . '_' . $assessmentRole));
+                                                return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => 3, 'locationRole' => $location . '_' . $assesRole));
                                                 
                                             }
                                         }
                                     }
                                 }
-                            }
-                            foreach ($checkSteps as $step => $finished_array) {
-                                if ($step == 1) continue;
-                                if ($step == 5) {
-                                    foreach ($finished_array as $location => $finished_array2) {
-                                        foreach ($finished_array2 as $assessmentRole => $finished) {
-                                            if (!$finished) {
-                                                return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => $step, 'locationRole' => $location . '_' . $assessmentRole));
-                                                
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    foreach ($finished_array as $location => $finished_value) {
-                                        if (!$finished_value) {
-                                            return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => $step, 'location' => $location));
-                                                                                            
-                                        }
-                                        
-                                    }
-                                }
-                                
                             }
                             return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'list'));
                         } else {
@@ -684,16 +510,6 @@ class AssessmentController extends AbstractActionController
             }
             $viewParams['rolesAdr1'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->getArlcByLocation($id, $adrId);
         } elseif ($step == 3) {
-            $viewParams['notes'] = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_AILI, $location);
-            $viewParams['assessmentsInv'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryTable')->getAssessmentsInventory();
-            $viewParams['ailiItems'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationItemTable')->getAiliByLocation($id, $location);
-            $viewParams['reportFiles'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationReportTable')->getAilrByLocation($id, $location);
-        } elseif ($step == 4) {
-            $viewParams['notes'] = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_ABAL, $location);
-            $viewParams['bas'] = $this->getServiceLocator()->get('Businessassociate\Model\BusinessassociateTable')->getBusinessassociatesPairs($aObj->a_c_id);
-            $viewParams['abals'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentBusinessAssociateLocationTable')->getAbalsByLocation($id, $location);
-            $viewParams['reportFiles'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationReportTable')->getReportsFiles($id, $location, 5);
-        } elseif ($step == 5) {
             $viewParams['assessmentsRoles'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type, true);
             $viewParams['assessmentRole'] = $assessmentRole;
             $viewParams['locationName'] = $this->getAddressTable()->getLocationNameById($location);

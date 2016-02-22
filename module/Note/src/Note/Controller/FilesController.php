@@ -111,6 +111,22 @@ class FilesController extends AbstractActionController
             }
             $filename = $file->f_name;
             $filetype = $file->f_type;
+        } elseif ($type == 'it_asset') {
+            $file = $this->getFileTable()->getFile($fId);
+
+            $filepath = $docRoot . '/data/it_asset/' . $noteId . '/' . $fId;
+            if (!file_exists($filepath)) {
+                $noteId = $this->getServiceLocator()->get('Itassetinventory\Model\ItAssetInventoryReportTable')->getFileByFId($fId);
+                $filepath = $docRoot . '/data/it_asset/' . $noteId . '/' . $fId;
+            }
+            $filename = $file->f_name;
+            $filetype = $file->f_type;
+        } elseif ($type == 'ba_report') {
+            $file = $this->getFileTable()->getFile($fId);
+
+            $filepath = $docRoot . '/data/ba_reports/' . $noteId . '/' . $fId;
+            $filename = $file->f_name;
+            $filetype = $file->f_type;
         }
 
         $tmpfile = $docRoot . '/data/tmp/' . $filename;

@@ -289,7 +289,7 @@ body {
 	border-color: transparent transparent transparent #ffffff;
 }
 
-.admin #nav ul li a, .sales-rep #nav ul li a, .client #nav ul li a { padding: 0 12px}
+.admin #nav ul li a, .sales-rep #nav ul li a, .client #nav ul li a { padding: 0 10px}
 .client #nav ul li li a, .sales-rep #nav ul li li a, .admin #nav ul li li a{
 	padding: 10px 16px 10px 17px;
 }
@@ -325,7 +325,7 @@ h6 { padding: 8px 0 12px 0; font-size: 12px; line-height: 16px; }
 	border-bottom: 4px solid #e1ebf0;
 }
 
-.page-title h1.fleft { width: auto; padding-right: 25px; }
+.page-title h1.fleft, .page-title h2.fleft { width: auto; padding-right: 25px; font-weight: 300;}
 
 .page-title .label { float: left; margin: 24px 5px 0 0; }
 
@@ -1120,6 +1120,46 @@ tr.login-unsuccess td {
 .administrationBlockWrap {
 	overflow: hidden;
 	margin-bottom: 30px;
+}
+.it-asset-inventory-wrap input[type="file"]{
+	clear: both
+}
+.it-asset-inventory-list.page-title {
+    padding-bottom: 20px;
+}
+.it-asset-inventory-wrap .buttonAdd {
+	float: right;
+}
+.it-asset-inventory-wrap .it-inventory-items-table input{
+	margin: 0;
+}
+.it-asset-inventory-wrap label.error{
+	margin: 0;
+	line-height: 12px;
+}
+.it-asset-inventory-wrap .it-inventory-items-table input{
+	margin: 0;
+}
+#manualEntryFormWrap .it-inventory-items-table {
+	margin-bottom: 6px;
+}
+#manualEntryFormWrap .it-inventory-items-table td {
+	vertical-align: top;
+}
+#manualEntryFormWrap .it-inventory-items-table td.acenter {
+	vertical-align: middle;
+}
+#manualEntryFormWrap .it-inventory-items-table td input {
+	width: 95%;
+}
+#manualEntryFormWrap .it-inventory-items-table td label.error{
+	width: 240px;
+}
+#manualEntryFormWrap .buttonAdd  {
+	margin: 0;
+}
+#manualEntryFormWrap {
+	display: none;
 }
 /* Tables */
 
