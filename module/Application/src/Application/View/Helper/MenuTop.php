@@ -154,7 +154,7 @@ class MenuTop extends AbstractHelper
                             'url' => '/itassetinventory/list',
                         ),
                     array('title' => 'Physical Security Changes',
-                            'url' => '/disclosurerequest/list',
+                            'url' => '/physicalsecuritychange/list',
                         ),
                     array('title' => 'Requests',
                             'url' => '/disclosurerequest/list',
@@ -257,7 +257,7 @@ class MenuTop extends AbstractHelper
                             'url' => '/itassetinventory/list',
                         ),
                     array('title' => 'Physical Security Changes',
-                            'url' => '/disclosurerequest/list',
+                            'url' => '/physicalsecuritychange/list',
                         ),
                     array('title' => 'Requests',
                             'url' => '/disclosurerequest/list',
@@ -393,7 +393,7 @@ class MenuTop extends AbstractHelper
                                                 'url' => '/itassetinventory/list',
                                             ),
                                         array('title' => 'Physical Security Changes',
-                                                'url' => '/disclosurerequest/list',
+                                                'url' => '/physicalsecuritychange/list',
                                             )
                                 )
                             );
@@ -526,7 +526,7 @@ class MenuTop extends AbstractHelper
                                             'url' => '/itassetinventory/list',
                                         ),
                                     array('title' => 'Physical Security Changes',
-                                            'url' => '/disclosurerequest/list',
+                                            'url' => '/physicalsecuritychange/list',
                                         )
                             )
                         );

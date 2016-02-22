@@ -24,7 +24,8 @@ return array(
         'Sitesetting',
         'Disclosure',
         'Reporting',
-        'Itassetinventory'
+        'Itassetinventory',
+        'Physicalsecuritychange'
         ),
     'module_listener_options' => array(
         'module_paths' => array(
