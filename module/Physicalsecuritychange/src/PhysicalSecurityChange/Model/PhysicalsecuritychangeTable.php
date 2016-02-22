@@ -104,4 +104,39 @@ class PhysicalsecuritychangeTable implements ServiceLocatorAwareInterface
         
         return $row;
     }
+
+    public function savePhysicalsecuritychange(Physicalsecuritychange $psc)
+    {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
+        $data = array(
+            'psc_c_id'     => $psc->psc_c_id,
+            'psc_adr_id'          => $psc->psc_adr_id,
+            'psc_change_type'         => $psc->psc_change_type,
+            'psc_active' => $psc->psc_active,
+        );
+
+        $id = (int) $psc->psc_id;
+
+        if ($id == 0) {
+            $data['psc_create_u_id'] = $identity['u_id'];
+
+            $this->tableGateway->insert($data);
+            $id = $this->tableGateway->lastInsertValue;
+
+            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_ADD, \Application\Model\LogsTable::ITEM_TYPE_PSC, $id);
+        } else {
+            if ($this->getPhysicalsecuritychange($id)) {
+                $this->tableGateway->update($data, array('psc_id' => $id));
+
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_EDIT, \Application\Model\LogsTable::ITEM_TYPE_PSC, $id);
+            } else {
+                throw new \Exception('Form id does not exist');
+            }
+        }        
+
+        return $id;
+    }
 }

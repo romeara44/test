@@ -22,7 +22,7 @@ $form->setAttribute('method', 'post');
     <p></p>
 
 <div class="col-left">
-    <form action="/physicalsecuritychange/edit/<?php echo $this->psc_id ?>" method="post" enctype="multipart/form-data" name="physicalsecuritychange" id="physicalsecuritychange">
+    <form action="/physicalsecuritychange/edit/<?php echo $this->pscId ?>" method="post" enctype="multipart/form-data" name="physicalsecuritychange" id="physicalsecuritychange">
         <?php
             $fn = $form->get('psc_id');
             echo $this->formHidden($fn);
