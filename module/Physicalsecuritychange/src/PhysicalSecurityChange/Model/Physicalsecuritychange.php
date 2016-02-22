@@ -49,7 +49,7 @@ class Physicalsecuritychange
             $factory     = new InputFactory();
 
             $inputFilter->add($factory->createInput(array(
-                'name'     => 'tl_company_id',
+                'name'     => 'psc_c_id',
                 'required' => true,
                 'filters'  => array(
                     array('name' => 'Int'),
@@ -57,34 +57,7 @@ class Physicalsecuritychange
             )));
 
             $inputFilter->add($factory->createInput(array(
-                'name'     => 'tl_id',
-                'required' => false,
-                'filters'  => array(
-                    array('name' => 'Int'),
-                ),
-            )));
-
-            $inputFilter->add($factory->createInput(array(
-                'name'     => 'tl_title',
-                'required' => true,
-                'filters'  => array(
-                    array('name' => 'StripTags'),
-                    array('name' => 'StringTrim'),
-                ),
-                'validators' => array(
-                    array(
-                        'name'    => 'StringLength',
-                        'options' => array(
-                            'encoding' => 'UTF-8',
-                            'min'      => 1,
-                            'max'      => 100,
-                        ),
-                    ),
-                ),
-            )));
-
-            $inputFilter->add($factory->createInput(array(
-                'name'     => 'tl_tlt_id',
+                'name'     => 'psc_adr_id',
                 'required' => true,
                 'filters'  => array(
                     array('name' => 'Int'),
@@ -92,21 +65,10 @@ class Physicalsecuritychange
             )));
 
             $inputFilter->add($factory->createInput(array(
-                'name'     => '_tl_type_name',
-                'required' => false,
+                'name'     => 'psc_change_type',
+                'required' => true,
                 'filters'  => array(
-                    array('name' => 'StripTags'),
-                    array('name' => 'StringTrim'),
-                ),
-                'validators' => array(
-                    array(
-                        'name'    => 'StringLength',
-                        'options' => array(
-                            'encoding' => 'UTF-8',
-                            'min'      => 1,
-                            'max'      => 100,
-                        ),
-                    ),
+                    array('name' => 'Int'),
                 ),
             )));
 

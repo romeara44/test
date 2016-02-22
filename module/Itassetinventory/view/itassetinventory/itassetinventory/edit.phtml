@@ -259,10 +259,11 @@ $form->setAttribute('method', 'post');
                 $.ajax({
                     type:"GET",
                     url:"/itassetinventory/getcompanylocations/" + cId,
+                    dataType:"json",
                     success: function(data){
                         var html = '<option value="">Select Location</option>';
                         $.each(data, function(index, value) {
-                            html += '<option value="' + index + '">' + value + '</option>';
+                            html += '<option value="' + index + '">Location ' + index + '</option>';
                         });
                         $('#iai_location_id').html(html);
                     }

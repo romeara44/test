@@ -165,8 +165,8 @@ class PhysicalsecuritychangeController extends AbstractActionController
 
             if ($form->isValid()) {
                 $psc->exchangeArray($post);
-                
-                $pscId = $this->PhysicalsecuritychangeTable()->savePhysicalsecuritychange($psc);
+                $psc->psc_active = 1;
+                $pscId = $this->getPhysicalsecuritychangeTable()->savePhysicalsecuritychange($psc);
 
                 if((int)$id) {
                     $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update Physicalsecuritychange "' . $pscId . '"');
