@@ -163,8 +163,8 @@ $form->setAttribute('method', 'post');
                     dataType: 'json',
                     success: function(data){
                         var html = '<option value="">Please Select</option>';
-                        $.each(data, function(index, value) {
-                            html += '<option value="' + value[0].adr_id + '">' + value[0].adr_name + '</option>';
+                        $.each(data.addresses, function(index, value) {
+                            html += '<option value="' + value.adr_id + '">' + value.adr_name + '</option>';
                         });
                         $('#location').html(html);
                     }
