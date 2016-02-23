@@ -9,7 +9,8 @@
 <div class="tab_nav">
     <ul class="ul_tabs">
     <?php foreach ($this->addresses->buffer() as $key => $address): ?>
-        <li>
+    <?php if ($location == 0) { $location = $address->adr_id; } ?>
+        <li <?php echo $location == $address->adr_id ? 'class="active_tab"' : ''; ?> >
         <a href="/assessment/editlist/<?php echo $this->aObj->a_id; ?><?php echo '/location/' . $address->adr_id; ?>" data-key="<?php echo $key; ?>" class="panel-tabs"><?php echo $this->aObj->_client_name . ' - ' . $address->adr_name ?></a>
         </li>
     <?php endforeach; ?>
@@ -17,7 +18,6 @@
 </div>
 <div class="tab-panels">
 <?php foreach ($this->addresses->buffer() as $key => $address): ?>
-<?php if ($location == 0) { $location = $address->adr_id; } ?>
 <?php if ($location != $address->adr_id) continue; ?>
 <table cellpadding="0" cellspacing="0" style="width: 450px; margin: 0 auto;">
     <thead>
