@@ -225,26 +225,26 @@ class PhysicalsecuritychangeController extends AbstractActionController
     {
         $id = $this->params('id');
 
-        $this->getTraininglogTable()->deleteTraininglog($id);
-        $this->flashMessenger()->addSuccessMessage('Training log has been deleted');
+        $this->getPhysicalsecuritychangeTable()->deletePhysicalsecuritychange($id);
+        $this->flashMessenger()->addSuccessMessage('Physicalsecuritychange has been deleted');
 
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_DELETE, \Application\Model\LogsTable::ITEM_TYPE_TL, $id);
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_DELETE, \Application\Model\LogsTable::ITEM_TYPE_PSC, $id);
         
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete trainiglog "' . $id . '"');
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete Physicalsecuritychange "' . $id . '"');
         
-        return $this->redirect()->toRoute('traininglog', array('controller' => 'traininglog', 'action' => 'list'));
+        return $this->redirect()->toRoute('physicalsecuritychange', array('controller' => 'physicalsecuritychange', 'action' => 'list'));
     }
 
     public function unarchiveAction()
     {
         $id = $this->params('id');
 
-        $this->getTraininglogTable()->unarchiveTraininglog($id);
-        $this->flashMessenger()->addSuccessMessage('Training log has been unarchived');
+        $this->getPhysicalsecuritychangeTable()->unarchivePhysicalsecuritychange($id);
+        $this->flashMessenger()->addSuccessMessage('Physicalsecuritychange has been unarchived');
 
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Unarchive traininglog "' . $id . '"');
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Unarchive Physicalsecuritychange "' . $id . '"');
 
-        return $this->redirect()->toRoute('traininglog', array('controller' => 'traininglog', 'action' => 'list'));
+        return $this->redirect()->toRoute('physicalsecuritychange', array('controller' => 'physicalsecuritychange', 'action' => 'list'));
 
     }
 }

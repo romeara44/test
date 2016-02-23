@@ -24,6 +24,8 @@ class Physicalsecuritychange
 
     protected $inputFilter;
 
+    public static $typeNames = array('1' => 'Maintenance', '2' => 'Replacement', '3' => 'Repair');
+
     public function exchangeArray($data)
     {
         $this->psc_id           = (isset($data['psc_id']))           ? $data['psc_id']           : null;

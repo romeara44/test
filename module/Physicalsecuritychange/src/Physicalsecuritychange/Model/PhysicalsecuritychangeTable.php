@@ -165,4 +165,19 @@ class PhysicalsecuritychangeTable implements ServiceLocatorAwareInterface
 
         return $id;
     }
+
+    public function deletePhysicalsecuritychange($id)
+    {
+        $data['psc_active'] = 0;
+        $this->tableGateway->update($data, array('psc_id' => $id));
+        return true;
+    }
+
+    public function unarchivePhysicalsecuritychange($id)
+    {
+        $data['psc_active'] = 1;
+        $this->tableGateway->update($data, array('psc_id' => $id));
+
+        return true;
+    }
 }
