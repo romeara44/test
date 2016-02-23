@@ -85,14 +85,15 @@ $form->setAttribute('method', 'post');
 
         <div id="step1" <?php if (!$this->aId): ?>style="display:none"<?php endif; ?>>
 
-            <h2>Step 1 of 5 - Enter Locations</h2>
+            <h2>Edit <?php echo $this->locationName; ?></h2>
 
             <div class="col-left">
 
                 <?php if ($this->aId): ?>
                     <?php $counter = 1;
 
-                    foreach ($this->addresses as $address): ?>
+                    foreach ($this->addresses as $address):
+                        if ($this->location != $address->adr_id) continue; ?>
                         <h2>
                             <?php if ($counter == 1): ?>
                             <?php else: ?>
@@ -263,7 +264,7 @@ $form->setAttribute('method', 'post');
                     </div>
                 <?php endif; ?>
 
-                <?php if (!$this->isClosed): ?>
+                <?php if (!$this->isClosed && false): ?>
                     <p style="border-top: 0">
                         <a id="addLocationButton" href="javascript:" onclick="return addLocation()" class="button"><i class="fa fa-plus-circle"></i> Add Additional Location</a>
                     </p>

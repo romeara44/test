@@ -31,7 +31,7 @@
             $color = $this->checkSteps[1] ? '' : 'color: #aaa';
             ?>
             <td class="acenter"><i style="<?php echo $color ?>" class="fa <?php echo $stepClass ?>"></i></td>
-            <td><a href="/assessment/edit/<?php echo $this->aObj->a_id; ?>/step/1">Location contact information</a></td>
+            <td><a href="/assessment/edit/<?php echo $this->aObj->a_id; ?>/step/1/location/<?php echo $location; ?>"><?php echo $address->adr_name; ?> contact information</a></td>
         </tr>
 
         <tr>
