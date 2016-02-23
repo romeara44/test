@@ -63,16 +63,14 @@ class PhysicalsecuritychangeTable implements ServiceLocatorAwareInterface
 
             $select->columns(array('psc_id',
                                '_company_name' => new \Zend\Db\Sql\Expression('c_name'),
-                               '_location' => new \Zend\Db\Sql\Expression('CONCAT("Location ", psc_adr_id)'),
-                               //'_location' => new \Zend\Db\Sql\Expression('adr_name'),
+                               '_location' => new \Zend\Db\Sql\Expression('adr_name'),
                                '_type' => new \Zend\Db\Sql\Expression('psc_change_type'),
                                'psc_create_date',
                                'psc_active'
                                )
                         );
             $select->join(array('c' => 'companies'), 'psc_c_id = c_id', array(), 'left');
-            //$select->join(array('ai' => 'addresses_items'), 'psc_adr_id = cadr_id', array(), 'left');
-            //$select->join(array('a' => 'addresses'), 'cadr_adr_id = adr_id', array(), 'left');
+            $select->join(array('a' => 'addresses'), 'psc_adr_id = adr_id', array(), 'left');
 
             if ($orderBy) {
                 $order = $order ? $order : 'ASC';
@@ -80,7 +78,6 @@ class PhysicalsecuritychangeTable implements ServiceLocatorAwareInterface
             }
 
             $select->where("psc_create_u_id = " . $identity['u_id']);
-            //$select->where('adr_active = 1');
 
             $select->group('psc_id');
 

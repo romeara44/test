@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS `physical_security_changes` (
   `psc_c_id` int(11) DEFAULT NULL,
   `psc_adr_id` int(11) DEFAULT NULL,
   `psc_change_type` tinyint(1) DEFAULT NULL,
-  `psc_active` tinyint(1) DEFAULT NULL,
+  `psc_active` tinyint(1) DEFAULT 1,
   `psc_create_u_id` int(11) DEFAULT NULL,
   `psc_create_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
