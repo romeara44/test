@@ -201,6 +201,16 @@ class CompanyForm extends Form
         ////////////////////////////////////
 
         $this->add(array(
+            'name' => 'adr_name[]',
+            'attributes' => array(
+                'type'  => 'text',
+            ),
+            'options' => array(
+                'label' => 'Name',
+            ),
+        ));
+
+        $this->add(array(
             'name' => 'adr_address1[]',
             'attributes' => array(
                 'type'  => 'text',

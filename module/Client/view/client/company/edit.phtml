@@ -175,6 +175,10 @@ $form->setAttribute('method', 'post');
                     </h2>
                     <div id="<?php echo ($counter == 1) ? 'location' : '' ?>">
                         <p>
+                            <label for="exists_adr_name[<?php echo $address->adr_id ?>]">Name</label>
+                            <input type="text" value="<?php echo $address->adr_name ?>" class="form-control" name="exists_adr_name[<?php echo $address->adr_id ?>]">
+                        </p>
+                        <p>
                             <label for="exists_adr_address1[<?php echo $address->adr_id ?>]">Address 1</label>
                             <input type="text" value="<?php echo $address->adr_address1 ?>" class="form-control" name="exists_adr_address1[<?php echo $address->adr_id ?>]">
                         </p>
@@ -208,6 +212,14 @@ $form->setAttribute('method', 'post');
             <?php if (!$this->cId || !count($this->addresses)): ?>
                 <h2>Primary Location</h2>
                 <div id="location">
+                    <p>
+                        <?php
+                        $fn = $form->get('adr_name[]');
+                        echo $this->formLabel($fn);
+                        echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                        echo $this->formElementErrors($fn);
+                        ?>
+                    </p>
                     <p>
                         <?php
                         $fn = $form->get('adr_address1[]');

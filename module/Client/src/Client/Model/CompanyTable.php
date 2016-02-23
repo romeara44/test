@@ -589,6 +589,7 @@ class CompanyTable implements ServiceLocatorAwareInterface
             foreach ($post['adr_address1'] as $keyAdr => $adr) {
                 if (trim($post['adr_address1'][$keyAdr]) == '') continue;
 
+                $addressData['adr_name'] = $post['adr_name'][$keyAdr];
                 $addressData['adr_address1'] = $post['adr_address1'][$keyAdr];
                 $addressData['adr_address2'] = $post['adr_address2'][$keyAdr];
                 $addressData['adr_city'] = $post['adr_city'][$keyAdr];
@@ -636,6 +637,7 @@ class CompanyTable implements ServiceLocatorAwareInterface
                     $this->setPrimaryAddressId($companyId, $keyAdr);
                 }
 
+                $addressData['adr_name'] = $post['exists_adr_name'][$keyAdr];
                 $addressData['adr_address1'] = $post['exists_adr_address1'][$keyAdr];
                 $addressData['adr_address2'] = $post['exists_adr_address2'][$keyAdr];
                 $addressData['adr_city'] = $post['exists_adr_city'][$keyAdr];
