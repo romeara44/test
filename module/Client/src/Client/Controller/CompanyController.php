@@ -452,4 +452,22 @@ class CompanyController extends AbstractActionController
 
         return $this->getResponse()->setContent(json_encode(array('addresses' => $res)));
     }
+
+    public function importAction()
+    {
+        $companies = $this->getCompanyTable()->getCompanies();
+        foreach ($companies as $company) {
+            $addresses = $this->getAddressTable()->getAddresses($company->c_id, \Client\Model\AddressItem::COMPANY_TYPE);
+            foreach ($addresses as $key => $address) {
+                if ($address->adr_name) continue;
+                if ($key) {
+                    $address->adr_name = 'Location #' . ($key + 1);
+                } else {
+                    $address->adr_name = 'Primary Location';
+                }
+                $this->getAddressTable()->saveAddress($address);
+            }
+        }
+        die();
+    }
 }

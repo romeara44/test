@@ -64,6 +64,16 @@ $form->setAttribute('method', 'post');
 
         <div class="cboth"></div>
 
+        <div>
+            <?php echo $this->partial('physicalsecuritychange/physicalsecuritychange/partials/_psc_item.phtml', 
+                                      array('items' => $this->items,
+                                            )
+                                      ); 
+            ?>
+        </div>
+
+        <div class="cboth"></div>
+
         <p>
             <strong style="line-height: 30px;">Comments</strong><br />
             <?php
@@ -95,7 +105,7 @@ $form->setAttribute('method', 'post');
                             <?php
                             $_files = explode(',', $note->_files);
                             ?>
-                            <strong>Comments:</strong><br />
+                            <strong>Attachments:</strong><br />
                             <?php foreach ($_files as $_file): ?>
                                 <?php
                                 $_file = explode('::', $_file);
@@ -111,7 +121,7 @@ $form->setAttribute('method', 'post');
             <?php endforeach; ?>
         <?php endif; ?>
         
-        <div class="cboth"></div>
+        <div class="cboth"></div>        
         
         <div class="form-buttons">
             <input type="submit" value="Save" class="form-button" />
@@ -126,18 +136,16 @@ $form->setAttribute('method', 'post');
 
 
 <script type="text/javascript">
-    jQuery(function() {
+    $(document).ready(function() {
         $('#physicalsecuritychange').validate();
 
         var browseFilesCounter = 0;
         
-        $(document).ready(function() {
-            $('#browseFile').click(function() {
-                $('#filesToUploadBox').append('<div><input type="file" name="notesFiles[]" id="file' + browseFilesCounter + '" /><div class="cboth"></div></div>');
+        $('#browseFile').click(function() {
+            $('#filesToUploadBox').append('<div><input type="file" name="notesFiles[]" id="file' + browseFilesCounter + '" /><div class="cboth"></div></div>');
 
-                $('#file' + browseFilesCounter).click();
-                browseFilesCounter++;
-            });
+            $('#file' + browseFilesCounter).click();
+            browseFilesCounter++;
         });
 
         $("#company").change(function(){
@@ -155,13 +163,32 @@ $form->setAttribute('method', 'post');
                     dataType: 'json',
                     success: function(data){
                         var html = '<option value="">Please Select</option>';
-                        $.each(data, function(index, value) {
-                            html += '<option value="' + value[0].adr_id + '">Location ' + value[0].adr_id + '</option>';
+                        $.each(data.addresses, function(index, value) {
+                            html += '<option value="' + value.adr_id + '">' + value.adr_name + '</option>';
                         });
                         $('#location').html(html);
                     }
                 });
             }
         }
+
+        $('.buttonAdd').click(function ()  {
+           var counter = parseInt($("#psc-items tr:last td:first").text());
+           if(isNaN(counter)) counter = 0;
+           ++counter;
+           var temp = $("#psc-items-row").clone();
+           temp.find('input').each(function(indx, elem) {
+            $(elem).prop('name', $(elem).prop('name').replace('_items[new][0]', '_items[new][' + counter + ']').replace('[pscidate]', '[psci_date]'));
+           });
+           temp.removeAttr("id").show().appendTo($("#psc-items-row").parent());
+           $("#psc-items tr:last td:first").text(counter + '.');
+           $("#psc-items tr:last td:nth-child(2) input").datepicker({dateFormat: 'mm/dd/yy'});
+       });
+
+        $('#psc-items').on('click', '.deleteIaiiTableRow', function() {
+            $(this).closest('tr').remove();
+       });
+
+        $( "#psc-items input[name*='psci_date']").datepicker({dateFormat: 'mm/dd/yy'});
     });
 </script>

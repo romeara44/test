@@ -39,7 +39,7 @@ class PhysicalsecuritychangeForm extends Form
         if (!empty($pscObj->psc_c_id)) {
             $comp_addresses = $sl->get('Client\Model\AddressTable')->getAddresses($pscObj->psc_c_id, \Client\Model\AddressItem::COMPANY_TYPE);
             foreach ($comp_addresses as $addr) {
-                $locations[$addr->adr_id] = 'Location ' . $addr->adr_id;
+                $locations[$addr->adr_id] = $addr->adr_name;
             }
         }        
 

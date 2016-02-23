@@ -263,7 +263,7 @@ $form->setAttribute('method', 'post');
                     success: function(data){
                         var html = '<option value="">Select Location</option>';
                         $.each(data, function(index, value) {
-                            html += '<option value="' + index + '">Location ' + index + '</option>';
+                            html += '<option value="' + index + '">' + value + '</option>';
                         });
                         $('#iai_location_id').html(html);
                     }

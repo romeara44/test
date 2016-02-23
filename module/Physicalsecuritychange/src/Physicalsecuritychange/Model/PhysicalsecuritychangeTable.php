@@ -63,16 +63,14 @@ class PhysicalsecuritychangeTable implements ServiceLocatorAwareInterface
 
             $select->columns(array('psc_id',
                                '_company_name' => new \Zend\Db\Sql\Expression('c_name'),
-                               '_location' => new \Zend\Db\Sql\Expression('CONCAT("Location ", psc_adr_id)'),
-                               //'_location' => new \Zend\Db\Sql\Expression('adr_name'),
+                               '_location' => new \Zend\Db\Sql\Expression('adr_name'),
                                '_type' => new \Zend\Db\Sql\Expression('psc_change_type'),
                                'psc_create_date',
                                'psc_active'
                                )
                         );
             $select->join(array('c' => 'companies'), 'psc_c_id = c_id', array(), 'left');
-            //$select->join(array('ai' => 'addresses_items'), 'psc_adr_id = cadr_id', array(), 'left');
-            //$select->join(array('a' => 'addresses'), 'cadr_adr_id = adr_id', array(), 'left');
+            $select->join(array('a' => 'addresses'), 'psc_adr_id = adr_id', array(), 'left');
 
             if ($orderBy) {
                 $order = $order ? $order : 'ASC';
@@ -80,7 +78,6 @@ class PhysicalsecuritychangeTable implements ServiceLocatorAwareInterface
             }
 
             $select->where("psc_create_u_id = " . $identity['u_id']);
-            //$select->where('adr_active = 1');
 
             $select->group('psc_id');
 
@@ -115,7 +112,6 @@ class PhysicalsecuritychangeTable implements ServiceLocatorAwareInterface
             'psc_c_id'     => $psc->psc_c_id,
             'psc_adr_id'          => $psc->psc_adr_id,
             'psc_change_type'         => $psc->psc_change_type,
-            'psc_active' => $psc->psc_active,
         );
 
         $id = (int) $psc->psc_id;
@@ -125,7 +121,7 @@ class PhysicalsecuritychangeTable implements ServiceLocatorAwareInterface
 
             $this->tableGateway->insert($data);
             $id = $this->tableGateway->lastInsertValue;
-
+            if (!$id) return false;
             $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_ADD, \Application\Model\LogsTable::ITEM_TYPE_PSC, $id);
         } else {
             if ($this->getPhysicalsecuritychange($id)) {
@@ -133,10 +129,55 @@ class PhysicalsecuritychangeTable implements ServiceLocatorAwareInterface
 
                 $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_EDIT, \Application\Model\LogsTable::ITEM_TYPE_PSC, $id);
             } else {
-                throw new \Exception('Form id does not exist');
+                return false;
             }
-        }        
+        }  
+
+        $existsItemIds = [];
+        $curItemIds = $this->getServiceLocator()->get('Physicalsecuritychange\Model\PhysicalsecuritychangeitemTable')->getItemsIds($id);
+
+        foreach ($psc->_items as $key => $items) {
+            if ($key == 'new') {
+                foreach ($items as $key => $item) {
+                    if (!$key) continue;
+                    $psci = new Physicalsecuritychangeitem();
+                    $psci->exchangeArray($item);
+                    $psci->psci_psc_id = $id;
+                    $this->getServiceLocator()->get('Physicalsecuritychange\Model\PhysicalsecuritychangeitemTable')->savePsci($psci);
+                }
+            } elseif ($key == 'exists') {
+                foreach ($items as $key => $item) {
+                    $existsItemIds[] = $key;
+                    $psci = new Physicalsecuritychangeitem();
+                    $psci->exchangeArray($item);
+                    $psci->psci_psc_id = $id;
+                    $this->getServiceLocator()->get('Physicalsecuritychange\Model\PhysicalsecuritychangeitemTable')->savePsci($psci);
+                }
+            }            
+        }    
+
+        
+        $delItemIds = array_diff($curItemIds, $existsItemIds);
+
+        foreach ($delItemIds as $delItemId) {
+            $this->getServiceLocator()->get('Physicalsecuritychange\Model\PhysicalsecuritychangeitemTable')->deleteItem($delItemId);
+        }  
 
         return $id;
+    }
+
+    public function deletePhysicalsecuritychange($id)
+    {
+        $data['psc_active'] = 0;
+        $this->tableGateway->update($data, array('psc_id' => $id));
+        return true;
+    }
+
+    public function unarchivePhysicalsecuritychange($id)
+    {
+        $data['psc_active'] = 1;
+        $this->tableGateway->update($data, array('psc_id' => $id));
+
+        return true;
     }
 }

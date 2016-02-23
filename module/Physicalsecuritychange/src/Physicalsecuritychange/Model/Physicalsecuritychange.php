@@ -20,7 +20,11 @@ class Physicalsecuritychange
     public $_location;
     public $_type;
 
+    public $_items;
+
     protected $inputFilter;
+
+    public static $typeNames = array('1' => 'Maintenance', '2' => 'Replacement', '3' => 'Repair');
 
     public function exchangeArray($data)
     {
@@ -35,6 +39,8 @@ class Physicalsecuritychange
         $this->_company_name      = (isset($data['_company_name']))      ? $data['_company_name']      : null;
         $this->_location      = (isset($data['_location']))      ? $data['_location']      : null;
         $this->_type      = (isset($data['_type']))      ? $data['_type']      : null;
+
+        $this->_items      = (isset($data['_items']))      ? $data['_items']      : null;
     }
 
     public function getArrayCopy()

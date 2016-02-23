@@ -79,6 +79,15 @@ class PhysicalsecuritychangeController extends AbstractActionController
         return $this->physicalSecurityChangeTable;
     }
 
+    public function getPhysicalsecuritychangeitemTable()
+    {
+        if (!isset($this->physicalSecurityChangeitemTable)) {
+            $sm = $this->getServiceLocator();
+            $this->physicalSecurityChangeitemTable = $sm->get('Physicalsecuritychange\Model\PhysicalsecuritychangeitemTable');
+        }
+        return $this->physicalSecurityChangeitemTable;
+    }
+
     public function hasIdentity()
     {
         $authService = new \Zend\Authentication\AuthenticationService();
@@ -147,10 +156,13 @@ class PhysicalsecuritychangeController extends AbstractActionController
         $pscObj = null;
 
         $comments          = null;
+
+        $items = [];
         
         if ((int) $id) {
             $pscObj             = $this->getPhysicalsecuritychangeTable()->getPhysicalsecuritychange($id);
             $comments          = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_PSC);
+            $items = $this->getPhysicalsecuritychangeitemTable()->getItems($id);
         }
         
         $form = new PhysicalsecuritychangeForm($this->getServiceLocator(), $pscObj);
@@ -165,7 +177,6 @@ class PhysicalsecuritychangeController extends AbstractActionController
 
             if ($form->isValid()) {
                 $psc->exchangeArray($post);
-                $psc->psc_active = 1;
                 $pscId = $this->getPhysicalsecuritychangeTable()->savePhysicalsecuritychange($psc);
 
                 if((int)$id) {
@@ -173,20 +184,7 @@ class PhysicalsecuritychangeController extends AbstractActionController
                 } else {
                     $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Add new Physicalsecuritychange "' . $pscId . '"');
                 }
-/*
-                // save text note
-                if($post['note_text'])
-                {
-                    $note = new Note();
-                    $noteData['note_text'] = $post['note_text'];
-                    $noteData['note_item_type'] = \Note\Model\Note::NOTE_TLC;
-                    $noteData['note_item_id'] = $tlId;
-                    $note->exchangeArray($noteData);
-                    $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-                    $noteId = $this->getNoteTable()->saveNote($note);
-                }*/
                 
-                // save files
                 $note = new Note();
                 $noteData['note_text'] = $post['note_text'];
                 $noteData['note_item_type'] = \Note\Model\Note::NOTE_PSC;
@@ -219,6 +217,7 @@ class PhysicalsecuritychangeController extends AbstractActionController
             'comments' => $comments,
             'formNote' => $formNote,
             'pscId' => $id,
+            'items' => $items,
         );
     }
 
@@ -226,26 +225,26 @@ class PhysicalsecuritychangeController extends AbstractActionController
     {
         $id = $this->params('id');
 
-        $this->getTraininglogTable()->deleteTraininglog($id);
-        $this->flashMessenger()->addSuccessMessage('Training log has been deleted');
+        $this->getPhysicalsecuritychangeTable()->deletePhysicalsecuritychange($id);
+        $this->flashMessenger()->addSuccessMessage('Physicalsecuritychange has been deleted');
 
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_DELETE, \Application\Model\LogsTable::ITEM_TYPE_TL, $id);
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_DELETE, \Application\Model\LogsTable::ITEM_TYPE_PSC, $id);
         
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete trainiglog "' . $id . '"');
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete Physicalsecuritychange "' . $id . '"');
         
-        return $this->redirect()->toRoute('traininglog', array('controller' => 'traininglog', 'action' => 'list'));
+        return $this->redirect()->toRoute('physicalsecuritychange', array('controller' => 'physicalsecuritychange', 'action' => 'list'));
     }
 
     public function unarchiveAction()
     {
         $id = $this->params('id');
 
-        $this->getTraininglogTable()->unarchiveTraininglog($id);
-        $this->flashMessenger()->addSuccessMessage('Training log has been unarchived');
+        $this->getPhysicalsecuritychangeTable()->unarchivePhysicalsecuritychange($id);
+        $this->flashMessenger()->addSuccessMessage('Physicalsecuritychange has been unarchived');
 
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Unarchive traininglog "' . $id . '"');
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Unarchive Physicalsecuritychange "' . $id . '"');
 
-        return $this->redirect()->toRoute('traininglog', array('controller' => 'traininglog', 'action' => 'list'));
+        return $this->redirect()->toRoute('physicalsecuritychange', array('controller' => 'physicalsecuritychange', 'action' => 'list'));
 
     }
 }

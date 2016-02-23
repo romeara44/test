@@ -335,7 +335,7 @@ class ItassetinventoryController extends AbstractActionController
         $i = $j = 0;
         $non_imported_assessments_ids = [];
         foreach ($assessments as $assessment) {
-            
+
             $ass_addresses = $this->getAddressTable()->getAddresses($assessment->a_id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
             $ass_addresses_arr = [];
             foreach ($ass_addresses as $value) {
@@ -364,8 +364,9 @@ class ItassetinventoryController extends AbstractActionController
                 //continue;
             }*/
             if (count($ass_addresses_arr) > 1) {//$non_imported_assessments_ids[] = $assessment->a_id;
-            
+            $non_imported_assessments_ids[$assessment->a_c_id][] = $assessment->a_id . ' - ' . $assessment->a_status;
         }
+        continue;
             foreach ($ass_addresses_arr as $key => $ass_address) {
                 if (!$key) continue;
                 /*$iai = new ItAssetInventory();
@@ -379,7 +380,8 @@ class ItassetinventoryController extends AbstractActionController
                     echo $item->aili_name . ' ' . $item->aili_model . ' ' . $item->aili_description . '<br>';
                 }*/
                 //var_dump($ailiItems);
-                echo $assessment->a_id . ' - ' . count($key) . ' of ' . count($ass_addresses_arr) . '<br>';           
+                $non_imported_assessments_ids[$assessment->a_c_id][] = $assessment->a_id;
+                /*echo $assessment->a_id . ' - ' . $assessment->a_c_id . '<br>';           
                 echo 'Notes:<br>';
                 $notes = $this->getNoteTable()->getNotes($assessment->a_id,  \Note\Model\Note::NOTE_AILI, $ass_address->adr_id);
                 foreach ($notes as $key => $note) {
@@ -390,7 +392,7 @@ class ItassetinventoryController extends AbstractActionController
                 $reportFiles = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationReportTable')->getAilrByLocation($assessment->a_id, $ass_address->adr_id);
                 foreach ($reportFiles as $key => $report) {
                     var_dump($report);
-                }
+                }*/
 
                 echo '<br>';
             }
@@ -409,7 +411,7 @@ class ItassetinventoryController extends AbstractActionController
             
             
         }
-//        var_dump($non_imported_assessments_ids);
+        var_dump($non_imported_assessments_ids);
         die();
     }
 }

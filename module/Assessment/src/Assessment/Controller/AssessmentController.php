@@ -498,7 +498,10 @@ class AssessmentController extends AbstractActionController
             $viewParams['companyAddresses'] = $companyAddresses;
         }
 
-        if ($step == 2) {
+        if ($step == 1) {
+            $viewParams['locationName'] = $this->getAddressTable()->getLocationNameById($location);
+            
+        } elseif ($step == 2) {
             $viewParams['assessmentsRoles'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type);
             $viewParams['arlcContacts'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->getArlcByLocation($id, $location);
             $viewParams['companyRoles'] = $this->getServiceLocator()->get('Client\Model\CompanyRolesTable')->getExistsCompanyRoles($aObj->a_c_id);
