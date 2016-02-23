@@ -164,7 +164,7 @@ $form->setAttribute('method', 'post');
                     success: function(data){
                         var html = '<option value="">Please Select</option>';
                         $.each(data, function(index, value) {
-                            html += '<option value="' + value[0].adr_id + '">Location ' + value[0].adr_id + '</option>';
+                            html += '<option value="' + value[0].adr_id + '">' + value[0].adr_name + '</option>';
                         });
                         $('#location').html(html);
                     }

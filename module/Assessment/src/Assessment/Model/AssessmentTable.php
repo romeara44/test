@@ -899,7 +899,6 @@ class AssessmentTable implements ServiceLocatorAwareInterface
             $oldAddressId = $address->adr_id;
             // save to address table
             $address->adr_id = 0;
-            $address->adr_name = 'Location ' . $i++;
             $address->adr_create_date = new \Zend\Db\Sql\Expression('NOW()');
 
             $addressTable = $this->getServiceLocator()->get('Client\Model\AddressTable');
