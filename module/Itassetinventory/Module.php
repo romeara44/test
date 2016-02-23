@@ -58,12 +58,12 @@ class Module
                         $resultSetPrototype = new ResultSet();
                         return new TableGateway('it_asset_inventory_item_types', $dbAdapter, null, $resultSetPrototype);
                 },
-                'Itassetinventory\Model\ItassetInventoryItemTable' => function($sm) {
-                        $tableGateway = $sm->get('ItassetInventoryItemTableGateway');
-                        $table = new \Itassetinventory\Model\ItassetInventoryItemTable($tableGateway);
+                'Itassetinventory\Model\ItAssetInventoryItemTable' => function($sm) {
+                        $tableGateway = $sm->get('ItAssetInventoryItemTableGateway');
+                        $table = new \Itassetinventory\Model\ItAssetInventoryItemTable($tableGateway);
                         return $table;
                 },
-                'ItassetInventoryItemTableGateway' => function ($sm) {
+                'ItAssetInventoryItemTableGateway' => function ($sm) {
                         $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                         $resultSetPrototype = new ResultSet();
                         return new TableGateway('it_asset_inventory_items', $dbAdapter, null, $resultSetPrototype);

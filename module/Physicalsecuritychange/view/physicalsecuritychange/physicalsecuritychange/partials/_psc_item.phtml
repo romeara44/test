@@ -1,0 +1,75 @@
+<table cellpadding="0" cellspacing="0" id="psc-items">
+    <thead>
+        <tr>
+            <th width="5%">ID</th>
+            <th width="10%">Date of Repair or Change</th>
+            <th width="10%">Identification of Specific Component</th>
+            <th width="20%">Reason for modification or repair</th>
+            <th width="10%">Person performing the maintenance</th>
+            <th width="10%">Individual authorizing maintenance repair or modification</th>
+            <th width="20%">Comments</th>
+            <th width="5%"></th>
+        </tr>
+    </thead>
+    <tbody>
+            <tr style="display: none" id="psc-items-row">
+                <td>0.
+                </td>
+                <td>
+                    <input type="text" name="_items[new][0][pscidate]" class="required" readonly />
+                </td>
+                <td><input type="text" name="_items[new][0][psci_identification]" id="" class="" value="" /></td>
+                <td><input type="text" name="_items[new][0][psci_reason]" id="" class="" value="" /></td>
+                <td>
+                    <input type="text" name="_items[new][0][psci_person]" value="" />
+                </td>
+                <td><input type="text" name="_items[new][0][psci_individual]" id="" class="" value="" /></td>
+                <td><input type="text" name="_items[new][0][psci_comments]" id="" class="" value="" /></td>
+                <td class="acenter">
+                    <a title="Delete" class="i-delete deleteIaiiTableRow" href="javascript:;"><i class="fa fa-trash-o"></i></a>
+                </td>
+            </tr>
+        <?php $counter = 0;?>
+        <?php foreach ($items as $item): ?>
+            <tr>
+                <td>
+                    <?php echo ++$counter ?>.
+                    <input type="hidden" name="_items[exists][<?php echo $item->psci_id?>][psci_id]" value="<?php echo $item->psci_id?>">
+                </td>
+                <td>
+                    <input type="text" name="_items[exists][<?php echo $item->psci_id?>][psci_date]" class="required" readonly value="<?php $t = \DateTime::createFromFormat('Y-m-d', $item->psci_date);echo $t->format('m/d/Y'); ?>" />
+                </td>
+                <td><input type="text" name="_items[exists][<?php echo $item->psci_id?>][psci_identification]" id="" class="" value="<?php echo $item->psci_identification ?>" /></td>
+                <td><input type="text" name="_items[exists][<?php echo $item->psci_id?>][psci_reason]" id="" class="" value="<?php echo $item->psci_reason ?>" /></td>
+                <td>
+                    <input type="text" name="_items[exists][<?php echo $item->psci_id?>][psci_person]" value="<?php echo $item->psci_person ?>" />
+                </td>
+                <td><input type="text" name="_items[exists][<?php echo $item->psci_id?>][psci_individual]" id="" class="" value="<?php echo $item->psci_individual ?>" /></td>
+                <td><input type="text" name="_items[exists][<?php echo $item->psci_id?>][psci_comments]" id="" class="" value="<?php echo $item->psci_comments ?>" /></td>
+                <td class="acenter">
+                    <a title="Delete" class="i-delete deleteIaiiTableRow" href="javascript:;" class=""><i class="fa fa-trash-o"></i></a>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        <?php if(!$items || !$items->count()): ?>
+            <tr>
+                <td><?php echo ++$counter ?>.
+                </td>
+                <td>
+                    <input type="text" name="_items[new][1][psci_date]" class=" required" readonly />
+                </td>
+                <td><input type="text" name="_items[new][1][psci_identification]" id="" class="" value="" /></td>
+                <td><input type="text" name="_items[new][1][psci_reason]" id="" class="" value="" /></td>
+                <td>
+                    <input type="text" name="_items[new][1][psci_person]" value="" />
+                </td>
+                <td><input type="text" name="_items[new][1][psci_individual]" id="" class="" value="" /></td>
+                <td><input type="text" name="_items[new][1][psci_comments]" id="" class="" value="" /></td>
+                <td class="acenter">
+                    <a title="Delete" class="i-delete deleteIaiiTableRow" href="javascript:;"><i class="fa fa-trash-o"></i></a>
+                </td>
+            </tr>
+        <?php endif; ?>
+    </tbody>
+</table>
+<a href="javascript:;" class="button buttonAdd"><i class="fa fa-plus-circle"></i> Add</a>
