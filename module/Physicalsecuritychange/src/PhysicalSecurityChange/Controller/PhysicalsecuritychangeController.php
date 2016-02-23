@@ -79,6 +79,15 @@ class PhysicalsecuritychangeController extends AbstractActionController
         return $this->physicalSecurityChangeTable;
     }
 
+    public function getPhysicalsecuritychangeitemTable()
+    {
+        if (!isset($this->physicalSecurityChangeitemTable)) {
+            $sm = $this->getServiceLocator();
+            $this->physicalSecurityChangeitemTable = $sm->get('Physicalsecuritychange\Model\PhysicalsecuritychangeitemTable');
+        }
+        return $this->physicalSecurityChangeitemTable;
+    }
+
     public function hasIdentity()
     {
         $authService = new \Zend\Authentication\AuthenticationService();
@@ -147,10 +156,13 @@ class PhysicalsecuritychangeController extends AbstractActionController
         $pscObj = null;
 
         $comments          = null;
+
+        $items = [];
         
         if ((int) $id) {
             $pscObj             = $this->getPhysicalsecuritychangeTable()->getPhysicalsecuritychange($id);
             $comments          = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_PSC);
+            $items = $this->getPhysicalsecuritychangeitemTable()->getItems($id);
         }
         
         $form = new PhysicalsecuritychangeForm($this->getServiceLocator(), $pscObj);
@@ -165,7 +177,6 @@ class PhysicalsecuritychangeController extends AbstractActionController
 
             if ($form->isValid()) {
                 $psc->exchangeArray($post);
-                $psc->psc_active = 1;
                 $pscId = $this->getPhysicalsecuritychangeTable()->savePhysicalsecuritychange($psc);
 
                 if((int)$id) {
@@ -173,20 +184,7 @@ class PhysicalsecuritychangeController extends AbstractActionController
                 } else {
                     $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Add new Physicalsecuritychange "' . $pscId . '"');
                 }
-/*
-                // save text note
-                if($post['note_text'])
-                {
-                    $note = new Note();
-                    $noteData['note_text'] = $post['note_text'];
-                    $noteData['note_item_type'] = \Note\Model\Note::NOTE_TLC;
-                    $noteData['note_item_id'] = $tlId;
-                    $note->exchangeArray($noteData);
-                    $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-                    $noteId = $this->getNoteTable()->saveNote($note);
-                }*/
                 
-                // save files
                 $note = new Note();
                 $noteData['note_text'] = $post['note_text'];
                 $noteData['note_item_type'] = \Note\Model\Note::NOTE_PSC;
@@ -219,6 +217,7 @@ class PhysicalsecuritychangeController extends AbstractActionController
             'comments' => $comments,
             'formNote' => $formNote,
             'pscId' => $id,
+            'items' => $items,
         );
     }
 
