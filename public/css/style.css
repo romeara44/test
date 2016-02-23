@@ -1525,3 +1525,54 @@ form.chart select {
 
 #footer strong { color: #8f97a1; font-weight: 600; }
 
+.tab_nav {
+    border-bottom: 3px solid #c7d8e2;
+    width: 100%;
+}
+.ul_tabs:after{
+	clear: both;
+	display: table;
+	content: '';
+}
+.ul_tabs{
+	padding: 0;
+	margin: 0 -2px;
+}
+.ul_tabs li a{
+	text-decoration: none;
+	padding: 10px 19px 10px;
+	display: inline-block;
+	line-height: 22px;
+}
+.ul_tabs li a:hover{
+	background: #0d3253;
+	color:#fff;
+}
+.ul_tabs li{
+	position: relative;
+    display: inline-block;
+    font-weight: 300;
+    background: #c7d8e2;
+    float: left;
+    margin: 0 2px;
+    color: #1c1b1d;
+    font-size: 14px;
+    line-height: 16px;
+    cursor: pointer;
+    padding:0;
+}
+.tab_nav ul li.active_tab {
+    color: #fff;
+    background: #0d3253;
+}
+.tab_nav ul li.active_tab a{
+	color:#fff;
+}
+.tab_nav ul li.active_tab a:hover{
+	cursor: default;
+}
+.tab-panels {
+    border: 1px solid #c7d8e2;
+    border-top: 1px #252959;
+    padding:30px 0;
+}
