@@ -337,11 +337,11 @@ class ItassetinventoryController extends AbstractActionController
         foreach ($assessments as $assessment) {
             $ass_addresses = $this->getAddressTable()->getAddresses($assessment->a_id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
             $comp_addresses = $this->getAddressTable()->getAddresses($assessment->a_c_id, \Client\Model\AddressItem::COMPANY_TYPE);
-
+/*
             if ($ass_addresses->count() > 1 || $comp_addresses->count() > 1) {
                 $ass_no_loc[] = $assessment->a_id;
                 continue;
-            }
+            }*/
             $iaiId = 0;
             $flag = 1;
             foreach ($ass_addresses as $ass_address) {
@@ -349,7 +349,7 @@ class ItassetinventoryController extends AbstractActionController
                     $ailiItems = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationItemTable')->getAiliByLocation($assessment->a_id, $ass_address->adr_id);
                     $notes = $this->getNoteTable()->getNotes($assessment->a_id,  \Note\Model\Note::NOTE_AILI, $ass_address->adr_id);
                     $reportFiles = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationReportTable')->getAilrByLocation($assessment->a_id, $ass_address->adr_id);
-                    //var_dump($ailiItems);die();
+                    var_dump($ailiItems);die();
                     foreach ($ailiItems as $key => $items) {
                         foreach ($items as $item) {
                             if (!$iaiId) {
@@ -403,7 +403,9 @@ class ItassetinventoryController extends AbstractActionController
                             }
                         }
                     }
+                    break;
                 }
+                break;
             }            
             if (!$flag) {
                 $ass_errs[] = $assessment->a_id;
