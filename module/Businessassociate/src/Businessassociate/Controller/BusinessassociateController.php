@@ -512,7 +512,7 @@ class BusinessassociateController extends AbstractActionController
                 foreach ($abals as $abal) {
                     if (!$abal->abal_ba_id) continue;
                     if (!$this->getBusinessassociateTable()->getBusinessassociate($abal->abal_ba_id)) continue;
-                    foreach ($notes as $note) {
+                    foreach ($notes->buffer() as $note) {
                         $note_dest = new Note;
                         $note_dest->note_item_type = \Note\Model\Note::NOTE_BUSINESSASSOCIATE;
                         $note_dest->note_item_id = $abal->abal_ba_id;
@@ -520,7 +520,7 @@ class BusinessassociateController extends AbstractActionController
                             $flag = 0;
                         }
                     } 
-                    foreach ($reportFiles as $report) {
+                    foreach ($reportFiles->buffer() as $report) {
                         if (!$this->getServiceLocator()->get('Businessassociate\Model\BusinessassociatereportTable')->createReportFromAssessmentInventoryLocationReport($abal->abal_ba_id, $report)) {
                             $flag = 0;
                         }
