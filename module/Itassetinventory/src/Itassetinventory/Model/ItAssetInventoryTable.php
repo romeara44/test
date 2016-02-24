@@ -250,76 +250,22 @@ class ItAssetInventoryTable implements ServiceLocatorAwareInterface
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_UNARCHIVE, \Application\Model\LogsTable::ITEM_TYPE_IAI, $id);
 
         return true;
-    }
+    }   
 
-    public function importItassetinventory(Itassetinventory $iai, $files = []) {
-        $authService = new \Zend\Authentication\AuthenticationService();
-        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
-        $identity = $authService->getIdentity();
-
-        $data = array(
-            'iai_c_id'        => $iai->iai_c_id,
-            'iai_location_id' => $iai->iai_location_id,
-            'iai_type_id'     => $iai->iai_type_id,
-        );
-
-        $id = (int) $iai->iai_id;
+    public function importItassetinventory($data) {
+        $id = 0;
 
         if (!$id) {
-            if (in_array($identity['u_role_id'], array(User::ROLE_CONSULTANT, User::ROLE_SENIOR_CONSULTANT))) {
-                $data['iai_consultant_u_id'] = $identity['u_id'];
-            } elseif ($identity['u_role_id'] == User::ROLE_CLIENT) {
-                $data['iai_consultant_u_id'] = $identity['u_senior_consultant_u_id'];
-                $data['iai_c_id'] = $identity['u_company_id'];
-            }
-
-            $data['iai_owner_u_id'] = $identity['u_id'];
-
             $this->tableGateway->insert($data);
             $id = $this->tableGateway->lastInsertValue;
         } else {
-
-            $data['iai_update_u_id'] = $identity['u_id'];
-            $data['iai_update_date'] = new \Zend\Db\Sql\Expression('NOW()');
-
             if ($this->getItassetinventory($id)) {
                 $this->tableGateway->update($data, array('iai_id' => $id));
-
-                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_EDIT, \Application\Model\LogsTable::ITEM_TYPE_IAI, $id);
             } else {
-                throw new \Exception('Form id does not exist');
-            }
-        }
-
-        if($id) {
-            if($iai->_items) {
-                $existsItems = [];
-                $existsItemIds = [];
-                foreach ($iai->_items as $itemTypeId => $itemsType) {
-                    $newItems[$itemTypeId] = [];
-                    if(isset($itemsType['new']) && $itemsType['new']) {
-                        foreach ($itemsType['new'] as $attrName => $itemsAttrs) {
-                            foreach ($itemsAttrs as $i => $itemsAttr) {
-                                $newItems[$itemTypeId][$i]['iaii_iai_id'] = $id;
-                                $newItems[$itemTypeId][$i][$attrName] = $itemsAttr;
-                            }
-                        }
-                    }
-                    
-                    if(isset($files['items' . $itemTypeId])) {
-                        $this->getServiceLocator()->get('Itassetinventory\Model\ItAssetInventoryReportTable')->saveIair($id, $itemTypeId, $files['items' . $itemTypeId]);
-                    }
-                }
-                foreach ($newItems as $newItemsType) {
-                    foreach ($newItemsType as $item) {
-                        $iaii = new ItAssetInventoryItem();
-                        $iaii->exchangeArray($item);
-                        $this->getServiceLocator()->get('Itassetinventory\Model\ItAssetInventoryItemTable')->saveIaii($iaii);
-                    }
-                }
+                return false;
             }
         }
 
         return $id;
-    }
+    } 
 }

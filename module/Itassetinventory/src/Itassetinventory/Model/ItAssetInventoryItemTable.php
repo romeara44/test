@@ -145,4 +145,21 @@ class ItAssetInventoryItemTable implements ServiceLocatorAwareInterface
 
         return true;
     }
+
+    public function importIaii($data)
+    {
+        $id = 0;
+        if ($id == 0) {
+            $this->tableGateway->insert($data);
+            $id = $this->tableGateway->lastInsertValue;
+        } else {
+            if ($this->getItem($id)) {
+                $this->tableGateway->update($data, array('iaii_id' => $id));
+            } else { echo $id;exit;
+                return false;
+            }
+        }
+
+        return $id;
+    }
 }

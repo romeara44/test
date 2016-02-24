@@ -331,87 +331,72 @@ class ItassetinventoryController extends AbstractActionController
     }
 
     public function importAction() {
+        $ass_errs = [];
         $assessments = $this->getServiceLocator()->get('Assessment\Model\AssessmentTable')->getForImport();
-        $i = $j = 0;
-        $non_imported_assessments_ids = [];
         foreach ($assessments as $assessment) {
-
             $ass_addresses = $this->getAddressTable()->getAddresses($assessment->a_id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
-            $ass_addresses_arr = [];
-            foreach ($ass_addresses as $value) {
-                $ass_addresses_arr[] = $value;
-            }
-            /*$comp_addresses = $this->getAddressTable()->getAddresses($assessment->a_c_id, \Client\Model\AddressItem::COMPANY_TYPE);
-            $comp_addresses_arr = [];
-            foreach ($comp_addresses as $value) {
-                $comp_addresses_arr[] = $value;
-            }
-            //var_dump($ass_addresses_arr, $comp_addresses_arr);die();
-            if (count($ass_addresses_arr) != count($comp_addresses_arr)) {
-                $non_imported_assessments_ids[] = $assessment->a_id;
-                //continue;
-            }
+            $comp_addresses = $this->getAddressTable()->getAddresses($assessment->a_c_id, \Client\Model\AddressItem::COMPANY_TYPE);
 
-            $flag = 0;
-            foreach ($ass_addresses_arr as $key => $ass_address) {
-                if ($ass_addresses_arr[$key]->adr_address1 != $comp_addresses_arr[$key]->adr_address1) {                        
-                    $flag = 1;
-                    break;
+            if ($ass_addresses->count() > 1 || $comp_addresses->count() > 1) continue;
+            $iaiId = 0;
+            $flag = 1;
+            foreach ($ass_addresses as $ass_address) {
+                foreach ($comp_addresses as $comp_address) {
+                    $ailiItems = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationItemTable')->getAiliByLocation($assessment->a_id, $ass_address->adr_id);
+                    $notes = $this->getNoteTable()->getNotes($assessment->a_id,  \Note\Model\Note::NOTE_AILI, $ass_address->adr_id);
+                    $reportFiles = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationReportTable')->getAilrByLocation($assessment->a_id, $ass_address->adr_id);
+//                    var_dump($ailiItems);die();
+                    /*foreach ($ailiItems as $key => $item) {
+                        if (!$iaiId) {
+                            $data = array(
+                                'iai_c_id'        => $assessment->a_c_id,
+                                'iai_location_id' => $comp_address->adr_id,
+                                'iai_type_id'     => \Itassetinventory\Model\ItAssetInventoryItemTypeTable::TYPE_MANUAL_ENTRY,
+                                'iai_owner_u_id'        => $item[0]->aili_create_u_id,
+                                'iai_update_u_id' => $item[0]->aili_update_u_id,
+                                'iai_create_date'     => $item[0]->aili_create_date,
+                                'iai_update_date'     => $item[0]->aili_update_date,
+                            );
+                            $iaiId = $this->getItassetinventoryTable()->importItassetinventory($data);
+                            if (!$iaiId) {
+                                $flag = 0;
+                                break;
+                            }
+                        }
+                        $data_iaii = [];
+                        $data_iaii['iaii_iai_id'] = $iaiId;
+                        $data_iaii['iaii_iaiit_id'] = $key;
+                        $data_iaii['iaii_name'] = $item[0]->aili_name;
+                        $data_iaii['iaii_model'] = $item[0]->aili_model;
+                        $data_iaii['iaii_description'] = $item[0]->aili_description;
+                        $data_iaii['iaii_create_u_id'] = $item[0]->aili_create_u_id;
+                        $data_iaii['iaii_update_u_id'] = $item[0]->aili_update_u_id;
+                        $data_iaii['iaii_create_date'] = $item[0]->aili_create_date;
+                        $data_iaii['iaii_update_date'] = $item[0]->aili_update_date;
+
+                        $this->getServiceLocator()->get('Itassetinventory\Model\ItAssetInventoryItemTable')->importIaii($data_iaii);
+                    }*/
+                    
+                    foreach ($notes as $note) {var_dump($ailiItems);continue;
+                        $note_dest = new Note;
+                        $note_dest->note_item_type = \Note\Model\Note::NOTE_BUSINESSASSOCIATE;
+                        $note_dest->note_item_id = $abal->abal_ba_id;
+                        if (!$this->getNoteTable()->copyNote($note, $note_dest)) {
+                            $flag = 0;
+                        }
+                    } 
+                    /*foreach ($reportFiles as $report) {
+                        if (!$this->getServiceLocator()->get('Businessassociate\Model\BusinessassociatereportTable')->createReportFromAssessmentInventoryLocationReport($abal->abal_ba_id, $report)) {
+                            $flag = 0;
+                        }
+                    }*/
                 }
+            }            
+            if (!$flag) {
+                $ass_errs[] = $assessment->a_id;
             }
-            if ($flag) {
-                $non_imported_assessments_ids[] = $assessment->a_id;
-                //continue;
-            }*/
-            if (count($ass_addresses_arr) > 1) {//$non_imported_assessments_ids[] = $assessment->a_id;
-            $non_imported_assessments_ids[$assessment->a_c_id][] = $assessment->a_id . ' - ' . $assessment->a_status;
         }
-        continue;
-            foreach ($ass_addresses_arr as $key => $ass_address) {
-                if (!$key) continue;
-                /*$iai = new ItAssetInventory();
-                $iai->iai_c_id = $assessment->a_c_id;
-                $iai->iai_location_id = $comp_addresses_arr[$key]->adr_id;
-                $iai->iai_type_id = \Itassetinventory\Model\ItAssetInventoryItemTypeTable::TYPE_MANUAL_ENTRY;
-                $iai->iai_c_id = $assessment->a_c_id;*/
-                //$ailiItems = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationItemTable')->getAiliByLocation($assessment->a_id, $ass_address->adr_id);
-                /*foreach ($ailiItems as $key => $item) {
-                    var_dump($item);continue;
-                    echo $item->aili_name . ' ' . $item->aili_model . ' ' . $item->aili_description . '<br>';
-                }*/
-                //var_dump($ailiItems);
-                $non_imported_assessments_ids[$assessment->a_c_id][] = $assessment->a_id;
-                /*echo $assessment->a_id . ' - ' . $assessment->a_c_id . '<br>';           
-                echo 'Notes:<br>';
-                $notes = $this->getNoteTable()->getNotes($assessment->a_id,  \Note\Model\Note::NOTE_AILI, $ass_address->adr_id);
-                foreach ($notes as $key => $note) {
-                    var_dump($note);
-                }
-                echo '<br>';
-                echo 'Reports:<br>';
-                $reportFiles = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationReportTable')->getAilrByLocation($assessment->a_id, $ass_address->adr_id);
-                foreach ($reportFiles as $key => $report) {
-                    var_dump($report);
-                }*/
-
-                echo '<br>';
-            }
-
-            /*
-                $notes = $this->getNoteTable()->getNotes($assessment->a_id, \Note\Model\Note::NOTE_AILI, $ass_address->adr_id);
-                $assessmentsInv = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryTable')->getAssessmentsInventory();
-                $ailiItems = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationItemTable')->getAiliByLocation($assessment->a_id, $ass_address->adr_id);
-                $reportFiles = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationReportTable')->getAilrByLocation($assessment->a_id, $ass_address->adr_id);
-
-                //var_dump($notes);
-                var_dump($assessmentsInv);
-                //var_dump($ailiItems);
-                //var_dump($reportFiles);
-                */
-            
-            
-        }
-        var_dump($non_imported_assessments_ids);
+        var_dump($ass_errs);
         die();
     }
 }
