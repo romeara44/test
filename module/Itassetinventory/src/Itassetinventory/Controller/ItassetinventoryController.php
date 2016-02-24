@@ -349,7 +349,7 @@ class ItassetinventoryController extends AbstractActionController
                     $ailiItems = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationItemTable')->getAiliByLocation($assessment->a_id, $ass_address->adr_id);
                     $notes = $this->getNoteTable()->getNotes($assessment->a_id,  \Note\Model\Note::NOTE_AILI, $ass_address->adr_id);
                     $reportFiles = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationReportTable')->getAilrByLocation($assessment->a_id, $ass_address->adr_id);
-                    var_dump($ailiItems);die();
+                    //var_dump($ailiItems);die();
                     foreach ($ailiItems as $key => $items) {
                         foreach ($items as $item) {
                             if (!$iaiId) {

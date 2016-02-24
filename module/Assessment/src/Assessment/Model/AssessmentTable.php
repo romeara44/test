@@ -193,7 +193,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
     {
         $select = $this->tableGateway->getSql()->select();
         $select->where('a_type = ' . Assessment::TYPE_SECURITY_RISK);
-        //$select->where('a_id = 48');
+        //$select->where('a_id = 110');
         $resultSet = $this->tableGateway->selectWith($select);
 
         return $resultSet;
