@@ -182,4 +182,59 @@ class ItAssetInventoryReportTable implements ServiceLocatorAwareInterface
 
         return $row->iair_a_id;
     }
+
+    public function createReportFromAssessmentInventoryLocationReport($ba_id, \Assessment\Model\AssessmentInventoryLocationReport $ailr)
+    {
+        $reportsFolder = 'public/data/reports';
+        $ba_reportsFolder = 'public/data/it_asset';
+
+        if (!is_dir($ba_reportsFolder)) {
+            mkdir($ba_reportsFolder);
+        }
+
+        if (!is_dir($ba_reportsFolder . '/' . $ba_id)) {
+            mkdir($ba_reportsFolder . '/' . $ba_id);
+        }
+
+        $filesTable = $this->getServiceLocator()->get('Application\Model\FilesTable');
+
+        $file_source = $filesTable->getFile($ailr->ailr_f_id);
+        if (!$file_source) return false;
+
+        $dataFile = array();
+
+        $dataFile['f_name']      = $file_source->f_name;
+        $dataFile['f_type']      = $file_source->f_type;
+        $dataFile['f_encrypted'] = $file_source->f_encrypted;
+        $dataFile['f_create_date'] = $file_source->f_create_date;
+
+        $f_id_dest = $filesTable->saveFile($dataFile);
+        if (!$f_id_dest) return false;
+
+        if (file_exists($reportsFolder . '/' . $ailr->ailr_a_id . '/' . $ailr->ailr_f_id)) {
+            if (!copy($reportsFolder . '/' . $ailr->ailr_a_id . '/' . $ailr->ailr_f_id, $ba_reportsFolder . '/' . $ba_id . '/' . $f_id_dest)) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+        
+
+        $dataAilr = array();
+
+        $dataAilr['iair_create_u_id'] = $ailr->ailr_create_u_id;
+        $dataAilr['iair_iai_id'] = $ba_id;
+        $dataAilr['iair_iaiit_id'] = $ailr->ailr_ai_id;
+        $dataAilr['iair_f_id'] = $f_id_dest;
+        $dataAilr['iair_create_date'] = $ailr->ailr_create_date;
+        $dataAilr['iair_update_date'] = $ailr->ailr_update_date;
+        $dataAilr['iair_update_u_id'] = $ailr->ailr_update_u_id;
+
+        $this->tableGateway->insert($dataAilr);
+        $bar_id = $this->tableGateway->lastInsertValue;
+
+        if (!$bar_id) return false;        
+
+        return $bar_id;
+    }
 }

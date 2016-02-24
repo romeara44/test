@@ -72,7 +72,11 @@ class BusinessassociatereportTable implements ServiceLocatorAwareInterface
         $f_id_dest = $filesTable->saveFile($dataFile);
         if (!$f_id_dest) return false;
 
-        if (!copy($reportsFolder . '/' . $ailr->ailr_a_id . '/' . $ailr->ailr_f_id, $ba_reportsFolder . '/' . $ba_id . '/' . $f_id_dest)) {
+        if (file_exists($reportsFolder . '/' . $ailr->ailr_a_id . '/' . $ailr->ailr_f_id)) {
+            if (!copy($reportsFolder . '/' . $ailr->ailr_a_id . '/' . $ailr->ailr_f_id, $ba_reportsFolder . '/' . $ba_id . '/' . $f_id_dest)) {
+                return false;
+            }
+        } else {
             return false;
         }
 

@@ -191,7 +191,7 @@ class ItassetinventoryController extends AbstractActionController
             $items = $this->getServiceLocator()->get('Itassetinventory\Model\ItassetInventoryItemTable')->getItemsByInventory($id);
             $itemReports = $this->getServiceLocator()->get('Itassetinventory\Model\ItassetInventoryReportTable')->getByInventory($id);
         }
-
+//foreach ($notes as $note) {var_dump($note);}die();
         $assetInvs = $this->getServiceLocator()->get('Itassetinventory\Model\ItAssetInventoryItemTypeTable')->getAllActive();
 
         $form = new ItAssetInventoryForm($this->getServiceLocator(), $iaiObj);
@@ -331,13 +331,17 @@ class ItassetinventoryController extends AbstractActionController
     }
 
     public function importAction() {
+        $ass_no_loc = [];
         $ass_errs = [];
         $assessments = $this->getServiceLocator()->get('Assessment\Model\AssessmentTable')->getForImport();
         foreach ($assessments as $assessment) {
             $ass_addresses = $this->getAddressTable()->getAddresses($assessment->a_id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
             $comp_addresses = $this->getAddressTable()->getAddresses($assessment->a_c_id, \Client\Model\AddressItem::COMPANY_TYPE);
 
-            if ($ass_addresses->count() > 1 || $comp_addresses->count() > 1) continue;
+            if ($ass_addresses->count() > 1 || $comp_addresses->count() > 1) {
+                $ass_no_loc[] = $assessment->a_id;
+                continue;
+            }
             $iaiId = 0;
             $flag = 1;
             foreach ($ass_addresses as $ass_address) {
@@ -345,58 +349,67 @@ class ItassetinventoryController extends AbstractActionController
                     $ailiItems = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationItemTable')->getAiliByLocation($assessment->a_id, $ass_address->adr_id);
                     $notes = $this->getNoteTable()->getNotes($assessment->a_id,  \Note\Model\Note::NOTE_AILI, $ass_address->adr_id);
                     $reportFiles = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationReportTable')->getAilrByLocation($assessment->a_id, $ass_address->adr_id);
-//                    var_dump($ailiItems);die();
-                    /*foreach ($ailiItems as $key => $item) {
-                        if (!$iaiId) {
-                            $data = array(
-                                'iai_c_id'        => $assessment->a_c_id,
-                                'iai_location_id' => $comp_address->adr_id,
-                                'iai_type_id'     => \Itassetinventory\Model\ItAssetInventoryItemTypeTable::TYPE_MANUAL_ENTRY,
-                                'iai_owner_u_id'        => $item[0]->aili_create_u_id,
-                                'iai_update_u_id' => $item[0]->aili_update_u_id,
-                                'iai_create_date'     => $item[0]->aili_create_date,
-                                'iai_update_date'     => $item[0]->aili_update_date,
-                            );
-                            $iaiId = $this->getItassetinventoryTable()->importItassetinventory($data);
+                    //var_dump($ailiItems);die();
+                    foreach ($ailiItems as $key => $items) {
+                        foreach ($items as $item) {
                             if (!$iaiId) {
+                                $data = array(
+                                    'iai_c_id'        => $assessment->a_c_id,
+                                    'iai_location_id' => $comp_address->adr_id,
+                                    'iai_type_id'     => \Itassetinventory\Model\ItAssetInventoryItemTypeTable::TYPE_MANUAL_ENTRY,
+                                    'iai_owner_u_id'        => $item->aili_create_u_id,
+                                    'iai_update_u_id' => $item->aili_update_u_id,
+                                    'iai_create_date'     => $item->aili_create_date,
+                                    'iai_update_date'     => $item->aili_update_date,
+                                );
+                                $iaiId = $this->getItassetinventoryTable()->importItassetinventory($data);
+                                if (!$iaiId) {
+                                    $flag = 0;
+                                    break;
+                                }
+                            }
+                            $data_iaii = [];
+                            $data_iaii['iaii_iai_id'] = $iaiId;
+                            $data_iaii['iaii_iaiit_id'] = $key;
+                            $data_iaii['iaii_name'] = $item->aili_name;
+                            $data_iaii['iaii_model'] = $item->aili_model;
+                            $data_iaii['iaii_description'] = $item->aili_description;
+                            $data_iaii['iaii_create_u_id'] = $item->aili_create_u_id;
+                            $data_iaii['iaii_update_u_id'] = $item->aili_update_u_id;
+                            $data_iaii['iaii_create_date'] = $item->aili_create_date;
+                            $data_iaii['iaii_update_date'] = $item->aili_update_date;
+
+                            $iaii_id = $this->getServiceLocator()->get('Itassetinventory\Model\ItAssetInventoryItemTable')->importIaii($data_iaii);
+                            if (!$iaii_id) {
                                 $flag = 0;
-                                break;
                             }
                         }
-                        $data_iaii = [];
-                        $data_iaii['iaii_iai_id'] = $iaiId;
-                        $data_iaii['iaii_iaiit_id'] = $key;
-                        $data_iaii['iaii_name'] = $item[0]->aili_name;
-                        $data_iaii['iaii_model'] = $item[0]->aili_model;
-                        $data_iaii['iaii_description'] = $item[0]->aili_description;
-                        $data_iaii['iaii_create_u_id'] = $item[0]->aili_create_u_id;
-                        $data_iaii['iaii_update_u_id'] = $item[0]->aili_update_u_id;
-                        $data_iaii['iaii_create_date'] = $item[0]->aili_create_date;
-                        $data_iaii['iaii_update_date'] = $item[0]->aili_update_date;
-
-                        $this->getServiceLocator()->get('Itassetinventory\Model\ItAssetInventoryItemTable')->importIaii($data_iaii);
-                    }*/
+                        
+                    }
                     
-                    foreach ($notes as $note) {var_dump($ailiItems);continue;
+                    foreach ($notes as $note) {
                         $note_dest = new Note;
-                        $note_dest->note_item_type = \Note\Model\Note::NOTE_BUSINESSASSOCIATE;
-                        $note_dest->note_item_id = $abal->abal_ba_id;
+                        $note_dest->note_item_type = \Note\Model\Note::NOTE_IAIN;
+                        $note_dest->note_item_id = $iaiId;
                         if (!$this->getNoteTable()->copyNote($note, $note_dest)) {
                             $flag = 0;
                         }
                     } 
-                    /*foreach ($reportFiles as $report) {
-                        if (!$this->getServiceLocator()->get('Businessassociate\Model\BusinessassociatereportTable')->createReportFromAssessmentInventoryLocationReport($abal->abal_ba_id, $report)) {
-                            $flag = 0;
+                    foreach ($reportFiles as $reports) {//var_dump($report);continue;
+                        foreach ($reports as $report) {
+                            if ($report->ailr_ai_id == 5) continue;
+                            if (!$this->getServiceLocator()->get('Itassetinventory\Model\ItassetInventoryReportTable')->createReportFromAssessmentInventoryLocationReport($iaiId, $report)) {
+                                $flag = 0;
+                            }
                         }
-                    }*/
+                    }
                 }
             }            
             if (!$flag) {
                 $ass_errs[] = $assessment->a_id;
             }
         }
-        var_dump($ass_errs);
+        var_dump($ass_no_loc, $ass_errs);
         die();
     }
 }
