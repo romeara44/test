@@ -492,7 +492,7 @@ class AssessmentController extends AbstractActionController
 
         if ($step == 1) {
             $viewParams['locationName'] = $this->getAddressTable()->getLocationNameById($location);
-            $viewParams['locationFinished'] = $this->getAssessmentTable()->checkLocationFinished($id, $location);
+            $viewParams['locationFinished'] = $id ? $this->getAssessmentTable()->checkLocationFinished($id, $location) : 0;
         } elseif ($step == 2) {
             $viewParams['locationFinished'] = $this->getAssessmentTable()->checkLocationFinished($id, $location);
             $viewParams['assessmentsRoles'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type);
