@@ -104,10 +104,21 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
             $select->order($orders);
 
             $paginator = new Paginator($paginatorAdapter);
-
+            
             return $paginator;
         }
         $resultSet = $this->tableGateway->select();
+        return $resultSet;
+    }
+
+    public function getRpLocs($a_id)
+    {
+        $select = $this->tableGateway->getSql()->select();
+        
+        $select->where('rp_a_id =' . $a_id);
+        
+        $resultSet = $this->tableGateway->selectWith($select);
+
         return $resultSet;
     }
 

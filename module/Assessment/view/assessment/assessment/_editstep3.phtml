@@ -159,15 +159,16 @@ $form->setAttribute('method', 'post');
             <?php endforeach; ?>
 
             <div class="form-buttons">
+                <?php if (!$this->locationFinished): ?>
                 <?php if (!$this->isClosed): ?>
-                    <?php if (($this->assessmentRole == 6) && ($this->location == $this->lastAdrId)): ?>
-                    <?php else: ?>
+                    <?php //if (($this->assessmentRole == 6) && ($this->location == $this->lastAdrId)): ?>
+                    <?php //else: ?>
                         <input id="saveAndContinue" type="button" value="Save and Continue" class="form-button" />
-                    <?php endif; ?>
+                    <?php //endif; ?>
                     <input type="submit" value="Save" class="form-button" />
                     <div class="fleft">or</div>
                 <?php endif; ?>
-
+                <?php endif; ?>
                 <a href="/assessment/list" class="cancel">Cancel</a>
             </div>
 

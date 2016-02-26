@@ -1,5 +1,14 @@
-
-
+<?php if (count($this->loc_rps) > 1) : ?>
+<div class="tab_nav">
+    <ul class="ul_tabs">
+    <?php foreach ($this->loc_rps as $rp_id => $loc_name): ?>
+        <li <?php echo $this->id == $rp_id ? 'class="active_tab"' : ''; ?> >
+        <a href="/remediationplan/edit/<?php echo $rp_id; ?>" class="panel-tabs"><?php echo $loc_name; ?></a>
+        </li>
+    <?php endforeach; ?>
+    </ul>
+</div>
+<?php endif; ?>
 <div class="page-title">
     <h1 class="fleft">Remediation Plan for <?php echo (!$this->isPdf) ? '<br/>' : '' ?><?php echo $this->rpObj->_client_name ?>
     <?php foreach ($this->actions as $rpa): ?>

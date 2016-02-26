@@ -108,12 +108,13 @@ $form->setAttribute('method', 'post');
 
             <div class="cboth"></div>
             <div class="form-buttons">
+                <?php if (!$this->locationFinished): ?>
                 <?php if (!$this->isClosed): ?>
                     <input id="saveAndContinue" type="button" value="Save and Continue" class="form-button" />
                     <input type="submit" value="Save" class="form-button" />
                     <div class="fleft">or</div>
                 <?php endif; ?>
-
+                <?php endif; ?>
                 <a href="/assessment/list" class="cancel">Cancel</a>
             </div>
 

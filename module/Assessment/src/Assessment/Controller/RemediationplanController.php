@@ -158,13 +158,19 @@ class RemediationplanController extends AbstractActionController
         $paginator->setCurrentPageNumber($page);
         $paginator->setItemCountPerPage(10);
 
+        $res = [];
+        foreach ($paginator as $rp) {
+            $res[$rp->rp_a_id][] = $rp;
+        }
+
         $view = new ViewModel(array(
             'order_by' => $orderBy,
             'order' => $order,
             'page' => $page,
             'paginator' => $paginator,
             'hasIdentity' => $this->hasIdentity(),
-            'roleFilter' => $roleFilter
+            'roleFilter' => $roleFilter,
+            'res' => $res,
         ));
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open remediationplan list page');
@@ -304,13 +310,26 @@ class RemediationplanController extends AbstractActionController
                 }
             }
         }
-
+        $loc_rps = [];
         if ($rpObj->rp_a_id) {
             $complianceOfficersIds = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->getComplianceOfficers($rpObj->rp_a_id);
             $complianceOfficers = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUsersByIds($complianceOfficersIds);
             foreach ($complianceOfficers as $key => $r) {
                 $contacts[$key] = $r;
                 $contactsApr[$key] = $r;
+            }
+            $rps = $this->getRemediationplanTable()->getRpLocs($rpObj->rp_a_id);
+
+            foreach ($rps as $rp) {
+                $loc_actions = $this->getRemediationplanactionTable()->getRemediationplanactions($rp->rp_id);
+                foreach ($loc_actions as $rpa){
+                    if($rpa->rpa_adr_id === null){
+                        $loc_rps[$rp->rp_id] = 'Additional Tasks';
+                    } else {
+                        $loc_rps[$rp->rp_id] = $rpa->_location_name;
+                    }        
+                    break;
+                }
             }
         }
         $view = new ViewModel(array(
@@ -328,7 +347,8 @@ class RemediationplanController extends AbstractActionController
             'order_by' => $orderBy,
             'order' => $order,
             'urlOrder' => $order == 'ASC' ? 'DESC' : 'ASC',
-            'roleFilter' => $roleFilter
+            'roleFilter' => $roleFilter,            
+            'loc_rps' => $loc_rps,
         ));
 
         if ($type == 'pdf') {
