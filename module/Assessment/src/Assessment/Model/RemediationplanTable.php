@@ -79,6 +79,7 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
 
 
             $select->join(array('c' => 'companies'), 'rp_c_id = c_id', array('_client_name' => 'c_name'), 'left');
+            $select->join(array('adr' => 'addresses'), new \Zend\Db\Sql\Expression('adr_id = rp_adr_id'), array('_location_name' => new \Zend\Db\Sql\Expression('adr_name')), 'left');
             $select->join(array('as' => 'assessments'), 'rp_a_id = a_id', array('a_security_a_id', 'a_version_index', 'a_version_index_item'), 'left');
             $select->join(array('u' => 'users'), 'rp_approver_u_id = u_id', array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)')), 'left');
             $select->columns(array( '*'

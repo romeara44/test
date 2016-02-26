@@ -1036,7 +1036,8 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         $dataRp['rp_consultant_u_id'] = $a->a_consultant_u_id;
         $dataRp['rp_performed_u_id'] = $identity['u_id'];
         $dataRp['rp_remediation_date'] = new \Zend\Db\Sql\Expression('NOW()');
-        $dataRp['rp_incident_date'] = $a->a_create_date;        
+        $dataRp['rp_incident_date'] = $a->a_create_date;   
+        $dataRp['rp_adr_id'] = $location;     
 
         $rpDb = $this->getServiceLocator()->get('Assessment\Model\RemediationplanTable');
         $rpDb->setServiceLocator($this->getServiceLocator());

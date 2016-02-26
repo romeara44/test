@@ -103,6 +103,7 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
                 endif;
 
                 $paddingVersion = $counterVersion * 20;
+
                 if ($rp->rp_type == 2):
                     $rowId = $rp->rp_security_rp_id . '-' . $rp->rp_version_index_item;
                     if (!$rp->rp_security_rp_id):
@@ -120,21 +121,35 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
             if ($rp->rp_status == 10):
                 $classBold = ' bold ';
             endif;
+            $client_name = '';
+            if ($multiple) {
+                $paddingVersion += 20;
+                if ($rp->_location_name) {
+                    $client_name = $rp->_location_name;
+                } else {
+                    $client_name = $rp->_client_name;
+                }                
+            } else {
+                $client_name = $rp->_client_name;
+                if ($rp->_location_name) {
+                    $client_name .= ' - ' . $rp->_location_name;
+                }
+            }
             ?>
             <?php if ($multiple && !$key) : ?>
             <tr>
-                <td>&nbsp;</td>
-                <td><a href="javascript:void(0)" class="multiple-locs" data-ass_id="<?php echo $rp->rp_a_id ?>"><?php echo stripslashes($rp->_client_name) ?></a></td>
+                <td></td>
+                <td style="padding-left: 0px" ><a href="javascript:void(0)" class="multiple-locs" data-ass_id="<?php echo $rp->rp_a_id ?>"><?php echo stripslashes($rp->_client_name) ?></a></td>
                 <td>&nbsp;</td>
                 <td>&nbsp;</td>
                 <td>&nbsp;</td>
                 <td>&nbsp;</td>
             </tr>
             <?php endif; ?>
-            <tr <?php if ($multiple) : ?>style="display:none;background-color:grey;" class="assess-<?php echo $rp->rp_a_id ?>" <?php endif; ?> >
+            <tr <?php if ($multiple) : ?>class="assess-<?php echo $rp->rp_a_id ?>" <?php endif; ?> >
                 <td><?php echo $rowId ?><?php echo $postFix ?></td>
                 <?php if (!$isClientRole): ?>
-                    <td class="<?php echo $classBold ?>" style="padding-left: <?php echo $paddingVersion ?>px"><?php if ($isVersion): ?><i class="fa fa-code-fork"></i> &nbsp; <?php endif ?><a href="/remediationplan/edit/<?php echo $rp->rp_id ?>"><?php echo stripslashes($rp->_client_name) ?><?php echo !$rp->rp_a_id ? ' <span class="remediationplan_imported_list">(imported)</span>' : ''?></a></td>
+                    <td class="<?php echo $classBold ?>" style="padding-left: <?php echo $paddingVersion ?>px"><?php if ($isVersion): ?><i class="fa fa-code-fork"></i> &nbsp; <?php endif ?><a href="/remediationplan/edit/<?php echo $rp->rp_id ?>"><?php echo $client_name; ?><?php echo !$rp->rp_a_id ? ' <span class="remediationplan_imported_list">(imported)</span>' : ''?></a></td>
                 <?php endif; ?>
                 <td class="<?php echo $classBold ?>"><?php echo \Assessment\Model\Remediationplan::$statusesNames[$rp->rp_status]  ?></td>
                 <td class="<?php echo $classBold ?>"><?php echo \Assessment\Model\Assessment::$typesNames[$rp->rp_type] ?></td>
