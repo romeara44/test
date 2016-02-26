@@ -490,6 +490,66 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         return true;
     }
 
+    public function checkAllLocationsFinished($id)
+    {
+        $a = $this->getAssessment($id);
+
+        $addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
+        $assessmentsRoles = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($a->a_type);
+
+        if (!count($addresses)) {
+            return false;
+        }
+
+        foreach ($addresses->buffer() as $address) {
+            if (!(int) $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->checkStep($id, $address->adr_id)) {
+                return false;
+            }
+        }
+
+        foreach ($addresses->buffer() as $address) {
+            foreach ($assessmentsRoles->buffer() as $ar) {
+                $questions = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionTable')->getQuestions($a->a_type, $ar->ar_id, $a->a_id, $address->adr_id, $a);
+                if (!(int) $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionAnswerTable')->checkStep($id, $address->adr_id, $ar->ar_id, $questions)) {
+                    return false;
+                }
+
+            }
+        }
+
+        $data['a_all_steps_finished'] = 1;
+        $data['a_status'] = 100;
+        $this->tableGateway->update($data, array('a_id' => $id));
+
+        return true;
+    }
+
+    public function checkLocationFinished($id, $location)
+    {
+        $a = $this->getAssessment($id);
+
+        $addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
+        $assessmentsRoles = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($a->a_type);
+
+        if (!count($addresses)) {
+            return false;
+        }
+
+        if (!(int) $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->checkStep($id, $location)) {
+            return false;
+        }
+
+        foreach ($assessmentsRoles->buffer() as $ar) {
+            $questions = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionTable')->getQuestions($a->a_type, $ar->ar_id, $a->a_id, $location, $a);
+            if (!(int) $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionAnswerTable')->checkStep($id, $location, $ar->ar_id, $questions)) {
+                return false;
+            }
+
+        }
+
+        return true;
+    }
+
 
     public function checkStepFinished($id, $stepNum, $isNew = false)
     {
@@ -950,7 +1010,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         return true;
     }
 
-    public function _createRemediationPlan($aId)
+    public function _createRemediationPlan($aId, $location)
     {
         $aDb = $this->getServiceLocator()->get('Assessment\Model\AssessmentTable');
         $a = $aDb->getAssessment($aId);
@@ -988,6 +1048,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
 
         $addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($aId, \Client\Model\AddressItem::ASSESSMENT_TYPE);
         foreach ($addresses->buffer() as $addressKey => $address) {
+            if ($address->adr_id != $location) continue;
             $cats = $catsDb->getCategoriesByType($a->a_type, $addressKey, $company);
             if ($a->a_security_a_id) {
                 $this->getServiceLocator()->get('Assessment\Model\RemediationplanTable')->setServiceLocator($this->getServiceLocator());
