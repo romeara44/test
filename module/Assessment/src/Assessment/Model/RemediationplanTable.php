@@ -407,6 +407,7 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
             'rp_approved_date' => $rp->rp_approved_date,
             'rp_accepted_date' => $rp->rp_accepted_date,
             'rp_accepter_u_id' => $rp->rp_accepter_u_id,
+            'rp_adr_id' => $rp->rp_adr_id,
         );
 
         if ($rp->rp_security_rp_id) {

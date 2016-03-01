@@ -326,9 +326,8 @@ class AssessmentController extends AbstractActionController
                     }
                 }
                 if ($this->getAssessmentTable()->checkLocationFinished($id, $location)) {
-                    $this->getAssessmentTable()->checkAllLocationsFinished($id);
-                    $newCreatedRpId = $this->getAssessmentTable()->_createRemediationPlan($id, $location);
-                    if ($newCreatedRpId) {
+                    $this->getAssessmentTable()->_createRemediationPlan($id, $location);
+                    if ($this->getAssessmentTable()->checkAllLocationsFinished($id)) {
                         return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'list'));
                     }
                 }
@@ -345,9 +344,8 @@ class AssessmentController extends AbstractActionController
                 $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionAnswerTable')->saveAqa($id, $adrId, $assessmentRole, $post, $files);
 
                 if ($this->getAssessmentTable()->checkLocationFinished($id, $adrId)) {
-                    $this->getAssessmentTable()->checkAllLocationsFinished($id);
-                    $newCreatedRpId = $this->getAssessmentTable()->_createRemediationPlan($id, $adrId);
-                    if ($newCreatedRpId) {
+                    $this->getAssessmentTable()->_createRemediationPlan($id, $adrId);
+                    if ($this->getAssessmentTable()->checkAllLocationsFinished($id)) {
                         return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'list'));
                     }
                 }                
