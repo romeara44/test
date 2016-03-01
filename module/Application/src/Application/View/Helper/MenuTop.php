@@ -156,7 +156,7 @@ class MenuTop extends AbstractHelper
                     array('title' => 'Physical Security Changes',
                             'url' => '/physicalsecuritychange/list',
                         ),
-                    array('title' => 'Requests',
+                    array('title' => 'Disclosure Requests',
                             'url' => '/disclosurerequest/list',
                             'class' => 'with-access'
                         ),
@@ -259,7 +259,7 @@ class MenuTop extends AbstractHelper
                     array('title' => 'Physical Security Changes',
                             'url' => '/physicalsecuritychange/list',
                         ),
-                    array('title' => 'Requests',
+                    array('title' => 'Disclosure Requests',
                             'url' => '/disclosurerequest/list',
                             'class' => 'with-access'
                         ),
@@ -400,7 +400,7 @@ class MenuTop extends AbstractHelper
             if($identity['u_grant_to_disclosures']) {
                 $this->items[count($this->items) - 1]['items'] = array_merge($this->items[count($this->items) - 1]['items'],
                                     array(
-                                        array('title' => 'Requests',
+                                        array('title' => 'Disclosure Requests',
                                                 'url' => '/disclosurerequest/list',
                                                 'class' => 'with-access'
                                             ),
@@ -420,7 +420,7 @@ class MenuTop extends AbstractHelper
                                     'title' => 'Disclosure Requests',
                                     'url' => '/disclosurerequest/list',
                                     'items' => array(
-                                       array('title' => 'Requests',
+                                       array('title' => 'Disclosure Requests',
                                                 'url' => '/disclosurerequest/list',
                                                 'class' => 'with-access'
                                             ),
@@ -534,7 +534,7 @@ class MenuTop extends AbstractHelper
         if($identity['u_grant_to_disclosures']) {
             $this->items[count($this->items) - 1]['items'] = array_merge($this->items[count($this->items) - 1]['items'],
                                 array(
-                                    array('title' => 'Requests',
+                                    array('title' => 'Disclosure Requests',
                                             'url' => '/disclosurerequest/list',
                                             'class' => 'with-access'
                                         ),
