@@ -252,7 +252,8 @@ body {
 	padding: 0;
 	display: block;
 }
-#nav ul li li a {
+#nav ul li li a,
+.consultant #nav ul li li a {
 	color: #fff;
 	height: auto;
 	padding: 10px 16px 10px 17px;
