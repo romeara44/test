@@ -276,7 +276,7 @@ class UserTable implements ServiceLocatorAwareInterface
             unset($data['u_senior_consultant_u_id']);
         }
 
-        if($identity['u_role_id'] == User::ROLE_ADMIN) {
+        if($identity['u_role_id'] == User::ROLE_ADMIN || $identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
             $data['u_grant_to_disclosures'] = $user->u_grant_to_disclosures ? $user->u_grant_to_disclosures : 0;
             $data['u_grant_to_breach'] = $user->u_grant_to_breach ? $user->u_grant_to_breach : 0;
         }
