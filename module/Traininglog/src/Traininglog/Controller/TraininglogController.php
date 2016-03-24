@@ -21,6 +21,7 @@ use Traininglog\Model\Traininglogtype;
 use Traininglog\Model\Traininglog;
 use Zend\Session\Container;
 use Zend\View\Model\JsonModel;
+use Traininglog\Form\EmployeemasterlistForm;
 
 class TraininglogController extends AbstractActionController
 {
@@ -107,6 +108,15 @@ class TraininglogController extends AbstractActionController
             $this->companyRolesTable = $sm->get('Client\Model\CompanyRolesTable');
         }
         return $this->companyRolesTable;
+    }
+
+    public function getEmployeemasterlistTable()
+    {
+        if (!isset($this->employeemasterlistTable)) {
+            $sm = $this->getServiceLocator();
+            $this->employeemasterlistTable = $sm->get('Traininglog\Model\EmployeemasterlistTable');
+        }
+        return $this->employeemasterlistTable;
     }
 
     public function hasIdentity()
@@ -345,7 +355,35 @@ class TraininglogController extends AbstractActionController
 
         $trainers = $this->getTraininglogTable()->getTrainers($cId);
 
-        return new JsonModel($trainers);
+        $list = $this->getEmployeemasterlistTable()->getEmployeemasterlist($cId);
+
+        /*if($list) {
+            $list = array('-1' => 'Please select') + $list;
+        }*/
+
+        return new JsonModel(array('trainers' => $trainers, 'list' => $list));
+    }
+
+    public function employeemasterlistAction()
+    {
+        $identity = $this->getIdentity();
+        if (!in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_SENIOR_CONSULTANT))) {
+            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+        }
+        $request = $this->getRequest(); 
+        if ($request->isPost()) {
+            $this->getEmployeemasterlistTable()->saveEmployeemasterlists($request->getPost());
+            return $this->redirect()->toRoute('traininglog', array('controller' => 'traininglog', 'action' => 'employeemasterlist'));
+        
+        } else {
+            $form = new EmployeemasterlistForm($this->getServiceLocator());
+            $lists = $this->getEmployeemasterlistTable()->getEmployeemasterlists();
+        }
+
+        return array(
+            'lists' => $lists,
+            'form' => $form,
+        );
     }
 
 }

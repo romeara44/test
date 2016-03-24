@@ -14,6 +14,27 @@ class TraininglogForm extends Form
         $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
         $identity = $authService->getIdentity();
 
+        $list = array();
+        if ($tlObj && $tlObj->tl_company_id) {
+            $list = $sl->get('Traininglog\Model\EmployeemasterlistTable')->getEmployeemasterlist($tlObj->tl_company_id);
+        }
+
+        /*if($list) {
+            $list = array('-1' => 'Please select') + $list;
+        }*/
+
+        $this->add(array(
+            'name' => '_tl_eml_items',
+            'type' => 'Zend\Form\Element\Select',
+            'attributes' => array(
+                'multiple' => 'multiple',
+            ),
+            'options' => array(
+                'label' => 'Attendees',
+                'value_options' => $list,
+            ),
+        ));
+
         $companies = array();
         
         $companyTable = $sl->get('Client\Model\CompanyTable');

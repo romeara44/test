@@ -143,6 +143,9 @@ class MenuTop extends AbstractHelper
                         ),
                     array('title' => 'Security Reminder',
                          'url' => '/securityreminder/list',
+                        ),
+                    array('title' => 'Employee Master List',
+                         'url' => '/traininglog/employeemasterlist',
                         )
                 )
             ),
@@ -357,7 +360,24 @@ class MenuTop extends AbstractHelper
         }
                                                         
         if ($is_company_admin || $is_primary_contact || $is_training_manager) {
-            $this->items[] = array(
+            if ($is_training_manager) {
+                $this->items[] = array(
+                                'title' => 'Trainings',
+                                'url' => '/traininglog/list',
+                                'items' => array(
+                                    array('title' => 'Training Logs',
+                                          'url' => '/traininglog/list'
+                                        ),
+                                    array('title' => 'Security Reminder',
+                                          'url' => '/securityreminder/list',
+                                        ),
+                                    array('title' => 'Employee Master List',
+                                         'url' => '/traininglog/employeemasterlist',
+                                        )
+                                )
+                            );
+            } else {
+                $this->items[] = array(
                                 'title' => 'Trainings',
                                 'url' => '/traininglog/list',
                                 'items' => array(
@@ -369,6 +389,8 @@ class MenuTop extends AbstractHelper
                                         )
                                 )
                             );
+            }
+            
         }     
 
         $this->items[] = array(

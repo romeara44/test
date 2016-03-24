@@ -196,6 +196,11 @@ class TraininglogTable implements ServiceLocatorAwareInterface
         foreach ($regulations as $rs) {
             $row->_tl_cur_regulations[$rs->_tl_tlrg_id] = $rs->_tl_tlrg_rg_id;
         }
+
+        if ($row->_tl_eml_items) {
+            $row->_tl_eml_items   = explode("\n", $row->_tl_eml_items);
+        }
+
         return $row;
     }
 
@@ -252,6 +257,12 @@ class TraininglogTable implements ServiceLocatorAwareInterface
             'tl_hire_date'      => $traininglog->tl_hire_date,
             'tl_attendees'      => $traininglog->tl_attendees
         );
+
+        if ($traininglog->_tl_eml_items) {
+            $data['_tl_eml_items']   = implode("\n", $traininglog->_tl_eml_items);
+        } else {
+            $data['_tl_eml_items']   = '';
+        }
 
         if($traininglog->_tl_trainer != '-1') {
             $data['tl_trainer_id']   = $traininglog->tl_trainer_id;

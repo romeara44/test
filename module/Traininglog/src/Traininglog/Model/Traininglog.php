@@ -32,6 +32,7 @@ class Traininglog
     public $_tl_trainer;
     public $_tl_trainer_name;
     public $_tl_type_name;
+    public $_tl_eml_items;
 
     protected $inputFilter;
 
@@ -60,6 +61,7 @@ class Traininglog
         $this->_tl_trainer         = (isset($data['_tl_trainer']))         ? $data['_tl_trainer']         : null;
         $this->_tl_trainer_name    = (isset($data['_tl_trainer_name']))    ? $data['_tl_trainer_name']    : null;
         $this->_tl_type_name       = (isset($data['_tl_type_name']))       ? $data['_tl_type_name']       : null;
+        $this->_tl_eml_items       = (isset($data['_tl_eml_items']))       ? $data['_tl_eml_items']       : null;
     }
 
     public function getArrayCopy()
@@ -133,6 +135,11 @@ class Traininglog
                         ),
                     ),
                 ),
+            )));
+
+            $inputFilter->add($factory->createInput(array(
+                'name'     => '_tl_eml_items',
+                'required' => false,
             )));
 
             $this->inputFilter = $inputFilter;

@@ -113,6 +113,7 @@ $form->setAttribute('method', 'post');
             echo $this->formElementErrors($fn);
             ?>
         </p>
+
         <div>
             <?php foreach ($regulations as $value) {?>
                 <div id="_regulation_wrap_<?php echo $value->rg_id?>" style="display:none">
@@ -159,8 +160,18 @@ $form->setAttribute('method', 'post');
 
         <div class="cboth"></div>
 
-        <p style="overflow: hidden;">
-            <strong style="line-height: 40px; float:left;">Attendees</strong>
+        <p style="overflow: hidden;"> 
+            <strong style="line-height: 30px;">Attendees</strong><br />
+            <?php
+                $fn = $form->get('_tl_eml_items');
+            ?>
+            <div id="eml-select" <?php if (!$fn->getValueOptions()) : ?> style="display:none" <?php endif; ?> >            
+            <?php
+            echo $this->formSelect($fn->setAttributes(array('class'=>'', 'id'=>'_tl_eml_items')));
+            echo $this->formElementErrors($fn);
+            ?>
+            <div class="cboth"></div>
+            </div>
             <a id="browseFile_attendees" style="margin-right: 130px; float:right" href="javascript:" class="button"><i class="fa fa-plus-circle"></i> Import from CSV</a>
             <div id="filesToUploadBox_attendees">
 
@@ -391,11 +402,22 @@ $form->setAttribute('method', 'post');
                     url:"/traininglog/gettrainers/" + cId,
                     success: function(data){
                         var html = '<option value="">Please Select</option>';
-                        $.each(data, function(index, value) {
+                        $.each(data.trainers, function(index, value) {
                             html += '<option value="' + index + '">' + value + '</option>';
                         });
                         html += '<option value="-1">Other</option>';
                         $('#_tl_trainer').html(html);
+
+                        html = '';
+                        $.each(data.list, function(index, value) {
+                            html += '<option value="' + index + '">' + value + '</option>';
+                        });
+                        $('#_tl_eml_items').html(html);
+                        if (html) {
+                            $('#eml-select').show();
+                        } else {
+                            $('#eml-select').hide();
+                        }
                     }
                 });
             }
