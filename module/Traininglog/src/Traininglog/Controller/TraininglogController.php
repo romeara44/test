@@ -367,9 +367,18 @@ class TraininglogController extends AbstractActionController
     public function employeemasterlistAction()
     {
         $identity = $this->getIdentity();
-        if (!in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_SENIOR_CONSULTANT))) {
+        if (!in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_CLIENT))) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
+
+        if ($identity['u_role_id'] == \Admin\Model\User::ROLE_CLIENT) {
+            $clientObj = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getClientCompany($identity['u_company_id']);
+            if(is_object($clientObj) && $clientObj->c_training_manager_u_id && $clientObj->c_training_manager_u_id == $identity['u_id']) {
+            } else {
+                return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+            }            
+        }
+
         $request = $this->getRequest(); 
         if ($request->isPost()) {
             $this->getEmployeemasterlistTable()->saveEmployeemasterlists($request->getPost());

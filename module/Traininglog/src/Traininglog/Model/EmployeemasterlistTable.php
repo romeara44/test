@@ -35,7 +35,19 @@ class EmployeemasterlistTable implements ServiceLocatorAwareInterface
 
     public function getEmployeemasterlists()
     {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
         $select = $this->tableGateway->getSql()->select();
+        if ($identity['u_role_id'] != User::ROLE_ADMIN) {
+            $companies = $this->serviceLocator->get('Client\Model\CompanyTable')->getCompaniesPairs();
+            if ($companies) {
+                $select->where('eml_company_id IN (' . implode(',', array_keys($companies)) . ')');
+            } else {
+                $select->where('1 != 1');
+            }
+        }
         
         $resultSet = $this->tableGateway->selectWith($select);
 
