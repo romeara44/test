@@ -42,7 +42,7 @@ class TraininglogForm extends Form
             $companies[$key] = $r;
         }
 
-        if(count($companies) != 1) {
+        if(count($companies) > 0) {
             $companies = array('' => 'Please select') + $companies;
         }
 

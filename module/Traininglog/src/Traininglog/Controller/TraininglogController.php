@@ -367,7 +367,8 @@ class TraininglogController extends AbstractActionController
     public function employeemasterlistAction()
     {
         $identity = $this->getIdentity();
-        if (!in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_CLIENT))) {
+        if (!in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_CLIENT,
+            \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_CONSULTANT))) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
 

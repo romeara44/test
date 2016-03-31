@@ -249,6 +249,9 @@ class MenuTop extends AbstractHelper
                         ),
                     array('title' => 'Security Reminder',
                          'url' => '/securityreminder/list',
+                        ),
+                    array('title' => 'Employee Master List',
+                         'url' => '/traininglog/employeemasterlist',
                         )
                 )
             ),
