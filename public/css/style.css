@@ -922,8 +922,9 @@ cite { font-weight: bold; }
 
 /* Modals */
 
-.fancybox-wrap {
+.fancybox-wrap, .fancybox-inner {
 	/*top: 180px !important;*/
+	width: 800px !important;
 }
 
 .fancybox-skin {

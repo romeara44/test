@@ -112,9 +112,7 @@
             <th>Risk score</th>
             <th>Threat</th>
             <th>Action plan</th>
-            <?php if ($this->isPdf): ?>
-                <th>Policy number</th>
-            <?php endif; ?>
+            <th>Policy number</th>
             <?php $classSort = ($order_by == 'status') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
                 <a href="<?php echo $this->url('remediationplan', array('action' => 'edit', 'id' => $this->id, 'order_by' => 'status', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
@@ -179,9 +177,7 @@
                 <?php echo str_replace('Â', '', $rpaThreat); ?>
             </td>
             <td class="tdSmall"><?php echo $rpa->rpa_action_plan ?></td>
-            <?php if ($this->isPdf): ?>
-                <td class="tdSmall"><?php echo $rpa->rpa_policy ?></td>
-            <?php endif; ?>
+            <td class="tdSmall"><?php echo $rpa->rpa_policy ?></td>
             <td class="acenter"><?php echo \Assessment\Model\Remediationplanaction::$statusesNames[$rpa->rpa_status] ?></td>
             <td><?php echo $rpa->_contact_name ?></td>
             <td><?php echo $rpa->_approver_name ?></td>
