@@ -374,7 +374,7 @@ class TraininglogController extends AbstractActionController
 
         if ($identity['u_role_id'] == \Admin\Model\User::ROLE_CLIENT) {
             $clientObj = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getClientCompany($identity['u_company_id']);
-            if(is_object($clientObj) && $clientObj->c_training_manager_u_id && $clientObj->c_training_manager_u_id == $identity['u_id']) {
+            if($this->getServiceLocator()->get('Client\Model\CompanyTrainingManagersTable')->getTrainingManagerCompaniesIds($identity['u_id'])) {
             } else {
                 return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
             }            

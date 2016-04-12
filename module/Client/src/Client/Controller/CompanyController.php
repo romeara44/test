@@ -142,7 +142,7 @@ class CompanyController extends AbstractActionController
         $companyObj = null;
         $contacts = null;
         $primaryContactId = null;
-        $trainingManagerId = null;
+        $trainingManagerIds = null;
         $checkHasPartial = null;
         $existsCompanyRoles = array();
         $ownerContact = null;
@@ -158,7 +158,8 @@ class CompanyController extends AbstractActionController
             $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_COMPANY);
 
             $primaryContactId = $companyObj->c_primary_contact_u_id;
-            $trainingManagerId = $companyObj->c_training_manager_u_id;
+
+            $trainingManagerIds = $this->getServiceLocator()->get('Client\Model\CompanyTrainingManagersTable')->getTrainingManagersIdsForCompany($id);
 
             $checkHasPartial = $this->getUserTable()->checkHasPartial($id);
             $existsCompanyRoles = $this->getServiceLocator()->get('Client\Model\CompanyRolesTable')->getExistsCompanyRoles($id);
@@ -269,7 +270,7 @@ class CompanyController extends AbstractActionController
             'companyObj' => $companyObj,
             'assessmentsRoles' => $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles(),
             'primaryContactId'=> $primaryContactId,
-            'trainingManagerId'=> $trainingManagerId,
+            'trainingManagerIds'=> $trainingManagerIds,
             'roleId' => $identity['u_role_id'],
             'checkClientLimitCompany' => $checkClientLimitCompany,
             'checkHasPartial' => $checkHasPartial,

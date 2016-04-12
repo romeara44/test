@@ -53,6 +53,7 @@ class MenuTop extends AbstractHelper
     {
         $identity = $this->getIdentity();
         $clientObj = $this->sl->get('Client\Model\CompanyTable')->getClientCompany($identity['u_company_id']);
+
         if($identity['u_company_id_admin']) {
             $is_company_admin = 1;
         } else {
@@ -63,7 +64,7 @@ class MenuTop extends AbstractHelper
         } else {
             $is_primary_contact = 0;
         }
-        if(is_object($clientObj) && $clientObj->c_training_manager_u_id && $clientObj->c_training_manager_u_id == $identity['u_id']) {
+        if($this->sl->get('Client\Model\CompanyTrainingManagersTable')->getTrainingManagerCompaniesIds($identity['u_id'])) {
             $is_training_manager = 1;
         } else {
             $is_training_manager = 0;

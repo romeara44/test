@@ -435,7 +435,7 @@ $form->setAttribute('method', 'post');
                 <?php if ($user->u_id == $primaryContactId): ?>
                     <span class="label primary">Primary Contact</span>
                 <?php endif; ?>
-                <?php if ($user->u_id == $trainingManagerId): ?>
+                <?php if (in_array($user->u_id, $trainingManagerIds)): ?>
                     <span class="label primary">Training Manager</span>
                 <?php endif; ?>
                 <?php if ($user->u_company_id_admin == $cId): ?>

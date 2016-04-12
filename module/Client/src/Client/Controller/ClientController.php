@@ -173,6 +173,7 @@ class ClientController extends AbstractActionController
         $clientLimitMsg = '';
         $setTrainingManager = true;
         $setTrainingManagerMsg = '';
+        $training_managers = array();
 
         if ((int) $id) {
             $userObj = $this->getUserTable()->getUser($id);
@@ -182,6 +183,7 @@ class ClientController extends AbstractActionController
             $clientObj = $this->getCompanyTable()->getCompany($userObj->u_company_id);
             $primaryAddressObj = $this->getAddressTable()->getAddress($clientObj->c_primary_adr_id);
             $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_CONTACT);
+            $training_managers = $this->getServiceLocator()->get('Client\Model\CompanyTrainingManagersTable')->getTrainingManagersIdsForCompany($userObj->u_company_id);
         }
 
         $request = $this->getRequest();
@@ -200,11 +202,16 @@ class ClientController extends AbstractActionController
                     }
 
                     $iisTrainingManager = isset($post['is_training_manager']) ? 1 : 0;
-                    $curTrainingManager = $this->getCompanyTable()->getTrainingManager($post['u_company_id']);
+                    
+                    if (!$id || $userObj->u_company_id != $post['u_company_id']) {
+                        $training_managers = $this->getServiceLocator()->get('Client\Model\CompanyTrainingManagersTable')->getTrainingManagersIdsForCompany($post['u_company_id']);
+                    }                    
 
-                    if($iisTrainingManager && $post['u_company_id'] && $curTrainingManager && (int)$curTrainingManager != (int)$id) {
-                        $setTrainingManagerMsg = 'Company already has training manager!';
-                        $setTrainingManager = false;
+                    if($iisTrainingManager) {                        
+                        if (count($training_managers) > 2 && !in_array($id, $training_managers)) {
+                            $setTrainingManagerMsg = 'Company cannot has more than 3 training managers!';
+                            $setTrainingManager = false;
+                        }                        
                     }
 
                     if ($clienLimit && $setTrainingManager) {
@@ -238,9 +245,13 @@ class ClientController extends AbstractActionController
                         }
 
                         if ($iisTrainingManager) {
-                            $this->getCompanyTable()->setTrainingManager($post['u_company_id'], $uId);
-                        } else if(!$iisTrainingManager) {
-                            $this->getCompanyTable()->unsetTrainingManager($uId);
+                            if (!in_array($uId, $training_managers)) {
+                                $this->getServiceLocator()->get('Client\Model\CompanyTrainingManagersTable')->addTrainingManagerForCompany($post['u_company_id'], $uId);
+                            }
+                        } else {
+                            if (in_array($uId, $training_managers)) {
+                                $this->getServiceLocator()->get('Client\Model\CompanyTrainingManagersTable')->deleteTrainingManagerForCompany($post['u_company_id'], $uId);
+                            }
                         }
                         
                         if($request->getPost('save_send_email')) {
@@ -305,7 +316,8 @@ class ClientController extends AbstractActionController
             'clientLimitMsg' => $clientLimitMsg,
             'setTrainingManagerMsg' => $setTrainingManagerMsg,
             'checkClientLimitCompany' => $this->getCompanyTable()->checkClientLimitCompany(),
-            'administrationAccess' => $this->getUserTable()->checkClientAdministrationAccess($userObj)
+            'administrationAccess' => $this->getUserTable()->checkClientAdministrationAccess($userObj),
+            'training_managers' => $training_managers,
         );
     }
 

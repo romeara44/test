@@ -523,18 +523,6 @@ class CompanyTable implements ServiceLocatorAwareInterface
         $this->tableGateway->update($data, array('c_id' => $companyId));
     }
 
-    public function getTrainingManager($companyId)
-    {
-        $select = $this->tableGateway->getSql()->select();
-
-        $select->where('c_training_manager_u_id IS NOT NULL');
-        $select->where('c_id =' . $companyId);
-
-        $resultSet = $this->tableGateway->selectWith($select)->current();
-        
-        return is_object($resultSet) ? $resultSet->c_training_manager_u_id : null;
-    }
-
     public function getUsersLimit($companyId)
     {
         $select = $this->tableGateway->getSql()->select();
@@ -553,32 +541,6 @@ class CompanyTable implements ServiceLocatorAwareInterface
                     , '9' => 9
                     , '0' => 'unlimited'
                     );
-    }
-
-    public function setTrainingManager($companyId, $uId)
-    {
-        $this->unsetTrainingManager($uId);
-
-        $data['c_training_manager_u_id'] = $uId;
-        $this->tableGateway->update($data, array('c_id' => $companyId));
-
-        return true;
-    }
-
-    public function unsetTrainingManager($uId)
-    {
-        $select = $this->tableGateway->getSql()->select();
-
-        $select->where('c_training_manager_u_id =' . $uId);
-
-        $resultSet = $this->tableGateway->selectWith($select)->current();
-
-        if(is_object($resultSet)) {
-            $data['c_training_manager_u_id'] = null;
-            $this->tableGateway->update($data, array('c_id' => $resultSet->c_id));
-        }
-
-        return true;
     }
 
     public function saveAddresses($companyId, $post)

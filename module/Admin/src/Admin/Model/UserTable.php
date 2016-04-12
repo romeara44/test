@@ -607,7 +607,7 @@ class UserTable implements ServiceLocatorAwareInterface
         
         $this->tableGateway->update($data, array('u_id' => $id));
 
-        $this->getServiceLocator()->get('Client\Model\CompanyTable')->unsetTrainingManager($id);
+        $this->getServiceLocator()->get('Client\Model\CompanyTrainingManagersTable')->deleteTrainingManager($id);
 
         return true;
     }
@@ -916,8 +916,8 @@ class UserTable implements ServiceLocatorAwareInterface
         if($company->c_consultant_u_id) {
             $uIds[] = $company->c_consultant_u_id;
         }
-        if($company->c_training_manager_u_id) {
-            $uIds[] = $company->c_training_manager_u_id;
+        if($training_managers = $this->getServiceLocator()->get('Client\Model\CompanyTrainingManagersTable')->getTrainingManagersIdsForCompany($cId)) {
+            $uIds[] = array_merge($uIds, $training_managers);
         }
 
         if($uIds) {
