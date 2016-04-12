@@ -441,6 +441,12 @@ $form->setAttribute('method', 'post');
                 <?php if ($user->u_company_id_admin == $cId): ?>
                     <span class="label primary">Company Admin</span>
                 <?php endif; ?>
+                <?php if ($user->u_grant_to_disclosures): ?>
+                    <span class="label primary">Grant to Disclosures</span>
+                <?php endif; ?>
+                <?php if ($user->u_grant_to_breach): ?>
+                    <span class="label primary">Grant to Breach</span>
+                <?php endif; ?>
                 <br class="cboth" />
                 <em style="font-weight: 400;"><?php echo $user->u_title ?></em>
             </h5>
