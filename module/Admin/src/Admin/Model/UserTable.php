@@ -917,7 +917,7 @@ class UserTable implements ServiceLocatorAwareInterface
             $uIds[] = $company->c_consultant_u_id;
         }
         if($training_managers = $this->getServiceLocator()->get('Client\Model\CompanyTrainingManagersTable')->getTrainingManagersIdsForCompany($cId)) {
-            $uIds[] = array_merge($uIds, $training_managers);
+            $uIds = array_merge($uIds, $training_managers);
         }
 
         if($uIds) {

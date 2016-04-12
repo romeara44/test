@@ -109,7 +109,7 @@ $form->setAttribute('method', 'post');
             <label style="width: 300px;">Regulation</label><br />
             <?php
             $fn = $form->get('_tl_cur_regulations');
-            echo $this->formSelect($fn->setAttributes(array('class'=>'', 'id' => '_tl_cur_regulations')));
+            echo $this->formSelect($fn->setAttributes(array('class'=>'', 'id' => '_tl_cur_regulations', 'style' => "width: 470px; height: 150px;")));
             echo $this->formElementErrors($fn);
             ?>
         </p>
