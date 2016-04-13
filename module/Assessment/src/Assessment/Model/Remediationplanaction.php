@@ -28,7 +28,7 @@ class Remediationplanaction
         12 => 'When they are through with their investigation and findings, they will send you a letter notifying you of any areas in which you are not compliant, and any monetary penalties (fines) that are issued.',
     );
 
-    public static $statusesNames = array('' => 'To-Do', self::STATUS_TODO => 'To-Do', self::STATUS_PENDING_APPROVAL => 'Pending Approval', self::STATUS_PENDING_IMPLEMENTATION => 'Pending Implementation', self::STATUS_COMPLETED => 'Completed');
+    public static $statusesNames = array('' => 'To-Do', self::STATUS_TODO => 'To-Do', self::STATUS_PENDING_APPROVAL => 'Pending Policy Approval', self::STATUS_PENDING_IMPLEMENTATION => 'Pending Implementation', self::STATUS_COMPLETED => 'Completed');
     public static $levelsNames = array('' => '', 0 => 'Low', 1 => 'Medium', 2 => 'High', 3 => 'N/A');
 
     public $rpa_id;
