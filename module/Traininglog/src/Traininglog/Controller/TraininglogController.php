@@ -235,6 +235,10 @@ class TraininglogController extends AbstractActionController
                     }
                 }
 
+                if ($tl->_tl_cur_regulations) {
+                    $tl->_tl_cur_regulations = explode(',', $tl->_tl_cur_regulations);
+                }
+
                 $tlId = $this->getTraininglogTable()->saveTraininglog($tl);
 
                 if((int)$id) {

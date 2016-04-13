@@ -1587,3 +1587,5 @@ form.chart select {
 	white-space: normal;
 	font-size: 14px;
 }
+
+.tr-selected { background: #f7f8fb; }

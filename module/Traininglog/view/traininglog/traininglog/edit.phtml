@@ -23,6 +23,7 @@ $form->setAttribute('method', 'post');
 
 <div class="col-left">
     <form action="/traininglog/edit/<?php echo $this->tlId ?>" method="post" enctype="multipart/form-data" name="traininglog" id="traininglog">
+        <input type="hidden" id="_tl_cur_regulations_hidden" name="_tl_cur_regulations" value="<?php echo $this->tlObj ? implode(',', $this->tlObj->_tl_cur_regulations) : ''; ?>">
         <?php
             $fn = $form->get('tl_id');
             echo $this->formHidden($fn);
@@ -106,12 +107,34 @@ $form->setAttribute('method', 'post');
         </p>
 
         <p>
-            <label style="width: 300px;">Regulation</label><br />
-            <?php
-            $fn = $form->get('_tl_cur_regulations');
-            echo $this->formSelect($fn->setAttributes(array('class'=>'', 'id' => '_tl_cur_regulations', 'style' => "width: 470px; height: 150px;")));
-            echo $this->formElementErrors($fn);
-            ?>
+            <label for="_search_regulation">Regulation Number or Regulation Description</label>
+            <input type="text" name="_search_regulation" id="_search_regulation" class="form-control">
+        </p>
+
+        <p>
+        <div style="width: 750px; height: 300px; overflow-y: scroll;">
+            <table id="_regulations_table">
+                <thead>
+                <tr>
+                <th>Policy&Procedure Name</th>
+                <th>Policy&Procedure Number</th>
+                <th>Regulation Number</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($regulations as $value) : ?>
+                <tr id="<?php echo $value->rg_id; ?>">
+                <td><?php echo $value->rg_pp_name; ?></td>
+                <td><?php echo $value->rg_pp_number; ?></td>
+                <td><?php echo $value->rg_number; ?></td>
+                </tr>
+                <?php endforeach; ?>
+                <tr id="-1">
+                <td colspan="3">Other</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
         </p>
 
         <div>
@@ -132,7 +155,7 @@ $form->setAttribute('method', 'post');
                     <?php if($value->rg_u_owner_id): ?>
                         <p style="border: 0;">
                             <label for="regulation_description_<?php echo $value->rg_id?>">Regulation Description</label>
-                            <input type="text" name="_regulation[<?php echo $value->rg_id?>][rg_description]" id="_regulation_description_<?php echo $value->rg_id?>" value="<?php echo $value->rg_description?>">
+                            <input type="text" name="_regulation[<?php echo $value->rg_id?>][rg_description]" id="_regulation_description_<?php echo $value->rg_id?>" value="<?php echo $value->rg_description?>" readonly="readonly" disabled="disabled">
                         </p>
                     <?php endif; ?>
                 </div>
@@ -351,23 +374,6 @@ $form->setAttribute('method', 'post');
             });
         });
 
-        function regulationHandle()
-        {
-            $('div[id^=_regulation_wrap_]').each(function(){
-                $(this).css('display', 'none');
-            });
-
-            $('#_tl_cur_regulations option:selected').each(function(){
-                $('#_regulation_wrap_' + $(this).val()).css('display', 'block');
-            });
-        }
-
-        regulationHandle();
-
-        $('#_tl_cur_regulations').change(function(){
-            regulationHandle();
-        });
-
         $('#_tl_trainer').change(function(){
             if($('#_tl_trainer option:selected').val() == '-1') {
                 $('#_tl_trainer_name_wrap').css('display', 'block');
@@ -422,5 +428,64 @@ $form->setAttribute('method', 'post');
                 });
             }
         }
+
+        function searchRegulations()
+        {
+            var value = $('#_search_regulation').val().toLowerCase();
+            if (value) {
+                $('#_regulations_table tbody tr').hide();
+                $('#_regulations_table th:nth-child(3), #_regulations_table td:nth-child(3)').show();
+                $('#_regulations_table tbody td').each(function(i, v) {
+                    var $td = $(v);
+                    if ($td.text().toLowerCase().indexOf(value) != -1) {
+                        $td.closest('tr').show();
+                    }
+                });
+            } else {
+                $('#_regulations_table th:nth-child(3), #_regulations_table td:nth-child(3)').hide();
+                $('#_regulations_table tbody tr').show();
+            }
+        }
+
+        $('#_search_regulation').keyup(function(){
+            searchRegulations();
+        });
+        searchRegulations();
+
+        $('#_regulations_table tbody tr').click(function() {
+            $(this).toggleClass('tr-selected');
+            regulationHandle();
+        });
+
+        function regulationHandle()
+        {
+            $('div[id^=_regulation_wrap_]').css('display', 'none');
+
+            $('#_regulations_table tbody tr').each(function(i, v){
+                if ($(v).hasClass('tr-selected')) {
+                    $('#_regulation_wrap_' + $(v).prop('id')).css('display', 'block');
+                }                
+            });
+        }
+
+        var cur_regulations_hidden = $('#_tl_cur_regulations_hidden').val();
+        if (cur_regulations_hidden) {
+            var cur_regulations = cur_regulations_hidden.split(',');
+            for (var i = 0; i <  cur_regulations.length; i++) {
+                $('#_regulations_table tbody tr#' + cur_regulations[i]).toggleClass('tr-selected');
+            };
+            regulationHandle();
+        }     
+
+        $('#traininglog').submit(function(e) {
+            var value = '';
+            $('#_regulations_table tbody tr.tr-selected').each(function(i, v) {
+                value += $(v).prop('id') + ',';                
+            });
+            if (value) {
+                value = value.slice(0, -1);
+            }
+            $('#_tl_cur_regulations_hidden').val(value);
+        });
     });
 </script>
