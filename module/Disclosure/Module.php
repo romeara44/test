@@ -59,7 +59,29 @@ class Module
                     $resultSetPrototype = new ResultSet();
                     $resultSetPrototype->setArrayObjectPrototype(new \Disclosure\Model\VerbalLog());
                     return new TableGateway('verbal_logs', $dbAdapter, null, $resultSetPrototype);
-                }
+                },
+                'Disclosure\Model\DisclosureRecordTable' =>  function($sm) {
+                        $tableGateway = $sm->get('DisclosureRecordTableGateway');
+                        $table = new \Disclosure\Model\DisclosureRecordTable($tableGateway);
+                        return $table;
+                },
+                'DisclosureRecordTableGateway' => function ($sm) {
+                        $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                        $resultSetPrototype = new ResultSet();
+                        $resultSetPrototype->setArrayObjectPrototype(new \Disclosure\Model\DisclosureRecord());
+                        return new TableGateway('disclosure_records', $dbAdapter, null, $resultSetPrototype);
+                },
+                'Disclosure\Model\AccountingRequestTable' =>  function($sm) {
+                        $tableGateway = $sm->get('AccountingRequestTableGateway');
+                        $table = new \Disclosure\Model\AccountingRequestTable($tableGateway);
+                        return $table;
+                },
+                'AccountingRequestTableGateway' => function ($sm) {
+                        $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                        $resultSetPrototype = new ResultSet();
+                        $resultSetPrototype->setArrayObjectPrototype(new \Disclosure\Model\AccountingRequest());
+                        return new TableGateway('accounting_requests', $dbAdapter, null, $resultSetPrototype);
+                },
             ),
         );
     }

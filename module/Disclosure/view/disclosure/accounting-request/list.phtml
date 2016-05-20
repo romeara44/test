@@ -1,0 +1,118 @@
+<?php
+$urlOrder = $order == 'ASC' ? 'DESC' : 'ASC';
+$authService = new \Zend\Authentication\AuthenticationService();
+$authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+$identity = $authService->getIdentity();
+?>
+
+<div class="page-title">
+    <h3 class="fleft" style="width: 420px">Requests for Accounting of Disclosures</h1>
+    <?php if(true): ?>
+        <form id="list_search_form" method="GET" onsubmit="encodeInput(this)" action="<?php echo $this->url('accountingrequest', array('action' => 'list', 'roleFilter' => $roleFilter)); ?>">
+            <a href="javascript:" onclick="$('#list_search_form').submit()" id="list_search-button"><i class="fa fa-search"></i></a>
+            <input type="text" name="search" id="list_search" placeholder="Search" value="<?php echo $search?>">
+        </form>
+    <?php endif;?>
+    <a href="/accountingrequest/edit" class="button" style="line-height: normal;max-width: 300px;"><i class="fa fa-plus-circle"></i> Add Request for Accounting of Disclosures</a>
+    <div class="cboth"></div>
+</div>
+
+<p></p>
+
+<table class="disclosurerequests" cellpadding="0" cellspacing="0">
+    <thead>
+        <tr>
+            <?php $classSort = ($order_by == 'id') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('accountingrequest', array('action' => 'list', 'page' => $page, 'order_by' => 'id', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    ID <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+            <?php $classSort = ($order_by == 'location') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('accountingrequest', array('action' => 'list', 'page' => $page, 'order_by' => 'location', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Office/Location <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'patient_name') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('accountingrequest', array('action' => 'list', 'page' => $page, 'order_by' => 'patient_name', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Patient Name <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'date_received') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('accountingrequest', array('action' => 'list', 'page' => $page, 'order_by' => 'date_received', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Date Received <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'request_finalized') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('accountingrequest', array('action' => 'list', 'page' => $page, 'order_by' => 'disclosed_by', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Request Finalized <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'date_accounting_sent') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('accountingrequest', array('action' => 'list', 'page' => $page, 'order_by' => 'date_accounting_sent', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
+                    Date Accounting Sent <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->paginator as $ar): ?>
+            <tr>
+                <td><?php echo $ar->ar_id ?></td>
+                <td><?php echo $ar->ar_location ?></td>
+                <td><?php echo $ar->ar_patient_name ?></td>
+                <td><?php echo ($ar->ar_date_requested != '0000-00-00') ? $this->formatDateA($ar->ar_date_requested) : '' ?></td>
+                <td><?php echo $ar->ar_is_finalized ?></td>
+                <td><?php echo ($ar->ar_date_sent != '0000-00-00') ? $this->formatDateA($ar->ar_date_sent) : '-' ?></td>
+                <td style="white-space: nowrap;" class="aright">
+                    <a href="/accountingrequest/edit/<?php echo $ar->ar_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+                    <?php if ($ar->ar_active): ?>
+                        <?php $deleteUrl = '/accountingrequest/delete/' . $ar->ar_id; ?>
+                        <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
+                    <?php elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
+                        <a href="/accountingrequest/unarchive/<?php echo $ar->ar_id  ?>" class="">Unarchive</a>
+                    <?php endif; ?>
+                </td>
+            </tr>
+
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+<?php echo $this->paginationControl(
+    $this->paginator,
+    'sliding',
+    array('partial/paginator.phtml', 'accountingrequest'),
+    array('route' => 'list', 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'roleFilter' => $roleFilter, 'role' => 1, 'controller' => 'accountingrequest', 'action' => 'list')
+);
+?>
+
+<div class="cboth"><br /></div>
+
+<script type="text/javascript">
+    jQuery(function() {
+        $(document).ready(function() {
+
+            $('#list_search_form').submit(function(e){
+                e.preventDefault();
+                var search = $('#list_search').val();
+                if(search === '') {
+                    window.location.href = $(this).attr('action');
+                } else if(search !== undefined) {
+                    window.location.href = $(this).attr('action') + '/search/' + search;
+                }
+            });
+        });
+    });
+</script>

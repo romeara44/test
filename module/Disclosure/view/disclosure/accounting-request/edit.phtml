@@ -1,0 +1,305 @@
+<?php
+
+// within a view script
+$form = $this->form;
+$form->prepare();
+
+// Assuming the "contact/process" route exists...
+$form->setAttribute('action', '/accountingrequest/edit');
+
+// Set the method attribute for the form
+$form->setAttribute('method', 'post');
+
+// Render the opening tag
+?>
+
+
+    <div class="page-title">
+        <h1 class="fleft">REQUEST FOR AN ACCOUNTING OF DISCLOSURES
+</h1>
+        <div class="cboth"></div>
+    </div>
+
+    <p></p>
+
+<div class="col-left">
+    <form action="/accountingrequest/edit/<?php echo $this->arId ?>" method="post" enctype="multipart/form-data" name="accountingrequest" id="accountingrequest">
+        <?php
+            $fn = $form->get('ar_id');
+            echo $this->formHidden($fn);
+        ?>
+        <?php
+            $fn = $form->get('ar_active');
+            echo $this->formHidden($fn);
+        ?>
+
+        <p>
+            <?php
+            $fn = $form->get('ar_location');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <h5 class="fleft m10">Request Received From</h5>
+
+        <p>
+            <?php
+            $fn = $form->get('ar_requested_by');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
+            <?php
+            $fn = $form->get('ar_date_requested');
+            if ($this->arObj):
+                $fn->setValue($this->formatDateA($this->arObj->ar_date_requested, false, true));
+            endif;
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'ar_date_requested', 'readonly' => 'readonly')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
+            <?php
+            $fn = $form->get('ar_disclosure_address');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <h5 class="fleft m10">Patient Information</h5>
+
+        <p>
+            <?php
+            $fn = $form->get('ar_patient_name');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
+            <?php
+            $fn = $form->get('ar_medical_record_number');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
+            <?php
+            $fn = $form->get('ar_date_of_birth');
+            if ($this->arObj):
+                $fn->setValue($this->formatDateA($this->arObj->ar_date_of_birth, false, true));
+            endif;
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'ar_date_of_birth', 'readonly' => 'readonly')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
+            <?php $fn = $form->get('ar_patient_address');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <h5 class="fleft m10">Dates Requested</h5>
+
+        <p>
+            <?php
+            $fn = $form->get('ar_date_requested_from');
+            if ($this->tlObj):
+                $fn->setValue($this->formatDateA($this->tlObj->ar_date_requested_from, false, true));
+            endif;
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'ar_date_requested_from', 'readonly' => 'readonly')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
+            <?php
+            $fn = $form->get('ar_date_requested_to');
+            if ($this->tlObj):
+                $fn->setValue($this->formatDateA($this->tlObj->ar_date_requested_to, false, true));
+            endif;
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'ar_date_requested_to', 'readonly' => 'readonly')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <h5 class="fleft m10">FEES</h5>
+
+        <p>
+            <?php $fn = $form->get('ar_fees_charge');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <span class="description_text">"There is no charge for the first accounting request in a 12-month period. Charge is for subsequent requests in the same 12-month period"</span>
+
+        <p>
+            <label>Fees</label>
+            <span class="radio-button-wrap">
+                <input type="radio" name="ar_is_fees" id="ar_is_fees1" <?php if(!$arObj || $arObj->ar_is_fees == 'Yes'){?>checked<?php }?> class="radio" value="Yes" />
+                    <label for="ar_is_fees1" class="checkbox">Yes</label>
+                <input type="radio" name="ar_is_fees" id="ar_is_fees0" <?php if($arObj && $arObj->ar_is_fees == 'No'){?>checked<?php }?> class="radio" value="No" />
+                    <label for="ar_is_fees0" class="checkbox">No</label>
+            </span>
+        </p>
+
+        <p>
+            <label>Extension requested</label>
+            <span class="radio-button-wrap">
+                <input type="radio" name="ar_is_extensions" id="ar_is_extensions1" <?php if(!$arObj || $arObj->ar_is_extensions == 'Yes'){?>checked<?php }?> class="radio" value="Yes" />
+                    <label for="ar_is_extensions1" class="checkbox">Yes</label>
+                <input type="radio" name="ar_is_extensions" id="ar_is_extensions0" <?php if($arObj && $arObj->ar_is_extensions == 'No'){?>checked<?php }?> class="radio" value="No" />
+                    <label for="ar_is_extensions0" class="checkbox">No</label>
+            </span>
+        </p>
+
+        <p>
+            <?php $fn = $form->get('ar_extension_reason');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
+            <label>Request Finalized</label>
+            <span class="radio-button-wrap">
+                <input type="radio" name="ar_is_finalized" id="ar_is_finalized1" <?php if(!$arObj || $arObj->ar_is_finalized == 'Yes'){?>checked<?php }?> class="radio" value="Yes" />
+                    <label for="ar_is_finalized1" class="checkbox">Yes</label>
+                <input type="radio" name="ar_is_finalized" id="ar_is_finalized0" <?php if($arObj && $arObj->ar_is_finalized == 'No'){?>checked<?php }?> class="radio" value="No" />
+                    <label for="ar_is_finalized0" class="checkbox">No</label>
+            </span>
+        </p>
+
+        <p>
+            <?php
+            $fn = $form->get('ar_date_sent');
+            if ($this->arObj):
+                $fn->setValue($this->formatDateA($this->arObj->ar_date_sent, false, true));
+            endif;
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'ar_date_sent', 'readonly' => 'readonly')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
+            <?php
+            $fn = $form->get('ar_date_patient_notified');
+            if ($this->arObj):
+                $fn->setValue($this->formatDateA($this->arObj->ar_date_patient_notified, false, true));
+            endif;
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'ar_date_patient_notified', 'readonly' => 'readonly')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
+            <?php $fn = $form->get('ar_staff_member');
+            echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <div class="cboth"></div>
+
+        <p>
+            <strong style="line-height: 30px;">Comments</strong><br />
+            <?php
+            $fn = $formNote->get('note_text');
+            echo $this->formTextarea($fn->setAttributes(array('style' => 'width: 450px;')));
+            echo $this->formElementErrors($fn);
+            ?>
+
+        </p>
+
+        <p style="border: 0;">
+            <a id="browseFile" href="javascript:" class="button"><i class="fa fa-plus-circle"></i> Browse Files...</a>
+        </p>
+
+        <div class="cboth"></div>
+        <div id="filesToUploadBox">
+
+        </div>
+        
+        <div class="cboth"></div>
+        
+        <?php if ($this->arId && is_object($comments) && ($comments->count())): ?>
+            <?php foreach ($comments as $note): ?>
+                <div class="note">
+                    <strong><?php echo $note->_username ?></strong> <small> on <?php echo $note->_note_create_date_format ?></small><br />
+                    <p>
+                        <?php echo $note->note_text ?><br />
+                        <?php if ($note->_files != ''): ?>
+                            <?php
+                            $_files = explode(',', $note->_files);
+                            ?>
+                            <strong>Attachments:</strong><br />
+                            <?php foreach ($_files as $_file): ?>
+                                <?php
+                                $_file = explode('::', $_file);
+                                $_fileName = $_file[0];
+                                $_fileId = $_file[1];
+                                ?>
+                                <span style="float: left; margin-right: 5px;" class="''?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </p>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+        
+        <div class="cboth"></div>
+        
+        <div class="form-buttons">
+            <input type="submit" value="Save" class="form-button" />
+            <div class="fleft">or</div>
+            <a href="/accountingrequest/list" class="cancel">Cancel</a>
+        </div>
+
+    <?php echo $this->form()->closeTag() ?>
+</div>
+
+<div class="cboth"><br /></div>
+
+
+<script type="text/javascript">
+    var browseFilesCounter = 0;
+    $(document).ready(function() {
+        $('#browseFile').click(function() {
+            $('#filesToUploadBox').append('<input type="file" name="notesFiles[]" id="file' + browseFilesCounter + '" />');
+
+            $('#file' + browseFilesCounter).click();
+            browseFilesCounter++;
+        });
+    });
+
+    jQuery(function() {
+        $('#accountingrequest').validate();
+
+        $("#ar_date_requested, #ar_date_of_birth, #ar_date_requested_from, #ar_date_requested_to, #ar_date_sent, #ar_date_patient_notified").datepicker({dateFormat: 'mm/dd/yy'});
+
+    });
+</script>
