@@ -47,7 +47,7 @@ class AssessmentController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
         $identity = $this->getIdentity();
-        if (!in_array($identity['u_role_id'], array(1, 2, 3, 5))) {
+        if (!in_array($identity['u_role_id'], array(1, 2, 3, 5, 8))) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         } else if ($identity['u_first_login'] == 1) {
             return $this->redirect()->toRoute('user', array('controller' => 'user', 'action' => 'acceptprivacyterms'));
@@ -153,6 +153,9 @@ class AssessmentController extends AbstractActionController
         $page = $this->params()->fromRoute('page') ? (int) $this->params()->fromRoute('page') : 1;
         $roleFilter = $this->params()->fromRoute('roleFilter') ? (int) $this->params()->fromRoute('roleFilter') : 0;
 
+        $identity = $this->getIdentity();
+        $clientObj = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getClientCompany($identity['u_company_id']);
+
         $mappingSortCol = array(
             'id' => 'a_id',
             'cName' => 'c_name',
@@ -172,7 +175,8 @@ class AssessmentController extends AbstractActionController
             'page' => $page,
             'paginator' => $paginator,
             'hasIdentity' => $this->hasIdentity(),
-            'roleFilter' => $roleFilter
+            'roleFilter' => $roleFilter,
+            'clientObj' => $clientObj,
         ));
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open assessments list page');

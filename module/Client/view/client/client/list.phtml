@@ -10,9 +10,11 @@ $identity = $authService->getIdentity();
     <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 0)); ?>" class="label <?php echo $roleFilter == 0 ? ' selected ' : '' ?>">All</a>
     <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 1)); ?>" class="label <?php echo $roleFilter == 1 ? ' selected ' : '' ?>">Companies</a>
     <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 2)); ?>" class="label <?php echo $roleFilter == 2 ? ' selected ' : '' ?>">Contacts</a>
+    <?php if ($identity['u_role_id'] != \Admin\Model\User::ROLE_TRAIL) : ?>
     <a href="/client/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Contact</a>
     <?php if($checkClientLimitCompany): ?>
         <a href="/company/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Company</a>
+    <?php endif;?>
     <?php endif;?>
     <div class="cboth"></div>
 </div>
@@ -75,6 +77,7 @@ $identity = $authService->getIdentity();
                 <td><?php echo ($isUser) ? $company->u_office_phone : $company->c_phone ?></td>
                 <td class="aright">
                     <a href="/<?php echo ($isUser) ? 'client' : 'company' ?>/edit/<?php echo ($isUser) ? $company->u_id : $company->c_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+                    <?php if ($identity['u_role_id'] != \Admin\Model\User::ROLE_TRAIL) : ?>
                     <?php if ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
                         <?php if ($company->_c_active): ?>
                             <?php $deleteUrl = '/' . (($isUser) ? 'client' : 'company') . '/delete/' . (($isUser) ? $company->u_id : $company->c_id); ?>
@@ -86,6 +89,7 @@ $identity = $authService->getIdentity();
                     <?php elseif($identity['u_company_id'] != $company->c_id):?>
                         <?php $deleteUrl = '/' . (($isUser) ? 'client' : 'company') . '/delete/' . (($isUser) ? $company->u_id : $company->c_id); ?>
                         <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
+                    <?php endif; ?>
                     <?php endif; ?>
                 </td>
             </tr>

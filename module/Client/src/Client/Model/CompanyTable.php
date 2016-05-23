@@ -366,6 +366,10 @@ class CompanyTable implements ServiceLocatorAwareInterface
             'c_parent_c_id'    => 0,
         );
 
+        if (in_array($identity['u_role_id'], array(User::ROLE_ADMIN))) {
+            $data['c_is_fee'] = $company->c_is_fee;
+        }
+
         if (in_array($identity['u_role_id'], array(User::ROLE_SALES_REP, User::ROLE_SENIOR_CONSULTANT, User::ROLE_ADMIN))) {
             $data['c_rel_type'] = $company->c_rel_type;
             if ($company->c_rel_type == \Client\Model\Company::RELATION_TYPE_PARENT) {

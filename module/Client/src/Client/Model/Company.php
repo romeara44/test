@@ -17,6 +17,7 @@ class Company
     const CHILD_TYPE_AS_COMPANY = 1;
     const CHILD_TYPE_LOCATION_ONLY = 2;
 
+    public $c_is_fee;
     public $c_id;
     public $c_name;
     public $c_email;
@@ -56,6 +57,7 @@ class Company
 
     public function exchangeArray($data)
     {
+        $this->c_is_fee     = (isset($data['c_is_fee'])) ? $data['c_is_fee'] : null;
         $this->c_id     = (isset($data['c_id'])) ? $data['c_id'] : null;
         $this->c_name     = (isset($data['c_name'])) ? $data['c_name'] : null;
         $this->c_email     = (isset($data['c_email'])) ? $data['c_email'] : null;

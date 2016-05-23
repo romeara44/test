@@ -70,7 +70,9 @@ class MenuTop extends AbstractHelper
             $is_training_manager = 0;
         }
 
-        if ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN) { // items for logged in
+        /*if ($clientObj->c_is_fee) {
+            $this->_prepareItemsForIsFee();
+        } else*/if ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN) { // items for logged in
             $this->_prepareItemsForAdmin();
         } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_SENIOR_CONSULTANT) {
             $this->_prepareItemsForConsultant();
@@ -84,7 +86,46 @@ class MenuTop extends AbstractHelper
             // nothing
         } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_PARTIAL) {
             $this->_prepareItemsForPartial($identity, $is_training_manager);
+        } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_TRAIL) {
+            $this->_prepareItemsForTrail();
         }
+    }
+
+    private function _prepareItemsForIsFee()
+    {
+        $this->items = array(
+            array(
+                'title' => 'Dashboard',
+                'url' => '/dashboard/admin'
+            ),
+            array(
+                'title' => 'Assessments',
+                'url' => '/assessment/list',
+            ),
+        );
+    }
+
+    private function _prepareItemsForTrail()
+    {
+        $this->items = array(
+            array(
+                'title' => 'Dashboard',
+                'url' => '/dashboard/admin'
+            ),
+            array(
+                'title' => 'Clients',
+                'url' => '/client/list',
+                'items' => array(
+                    array('title' => 'All Clients',
+                          'url' => '/client/list',
+                        ),
+                )
+            ),
+            array(
+                'title' => 'Assessments',
+                'url' => '/assessment/list',
+            ),
+        );
     }
 
     private function _prepareItemsForAdmin()
