@@ -119,7 +119,8 @@
                 <a href="/breachremediationplan/edittask/<?php echo $brpa->brpa_id ?>/brpId/<?php echo $brpObj->brp_id ?>" id="edittask<?php echo $brpa->brpa_id ?>"  class="fancybox" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
                 <?php /* <a href="/breachremediationplan/breachplanemail/<?php echo $brpa->brpa_id ?>/brpId/<?php echo $brpObj->brp_id ?>" class="fancybox" title="Email Assignee"><i class="fa fa-envelope"></i></a> &nbsp; */ ?>
                 <?php if ($this->writable): ?>
-                    <a href="/breachremediationplan/deletetask/<?php echo $brpa->brpa_id ?>/brpId/<?php echo $brpObj->brp_id ?>" class="i-delete" title="Delete"><i class="fa fa-trash-o"></i></a>
+                    <?php $deleteUrl = '/breachremediationplan/deletetask/' . $brpa->brpa_id . '/brpId/' .$brpObj->brp_id; ?>
+                    <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete" title="Delete"><i class="fa fa-trash-o"></i></a>
                 <?php endif; ?>
                 <?php  if (!$this->writable): ?>
                     <a href="" class="attachments" rel="<?php echo $brpa->brpa_id ?>" title="View Attachments"><i class="fa fa-paperclip"></i></a>

@@ -186,7 +186,8 @@
                 <a href="/remediationplan/edittask/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>" id="edittask<?php echo $rpa->rpa_id ?>" class="fancybox" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
                 <?php /* <a href="/remediationplan/planemail/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>" class="fancybox" title="Email Assignee"><i class="fa fa-envelope"></i></a> &nbsp; */ ?>
                 <?php if ($this->writable): ?>
-                    <a href="/remediationplan/deletetask/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>" class="i-delete" title="Delete"><i class="fa fa-trash-o"></i></a>
+                    <?php $deleteUrl = '/remediationplan/deletetask/' . $rpa->rpa_id . '/rpId/' . $rpObj->rp_id; ?>
+                    <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete" title="Delete"><i class="fa fa-trash-o"></i></a>
                 <?php endif; ?>
                 <?php if ($notesTaskAtt->count() || ($notesTaskAssessments && $notesTaskAssessments->count())): ?>
                     <a style="margin-left: 10px;" href="" class="attachments" rel="<?php echo $rpa->rpa_id ?>" title="View Attachments"><i class="fa fa-paperclip"></i></a>
