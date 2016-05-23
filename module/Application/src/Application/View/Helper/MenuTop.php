@@ -70,7 +70,7 @@ class MenuTop extends AbstractHelper
             $is_training_manager = 0;
         }
 
-        if ($clientObj->c_is_fee) {
+        if ($clientObj && $clientObj->c_is_fee) {
             $this->_prepareItemsForIsFee();
         } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN) { // items for logged in
             $this->_prepareItemsForAdmin();
