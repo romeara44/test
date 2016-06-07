@@ -501,11 +501,13 @@ class AssessmentTable implements ServiceLocatorAwareInterface
             return false;
         }
 
-        foreach ($addresses->buffer() as $address) {
-            if (!(int) $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->checkStep($id, $address->adr_id)) {
-                return false;
+        if ($a->a_type == 1) {
+            foreach ($addresses->buffer() as $address) {
+                if (!(int) $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->checkStep($id, $address->adr_id)) {
+                    return false;
+                }
             }
-        }
+        }        
 
         foreach ($addresses->buffer() as $address) {
             foreach ($assessmentsRoles->buffer() as $ar) {
@@ -535,7 +537,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
             return false;
         }
 
-        if (!(int) $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->checkStep($id, $location)) {
+        if ($a->a_type == 1 && !(int) $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->checkStep($id, $location)) {
             return false;
         }
 
