@@ -70,7 +70,7 @@ $identity = $authService->getIdentity();
         <?php foreach ($this->paginator as $ar): ?>
             <tr>
                 <td><?php echo $ar->ar_id ?></td>
-                <td><?php echo $ar->ar_location ?></td>
+                <td><?php echo $ar->_ar_location ?></td>
                 <td><?php echo $ar->ar_patient_name ?></td>
                 <td><?php echo ($ar->ar_date_requested != '0000-00-00') ? $this->formatDateA($ar->ar_date_requested) : '' ?></td>
                 <td><?php echo $ar->ar_is_finalized ?></td>

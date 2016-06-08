@@ -9,7 +9,8 @@ use Zend\InputFilter\InputFilterInterface;
 class AccountingRequest
 {
     public $ar_id;
-    public $ar_location;
+    public $ar_c_id;
+    public $ar_adr_id;
     public $ar_requested_by;
     public $ar_date_requested;
     public $ar_disclosure_address;
@@ -30,12 +31,15 @@ class AccountingRequest
     public $ar_create_u_id;
     public $ar_active;
 
+    public $_ar_location;
+
     protected $inputFilter;
 
     public function exchangeArray($data)
     {
         $this->ar_id                   = (isset($data['ar_id']))                   ? $data['ar_id']                   : null;
-        $this->ar_location                   = (isset($data['ar_location']))                   ? $data['ar_location']                   : null;
+        $this->ar_c_id                   = (isset($data['ar_c_id']))                   ? $data['ar_c_id']                   : null;
+        $this->ar_adr_id                   = (isset($data['ar_adr_id']))                   ? $data['ar_adr_id']                   : null;
         $this->ar_requested_by     = (isset($data['ar_requested_by']))     ? $data['ar_requested_by']     : null;
         $this->ar_date_requested         = (isset($data['ar_date_requested']))         ? $data['ar_date_requested']         : null;
         $this->ar_disclosure_address       = (isset($data['ar_disclosure_address']))       ? $data['ar_disclosure_address']       : null;
@@ -55,6 +59,8 @@ class AccountingRequest
         $this->ar_staff_member         = (isset($data['ar_staff_member']))         ? $data['ar_staff_member']         : null;
         $this->ar_create_u_id          = (isset($data['ar_create_u_id']))          ? $data['ar_create_u_id']          : null;
         $this->ar_active               = (isset($data['ar_active']))               ? $data['ar_active']               : null;
+
+        $this->_ar_location               = (isset($data['_ar_location']))               ? $data['_ar_location']               : null;
     }
 
     public function getArrayCopy()

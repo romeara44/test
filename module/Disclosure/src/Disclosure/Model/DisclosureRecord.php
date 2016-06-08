@@ -9,7 +9,8 @@ use Zend\InputFilter\InputFilterInterface;
 class DisclosureRecord
 {
     public $dr_id;
-    public $dr_location;
+    public $dr_c_id;
+    public $dr_adr_id;
     public $dr_date_received;
     public $dr_patient_name;
     public $dr_date_disclosure;
@@ -30,12 +31,15 @@ class DisclosureRecord
     public $dr_create_u_id;
     public $dr_active;
 
+    public $_dr_location;
+
     protected $inputFilter;
 
     public function exchangeArray($data)
     {
         $this->dr_id                   = (isset($data['dr_id']))                   ? $data['dr_id']                   : null;
-        $this->dr_location                   = (isset($data['dr_location']))                   ? $data['dr_location']                   : null;
+        $this->dr_c_id                   = (isset($data['dr_c_id']))                   ? $data['dr_c_id']                   : null;
+        $this->dr_adr_id                   = (isset($data['dr_adr_id']))                   ? $data['dr_adr_id']                   : null;
         $this->dr_date_received     = (isset($data['dr_date_received']))     ? $data['dr_date_received']     : null;
         $this->dr_patient_name         = (isset($data['dr_patient_name']))         ? $data['dr_patient_name']         : null;
         $this->dr_date_disclosure       = (isset($data['dr_date_disclosure']))       ? $data['dr_date_disclosure']       : null;
@@ -55,6 +59,8 @@ class DisclosureRecord
         $this->dr_date_disclosed         = (isset($data['dr_date_disclosed']))         ? $data['dr_date_disclosed']         : null;
         $this->dr_create_u_id          = (isset($data['dr_create_u_id']))          ? $data['dr_create_u_id']          : null;
         $this->dr_active               = (isset($data['dr_active']))               ? $data['dr_active']               : null;
+
+        $this->_dr_location               = (isset($data['_dr_location']))               ? $data['_dr_location']               : null;
     }
 
     public function getArrayCopy()

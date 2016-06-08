@@ -149,9 +149,7 @@ class AccountingRequestController extends AbstractActionController
 
         $formNote = new NoteForm($this->getServiceLocator());
 
-        $identity = $this->getIdentity();
-
-        $form = new AccountingRequestForm($this->getServiceLocator());
+        $identity = $this->getIdentity();        
 
         $arObj = null;
         $comments          = null;
@@ -162,6 +160,8 @@ class AccountingRequestController extends AbstractActionController
         }
         
         $request = $this->getRequest();
+
+        $form = new AccountingRequestForm($this->getServiceLocator(), $arObj);
 
         if ($request->isPost()) {
             $ar = new AccountingRequest();
@@ -181,6 +181,9 @@ class AccountingRequestController extends AbstractActionController
                     $post[$ymdKey] = '';
                 }
             }
+
+            $ar->ar_c_id = $post['ar_c_id'];
+            $form = new AccountingRequestForm($this->getServiceLocator(), $ar);
             
             $form->setInputFilter($ar->getInputFilter($this->getServiceLocator(), $id));
             $form->setData($post);
@@ -266,4 +269,17 @@ class AccountingRequestController extends AbstractActionController
 
     }
 
+    public function getlocationsAction()
+    {
+        $cId = $this->params('id');
+
+        $addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($cId, \Client\Model\AddressItem::COMPANY_TYPE);
+
+        $res = array('0' => 'Select location');
+        foreach ($addresses as $value) {
+            $res[$value->adr_id] = $value->adr_name;
+        }
+
+        return new JsonModel($res);
+    }
 }

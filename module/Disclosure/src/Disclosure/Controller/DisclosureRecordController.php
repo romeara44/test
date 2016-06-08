@@ -151,8 +151,6 @@ class DisclosureRecordController extends AbstractActionController
 
         $identity = $this->getIdentity();
 
-        $form = new DisclosureRecordForm($this->getServiceLocator());
-
         $drObj = null;
         $comments          = null;
 
@@ -162,6 +160,8 @@ class DisclosureRecordController extends AbstractActionController
         }
         
         $request = $this->getRequest();
+
+        $form = new DisclosureRecordForm($this->getServiceLocator(), $drObj);
 
         if ($request->isPost()) {
             $dr = new DisclosureRecord();
@@ -181,6 +181,9 @@ class DisclosureRecordController extends AbstractActionController
                     $post[$ymdKey] = '';
                 }
             }
+
+            $dr->dr_c_id = $post['dr_c_id'];
+            $form = new DisclosureRecordForm($this->getServiceLocator(), $dr);
             
             $form->setInputFilter($dr->getInputFilter($this->getServiceLocator(), $id));
             $form->setData($post);
@@ -266,4 +269,17 @@ class DisclosureRecordController extends AbstractActionController
 
     }
 
+    public function getlocationsAction()
+    {
+        $cId = $this->params('id');
+
+        $addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($cId, \Client\Model\AddressItem::COMPANY_TYPE);
+
+        $res = array('0' => 'Select location');
+        foreach ($addresses as $value) {
+            $res[$value->adr_id] = $value->adr_name;
+        }
+
+        return new JsonModel($res);
+    }
 }

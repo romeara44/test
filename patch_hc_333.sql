@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS `disclosure_records` (
   `dr_id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `dr_location` varchar(255) NOT NULL,
+  `dr_c_id` int(11) NOT NULL,
+  `dr_adr_id` int(11) NOT NULL,
   `dr_date_received` date NOT NULL,
   `dr_patient_name` varchar(255) NOT NULL,
   `dr_date_disclosure` date NOT NULL,
@@ -25,7 +26,8 @@ CREATE TABLE IF NOT EXISTS `disclosure_records` (
 
 CREATE TABLE IF NOT EXISTS `accounting_requests` (
   `ar_id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `ar_location` varchar(255) NOT NULL,
+  `ar_c_id` int(11) NOT NULL,
+  `ar_adr_id` int(11) NOT NULL,
   `ar_requested_by` varchar(255) NOT NULL,
   `ar_date_requested` date NOT NULL,
   `ar_disclosure_address` varchar(255) NOT NULL,

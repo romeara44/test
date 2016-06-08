@@ -5,7 +5,7 @@ use Zend\Form\Form;
 
 class AccountingRequestForm extends Form
 {
-    public function __construct($sl)
+    public function __construct($sl, $drObj)
     {
         parent::__construct('user');
         $this->setAttribute('method', 'post');
@@ -13,6 +13,40 @@ class AccountingRequestForm extends Form
         $authService = new \Zend\Authentication\AuthenticationService();
         $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
         $identity = $authService->getIdentity();
+
+        $companyTable = $sl->get('Client\Model\CompanyTable');
+        $companies[''] = 'Select Company';
+        foreach ($companyTable->getCompaniesPairs() as $key => $r) {
+            $companies[$key] = $r;
+        }
+
+        $this->add(array(
+            'name' => 'ar_c_id',
+            'type' => 'Zend\Form\Element\Select',
+            'options' => array(
+                'label' => 'Company',
+                'value_options' => $companies
+            ),
+        ));
+
+        $addresses = array();
+        if ($drObj && $drObj->ar_c_id) {
+            $addresses = $sl->get('Client\Model\AddressTable')->getAddresses($drObj->ar_c_id, \Client\Model\AddressItem::COMPANY_TYPE);
+        }
+
+        $res = array('0' => 'Select location');
+        foreach ($addresses as $value) {
+            $res[$value->adr_id] = $value->adr_name;
+        }
+        
+        $this->add(array(
+            'name' => 'ar_adr_id',
+            'type' => 'Zend\Form\Element\Select',
+            'options' => array(
+                'label' => 'Location',
+                'value_options' => $res,
+            ),
+        ));
 
         $this->add(array(
             'name' => 'ar_id',

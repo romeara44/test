@@ -48,8 +48,11 @@ class DisclosureRecordTable implements ServiceLocatorAwareInterface
         if ($paginated) {
             $select = $this->tableGateway->getSql()->select();
 
+            $select->join(array('c' => 'companies'), 'dr_c_id = c_id', array('c_name'), 'left');
+            $select->join(array('a' => 'addresses'), 'dr_adr_id = adr_id', array('adr_name'), 'left');
+
             $select->columns(array('dr_id'                   => 'dr_id',
-                                   'dr_location'     => 'dr_location',
+                                   '_dr_location'     => new \Zend\Db\Sql\Expression('CONCAT(c_name, "/", adr_name)'),
                                    'dr_patient_name'         => 'dr_patient_name',
                                    'dr_date_received'       => 'dr_date_received',
                                    'dr_disclosed_by' => 'dr_disclosed_by',
@@ -92,7 +95,7 @@ class DisclosureRecordTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
 
         $select->columns(array('dr_id'                   => 'dr_id',
-                               'dr_location'     => 'dr_location',
+                               '_dr_location'     => new \Zend\Db\Sql\Expression('CONCAT(c_name, "/", adr_name)'),
                                'dr_patient_name'         => 'dr_patient_name',
                                'dr_date_received'       => 'dr_date_received',
                                'dr_disclosed_by' => 'dr_disclosed_by',
@@ -122,7 +125,8 @@ class DisclosureRecordTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
 
         $select->columns(array('dr_id'                   => 'dr_id',
-                               'dr_location'     => 'dr_location',
+                               'dr_c_id'     => 'dr_c_id',
+                               'dr_adr_id'     => 'dr_adr_id',
                                'dr_patient_name'         => 'dr_patient_name',
                                'dr_date_received'       => 'dr_date_received',
                                'dr_disclosed_by' => 'dr_disclosed_by',
@@ -165,7 +169,8 @@ class DisclosureRecordTable implements ServiceLocatorAwareInterface
         $identity = $this->_getIdentity();
 
         $data = array(
-            'dr_location'     => $disclosurerecord->dr_location,
+            'dr_c_id'     => $disclosurerecord->dr_c_id,
+            'dr_adr_id'     => $disclosurerecord->dr_adr_id,
             'dr_patient_name'         => $disclosurerecord->dr_patient_name,
             'dr_date_received'       => $disclosurerecord->dr_date_received,
             'dr_disclosed_by' => $disclosurerecord->dr_disclosed_by,

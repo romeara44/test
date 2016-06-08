@@ -48,8 +48,11 @@ class AccountingRequestTable implements ServiceLocatorAwareInterface
         if ($paginated) {
             $select = $this->tableGateway->getSql()->select();
 
+            $select->join(array('c' => 'companies'), 'ar_c_id = c_id', array('c_name'), 'left');
+            $select->join(array('a' => 'addresses'), 'ar_adr_id = adr_id', array('adr_name'), 'left');
+
             $select->columns(array('ar_id'                   => 'ar_id',
-                                   'ar_location'     => 'ar_location',
+                                   '_ar_location'     => new \Zend\Db\Sql\Expression('CONCAT(c_name, "/", adr_name)'),
                                    'ar_patient_name'         => 'ar_patient_name',
                                    'ar_date_requested'       => 'ar_date_requested',
                                    'ar_is_finalized' => 'ar_is_finalized',
@@ -92,7 +95,7 @@ class AccountingRequestTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
 
         $select->columns(array('ar_id'                   => 'ar_id',
-                               'ar_location'     => 'ar_location',
+                               '_ar_location'     => new \Zend\Db\Sql\Expression('CONCAT(c_name, "/", adr_name)'),
                                'ar_patient_name'         => 'ar_patient_name',
                                'ar_date_requested'       => 'ar_date_requested',
                                'ar_is_finalized' => 'ar_is_finalized',
@@ -141,7 +144,8 @@ class AccountingRequestTable implements ServiceLocatorAwareInterface
         $identity = $this->_getIdentity();
 
         $data = array(
-            'ar_location'     => $accountingrequest->ar_location,
+            'ar_c_id'     => $accountingrequest->ar_c_id,
+            'ar_adr_id'     => $accountingrequest->ar_adr_id,
             'ar_requested_by'         => $accountingrequest->ar_requested_by,
             'ar_date_requested'       => $accountingrequest->ar_date_requested,
             'ar_disclosure_address' => $accountingrequest->ar_disclosure_address,

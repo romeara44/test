@@ -33,10 +33,17 @@ $form->setAttribute('method', 'post');
         ?>
 
         <p>
-            <?php
-            $fn = $form->get('dr_location');
+            <?php $fn = $form->get('dr_c_id');
             echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formSelect($fn->setAttributes(array('class'=>'form-control required', 'id' => 'company')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+
+        <p>
+            <?php $fn = $form->get('dr_adr_id');
+            echo $this->formLabel($fn);
+            echo $this->formSelect($fn->setAttributes(array('class'=>'form-control required', 'id' => 'location')));
             echo $this->formElementErrors($fn);
             ?>
         </p>
@@ -294,6 +301,30 @@ $form->setAttribute('method', 'post');
             $('#file' + browseFilesCounter).click();
             browseFilesCounter++;
         });
+
+        $("#company").change(function(){
+            getLocations()
+        });
+
+        function getLocations()
+        {
+            var cId = $("#company option:selected").val();
+            if(cId != undefined && cId != '') {
+                $.ajax({
+                    type:"GET",
+                    url:"/disclosurerecord/getlocations/" + cId,
+                    success: function(data){
+                        var html = '';
+                        $.each(data, function(index, value) {
+                            html += '<option value="' + index + '">' + value + '</option>';
+                        });
+                        $('#location').html(html);
+                    }
+                });
+            } else {
+                $('#location').html('<option value="0">Select location</option>');
+            }
+        }
     });
 
     jQuery(function() {
