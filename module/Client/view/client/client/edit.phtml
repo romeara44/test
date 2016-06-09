@@ -247,10 +247,12 @@ $form->setAttribute('method', 'post');
             <div class="cboth"></div>
             <div class="form-buttons">
                 <input type="submit"  name="save" value="Save" class="form-button" />
+                <?php if ($identity['u_role_id'] != \Admin\Model\User::ROLE_TRAIL) : ?>
                 <?php if ($this->uId): ?>
                     <a href="/client/sendinvite/<?php echo $this->uId ?>" class="form-button">Send Invite Email</a>
                 <?php else: ?>
                     <input type="submit" name="save_send_email" value="Save & Send Invite Email" class="form-button" />
+                <?php endif; ?>
                 <?php endif; ?>
                 <div class="fleft">or</div>
                 <a href="/client/list" class="cancel">Cancel</a>
@@ -499,5 +501,9 @@ $form->setAttribute('method', 'post');
                 $(this).val($('#u_company_id option:selected').val());
             }
         })
+
+        <?php if ($identity['u_role_id'] == \Admin\Model\User::ROLE_TRAIL) : ?>
+            $('input[type=submit]').prop('disabled', true);
+        <?php endif; ?>
     });
 </script>

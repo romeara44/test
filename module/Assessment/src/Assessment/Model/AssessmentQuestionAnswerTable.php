@@ -109,7 +109,7 @@ class AssessmentQuestionAnswerTable implements ServiceLocatorAwareInterface
                 }
             }
         }
-
+//var_dump(count($answers), $counterQuestionsToAnswered); exit;
         return (count($answers) == $counterQuestionsToAnswered) ? true : false;
     }
 

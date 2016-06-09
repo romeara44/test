@@ -57,6 +57,8 @@ class AssessmentTable implements ServiceLocatorAwareInterface
                     $where_str .= 'a_consultant_u_id IN (' . implode(',', $ids) . ')';
                 } elseif ($identity['u_role_id'] == User::ROLE_CLIENT && $identity['u_company_id']) {
                     $where_str .= 'a_c_id = ' . $identity['u_company_id'];
+                } elseif ($identity['u_role_id'] == User::ROLE_TRAIL && $identity['u_company_id']) {
+                    $where_str .= 'a_c_id = ' . $identity['u_company_id'];
                 }
 
                 $companies_ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getCompaniesIdsForConsultant($identity['u_id']);

@@ -155,10 +155,6 @@ class ClientController extends AbstractActionController
         
         $identity = $this->getIdentity();
 
-        if (in_array($identity['u_role_id'], array(8))) {
-            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
-        }
-
         $request = $this->getRequest();
 
         $id = (int) $this->params('id');

@@ -72,12 +72,14 @@ class CompanyTable implements ServiceLocatorAwareInterface
                     $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
                     $ids[] = $identity['u_id'];
                     $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR cc.cc_consultant_id IN (' . implode(',', $ids) . ') OR u_senior_consultant_u_id IN (' . implode(',', $ids) . '))');
-                } else if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
+                } elseif($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
                     if($identity['u_company_id_admin']) {
                         $select->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR c_id = ' . $identity['u_company_id_admin'] . ' OR u_senior_consultant_u_id = ' . $identity['u_id'] . ' OR u_company_id = ' . $identity['u_company_id_admin'] . ')');
                     } else {
                         $select->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR u_senior_consultant_u_id = ' . $identity['u_id'] . ')');
                     }
+                } elseif($identity['u_role_id'] == User::ROLE_TRAIL) {
+                    $select->where('u_company_id = ' . $identity['u_company_id']);                
                 }
             } else {
                 if ($identity['u_role_id'] == User::ROLE_SALES_REP) {
@@ -88,12 +90,14 @@ class CompanyTable implements ServiceLocatorAwareInterface
                     $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
                     $ids[] = $identity['u_id'];
                     $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR cc.cc_consultant_id IN (' . implode(',', $ids) . '))');
-                } else if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
+                } elseif($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
                     if($identity['u_company_id_admin']) {
                         $select->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR c_id = ' . $identity['u_company_id_admin'] . ')');
                     } else {
                         $select->where('c_owner_u_id = ' . $identity['u_id']);
                     }
+                } elseif($identity['u_role_id'] == User::ROLE_TRAIL) {
+                    $select->where('c_id = ' . $identity['u_company_id']);
                 }
             }            
 
@@ -134,12 +138,14 @@ class CompanyTable implements ServiceLocatorAwareInterface
                         $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
                         $ids[] = $identity['u_id'];
                         $selectCom->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR cc2.cc_consultant_id IN (' . implode(',', $ids) . '))');
-                    } else if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
+                    } elseif($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
                         if($identity['u_company_id_admin']) {
                             $selectCom->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR c_id = ' . $identity['u_company_id_admin'] . ')');
                         } else {
                             $selectCom->where('c_owner_u_id = ' . $identity['u_id']);
                         }
+                    } elseif($identity['u_role_id'] == User::ROLE_TRAIL) {
+                        $selectCom->where('c_id = ' . $identity['u_company_id']);                
                     }
                 }
                 $select->group('u.u_id');
@@ -365,10 +371,6 @@ class CompanyTable implements ServiceLocatorAwareInterface
             'c_type'    => 0,
             'c_parent_c_id'    => 0,
         );
-
-        if (in_array($identity['u_role_id'], array(User::ROLE_ADMIN))) {
-            $data['c_is_fee'] = $company->c_is_fee;
-        }
 
         if (in_array($identity['u_role_id'], array(User::ROLE_SALES_REP, User::ROLE_SENIOR_CONSULTANT, User::ROLE_ADMIN))) {
             $data['c_rel_type'] = $company->c_rel_type;

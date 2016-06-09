@@ -224,7 +224,7 @@ class AssessmentController extends AbstractActionController
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_ASSESSMENT, $id);
 
-        if ($step == 3) {
+        if ($step == 3 && $this->params('locationRole')) {
             $locationRole = explode('_', $this->params('locationRole'));
             $location = isset($locationRole[0]) ? $locationRole[0] : 0;
             $assessmentRole = isset($locationRole[1]) ? $locationRole[1] : 0;
@@ -358,12 +358,6 @@ class AssessmentController extends AbstractActionController
             if ($valid) {
                 $this->flashMessenger()->addSuccessMessage('Assessment (step: ' . $step . ') saved');
 
-                if ($isPrivacy) {
-                    if ($post['setStep']) {
-                        return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => 3));
-                    }
-                }
-
                 if ($post['setStep']) {
                     $currentAdrId = $post['locationHidden'];
                     $addresses = $this->getAddressTable()->getAddresses($id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
@@ -398,7 +392,11 @@ class AssessmentController extends AbstractActionController
                     }
 
                     if ($step == 1) {
-                        return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => $post['setStep'], 'location' => $adrId));
+                        if ($isPrivacy) {
+                            return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => 3, 'location' => $adrId));
+                        } else {
+                            return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => $post['setStep'], 'location' => $adrId));
+                        }                        
                     } elseif ($step == 3) {
                         if ($assessmentRole == 6) {
                             if ($nextAdrId) {

@@ -15,18 +15,14 @@ $form->setAttribute('method', 'post');
 
 <div class="page-title">
     <h1 class="fleft"><?php if ($this->cId): ?>Company Details<?php else: ?>Add New Company<?php endif; ?></h1>
-    <?php if ($roleId != \Admin\Model\User::ROLE_TRAIL) : ?>
     <a href="/client/edit/company/<?php echo $this->cId ?>" class="button"><i class="fa fa-plus-circle"></i> Add New Contact</a>
-    <?php endif; ?>
     <?php if ($this->cId): ?>
         <ul id="tabs-nav">
             <li><a href="#tab1">Details</a></li>
-            <?php if ($roleId != \Admin\Model\User::ROLE_TRAIL) : ?>
             <li><a href="#tab2">Notes</a></li>
             <li><a <?php if($roleId == \Admin\Model\User::ROLE_PARTIAL){ ?>class="disabled"<?php }?> href="#tab3">Roles</a></li>
             <?php if($administrationAccess): ?>
                 <li><a id="tab4Link" href="#tab4">Administration</a></li>
-            <?php endif; ?>
             <?php endif; ?>
         </ul>
         <div class="cboth"></div>
@@ -45,13 +41,6 @@ $form->setAttribute('method', 'post');
                 $fn = $form->get('c_id');
                 echo $this->formHidden($fn);
             ?>
-
-            <?php if($this->roleId == \Admin\Model\User::ROLE_ADMIN):?>
-            <p style="padding: 12px 0 12px 0; line-height: 14px;">
-                <label>&nbsp;</label>
-                <input type="checkbox" name="c_is_fee" class="checkbox" id="c_is_fee" value="1" <?php if(is_object($companyObj) && $companyObj->c_is_fee) :?>checked="checked"<?php endif; ?> /> <label for="c_is_fee" class="checkbox">Is Fee</label>
-            </p>  
-            <?php endif; ?>  
 
             <?php if (in_array($this->roleId, array(\Admin\Model\User::ROLE_SALES_REP, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_ADMIN))): ?>
                 <p>
@@ -279,14 +268,12 @@ $form->setAttribute('method', 'post');
             <?php endif; ?>
 
             <div class="cboth"></div>
-            <?php if ($roleId != \Admin\Model\User::ROLE_TRAIL) : ?>
             <div class="form-buttons">
                 <input id="save" type="submit" name="save" value="Save" class="form-button" />
                 <input id="saveAndContinue" type="submit" name="save_continue" value="Save and Continue" class="form-button" />
                 <div class="fleft">or</div>
                 <a href="/client/list" class="cancel">Cancel</a>
             </div>
-            <?php endif; ?>
         <?php echo $this->form()->closeTag() ?>
     </div>
 
@@ -333,13 +320,11 @@ $form->setAttribute('method', 'post');
                 </div>
 
                 <div class="cboth"></div>
-                <?php if ($roleId != \Admin\Model\User::ROLE_TRAIL) : ?>
                 <div class="form-buttons">
                     <input type="submit" value="Save" class="form-button" />
                     <div class="fleft">or</div>
                     <a href="/company/list" class="cancel">Cancel</a>
                 </div>
-                <?php endif; ?>
                 <div class="cboth"><br /></div>
 
             </form>
@@ -401,13 +386,11 @@ $form->setAttribute('method', 'post');
                 <?php $counterRoles++; endforeach; ?>
 
                 <div class="cboth"><br /></div>
-                <?php if ($roleId != \Admin\Model\User::ROLE_TRAIL) : ?>
                 <div class="form-buttons">
                     <input type="submit" value="Save" class="form-button" />
                     <div class="fleft">or</div>
                     <a href="/company/list" class="cancel">Cancel</a>
                 </div>
-                <?php endif; ?>
                 <div class="cboth"><br /></div>
             </form>
         </div>
@@ -438,7 +421,6 @@ $form->setAttribute('method', 'post');
         </div>
     <?php endif; ?>
 </div>
-<?php if ($roleId != \Admin\Model\User::ROLE_TRAIL) : ?>
 <?php if ($this->cId && is_array($contacts) && (count($contacts))): ?>
     <div class="col-right">
         <h3 style="padding-top: 0;">Related Contacts</h3>
@@ -470,7 +452,6 @@ $form->setAttribute('method', 'post');
             <div class="cboth"><br /></div>
         <?php endforeach; ?>
     </div>
-<?php endif; ?>
 <?php endif; ?>
 
 <div class="cboth"><br /></div>
@@ -627,6 +608,10 @@ $form->setAttribute('method', 'post');
                     }
                 });
             });
+
+            <?php if ($roleId == \Admin\Model\User::ROLE_TRAIL) : ?>
+            $('input[type=submit]').prop('disabled', true);
+            <?php endif; ?>
         });
     });
 </script>

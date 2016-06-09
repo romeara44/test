@@ -70,9 +70,7 @@ class MenuTop extends AbstractHelper
             $is_training_manager = 0;
         }
 
-        if ($clientObj && $clientObj->c_is_fee) {
-            $this->_prepareItemsForIsFee();
-        } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN) { // items for logged in
+        if ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN) { // items for logged in
             $this->_prepareItemsForAdmin();
         } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_SENIOR_CONSULTANT) {
             $this->_prepareItemsForConsultant();
@@ -89,20 +87,6 @@ class MenuTop extends AbstractHelper
         } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_TRAIL) {
             $this->_prepareItemsForTrail();
         }
-    }
-
-    private function _prepareItemsForIsFee()
-    {
-        $this->items = array(
-            array(
-                'title' => 'Dashboard',
-                'url' => '/dashboard/admin'
-            ),
-            array(
-                'title' => 'Assessments',
-                'url' => '/assessment/list',
-            ),
-        );
     }
 
     private function _prepareItemsForTrail()

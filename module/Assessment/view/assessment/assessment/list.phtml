@@ -8,10 +8,8 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
 
 <div class="page-title">
     <h1 class="fleft">Assessments</h1>
-    <?php if (!$clientObj->c_is_fee) : ?>
     <?php if (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_TRAIL)) || ($identity['u_role_id'] == \Admin\Model\User::ROLE_CLIENT && $identity['u_company_id_admin'])): ?>
         <a href="/assessment/edit/0/step/1" class="button"><i class="fa fa-clipboard"></i> Start New Assessment</a>
-    <?php endif; ?>
     <?php endif; ?>
     <div class="cboth"></div>
 </div>
@@ -120,7 +118,6 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
                     <?php if ($a->a_status != \Assessment\Model\Assessment::STATUS_CLOSED) : ?>
                     <a href="/assessment/editlist/<?php echo $a->a_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
                     <?php endif; ?>
-                    <?php if (!$clientObj->c_is_fee) : ?>
                     <?php if (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_ADMIN))): ?>
                         <a href="/assessment/duplicate/<?php echo $a->a_id ?>" title="Duplicate"><i class="fa fa-copy"></i></a> &nbsp;
                         <?php if ($a->a_active) : ?>
@@ -129,7 +126,6 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
                         <?php elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
                             <a href="/assessment/unarchive/<?php echo $a->a_id ?>" class="">Unarchive</a>
                         <?php endif; ?>
-                    <?php endif; ?>
                     <?php endif; ?>
                 </td>
             </tr>
