@@ -106,7 +106,7 @@ class DisclosureRecordController extends AbstractActionController
             'date_requested'       => 'dr_date_received',
             'disclosed_by' => 'dr_disclosed_by',
             'date_disclosed'         => 'dr_date_disclosed',
-            'location'   => 'dr_location',
+            'location'   => '_dr_location',
         );
 
         $mappingTypeItem = array(

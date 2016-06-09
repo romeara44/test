@@ -1,0 +1,15 @@
+<div class="page-title">
+    <h1 class="fleft">Dashboard</h1>
+    <?php if($usRoleId != 7):?><a href="/breachlog/edit" class="with-access button"><i class="fa fa-plus-circle"></i> Add New Incident Log</a><?php endif;?>
+    <div class="cboth"></div>
+</div>
+
+<p>Welcome to HIPAA SUITE.
+<?php if (in_array($usRoleId, array(8))): ?>
+<?php $sl = $this->getHelperPluginManager()->getServiceLocator(); ?>
+<?php $uConsultant = $this->getConsultant($sl); ?>
+<p>Your Consultant is <?php echo is_object($uConsultant) ? $uConsultant->u_firstname : '' ?> <?php echo is_object($uConsultant) ? $uConsultant->u_lastname : ''?>&nbsp;
+	<?php echo is_object($uConsultant) ? $uConsultant->u_office_phone : '' ?> &nbsp;<a href="mailto:<?php echo is_object($uConsultant) ? $uConsultant->u_email : ''?>"><?php echo is_object($uConsultant) ? $uConsultant->u_email : '' ?></a>
+<?php endif; ?>
+
+<div class="cboth"><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /></div>

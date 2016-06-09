@@ -264,7 +264,7 @@ class CompanyTable implements ServiceLocatorAwareInterface
             $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
             $ids[] = $identity['u_id'];
             $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR cc_consultant_id IN (' . implode(',', $ids) . '))');
-        } else if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
+        } elseif($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
             $where_str = '(c_owner_u_id = ' . $identity['u_id'];
             if($identity['u_company_id_admin']) {
                 $where_str .= ' OR c_id = ' . $identity['u_company_id_admin'];
@@ -274,6 +274,8 @@ class CompanyTable implements ServiceLocatorAwareInterface
             }
             $where_str .= ')';
             $select->where($where_str);
+        } elseif($identity['u_role_id'] == User::ROLE_TRAIL) {
+            $select->where('c_id = ' . $identity['u_company_id']);
         }
 
         $select->group('c_id');

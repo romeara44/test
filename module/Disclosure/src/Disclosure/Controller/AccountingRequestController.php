@@ -106,7 +106,7 @@ class AccountingRequestController extends AbstractActionController
             'date_received'       => 'ar_date_requested',
             'request_finalized' => 'ar_is_finalized',
             'date_accounting_sent'         => 'ar_date_sent',
-            'location'   => 'ar_location',
+            'location'   => '_ar_location',
         );
 
         $mappingTypeItem = array(
