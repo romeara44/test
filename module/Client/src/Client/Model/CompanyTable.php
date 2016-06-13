@@ -164,8 +164,8 @@ class CompanyTable implements ServiceLocatorAwareInterface
                 $select->order($orderBy . ' ' . $order);
             }
 
-            echo $select->getSqlString($this->tableGateway->getAdapter()->getPlatform());
-            die;
+            //echo $select->getSqlString($this->tableGateway->getAdapter()->getPlatform());
+            //die;
 
             $paginator = new Paginator($paginatorAdapter);
 
