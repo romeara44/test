@@ -15,7 +15,9 @@ $form->setAttribute('method', 'post');
 
 <div class="page-title">
     <h1 class="fleft"><?php if ($this->cId): ?>Company Details<?php else: ?>Add New Company<?php endif; ?></h1>
+    <?php if($roleId != \Admin\Model\User::ROLE_TRAIL) : ?>
     <a href="/client/edit/company/<?php echo $this->cId ?>" class="button"><i class="fa fa-plus-circle"></i> Add New Contact</a>
+    <?php endif; ?>
     <?php if ($this->cId): ?>
         <ul id="tabs-nav">
             <li><a href="#tab1">Details</a></li>
@@ -447,7 +449,8 @@ $form->setAttribute('method', 'post');
                 <em style="font-weight: 400;"><?php echo $user->u_title ?></em>
             </h5>
             <p><small>Office Phone:</small> <?php echo $user->u_office_phone ?> <?php echo $user->u_office_phone_inner != '' ? ' x ' . $user->u_office_phone_inner : '' ?><br /><small>Email:</small> <a href="mailto:<?php echo $user->u_email ?>"><?php echo $user->u_email ?></a></p>
-            <p><a href="/client/edit/<?php echo $user->u_id ?>" class="button"><i class="fa fa-pencil"></i> Contact Details</a></p>
+            <p><a href="/client/edit/<?php echo $user->u_id ?>" class="button
+                <?php if ($roleId == \Admin\Model\User::ROLE_TRAIL) : ?> disabled<?php endif; ?>"><i class="fa fa-pencil"></i> Contact Details</a></p>
 
             <div class="cboth"><br /></div>
         <?php endforeach; ?>
