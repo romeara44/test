@@ -50,6 +50,7 @@ class DisclosureRecordTable implements ServiceLocatorAwareInterface
 
             $select->join(array('c' => 'companies'), 'dr_c_id = c_id', array('c_name'), 'left');
             $select->join(array('a' => 'addresses'), 'dr_adr_id = adr_id', array('adr_name'), 'left');
+            $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = dr_c_id', array(), 'left');
 
             $select->columns(array('dr_id'                   => 'dr_id',
                                    '_dr_location'     => new \Zend\Db\Sql\Expression('CONCAT(c_name, "/", adr_name)'),
@@ -69,6 +70,12 @@ class DisclosureRecordTable implements ServiceLocatorAwareInterface
             if ($identity['u_role_id'] != User::ROLE_ADMIN) {
                 $select->where('dr_active = 1');
             }
+
+            if (in_array($identity['u_role_id'], array(User::ROLE_CONSULTANT, User::ROLE_SENIOR_CONSULTANT))) {
+              $select->where('cc.cc_consultant_id = ' . $identity['u_id']);                
+            } elseif (in_array($identity['u_role_id'], array(User::ROLE_CLIENT))) {
+              $select->where('dr_c_id = ' . $identity['u_company_id']);
+            }
             
             $resultSetPrototype = new ResultSet();
             $resultSetPrototype->setArrayObjectPrototype(new DisclosureRecord());
@@ -82,6 +89,8 @@ class DisclosureRecordTable implements ServiceLocatorAwareInterface
                 $select->where('dr_active = ' . $roleFilter);
             }
 
+            $select->group('dr_id');
+
             if ($orderBy) {
                 $order = $order ? $order : 'ASC';
                 $select->order($orderBy . ' ' . $order);
@@ -93,6 +102,8 @@ class DisclosureRecordTable implements ServiceLocatorAwareInterface
         }
 
         $select = $this->tableGateway->getSql()->select();
+
+        $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = dr_c_id', array(), 'left');
 
         $select->columns(array('dr_id'                   => 'dr_id',
                                '_dr_location'     => new \Zend\Db\Sql\Expression('CONCAT(c_name, "/", adr_name)'),
@@ -112,6 +123,14 @@ class DisclosureRecordTable implements ServiceLocatorAwareInterface
         if ($identity['u_role_id'] != User::ROLE_ADMIN) {
             $select->where('dr_active = 1');
         }
+
+        if (in_array($identity['u_role_id'], array(User::ROLE_CONSULTANT, User::ROLE_SENIOR_CONSULTANT))) {
+            $select->where('c_owner_u_id = ' . $identity['u_id']);
+        } elseif (in_array($identity['u_role_id'], array(User::ROLE_CLIENT))) {
+          $select->where('cc.cc_consultant_id = ' . $identity['u_id']);
+        }
+
+        $select->group('dr_id');
 
         return $this->tableGateway->selectWith($select);
     }
