@@ -80,7 +80,7 @@ $form->setAttribute('method', 'post');
 
     <form action="/assessment/edit/<?php echo $this->aId ?>/step/3/adrId/<?php echo $this->location ?>/assessmentRole/<?php echo $this->assessmentRole ?>" method="post" name="assessment" id="assessment2" enctype="multipart/form-data">
         <input id="setStep" type="hidden" name="setStep" value="" />
-
+        <input id="autoSave" type="hidden" name="autoSave" value="" />
         <?php
             $fn = $form->get('a_id');
             echo $this->formHidden($fn);
@@ -178,10 +178,20 @@ $form->setAttribute('method', 'post');
 
 
 <div class="cboth"><br /></div>
+<?php
+    $application_vars = new \Zend\Session\Container('application_vars');
+    $assessment_interview_autosave_interval = $application_vars->storage['assessment_interview_autosave_interval'];
+    ?>
 
-
-<script type="text/javascript">
+<script type="text/javascript">    
+    var assessment_interview_autosave_interval = <?php echo $assessment_interview_autosave_interval ? $assessment_interview_autosave_interval * 60000 : 60000; ?>;
     jQuery(document).ready(function() {
+        window.setInterval(function(){
+            $('#autoSave').val(1);
+          $('#setStep').val(3);
+            $('#assessment2').submit();
+        }, assessment_interview_autosave_interval);
+
         renumeringQuestions();
         $('#saveAndContinue').click(function() {
             $('#setStep').val(3);

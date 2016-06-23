@@ -171,6 +171,10 @@
 
     <script type="text/javascript">
         jQuery(document).ready(function() {
+            $.datepicker.setDefaults({
+              changeMonth: true,
+            changeYear: true
+            });
             jQuery('.confirmation-box').hover(
                 function() {
                     jQuery('.confirmation-box').stop(true, true).show();
