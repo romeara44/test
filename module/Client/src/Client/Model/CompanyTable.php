@@ -108,12 +108,6 @@ class CompanyTable implements ServiceLocatorAwareInterface
                 } else {
                     $select->where('c_active = 1');
                 }
-            } else {
-                if ($identity['u_role_id'] == User::ROLE_ADMIN) {
-                    $select->where('u_active IN (0, 1)');
-                } else {
-                    $select->where('u_active = 1');
-                }
             }
 
             ///////////////

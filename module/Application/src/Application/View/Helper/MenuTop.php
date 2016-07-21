@@ -85,188 +85,31 @@ class MenuTop extends AbstractHelper
         } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_PARTIAL) {
             $this->_prepareItemsForPartial($identity, $is_training_manager);
         } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_TRAIL) {
-            $this->_prepareItemsForTrail($identity, 1, 1, 1);
+            $this->_prepareItemsForTrail();
         }
     }
 
-    private function _prepareItemsForTrail($identity, $is_company_admin, $is_primary_contact, $is_training_manager)
+    private function _prepareItemsForTrail()
     {
-        $this->items = array();
-
-        $this->items[] = array(
+        $this->items = array(
+            array(
                 'title' => 'Dashboard',
-                'url' => '/dashboard/client',
-            );
-
-        $items_clients = array();
-
-        if ($is_company_admin || $is_primary_contact) {
-            $items_clients[] = array('title' => 'Business Associates',
-                  'url' => '/businessassociate/list',
-                  'class' => 'disabled',
-            );
-        }
-
-        if ($is_company_admin || $is_primary_contact || $is_training_manager) {
-            $items_clients[] = array('title' => 'All Clients',
-                          'url' => '/client/list',
-                        );
-            $items_clients[] = array('title' => 'Create Contact',
-                          'url' => '/client/edit',
-                          'class' => 'disabled',
-                        );
-        }
-
-        if ($items_clients) {
-            $this->items[] = array(
+                'url' => '/dashboard/trail'
+            ),
+            array(
                 'title' => 'Clients',
                 'url' => '/client/list',
-                'items' => $items_clients,
-                );
-        }
-
-        if($identity['u_grant_to_breach'] || $is_company_admin || $is_primary_contact) {
-            $this->items[] = array(
-                                'title' => 'Incident Response',
-                                'url' => '/breachlog/list',
-                                'class' => 'with-access',
-                                'class' => 'disabled',
-                                'items' => array(
-                                    array('title' => 'Breach Logs',
-                                          'url' => '/breachlog/list',
-                                          'class' => 'with-access',
-                                          'class' => 'disabled',
-                                        ),
-                                    array('title' => 'Breach Remediation Plans',
-                                          'url' => '/breachremediationplan/list',
-                                          'class' => 'with-access',
-                                          'class' => 'disabled',
-                                        )
-                                )
-                            );
-        }
-
-        if ($is_company_admin || $is_primary_contact) {
-            $this->items[] = array(
-                                    'title' => 'Assessments',
-                                    'url' => '/assessment/list',
-                                );
-            $this->items[] = array(
-                                    'title' => 'Remediation Plans',
-                                    'url' => '/remediationplan/list',
-                                    'class' => 'disabled',
-                                );
-        }
-                                                        
-        if ($is_company_admin || $is_primary_contact || $is_training_manager) {
-            if ($is_training_manager) {
-                $this->items[] = array(
-                                'title' => 'Trainings',
-                                'url' => '/traininglog/list',
-                                'class' => 'disabled',
-                                'items' => array(
-                                    array('title' => 'Training Logs',
-                                          'url' => '/traininglog/list',
-                                          'class' => 'disabled',
-                                        ),
-                                    array('title' => 'Security Reminder',
-                                          'url' => '/securityreminder/list',
-                                          'class' => 'disabled',
-                                        ),
-                                    array('title' => 'Employee Master List',
-                                         'url' => '/traininglog/employeemasterlist',
-                                         'class' => 'disabled',
-                                        )
-                                )
-                            );
-            } else {
-                $this->items[] = array(
-                                'title' => 'Trainings',
-                                'url' => '/traininglog/list',
-                                'class' => 'disabled',
-                                'items' => array(
-                                    array('title' => 'Training Logs',
-                                          'url' => '/traininglog/list',
-                                          'class' => 'disabled',
-                                        ),
-                                    array('title' => 'Security Reminder',
-                                          'url' => '/securityreminder/list',
-                                          'class' => 'disabled',
-                                        )
-                                )
-                            );
-            }
-            
-        }     
-
-        $this->items[] = array(
-                            'title' => 'Reporting',
-                            'url' => '/reporting/auditbreach',
-                            'class' => 'disabled',
-                            'items' => array(
-                                array('title' => 'Audit/Breach',
-                                        'url' => '/reporting/auditbreach',
-                                        'class' => 'disabled',
-                                    ),
-                                array('title' => 'Plans Progress',
-                                     'url' => '/reporting/planprogress',
-                                     'class' => 'disabled',
-                                    )
-                            )
-                        );
-
-        if ($is_company_admin || $is_primary_contact) {
-            $this->items[] = array(
-                                    'title' => 'Forms and Logs',
-                                    'url' => '/itassetinventory/list',
-                                    'class' => 'disabled',
-                                    'items' => array(
-                                        array('title' => 'IT Asset Inventory',
-                                                'url' => '/itassetinventory/list',
-                                                'class' => 'disabled',
-                                            ),
-                                        array('title' => 'Physical Security Changes',
-                                                'url' => '/physicalsecuritychange/list',
-                                                'class' => 'disabled',
-                                            )
-                                )
-                            );
-            if($identity['u_grant_to_disclosures']) {
-                $this->items[count($this->items) - 1]['items'] = array_merge($this->items[count($this->items) - 1]['items'],
-                                    array(
-                                        array('title' => 'Disclosure Records',
-                                                'url' => '/disclosurerecord/list',
-                                                'class' => 'with-access',
-                                                'class' => 'disabled',
-                                            ),
-                                        array('title' => 'Requests for Accounting of Disclosure Records',
-                                                'url' => '/accountingrequest/list',
-                                                'class' => 'with-access',
-                                                'class' => 'disabled',
-                                            ),
-                                    )
-                                );
-            }
-        } else if($identity['u_grant_to_disclosures']) {
-            $this->items[] = array(
-                                    'title' => 'Disclosure Requests',
-                                    'url' => '/disclosurerequest/list',
-                                    'class' => 'disabled',
-                                    'items' => array(                                       
-                                        array('title' => 'Disclosure Records',
-                                                'url' => '/disclosurerecord/list',
-                                                'class' => 'with-access',
-                                                'class' => 'disabled',
-                                            ),
-                                        array('title' => 'Requests for Accounting of Disclosure Records',
-                                                'url' => '/accountingrequest/list',
-                                                'class' => 'with-access',
-                                                'class' => 'disabled',
-                                            ),
-                                )
-                            );
-        }
-        
+                'items' => array(
+                    array('title' => 'All Clients',
+                          'url' => '/client/list',
+                        ),
+                )
+            ),
+            array(
+                'title' => 'Assessments',
+                'url' => '/assessment/list',
+            ),
+        );     
     }
 
     private function _prepareItemsForAdmin()
