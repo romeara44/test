@@ -1,6 +1,7 @@
 
 <div class="page-title">
     <h1 class="fleft"><?php if ($this->aObj->a_type == 1): ?>Security<?php else: ?>Privacy<?php endif; ?> Risk Assessment Details<br />for <?php echo stripslashes($this->aObj->_client_name); ?></h1>
+    <a href="/assessment/export/<?php echo $this->aObj->a_id; ?>/location/<?php echo $location ?>" class="button" title="Download as CSV"><i class="fa fa-download"></i> CSV</a>
     <div class="cboth"></div>
 </div>
 

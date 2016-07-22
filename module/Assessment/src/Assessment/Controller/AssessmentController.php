@@ -211,6 +211,101 @@ class AssessmentController extends AbstractActionController
 
     }
 
+    public function exportAction()
+    {
+        $id = (int) $this->params('id');
+        $location = (int) $this->params('location');
+
+        $rows = array();
+        $aObj = null;
+
+        if ($id) {
+            $aObj = $this->getAssessmentTable()->getAssessment($id);
+        }
+
+        if ($id && !$location) {
+            $addresses = $this->getAddressTable()->getAddresses($id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
+            foreach ($addresses->buffer() as $key => $address) {
+                $location = $address->adr_id;
+                break;
+            }
+        }
+
+        if ($aObj && $location) {            
+            $roles = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type, true);
+            
+            foreach ($roles as $role) {
+                $rows[] = $role->ar_name;
+                $questions = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionTable')->getQuestions($aObj->a_type, $role->ar_id, $aObj->a_id, $location, $aObj);
+                $answers = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionAnswerTable')->getAqas($id, $location, $role->ar_id);
+
+                foreach ($questions as $question) {
+                    foreach ($question['elements'] as $questionEl) {      
+                        $aqTitle = str_replace('Â', '', $questionEl['aq_title']);   
+                        $answer = '';               
+                        $isYes = false;                        
+                        if (isset($answers[$questionEl['aq_id']])) {
+                            $_options = $questionEl['_options'];
+                            $_optionsT = explode(',', $_options);                        
+                            foreach ($_optionsT as $_option) {
+                                $_optionT = explode('::', $_option);
+                                if ($answers[$questionEl['aq_id']]['answerId'] == $_optionT[0]) {
+                                    $answer = $_optionT[1];
+                                    if ($questionEl['aq_id'] == 14) {
+                                        $isYes = ($_optionT[1] == 'No') ? true : false;
+                                    } else {
+                                        $isYes = ($_optionT[1] == 'Yes') ? true : false;
+                                    }
+                                    break;
+                                }
+                            }
+                        } 
+                        
+                        $rows[] = array($aqTitle, $answer);
+
+                        if ($isYes && isset($questionEl['children'])) {
+                            foreach ($questionEl['children'] as $questionElChild) { 
+                                $aqTitle = str_replace('Â', '', $questionElChild['aq_title']);                                   
+                                $answer = '';
+                                if (isset($answers[$questionElChild['aq_id']])) {
+                                    $_options = $questionElChild['_options'];
+                                    $_optionsT = explode(',', $_options);
+                                    foreach ($_optionsT as $_option) {
+                                        $_optionT = explode('::', $_option);
+                                        if ($answers[$questionElChild['aq_id']]['answerId'] == $_optionT[0]) {
+                                            $answer = $_optionT[1];
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                                $rows[] = array($aqTitle, $answer);
+                            }
+                        }
+                    }
+                }
+            }            
+        }
+        $csvContent = '';
+        foreach ($rows as $row) {
+            if (is_array($row)) {
+                $csvContent .= '"' . implode('","', $row) . '"' . "\n";
+            } else {
+                $csvContent .= $row . "\n";
+            }
+        }
+        
+        header('Content-Description: File Transfer');
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="assessment_ ' . date('Y_m_d_h_i_s', time()) . '.csv"');
+        header('Content-Transfer-Encoding: binary');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Pragma: public');
+        echo $csvContent;
+        exit;
+    }
+
     public function editAction()
     {
         $request = $this->getRequest();
