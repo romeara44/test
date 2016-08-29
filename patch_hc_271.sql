@@ -1,0 +1,11 @@
+UPDATE `assessments_questions` SET `aq_title` = 'Is there a risk that the individual will request access to their protected health information and the practice will not be able to respond to the request' WHERE `aq_id` = 442;
+UPDATE `assessments_questions` SET `aq_title` = 'Does the practice have a standard authorization form for patients to sign that includes to whom the information is being disclosed, the purpose for the disclosure, the period of use of the PHI and the signature of the person disclosing the information' WHERE `aq_id` = 338;
+UPDATE `assessments_questions` SET `aq_title` = 'Has the practice had an individual request to see their protected health information and not be able to satisfy the request' WHERE `aq_id` = 443;
+UPDATE `assessments_questions` SET `aq_title` = 'Does the accounting procedure and the accounting form collect data about disclosures, for up to 6 years, including; the date of the request, the date of the disclosure, the person to whom the patient information was disclosed, what information was disclosed, the purpose for the disclosure, and what was done to mitigate the damage of the disclosure' WHERE `aq_id` = 463;
+UPDATE `assessments_questions` SET `aq_title` = 'Does the practice know what to do if a fraud and/or abuse incident occurs' WHERE `aq_id` = 539;
+DELETE FROM `assessments_questions` WHERE `aq_id` = 329;
+DELETE FROM `assessments_questions_answers` WHERE `aqa_aq_id` = 329;
+DELETE FROM `assessments_questions_options` WHERE `aqo_aq_id` = 329;
+DELETE FROM `assessments_questions` WHERE `aq_id` = 457;
+DELETE FROM `assessments_questions_answers` WHERE `aqa_aq_id` = 457;
+DELETE FROM `assessments_questions_options` WHERE `aqo_aq_id` = 457;

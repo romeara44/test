@@ -271,9 +271,11 @@ $form->setAttribute('method', 'post');
 
             <div class="cboth"></div>
             <div class="form-buttons">
-                <input id="save" type="submit" name="save" value="Save" class="form-button" />
-                <input id="saveAndContinue" type="submit" name="save_continue" value="Save and Continue" class="form-button" />
-                <div class="fleft">or</div>
+                <?php if ($this->roleId != \Admin\Model\User::ROLE_TRAIL): ?>
+                    <input id="save" type="submit" name="save" value="Save" class="form-button" />
+                    <input id="saveAndContinue" type="submit" name="save_continue" value="Save and Continue" class="form-button" />
+                    <div class="fleft">or</div>
+                <?php endif;?>
                 <a href="/client/list" class="cancel">Cancel</a>
             </div>
         <?php echo $this->form()->closeTag() ?>

@@ -131,6 +131,7 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
 
         $select->columns(array('_id' => new \Zend\Db\Sql\Expression('rp_id'),
                                '_name' => new \Zend\Db\Sql\Expression('c_name'),
+                               '_item_type' => new \Zend\Db\Sql\Expression('rp_type'),
                                '_type' => new \Zend\Db\Sql\Expression('CONCAT("remediationplan")'),
                                '_status' => new \Zend\Db\Sql\Expression('rp_status'),
                                '_date' => new \Zend\Db\Sql\Expression('rp_create_date'),

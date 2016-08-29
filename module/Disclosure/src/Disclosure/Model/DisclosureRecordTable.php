@@ -53,7 +53,7 @@ class DisclosureRecordTable implements ServiceLocatorAwareInterface
             $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = dr_c_id', array(), 'left');
 
             $select->columns(array('dr_id'                   => 'dr_id',
-                                   '_dr_location'     => new \Zend\Db\Sql\Expression('CONCAT(c_name, "/", adr_name)'),
+                                   '_dr_location'     => new \Zend\Db\Sql\Expression('IF(adr_name IS NOT NULL, CONCAT(c_name, " / ", adr_name), c_name)'),
                                    'dr_patient_name'         => 'dr_patient_name',
                                    'dr_date_received'       => 'dr_date_received',
                                    'dr_disclosed_by' => 'dr_disclosed_by',

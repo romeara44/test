@@ -35,7 +35,9 @@ class RoleTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
 
         if($uRoleId != \Admin\Model\User::ROLE_PARTIAL) {
-            if(in_array($identityRoleid, array(\Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_CONSULTANT))) {
+            if($identityRoleid == \Admin\Model\User::ROLE_SENIOR_CONSULTANT) {
+                $select->where('role_id IN (5, 6, 7, 8)');
+            } else if( $identityRoleid == \Admin\Model\User::ROLE_CONSULTANT) {
                 $select->where('role_id IN (5, 6, 7)');
             } else {
                 $select->where('role_id <> 1');

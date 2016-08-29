@@ -107,18 +107,6 @@ class BreachlogForm extends Form
         $regulations = $regulationTable->getRegulationsWithCategories();
         array_unshift($regulations, 'Please Select');
         $regulations['-1'] = 'Other';
-        
-        $this->add(array(
-            'name' => '_bl_cur_regulations',
-            'type' => 'Zend\Form\Element\Select',
-            'attributes' => array(
-                'multiple' => 'multiple',
-            ),
-            'options' => array(
-                'label' => 'Type',
-                'value_options' => $regulations
-            ),
-        ));
 
         $this->add(array(
             'name' => 'bl_initials_approver',

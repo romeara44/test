@@ -177,6 +177,7 @@ class CompanyTable implements ServiceLocatorAwareInterface
 
         $select->columns(array('_id' => 'c_id',
                                '_name' => 'c_name',
+                               '_item_type' => new \Zend\Db\Sql\Expression('NULL'),
                                '_type' => new \Zend\Db\Sql\Expression('CONCAT("company")'),
                                new \Zend\Db\Sql\Expression('NULL'),
                                new \Zend\Db\Sql\Expression('NULL')
