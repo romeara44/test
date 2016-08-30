@@ -153,15 +153,15 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
             $where_str .= 'rp_c_id IN (' . implode(',', $companies) . ') ';
         }
 
-        $companies_ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getCompaniesIdsForConsultant($identity['u_id']);
-        if ($companies_ids) {
-            if ($where_str) {
-                $where_str = '(' . $where_str . ' OR rp_c_id IN (' . implode(',', $companies_ids) . '))';
-              } else {
-                $where_str = 'rp_c_id IN (' . implode(',', $companies_ids) . ')';
-              }
-        }
         if ($identity['u_role_id'] != User::ROLE_ADMIN) {
+            $companies_ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getCompaniesIdsForConsultant($identity['u_id']);
+            if ($companies_ids) {
+                if ($where_str) {
+                    $where_str = '(' . $where_str . ' OR rp_c_id IN (' . implode(',', $companies_ids) . '))';
+                  } else {
+                    $where_str = 'rp_c_id IN (' . implode(',', $companies_ids) . ')';
+                  }
+            }
             if ($where_str) {
                 $where_str .= ' AND rp_active = 1';
             } else {

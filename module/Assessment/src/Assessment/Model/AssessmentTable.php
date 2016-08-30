@@ -140,9 +140,6 @@ class AssessmentTable implements ServiceLocatorAwareInterface
                     $where_str = 'a_c_id IN (' . implode(',', $companies_ids) . ')';
                   }
             }
-        }
-
-        if ($identity['u_role_id'] != User::ROLE_ADMIN) {
             if ($where_str) {
                 $where_str .= ' AND a_active = 1';
             } else {
