@@ -95,7 +95,7 @@ $identity = $authService->getIdentity();
             <?php elseif ($result['_type'] == 'assessment'): ?>
                 <tr>
                     <td><?= \Assessment\Model\Assessment::$typesNames[$result['_item_type']]?></td>
-                    <td><a href="/assessment/edit/<?php echo $result['_id'] ?>"><?php echo $result['_name'] ?></a></td>
+                    <td><a href="/assessment/editlist/<?php echo $result['_id'] ?>"><?php echo $result['_name'] ?></a></td>
                     <td><?php echo \Assessment\Model\Assessment::$statusesNames[$result['_status']] ?></td>
                     <td><?php echo ($result['_date'] != '0000-00-00 00:00:00') ? $this->formatDateA($result['_date']) : '' ?></td>
                 </tr>
