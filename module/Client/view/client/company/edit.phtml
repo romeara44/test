@@ -325,8 +325,10 @@ $form->setAttribute('method', 'post');
 
                 <div class="cboth"></div>
                 <div class="form-buttons">
-                    <input type="submit" value="Save" class="form-button" />
-                    <div class="fleft">or</div>
+                    <?php if ($this->roleId != \Admin\Model\User::ROLE_TRAIL): ?>
+                        <input type="submit" value="Save" class="form-button" />
+                        <div class="fleft">or</div>
+                    <?php endif;?>
                     <a href="/company/list" class="cancel">Cancel</a>
                 </div>
                 <div class="cboth"><br /></div>
@@ -391,8 +393,10 @@ $form->setAttribute('method', 'post');
 
                 <div class="cboth"><br /></div>
                 <div class="form-buttons">
-                    <input type="submit" value="Save" class="form-button" />
-                    <div class="fleft">or</div>
+                    <?php if ($this->roleId != \Admin\Model\User::ROLE_TRAIL): ?>
+                        <input type="submit" value="Save" class="form-button" />
+                        <div class="fleft">or</div>
+                    <?php endif;?>
                     <a href="/company/list" class="cancel">Cancel</a>
                 </div>
                 <div class="cboth"><br /></div>
