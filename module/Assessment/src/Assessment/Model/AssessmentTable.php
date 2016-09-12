@@ -112,6 +112,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
 
         $select->columns(array('_id' => new \Zend\Db\Sql\Expression('a_id'),
                                '_name' => new \Zend\Db\Sql\Expression('c_name'),
+                               '_item_type' => new \Zend\Db\Sql\Expression('a_type'),
                                '_type' => new \Zend\Db\Sql\Expression('CONCAT("assessment")'),
                                '_status' => new \Zend\Db\Sql\Expression('a_status'),
                                '_date' => new \Zend\Db\Sql\Expression('a_create_date')
@@ -130,15 +131,15 @@ class AssessmentTable implements ServiceLocatorAwareInterface
             $where_str .= 'a_c_id = ' . $identity['u_company_id'];
         }
 
-        $companies_ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getCompaniesIdsForConsultant($identity['u_id']);
-        if ($companies_ids) {
-            if ($where_str) {
-                $where_str = '(' . $where_str . ' OR a_c_id IN (' . implode(',', $companies_ids) . '))';
-              } else {
-                $where_str = 'a_c_id IN (' . implode(',', $companies_ids) . ')';
-              }
-        }
         if ($identity['u_role_id'] != User::ROLE_ADMIN) {
+            $companies_ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getCompaniesIdsForConsultant($identity['u_id']);
+            if ($companies_ids) {
+                if ($where_str) {
+                    $where_str = '(' . $where_str . ' OR a_c_id IN (' . implode(',', $companies_ids) . '))';
+                  } else {
+                    $where_str = 'a_c_id IN (' . implode(',', $companies_ids) . ')';
+                  }
+            }
             if ($where_str) {
                 $where_str .= ' AND a_active = 1';
             } else {

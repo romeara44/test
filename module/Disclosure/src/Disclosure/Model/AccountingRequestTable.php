@@ -52,7 +52,7 @@ class AccountingRequestTable implements ServiceLocatorAwareInterface
             $select->join(array('a' => 'addresses'), 'ar_adr_id = adr_id', array('adr_name'), 'left');
 
             $select->columns(array('ar_id'                   => 'ar_id',
-                                   '_ar_location'     => new \Zend\Db\Sql\Expression('CONCAT(c_name, "/", adr_name)'),
+                                   '_ar_location'     => new \Zend\Db\Sql\Expression('IF(adr_name IS NOT NULL, CONCAT(c_name, " / ", adr_name), c_name)'),
                                    'ar_patient_name'         => 'ar_patient_name',
                                    'ar_date_requested'       => 'ar_date_requested',
                                    'ar_is_finalized' => 'ar_is_finalized',

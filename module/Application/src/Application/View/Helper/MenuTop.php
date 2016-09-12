@@ -109,7 +109,80 @@ class MenuTop extends AbstractHelper
                 'title' => 'Assessments',
                 'url' => '/assessment/list',
             ),
-        );     
+            array(
+                'title' => 'Incident Response',
+                'url' => '/breachlog/list',
+                'disabled' => true,
+                'items' => array(
+                    array('title' => 'Breach Logs',
+                          'url' => '/breachlog/list',
+                          'disabled' => true
+                        ),
+                    array('title' => 'Breach Remediation Plans',
+                          'url' => '/breachremediationplan/list',
+                          'disabled' => true
+                        )
+                )
+            ),
+            array(
+                'title' => 'Remediation Plans',
+                'url' => '/remediationplan/list',
+                'disabled' => true
+            ),
+            array(
+                'title' => 'Trainings',
+                'url' => '/traininglog/list',
+                'disabled' => true,
+                'items' => array(
+                    array('title' => 'Training Logs',
+                          'url' => '/traininglog/list',
+                          'disabled' => true
+                        ),
+                    array('title' => 'Security Reminder',
+                          'url' => '/securityreminder/list',
+                          'disabled' => true
+                        )
+                )
+            ),
+            array(
+                'title' => 'Forms and Logs',
+                'url' => '/itassetinventory/list',
+                'disabled' => true,
+                'items' => array(
+                    array('title' => 'IT Asset Inventory',
+                          'url' => '/itassetinventory/list',
+                          'disabled' => true
+                        ),
+                    array('title' => 'Physical Security Changes',
+                          'url' => '/physicalsecuritychange/list',
+                          'disabled' => true
+                        ),
+                    array('title' => 'Disclosure Records',
+                          'url' => '/disclosurerecord/list',
+                          'disabled' => true
+                        ),
+                    array('title' => 'Requests for Accounting of Disclosure Records',
+                          'url' => '/accountingrequest/list',
+                          'disabled' => true
+                        ),
+                )
+            ),
+            array(
+                'title' => 'Reporting',
+                'url' => '/reporting/auditbreach',
+                'disabled' => true,
+                'items' => array(
+                    array('title' => 'Audit/Breach',
+                          'url' => '/reporting/auditbreach',
+                          'disabled' => true
+                        ),
+                    array('title' => 'Plans Progress',
+                          'url' => '/reporting/planprogress',
+                          'disabled' => true
+                        )
+                )
+            )
+        );
     }
 
     private function _prepareItemsForAdmin()
@@ -633,7 +706,6 @@ class MenuTop extends AbstractHelper
                 'url' => '/remediationplan/list',
                 'disabled' => true
             ),
-            
         );
 
         if ($is_training_manager) {

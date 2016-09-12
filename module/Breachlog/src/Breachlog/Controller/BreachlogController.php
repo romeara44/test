@@ -266,6 +266,11 @@ class BreachlogController extends AbstractActionController
                 if(isset($post['questions'][11]) && $post['questions'][11] == 2) $post['bl_date_of_occurrence'] = '';
                 $bl->exchangeArray($post);
                 $this->getBreachlogTable()->setServiceLocator($this->getServiceLocator());
+
+                if ($bl->_bl_cur_regulations) {
+                    $bl->_bl_cur_regulations = explode(',', $bl->_bl_cur_regulations);
+                }
+
                 $blId = $this->getBreachlogTable()->saveBreachlog($bl);
 
                 // save answers

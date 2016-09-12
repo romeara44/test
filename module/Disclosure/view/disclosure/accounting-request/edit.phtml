@@ -182,7 +182,7 @@ $form->setAttribute('method', 'post');
         <p>
             <?php $fn = $form->get('ar_extension_reason');
             echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id' => 'ar_extension_reason')));
             echo $this->formElementErrors($fn);
             ?>
         </p>
@@ -328,6 +328,21 @@ $form->setAttribute('method', 'post');
     });
 
     jQuery(function() {
+        function chechReasonRequired()
+        {
+            if ($('input[name="ar_is_extensions"]:checked').val() != 'No') {
+                $('#ar_extension_reason').addClass('required');
+            } else {
+                $('#ar_extension_reason').removeClass('required').removeClass('error').siblings('label.error').remove();
+            }
+        }
+
+        $('input[name="ar_is_extensions"]').change(function(el) {
+            chechReasonRequired();
+        });
+
+        chechReasonRequired();
+
         $('#accountingrequest').validate();
 
         $("#ar_date_requested, #ar_date_of_birth, #ar_date_requested_from, #ar_date_requested_to, #ar_date_sent, #ar_date_patient_notified").datepicker({dateFormat: 'mm/dd/yy'});
