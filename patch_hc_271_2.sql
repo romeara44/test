@@ -1,10 +1,9 @@
-
 -- phpMyAdmin SQL Dump
 -- version 4.3.7
 -- http://www.phpmyadmin.net
 --
 -- Хост: localhost
--- Время создания: Сен 12 2016 г., 15:27
+-- Время создания: Сен 15 2016 г., 16:48
 -- Версия сервера: 5.6.21-log
 -- Версия PHP: 5.4.36
 
@@ -44,11 +43,11 @@ CREATE TABLE IF NOT EXISTS `regulations` (
 
 INSERT INTO `regulations` (`rg_id`, `rg_pp_name`, `rg_pp_number`, `rg_number`, `rg_description`, `rg_rgc_id`, `rg_u_owner_id`) VALUES
 (1, 'Notice of Privacy Practices', 'PR-105', '45 C.F.R. §164.520', '', 5, NULL),
-(2, 'Confidentiality/Privacy of PHI', 'AS-105', '45 C.F.R. §164.502(a)<br>45 C.F.R. §164.502(b)<br>45 C.F.R. §164.514<br>45 C.F.R. §164.308(a)(4)(ii)(B)', '', 1, NULL),
+(2, 'Confidentiality/Privacy of PHI', 'AS-105', '45 C.F.R. §164.308(a)(4)(ii)(B)<br>45 C.F.R. §164.502(a)<br>45 C.F.R. §164.502(b)<br>45 C.F.R. §164.514', '', 1, NULL),
 (3, 'Pledge of Confidentiality', 'PR-110', '45 C.F.R. §164.502(a)', '', 5, NULL),
 (4, 'Use of PHI', 'PR-103', '§164.502(a);§164.502(b);§164.514', '', 5, NULL),
-(5, 'Minimum Necessary Use & Disclosure of PHI/ePHI', 'AS-110', '45 CFR §164.502(b)<br>45 CFR §164.514(d)<br>45 CFR §164.308(a)(3)(ii)(A) and (B)<br>45 CFR §164.308(a)(4)(ii)(B)', '', 1, NULL),
-(6, 'Policy for Requiring that Plan Documents include HIPAA disclosure constraints', 'AS-115', '45 C.F.R. §164.502(e)<br>45 C.F.R. §164.504(e)(1)<br>45 C.F.R. §164.308 <br>45 C.F.R. §164.314(a)', '', 1, NULL),
+(5, 'Minimum Necessary Use & Disclosure of PHI/ePHI', 'AS-110', '45 CFR §164.308(a)(3)(ii)(A) and (B)<br>45 CFR §164.308(a)(4)(ii)(B)<br>45 CFR §164.502(b)<br>45 CFR §164.514(d)', '', 1, NULL),
+(6, 'Policy for Requiring that Plan Documents include HIPAA disclosure constraints', 'AS-115', '45 C.F.R. §164.308 <br>45 C.F.R. §164.314(a)<br>45 C.F.R. §164.502(e)<br>45 C.F.R. §164.504(e)(1)', '', 1, NULL),
 (7, 'Acknowledgement of Receipt of Notice of Privacy Practices', 'PR-120', '45 C.F.R. § 164.520', '', 5, NULL),
 (8, 'Implementation Specifications', 'AS-120', '45 C.F.R. §164.306(d)(1)<br>45 C.F.R. §164.306(d)(2)', '', 1, NULL),
 (9, 'Development and Maintenance of Privacy Policies and Procedures', 'AS-125', '45 CFR §164.316(a)', '', 1, NULL),
@@ -87,8 +86,8 @@ INSERT INTO `regulations` (`rg_id`, `rg_pp_name`, `rg_pp_number`, `rg_number`, `
 (42, 'Development and Maintenance of Security Policies and Procedures', 'DR-105', '45 C.F.R §164.316(a)', '', 4, NULL),
 (43, 'Risk Analysis', 'AS-210', '45 CFR §164.308(a)(1)(ii)(A)<br>45 CFR §164.308(a)(1)(ii)(B)', '', 1, NULL),
 (44, 'Protection from Malicious Software', 'AS-215', '45 CFR § 164.308(a)(5)(ii)(B)', '', 1, NULL),
-(45, 'Log in Monitoring', 'AS-220', '45 CFR § 164.308(a)(5)(ii)(C)<br>45 CFR § 164.308(a)(1)(ii)(D)', '', 1, NULL),
-(46, 'Password Management', 'TS-105', '45 C.F.R.§ 164.312(a)(2)(i)<br>45 C.F.R.§ 164.308(a)(5)(ii)(D)', '', 3, NULL),
+(45, 'Log in Monitoring', 'AS-220', '45 CFR § 164.308(a)(1)(ii)(D)<br>45 CFR § 164.308(a)(5)(ii)(C)', '', 1, NULL),
+(46, 'Password Management', 'TS-105', '45 C.F.R.§ 164.308(a)(5)(ii)(D)<br>45 C.F.R.§ 164.312(a)(2)(i)', '', 3, NULL),
 (47, 'Data Back-up and Storage', 'AS-225', '45 CFR § 164.308(a)(7)(ii)(A)', '', 1, NULL),
 (48, 'Receipt and Removal of Hardware Containing ePHI', 'PS-115', '45 C.F.R §164.310(d)(2)(i)', '', 2, NULL),
 (49, 'Automatic Logoff', 'TS-110', '45 CFR § 164.312(a)(2)(iii)', '', 3, NULL),
@@ -118,10 +117,10 @@ INSERT INTO `regulations` (`rg_id`, `rg_pp_name`, `rg_pp_number`, `rg_number`, `
 (73, 'Applications and Data Criticality Analysis', 'AS-250', '45 CFR §164.308(a)(7)(ii)(E)', '', 1, NULL),
 (74, 'Data Backup and Storage', 'TS-135', '45 C.F.R §164.310(d)(2)(iv)', '', 3, NULL),
 (75, 'Emergency Access Procedure', 'TS-140', '45 C.F.R §164.312(a)(2)(ii)', '', 3, NULL),
-(76, 'Person or Entity Authentication', 'TS-145', '45 CFR §164.312(d)<br>45 CFR §164.312(a)(2)(i)', '', 3, NULL),
+(76, 'Person or Entity Authentication', 'TS-145', '45 CFR §164.312(a)(2)(i)<br>45 CFR §164.312(d)', '', 3, NULL),
 (77, 'Device and Media Controls – Accountability', 'AS-255', '45 C.F.R §164.310(d)(2)(iii)', '', 1, NULL),
 (78, 'Consent for Treatment, Payment and Healthcare Operations (Policy)', 'PR-265', '45 C.F.R. §164.512(e)<br>45 C.F.R. §164.530(h)', '', 5, NULL),
-(79, 'Policies and Procedures for Conducting Business with Business Associate', 'AS-260', '45 CFR §164.308(a)(8)(4)<br>45 CFR §164.314(a)(1)(ii)<br>45 CFR §164.314(a)(2)(i)(A)<br>45 CFR §164.314(a)(2)(i)(B)<br>45 CFR	§164.314(a)(2)(i)(C)<br>45 CFR §164.314(a)(2)(i)(D)<br>45 CFR §164.502(e)<br>45 CFR §164.504(e)(1)<br>45 CFR §164.308<br>45 CFR §164.314(a)(i)<br>45 CFR §164.314(a)(ii)', '', 1, NULL),
+(79, 'Policies and Procedures for Conducting Business with Business Associate', 'AS-260', '45 CFR	§164.314(a)(2)(i)(C)<br>45 CFR §164.308<br>45 CFR §164.308(a)(8)(4)<br>45 CFR §164.314(a)(1)(ii)<br>45 CFR §164.314(a)(2)(i)(A)<br>45 CFR §164.314(a)(2)(i)(B)<br>45 CFR §164.314(a)(2)(i)(D)<br>45 CFR §164.314(a)(i)<br>45 CFR §164.314(a)(ii)<br>45 CFR §164.502(e)<br>45 CFR §164.504(e)(1)', '', 1, NULL),
 (80, 'Policies and procedures for identifying business associates and distributing BA amendments', 'AS-265', '45 CFR §164.314(a)(i)(2)', '', 1, NULL),
 (81, 'Monitoring of PHI Disclosures by Business Associates', 'PR-270', '45 CFR § 164.410', '', 5, NULL),
 (82, 'test P&P name', 'test-P&P-number', 'test-Reg-number', 'test Description', NULL, 63),
@@ -138,7 +137,7 @@ INSERT INTO `regulations` (`rg_id`, `rg_pp_name`, `rg_pp_number`, `rg_number`, `
 (93, 'Requests for Restricting Use and Disclosure of PHI – Log', 'AS-200b', '§164.308(a)(3)(ii)(A) §164.308(a)(3)(ii)(B) §164.522', '', 1, NULL),
 (94, 'Circuit Diagram', 'AS-255b', '45 CFR §164.310(d)(2)(iii)', '', 1, NULL),
 (95, 'Business Associate Due Diligence', 'AS-261', '45 C.F.R. §164.308(a)(5)(ii)(A)<br>45 C.F.R. §164.502(a)<br>45 C.F.R. §164.502(b)<br>45 C.F.R. §164.514<br>45 C.F.R. §164.530', '', 1, NULL),
-(96, 'Use of PHI', 'PR-115', '45 C.F.R. § 164.501<br>45 C.F.R. § 164.502<br>45 C.F.R. § 164.504<br>45 C.F.R. § 164.506<br>45 C.F.R. § 164.506(a)<br>45 C.F.R. § 164.508<br>45 C.F.R. § 164.508(a)(2)<br>45 C.F.R. § 164.508(3)<br>45 C.F.R. § 164.510<br>45 C.F.R. § 164.512<br>45 C.F.R. § 164.530(c)', '', 5, NULL),
+(96, 'Use of PHI', 'PR-115', '45 C.F.R. § 164.501<br>45 C.F.R. § 164.502<br>45 C.F.R. § 164.504<br>45 C.F.R. § 164.506<br>45 C.F.R. § 164.506(a)<br>45 C.F.R. § 164.508<br>45 C.F.R. § 164.508(3)<br>45 C.F.R. § 164.508(a)(2)<br>45 C.F.R. § 164.510<br>45 C.F.R. § 164.512<br>45 C.F.R. § 164.530(c)', '', 5, NULL),
 (97, 'Use and Disclosure, Disaster Relief', 'PR-195', '45 C.F.R. §164.510(b)(4)', '', 5, NULL),
 (98, 'Use and Disclosure, Specialized Government Functions', 'PR-200', '45 C.F.R. §164.512(k)(1) Military<br>45 C.F.R. §164.512(k)(2) National Security<br>45 C.F.R. §164.512(k)(3) Protective Services<br>45 C.F.R. §164.512(k)(4) Medical Suitability<br>45 C.F.R. §164.512(k)(5) Correctional<br>45 C.F.R. §164.512(k)(6) Public Benefits', '', 5, NULL),
 (99, 'Use and Disclosure, Health Oversight', 'PR-205', '45 C.F.R. §164.512(d)', '', 5, NULL),
@@ -151,9 +150,9 @@ INSERT INTO `regulations` (`rg_id`, `rg_pp_name`, `rg_pp_number`, `rg_number`, `
 (106, 'Use and Disclosure for Cadaveric organ, eye or tissue donation - part of After Patient Death', 'PR-230', '45 C.F.R. §164.512(h)', '', 5, NULL),
 (107, 'Use and Disclosure for Workman''s Compensation - part of Judicial and Administrative', 'PR-235', '45 C.F.R. §164.512(l)', '', 5, NULL),
 (108, 'Use and Disclosure for Emergency Treatment - part of Use of PHI', 'PR-240', '', '', 5, NULL),
-(109, 'Use and Disclosure about Decedents, after Patient Death', 'PR-245', '45 C.F.R. §164.512(g)<br>45 C.F.R. §164.510(b)(5)', '', 5, NULL),
+(109, 'Use and Disclosure about Decedents, after Patient Death', 'PR-245', '45 C.F.R. §164.510(b)(5)<br>45 C.F.R. §164.512(g)', '', 5, NULL),
 (110, 'Seperation of Employee Health Documents', 'PR-267', '45 CFR 160.103<br>45 CFR 164.512(b)(1)(v)', '', 5, NULL),
-(111, 'Remote Access Policy', 'PS-143', '45 CFR §164.312(a)(2)(iii)<br>45 CFR §164.308(a)(3)(ii)(B)<br>45 CFR §164.308(a)(3)(ii)(C)<br>45 CFR §164.308(a)(4)(ii)(B)<br>45 CFR §164.308(a)(4)(ii)(C)', '', 2, NULL),
+(111, 'Remote Access Policy', 'PS-143', '45 CFR §164.308(a)(3)(ii)(B)<br>45 CFR §164.308(a)(3)(ii)(C)<br>45 CFR §164.308(a)(4)(ii)(B)<br>45 CFR §164.308(a)(4)(ii)(C)<br>45 CFR §164.312(a)(2)(iii)', '', 2, NULL),
 (112, 'Asset Inventory', 'PS-165a', '45 CFR §164.310(d)(2)(iii)', '', 2, NULL),
 (113, 'Mechanism to Authenticate', 'TS-150', '45 C.F.R. §164.312(c)(2)', '', 3, NULL);
 
