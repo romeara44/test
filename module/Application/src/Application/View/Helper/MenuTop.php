@@ -708,7 +708,7 @@ class MenuTop extends AbstractHelper
             ),
         );
 
-        if ($is_training_manager) {
+        //if ($is_training_manager) {
             $this->items[] = array(
                 'title' => 'Trainings',
                 'url' => '/traininglog/list',
@@ -721,8 +721,45 @@ class MenuTop extends AbstractHelper
                         )
                 )
             );
-        }
-        
+        //}
+
+        $this->items[] = array(
+                            'title' => 'Reporting',
+                            'url' => '/reporting/auditbreach',
+                            'items' => array(
+                                array('title' => 'Audit/Breach',
+                                        'url' => '/reporting/auditbreach',
+                                        'disabled' => true
+                                    ),
+                                array('title' => 'Plans Progress',
+                                     'url' => '/reporting/planprogress',
+                                     'disabled' => true
+                                    )
+                            )
+                        );
+
+        $this->items[] = array(
+                                    'title' => 'Forms and Logs',
+                                    'url' => '/itassetinventory/list',
+                                    'items' => array(
+                                        array('title' => 'IT Asset Inventory',
+                                                'url' => '/itassetinventory/list',
+                                                'disabled' => true
+                                            ),
+                                        array('title' => 'Physical Security Changes',
+                                                'url' => '/physicalsecuritychange/list',
+                                                'disabled' => true
+                                            ),
+                                        array('title' => 'Disclosure Records',
+                                                'url' => '/disclosurerecord/list',
+                                                'disabled' => true
+                                            ),
+                                        array('title' => 'Requests for Accounting of Disclosure Records',
+                                                'url' => '/accountingrequest/list',
+                                                'disabled' => true
+                                            ),
+                                )
+                            );
     }
 
     private function _prepareItemsForSalesRep()
