@@ -18,6 +18,7 @@ use User\Form\AcceptPrivacyTermsForm;
 use Zend\Session\Container;
 use Client\Model\CompanyTable;
 use Client\Model\Company;
+use Client\Model\CompanyRoles;
 
 class UserController extends AbstractActionController
 {
@@ -29,7 +30,7 @@ class UserController extends AbstractActionController
         $container->activity = time();
         $this->layout()->flashMessagesSuccess = $this->flashMessenger()->getSuccessMessages();
         $this->layout()->flashMessagesErrors = $this->flashMessenger()->getErrorMessages();
-        if (!$this->hasIdentity() && !in_array($this->params('action'), array('registration', 'registrationthanks', 'confirm'))) {
+        if (!$this->hasIdentity() && !in_array($this->params('action'), array('registration', 'registrationthanks', 'confirm', 'registrationtrial'))) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
 
@@ -96,27 +97,27 @@ class UserController extends AbstractActionController
         $passwordWrong = false;
         $request = $this->getRequest();
         if ($request->isPost()) {
-            $post = $request->getPost();
+            $location = $request->getPost();
             $user = new User();
             $uId = is_object($userObj) ? $userObj->u_id : 0;
             $form->setInputFilter($user->getSimpleInputFilter($this->getServiceLocator(), $id, $uId, true));
             $form->setData($request->getPost());
 
-            if (($post['u_password'] != '') && ($post['u_password'] != $post['u_confirm_password'])) {
+            if (($location['u_password'] != '') && ($location['u_password'] != $location['u_confirm_password'])) {
                 $passwordWrong = true;
             }
 
             if ($form->isValid() && !$passwordWrong) {
 
-                if ($post['u_password'] != '') {
-                    $this->getUserTable()->setNewPassword($id, $post['u_password']);
+                if ($location['u_password'] != '') {
+                    $this->getUserTable()->setNewPassword($id, $location['u_password']);
                 }
 
-                $post['u_senior_consultant_u_id'] = $userObj->u_senior_consultant_u_id;
-                $post['u_company_id'] = $userObj->u_company_id;
-                $post['u_role_id'] = $userObj->u_role_id;
-                $post['u_email'] = $userObj->u_email;
-                $user->exchangeArray($post);
+                $location['u_senior_consultant_u_id'] = $userObj->u_senior_consultant_u_id;
+                $location['u_company_id'] = $userObj->u_company_id;
+                $location['u_role_id'] = $userObj->u_role_id;
+                $location['u_email'] = $userObj->u_email;
+                $user->exchangeArray($location);
                 $this->getUserTable()->saveUser($user);
 
                 $this->flashMessenger()->addSuccessMessage('Profile has been modified');
@@ -157,32 +158,32 @@ class UserController extends AbstractActionController
         $request = $this->getRequest();
 
         if ($request->isPost()) {
-            $post = $request->getPost();
+            $location = $request->getPost();
             $user = new User();
             $form->setInputFilter($user->getRegistrationInputFilter($this->getServiceLocator()));
             $form->setData($request->getPost());
 
             if ($form->isValid()) {
 
-                $post['u_senior_consultant_u_id'] = null;
-                $post['u_company_id']             = null;
-                $post['u_register']               = 1;
-                $post['u_first_login']            = 1;
-                $post['u_confirmed']              = 0;
-                $post['u_role_id']                = \Admin\Model\User::ROLE_PARTIAL;
+                $location['u_senior_consultant_u_id'] = null;
+                $location['u_company_id']             = null;
+                $location['u_register']               = 1;
+                $location['u_first_login']            = 1;
+                $location['u_confirmed']              = 0;
+                $location['u_role_id']                = \Admin\Model\User::ROLE_PARTIAL;
 
-                $user->exchangeArray($post);
+                $user->exchangeArray($location);
 
                 $uId = $this->getUserTable()->registerUser($user);
 
                 if($uId) {
                     $company = new Company();
 
-                    $companyData['c_name']                 = $post['u_company'];
-                    $companyData['c_email']                = $post['u_email'];
-                    $companyData['c_phone']                = $post['u_office_phone'] . $post['u_office_phone_inner'];
-                    $companyData['c_other_phone']          = $post['u_other_phone'];
-                    $companyData['c_other_phone_inner']    = $post['u_other_phone_inner'];
+                    $companyData['c_name']                 = $location['u_company'];
+                    $companyData['c_email']                = $location['u_email'];
+                    $companyData['c_phone']                = $location['u_office_phone'] . $location['u_office_phone_inner'];
+                    $companyData['c_other_phone']          = $location['u_other_phone'];
+                    $companyData['c_other_phone_inner']    = $location['u_other_phone_inner'];
                     $companyData['c_owner_u_id']           = $uId;
                     $companyData['c_primary_contact_u_id'] = $uId;
                     $companyData['c_active']               = 1;
@@ -196,6 +197,94 @@ class UserController extends AbstractActionController
                         $user->u_company_id = $cId;
 
                         $this->getUserTable()->saveUser($user);
+                    }
+                }
+
+                $this->redirect()->toRoute('user', array('controller' => 'user', 'action' => 'registrationthanks'));
+            }
+        }
+
+        return array(
+            'form' => $form
+        );
+    }
+
+    public function registrationtrialAction()
+    {
+        if ($this->hasIdentity()) {
+            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+        }
+
+        $form = new RegistrationForm($this->getServiceLocator(), $this->getRequest()->getBaseUrl().'/data/captcha/');
+
+        $request = $this->getRequest();
+
+        if ($request->isPost()) {
+            $location = $request->getPost();
+            $user = new User();
+            $form->setInputFilter($user->getRegistrationInputFilter($this->getServiceLocator()));
+            $form->setData($request->getPost());
+
+            if ($form->isValid()) {
+
+                $location['u_senior_consultant_u_id'] = null;
+                $location['u_company_id']             = null;
+                $location['u_register']               = 1;
+                $location['u_first_login']            = 1;
+                $location['u_confirmed']              = 0;
+                $location['u_role_id']                = \Admin\Model\User::ROLE_TRAIL;
+
+                $user->exchangeArray($location);
+
+                $uId = $this->getUserTable()->registerUser($user);
+
+                if($uId) {
+                    $company = new Company();
+
+                    $companyData['c_name']                 = $location['u_company'];
+                    $companyData['c_email']                = $location['u_email'];
+                    $companyData['c_phone']                = $location['u_office_phone'] . $location['u_office_phone_inner'];
+                    $companyData['c_other_phone']          = $location['u_other_phone'];
+                    $companyData['c_other_phone_inner']    = $location['u_other_phone_inner'];
+                    $companyData['c_owner_u_id']           = $uId;
+                    $companyData['c_primary_contact_u_id'] = $uId;
+                    $companyData['c_active']               = 1;
+
+                    $company->exchangeArray($companyData);
+
+                    $cId = $this->getCompanyTable()->addClientCompany($company);
+
+                    $location = array();
+                    $location['adr_address1'] = array(
+                        0 => ''
+                    );
+                    $location['adr_name'][0] = 'main location';
+                    $location['adr_address1'][0] = 'test';
+                    $location['adr_address2'][0] = '';
+                    $location['adr_city'][0] = '';
+                    $location['adr_state_id'][0] = 0;
+                    $location['adr_zip'][0] = '';
+
+                    $this->getCompanyTable()->saveAddresses($cId, $location);
+
+                    if($cId) {
+                        $user->u_id         = $uId;
+                        $user->u_company_id = $cId;
+
+                        $this->getUserTable()->saveUser($user);
+                    }
+
+                    $assessmentsRoles = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles();
+
+                    foreach ($assessmentsRoles as $ar) {
+                        $cr = new CompanyRoles();
+
+                        $dataCr['cr_c_id']  = $cId;
+                        $dataCr['cr_ar_id'] = $ar['ar_id'];
+                        $dataCr['cr_u_id']  = $uId;
+
+                        $cr->exchangeArray($dataCr);
+                        $this->getServiceLocator()->get('Client\Model\CompanyRolesTable')->saveCompanyRole($cr);
                     }
                 }
 
@@ -244,7 +333,7 @@ class UserController extends AbstractActionController
         $request = $this->getRequest();
 
         if ($request->isPost()) {
-            $post = $request->getPost();
+            $location = $request->getPost();
             $user = new User();
             $form->setInputFilter($user->getAcceptPrivacyTermsInputFilter($this->getServiceLocator()));
             $form->setData($request->getPost());

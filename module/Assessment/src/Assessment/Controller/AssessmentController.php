@@ -442,16 +442,16 @@ class AssessmentController extends AbstractActionController
 
                 $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionAnswerTable')->saveAqa($id, $adrId, $assessmentRole, $post, $files);
 
-                if ($post['autoSave']) {
-                    return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => $post['setStep'], 'locationRole' => $adrId . '_' . $assessmentRole));
-                }
-
                 if ($this->getAssessmentTable()->checkLocationFinished($id, $adrId)) {
                     $this->getAssessmentTable()->_createRemediationPlan($id, $adrId);
                     if ($this->getAssessmentTable()->checkAllLocationsFinished($id)) {
                         return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'list'));
                     }
-                }                
+                }
+
+                if ($post['autoSave']) {
+                    return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => $post['setStep'], 'locationRole' => $adrId . '_' . $assessmentRole));
+                }                                
             }
 
             if ($valid) {
