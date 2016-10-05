@@ -449,16 +449,12 @@ $form->setAttribute('method', 'post');
             }
         }
 
-        $('#_search_regulation').keypress(function(e){            
-            if (e.keyCode == '13') {
-                e.preventDefault();
-                searchRegulations();
-                return false;
-            }                        
+        $('#_search_regulation').keyup(function(e){            
+            searchRegulations();                   
         });
 
         $('#list_search-button').click(function(){
-            searchRegulations();
+            //searchRegulations();
         });
 
         searchRegulations();
