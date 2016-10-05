@@ -71,8 +71,10 @@ class MailtemplateTable
         //error_reporting(255);
         //ini_set('display_errors', 1);
         $mt = null;
+        $templateKey = '';
         if (isset($params['templateKey'])) {
-            $mt = $this->getMailtemplateByKey($params['templateKey']);
+            $templateKey = $params['templateKey'];
+            $mt = $this->getMailtemplateByKey($params['templateKey']);            
         }
 
         $user = null;
@@ -172,7 +174,7 @@ class MailtemplateTable
             $mail->addReplyTo('hipaa@hipaa.carosh.com', 'HIPAA Suite');
         }
 
-        $htmlTemplateText = $this->_getHtmlTemplate($sl, $text);
+        $htmlTemplateText = $this->_getHtmlTemplate($sl, $text, $templateKey);
 
         $message = $htmlTemplateText;
 
@@ -284,7 +286,7 @@ class MailtemplateTable
 
     }
 
-    public function _getHtmlTemplate($sl, $content)
+    public function _getHtmlTemplate($sl, $content, $templateKey = '')
     {
         $renderer = new PhpRenderer();
 
@@ -318,6 +320,7 @@ class MailtemplateTable
             'consultant_email' => $consultantEmail,
             'consultant_phone' => $consultantPhone,
             'consultant_role'  => $sl->get('Admin\Model\RoleTable')->getRoleName($identity['u_role_id']),
+            'templateKey' => $templateKey,
         ));
         $model->setTemplate('mail/mailtemplate');
 

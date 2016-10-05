@@ -87,6 +87,10 @@
                             <?php if ($isConsultantRole && ($this->consultant_phone != '')): ?>
                                 <br/><?php echo $identity['u_office_phone'] ?>
                             <?php endif; ?>
+                        <?php if ($this->templateKey == 'registeruser') : ?>
+                            <br/>support@carosh.com
+                            <br/>(888) 534-0919
+                        <?php endif; ?>
                             <br/>Carosh Compliance Solutions, llc
                             <br/><a style="color: #93cccc;" href="<?php echo $this->serverUrl(); ?>"><?php echo preg_replace('#http[s]*://#Uis', '', $this->serverUrl())?></a>
                         </p>
@@ -98,7 +102,7 @@
             <tr>
                 <td align="center">
                     <p style="margin: 25px 0 18px 0; color: #476580; font-family: arial, tahoma, verdana; font-size: 12px; line-height: 21px;">
-                        Copyright &copy; 2014 <a href="<?php echo $this->serverUrl(); ?>/" style="color: #476580;" target="_blank">Carosh Compliance Solutions, llc</a>. All rights reserved.<br>
+                        Copyright &copy; <?= date('Y') ?> <a href="<?php echo $this->serverUrl(); ?>/" style="color: #476580;" target="_blank">Carosh Compliance Solutions, llc</a>. All rights reserved.<br>
                         <a href="<?php echo $this->serverUrl(); ?>/Privacy_Policy.pdf" style="color: #476580;" target="_blank">Privacy Statement</a> &nbsp; | &nbsp; <a href="<?php echo $this->serverUrl(); ?>/Terms_of_Use.pdf" style="color: #476580;" target="_blank">Terms and Conditions</a>
                     </p>
                     <br>

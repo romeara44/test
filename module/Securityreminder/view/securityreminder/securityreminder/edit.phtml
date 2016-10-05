@@ -106,7 +106,7 @@ $form->setAttribute('method', 'post');
                                 $_fileName = $_file[0];
                                 $_fileId = $_file[1];
                                 ?>
-                                <span style="float: left; margin-right: 5px;" class="''?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+                                <span style="float: left; margin-right: 5px;" class="''?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><span>&nbsp;</span><a href="/files/delete/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="remove-uploaded-materials">X</a><br/>
 
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -196,9 +196,7 @@ $form->setAttribute('method', 'post');
                         count = browseFilesCounter.comments;
                         break;
                 }
-                console.log('#file_' + type[1] + '_' + count);
-                console.log(count);
-                console.log(browseFilesCounter.training);
+
                 if(count > 0) {
                     var prevFile = $('#file_' + type[1] + '_' + (count - 1)).val();
                     if(prevFile == undefined || prevFile == '') {
@@ -207,22 +205,49 @@ $form->setAttribute('method', 'post');
                     }
                 }
 
-                $('#filesToUploadBox_' + type[1]).append('<input type="file" name="' + type[1] + '[]" id="file_' + type[1] + '_' + count + '" />');
-
-                $('#file_' + type[1] + '_' + count).click();
-
                 switch(type[1]) {
                     case 'materials':
+                        $('#filesToUploadBox_' + type[1]).append('<p><input type="file" name="' + type[1] + '[]" id="file_' + type[1] + '_' + count + '" /><a href="javascript:void(0)" class="remove-upload-materials">X</a></p>');
                         ++browseFilesCounter.training;
                         break;
                     case 'comments':
+                        $('#filesToUploadBox_' + type[1]).append('<p><input type="file" name="' + type[1] + '[]" id="file_' + type[1] + '_' + count + '" /></p>');
                         ++browseFilesCounter.comments;
                         break;
                 }
 
+                $('#file_' + type[1] + '_' + count).click();
+
             });
             
             $( "#sr_launched_date" ).datepicker({dateFormat: 'mm/dd/yy'});
+
+            $('#filesToUploadBox_materials').on('click', '.remove-upload-materials', function() {
+                $(this).parent().remove();
+                browseFilesCounter.training--;
+            });
+
+            $('body').on('click', '.remove-uploaded-materials', function(e) {
+                e.preventDefault();
+                var link = $(this);
+                $.ajax({
+                    type:"POST",
+                    url:link.prop('href'),
+                    success: function(data){
+                        if (data == '1') {
+                            link.prev('span').remove();
+                            link.prev('a').remove();
+                            link.prev('span').remove();
+                            link.next('br').remove();
+                            link.remove();
+                        } else if (data == '0') {
+                            link.closest('div.note').remove();
+                        } else {
+                            alert(data);
+                        }
+                    }
+                });
+            });
         });
     });
 </script>

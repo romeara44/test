@@ -240,6 +240,10 @@
         });
 
         var secLeftInterval  = null;
+
+        var funcOnLogout  = null;
+        var needLogout  = true;
+
         function setCheckActivity()
         {
             var check = setInterval(function() {
@@ -252,7 +256,13 @@
                         secLeftInterval = setInterval(function() {
                             $('#secLeft').html(--secLeft);
                             if (secLeft == 0) {
-                                document.location.href = '/auth/logout';
+                                console.log(typeof funcOnLogout)
+                                if (typeof funcOnLogout == 'function') {
+                                    funcOnLogout();
+                                }
+                                if (needLogout) {
+                                    document.location.href = '/auth/logout';
+                                }                                
                             }
                         }, 1000);
                     }

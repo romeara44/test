@@ -64,7 +64,7 @@ class SecurityreminderTable implements ServiceLocatorAwareInterface
             $select->join(array('u2' => 'users'), new \Zend\Db\Sql\Expression('sr_developed_by_u_id = u2.u_id'), array('_developed_by_name' => new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)')), 'left');
 
             if ($searchValue !== null) {
-                $select->where('(u2.u_firstname LIKE "%' . $searchValue . '%" OR u2.u_lastname LIKE "%' . $searchValue . '%" OR sr_title LIKE "%' . $searchValue . '%")');
+                $select->where('(u2.u_firstname LIKE "%' . $searchValue . '%" OR u2.u_lastname LIKE "%' . $searchValue . '%" OR sr_title LIKE "%' . $searchValue . '%" OR n.note_text LIKE "%' . $searchValue . '%")');
             }
 
             if ($orderBy) {

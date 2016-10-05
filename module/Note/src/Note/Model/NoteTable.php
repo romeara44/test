@@ -341,4 +341,13 @@ class NoteTable implements ServiceLocatorAwareInterface
 
         return $note_dest->note_id;
     }
+
+    public function deleteNote($id)
+    {
+        $data['note_id'] = $id;
+        $data['note_active'] = 0;
+        $this->tableGateway->delete(array('note_id' => $id));
+
+        return true;
+    }
 }

@@ -98,10 +98,11 @@ class UserController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $location = $request->getPost();
+            $location['u_company_id'] = $userObj->u_company_id;
             $user = new User();
             $uId = is_object($userObj) ? $userObj->u_id : 0;
             $form->setInputFilter($user->getSimpleInputFilter($this->getServiceLocator(), $id, $uId, true));
-            $form->setData($request->getPost());
+            $form->setData($location);
 
             if (($location['u_password'] != '') && ($location['u_password'] != $location['u_confirm_password'])) {
                 $passwordWrong = true;
@@ -114,7 +115,7 @@ class UserController extends AbstractActionController
                 }
 
                 $location['u_senior_consultant_u_id'] = $userObj->u_senior_consultant_u_id;
-                $location['u_company_id'] = $userObj->u_company_id;
+                
                 $location['u_role_id'] = $userObj->u_role_id;
                 $location['u_email'] = $userObj->u_email;
                 $user->exchangeArray($location);
@@ -124,7 +125,7 @@ class UserController extends AbstractActionController
 
                 $this->redirect()->toRoute('user', array('controller' => 'user', 'action' => 'account'));
 
-            } else {
+            } else {var_dump($form->getMessages());exit;
                 foreach ($form->getMessages() as $messageId => $message) {
                     //echo "Validation failure '$messageId': $message\n";
                     //die;
@@ -143,7 +144,7 @@ class UserController extends AbstractActionController
             'form' => $form,
             'passwordWrong' => $passwordWrong,
             'uId' => $id,
-            'email' => $identity['u_email']
+            'email' => $userObj->u_email
         );
     }
 

@@ -1,3 +1,6 @@
+<?php
+use Assessment\Model\Assessment;
+?>
 <?php if (count($this->loc_rps) > 1) : ?>
 <div class="tab_nav">
     <ul class="ul_tabs">
@@ -10,7 +13,7 @@
 </div>
 <?php endif; ?>
 <div class="page-title">
-    <h1 class="fleft">Remediation Plan for <?php echo (!$this->isPdf) ? '<br/>' : '' ?><?php echo $this->rpObj->_client_name ?>
+    <h1 class="fleft"><?php echo $this->rpObj->rp_type == Assessment::TYPE_SECURITY_RISK ? 'Security' : 'Privacy'; ?> Remediation Plan for <?php echo (!$this->isPdf) ? '<br/>' : '' ?><?php echo $this->rpObj->_client_name ?>
     <?php foreach ($this->actions as $rpa): ?>
     <?php
         if($rpa->rpa_adr_id === null){

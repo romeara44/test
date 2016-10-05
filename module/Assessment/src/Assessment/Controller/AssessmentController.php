@@ -362,6 +362,12 @@ class AssessmentController extends AbstractActionController
 
                 if(!$checkFillCompanyRoles = $this->getCompanyRolesTable()->checkFillCompanyRoles($post['a_c_id'])) {
                     $companyRolesMsg = 'Please, fill all roles for this company';
+                } elseif (!empty($post['a_c_id'])) {
+                    $c_addrs = $this->getAddressTable()->getAddresses($post['a_c_id'], \Client\Model\AddressItem::COMPANY_TYPE);
+                    if (!$c_addrs->count()) {
+                        $checkFillCompanyRoles = false;
+                        $companyRolesMsg = 'Please, fill primary location for this company';
+                    }
                 }
                 
                 if ($form->isValid() && $checkFillCompanyRoles) {
@@ -449,8 +455,8 @@ class AssessmentController extends AbstractActionController
                     }
                 }
 
-                if ($post['autoSave']) {
-                    return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'edit', 'id' => $id, 'step' => $post['setStep'], 'locationRole' => $adrId . '_' . $assessmentRole));
+                if ($post['logout']) {
+                    return $this->redirect()->toRoute('auth', array('controller' => 'auth', 'action' => 'logout'));
                 }                                
             }
 
