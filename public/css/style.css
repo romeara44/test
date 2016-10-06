@@ -1589,3 +1589,8 @@ form.chart select {
 }
 
 .tr-selected { background: #f7f8fb; }
+.hold_input{
+	float:left;
+	width:318px;
+	position:relative;
+}
