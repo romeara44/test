@@ -52,6 +52,10 @@ $identity = $authService->getIdentity();
     </thead>
     <tbody>
         <?php foreach ($this->paginator as $sr): ?>
+            <?php
+            $copyOfMaterials = $this->noteTable->getNotes($sr->sr_id, \Note\Model\Note::NOTE_SRM);
+            $comments        = $this->noteTable->getNotes($sr->sr_id, \Note\Model\Note::NOTE_SRC);
+            ?>
             <tr>
                 <td><?php echo $sr->sr_title ?></td>
                 <td><?php echo ($sr->sr_launched_date != '0000-00-00') ? $this->formatDateA($sr->sr_launched_date) : '' ?></td>
@@ -60,7 +64,7 @@ $identity = $authService->getIdentity();
                 <td><?php echo $this->textHelper($sr->_sr_comment, 20); ?></td>
                 <td style="white-space: nowrap;" class="aright">
                     <?php if ($sr->_sr_attachment): ?>
-                        <i class="fa fa-paperclip"></i> &nbsp;
+                        <a style="margin-left: 10px;" href="" class="attachments" rel="<?php echo $sr->sr_id ?>" title="View Attachments"><i class="fa fa-paperclip"></i></a> &nbsp;
                     <?php endif; ?>
                     <a href="/securityreminder/edit/<?php echo $sr->sr_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
                     <?php if ($sr->sr_active): ?>
@@ -70,6 +74,33 @@ $identity = $authService->getIdentity();
                         <a href="/securityreminder/unarchive/<?php echo $sr->sr_id  ?>" class="">Unarchive</a>
                     <?php endif; ?>
                 </td>
+            </tr>
+            <tr class="expandable" id="attachments<?php echo $sr->sr_id ?>">
+                <td>&nbsp;</td>
+                <?php foreach (array('Copy of Materials' => $copyOfMaterials, 'Reports' => $comments) as $keyAtt => $notes): ?>
+                <td colspan="2">
+                    <div>
+                        <div><strong><?php echo $keyAtt ?>:</strong></div>
+                        <div>
+                        <?php foreach ($notes as $note): ?>
+                            <?php if ($note->_files != ''): ?>
+                                <?php
+                                $_files = explode(',', $note->_files);
+                                ?>
+                                <?php foreach ($_files as $_file): ?>
+                                    <?php
+                                    $_file = explode('::', $_file);
+                                    $_fileName = $_file[0];
+                                    $_fileId = $_file[1];
+                                    ?>
+                                    <span style="float: left; margin-right: 5px;" class="i-file"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                        </div>
+                    </div>
+                </td>
+                <?php endforeach; ?>
             </tr>
 
         <?php endforeach; ?>
@@ -116,6 +147,18 @@ $identity = $authService->getIdentity();
                     window.location.href = $(this).attr('action');
                 } else if(search !== undefined) {
                     window.location.href = $(this).attr('action') + '/search/' + search;
+                }
+            });
+
+            jQuery('.expandable').hide();
+            jQuery('.attachments').click(function(e) {
+                e.preventDefault();
+                var $this = $(this);
+                var idA = $this.attr('rel');
+                if(jQuery('#attachments' + idA).is(':visible')) {
+                    jQuery('#attachments' + idA).slideUp();
+                } else {
+                    jQuery('#attachments' + idA).slideDown();
                 }
             });
         });

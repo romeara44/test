@@ -141,7 +141,8 @@ class SecurityreminderController extends AbstractActionController
             'paginator'   => $paginator,
             'hasIdentity' => $this->hasIdentity(),
             'roleFilter'  => $roleFilter,
-            'search'      => $search
+            'search'      => $search,
+            'noteTable' => $this->getNoteTable(),
         ));
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open security reminder list page');
