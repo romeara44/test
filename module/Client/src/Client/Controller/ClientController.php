@@ -174,6 +174,7 @@ class ClientController extends AbstractActionController
         $setTrainingManager = true;
         $setTrainingManagerMsg = '';
         $training_managers = array();
+        $cId = (int) $this->params('company');
 
         if ((int) $id) {
             $userObj = $this->getUserTable()->getUser($id);
@@ -184,6 +185,9 @@ class ClientController extends AbstractActionController
             $primaryAddressObj = $this->getAddressTable()->getAddress($clientObj->c_primary_adr_id);
             $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_CONTACT);
             $training_managers = $this->getServiceLocator()->get('Client\Model\CompanyTrainingManagersTable')->getTrainingManagersIdsForCompany($userObj->u_company_id);
+        } elseif ($cId) {
+            $compObj = $this->getCompanyTable()->getCompany($cId);
+            $primaryAddressObj = $this->getAddressTable()->getAddress($compObj->c_primary_adr_id);
         }
 
         $request = $this->getRequest();
@@ -312,7 +316,7 @@ class ClientController extends AbstractActionController
             'formNote' => $formNote,
             'notes' => $notes,
             'identity' => $identity,
-            'cId' => (int) $this->params('company'),
+            'cId' => $cId,
             'clientLimitMsg' => $clientLimitMsg,
             'setTrainingManagerMsg' => $setTrainingManagerMsg,
             'checkClientLimitCompany' => $this->getCompanyTable()->checkClientLimitCompany(),
