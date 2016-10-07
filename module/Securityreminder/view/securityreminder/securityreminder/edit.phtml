@@ -126,6 +126,7 @@ $form->setAttribute('method', 'post');
 
         </p>
         <p style="border: 0;">
+            <strong style="line-height: 30px;">Upload Reports</strong><br />
             <a id="browseFile_comments" href="javascript:" class="button"><i class="fa fa-plus-circle"></i> Browse Files...</a>
             <br /><br /><br />
         </p>
@@ -141,20 +142,22 @@ $form->setAttribute('method', 'post');
             <?php foreach ($comments as $note): ?>
                 <div class="note">
                     <strong><?php echo $note->_username ?></strong> <small> on <?php echo $note->_note_create_date_format ?></small><br />
-                    <p>
-                        <?php echo $note->note_text ?><br />
+                        <?php if ($note->note_text != ''): ?>
+                            <strong>Comments:</strong><br />
+                            <?php echo $note->note_text ?><br />
+                        <?php endif; ?>
                         <?php if ($note->_files != ''): ?>
                             <?php
                             $_files = explode(',', $note->_files);
                             ?>
-                            <strong>Comments:</strong><br />
+                            <strong>Reports:</strong><br />
                             <?php foreach ($_files as $_file): ?>
                                 <?php
                                 $_file = explode('::', $_file);
                                 $_fileName = $_file[0];
                                 $_fileId = $_file[1];
                                 ?>
-                                <span style="float: left; margin-right: 5px;" class="''?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+                                <span style="float: left; margin-right: 5px;" class="''?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><span>&nbsp;</span><a href="/files/delete/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="remove-uploaded-materials">X</a><br/>
 
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -211,7 +214,7 @@ $form->setAttribute('method', 'post');
                         ++browseFilesCounter.training;
                         break;
                     case 'comments':
-                        $('#filesToUploadBox_' + type[1]).append('<p><input type="file" name="' + type[1] + '[]" id="file_' + type[1] + '_' + count + '" /></p>');
+                        $('#filesToUploadBox_' + type[1]).append('<p><input type="file" name="' + type[1] + '[]" id="file_' + type[1] + '_' + count + '" /><a href="javascript:void(0)" class="remove-upload-comments">X</a></p>');
                         ++browseFilesCounter.comments;
                         break;
                 }
@@ -225,6 +228,11 @@ $form->setAttribute('method', 'post');
             $('#filesToUploadBox_materials').on('click', '.remove-upload-materials', function() {
                 $(this).parent().remove();
                 browseFilesCounter.training--;
+            });
+
+            $('#filesToUploadBox_comments').on('click', '.remove-upload-comments', function() {
+                $(this).parent().remove();
+                browseFilesCounter.comments--;
             });
 
             $('body').on('click', '.remove-uploaded-materials', function(e) {

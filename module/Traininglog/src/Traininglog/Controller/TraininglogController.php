@@ -163,7 +163,8 @@ class TraininglogController extends AbstractActionController
             'paginator'   => $paginator,
             'hasIdentity' => $this->hasIdentity(),
             'roleFilter'  => $roleFilter,
-            'search'      => $search
+            'search'      => $search,
+            'noteTable' => $this->getNoteTable(),
         ));
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open traininglog list page');
@@ -256,21 +257,8 @@ class TraininglogController extends AbstractActionController
                 $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
                 $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles(), false, 'training');
 
-                // save text note
-                if($post['note_text'])
-                {
-                    $note = new Note();
-                    $noteData['note_text'] = $post['note_text'];
-                    $noteData['note_item_type'] = \Note\Model\Note::NOTE_TLC;
-                    $noteData['note_item_id'] = $tlId;
-                    $note->exchangeArray($noteData);
-                    $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-                    $noteId = $this->getNoteTable()->saveNote($note);
-                }
-                
-                // save files
                 $note = new Note();
-                $noteData['note_text'] = '';
+                $noteData['note_text'] = $post['note_text'];
                 $noteData['note_item_type'] = \Note\Model\Note::NOTE_TLC;
                 $noteData['note_item_id'] = $tlId;
                 $note->exchangeArray($noteData);

@@ -222,21 +222,8 @@ class SecurityreminderController extends AbstractActionController
                 $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
                 $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles(), false, 'materials');
 
-                // save text note
-                if($post['note_text'])
-                {
-                    $note = new Note();
-                    $noteData['note_text'] = $post['note_text'];
-                    $noteData['note_item_type'] = \Note\Model\Note::NOTE_SRC;
-                    $noteData['note_item_id'] = $srId;
-                    $note->exchangeArray($noteData);
-                    $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-                    $noteId = $this->getNoteTable()->saveNote($note);
-                }
-                
-                // save files
                 $note = new Note();
-                $noteData['note_text'] = '';
+                $noteData['note_text'] = $post['note_text'];
                 $noteData['note_item_type'] = \Note\Model\Note::NOTE_SRC;
                 $noteData['note_item_id'] = $srId;
                 $note->exchangeArray($noteData);

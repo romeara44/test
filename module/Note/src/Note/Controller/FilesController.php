@@ -192,14 +192,18 @@ class FilesController extends AbstractActionController
             $this->getNotefilesTable()->deleteFileByFId($fId);
             $this->getFileTable()->deleteFileById($fId);
             unlink($filepath);
-            $files = $this->getNotefilesTable()->getFilesByNoteId($noteId);
-            if ($files->count()) {
-                echo '1';
+            $note = $this->getNoteTable()->getNote($noteId);
+            if ($note && $note->note_text == '') {
+                $files = $this->getNotefilesTable()->getFilesByNoteId($noteId);
+                if ($files->count()) {
+                    echo '1';
+                } else {
+                    $this->getNoteTable()->deleteNote($noteId);
+                    echo '0';
+                }
             } else {
-                $this->getNoteTable()->deleteNote($noteId);
-                echo '0';
-            }
-            
+                echo '1';
+            }            
             exit;
         } else {
             echo "Sorry, such file doesn't exist";
