@@ -380,10 +380,10 @@ class UserTable implements ServiceLocatorAwareInterface
         $adminId = null;
         $user    = $this->getUserByEmail($email);
 
-        if ($user->u_role_id == \Admin\Model\User::ROLE_ADMIN) {
+        //if ($user->u_role_id == \Admin\Model\User::ROLE_ADMIN) {
             return $this->resetPassword($user->u_id);
-        }
-
+        //}
+/*
         if($user->u_company_id && $user->u_company_id != $user->u_company_id_admin) {
             $select = $this->tableGateway->getSql()->select();
             $select->where('u_company_id_admin = ' . $user->u_company_id);
@@ -414,7 +414,7 @@ class UserTable implements ServiceLocatorAwareInterface
             return true;
         }
 
-        return false;
+        return false;*/
     }
 
     public function setConfirmed($uId, $hash)
@@ -687,7 +687,7 @@ class UserTable implements ServiceLocatorAwareInterface
 
         $user = $this->tableGateway->selectWith($select)->current();
 
-        if($user && ($user->u_role_id == \Admin\Model\User::ROLE_ADMIN || $this->checkClientAdministrationAccess($user))) {
+        if($user/* && ($user->u_role_id == \Admin\Model\User::ROLE_ADMIN || $this->checkClientAdministrationAccess($user))*/) {
             $password = sha1($user->u_email . time());
             $password = substr($password, 0, 6);
 
