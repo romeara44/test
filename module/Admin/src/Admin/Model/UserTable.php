@@ -680,6 +680,52 @@ class UserTable implements ServiceLocatorAwareInterface
         return true;
     }
 
+    public function checkPassword($password)
+    {
+        if (strlen($password) < 8 || !preg_match("/[A-Z]+/", $password) || !preg_match("/[a-z]+/", $password) || !preg_match("/\d+/", $password) || !preg_match("/[~!@#$%?^&*()_+`\-={}[\]:;<>.,\/\\\\]+/", $password)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public function generatePassword($password_length)
+    {
+        $str = '';
+        $chars = 'abcdefghijklmnopqrstuvwxyz';
+        $chars_length = 25;
+        $up_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $up_chars_length = 25;
+        $digits = '0123456789';
+        $digits_length = 9;
+        $spec_chars = '~!@#$%?^&*()_+`-={}[]:;<>.,/\\';
+        $spec_chars_length = strlen($spec_chars) - 1;
+
+        $chars_count = rand(1, $password_length - 3);
+        $up_chars_count = rand(1, $password_length - $chars_count - 2);
+        $digits_count = rand(1, $password_length - $chars_count - $up_chars_count - 1);
+        $spec_chars_count = rand(1, $password_length - $chars_count - $up_chars_count - $digits_count);
+
+        for ($i=0; $i < $chars_count; $i++) { 
+            $ind = rand(0, $chars_length);
+            $str .= $chars[$ind];
+        }
+        for ($i=0; $i < $up_chars_count; $i++) { 
+            $ind = rand(0, $up_chars_length);
+            $str .= $up_chars[$ind];
+        }
+        for ($i=0; $i < $digits_count; $i++) { 
+            $ind = rand(0, $digits_length);
+            $str .= $digits[$ind];
+        }
+        for ($i=0; $i < $spec_chars_count; $i++) { 
+            $ind = rand(0, $spec_chars_length);
+            $str .= $spec_chars[$ind];
+        }
+
+        return str_shuffle($str);
+    }
+
     public function resetPassword($id)
     {
         $select = $this->tableGateway->getSql()->select();
@@ -688,10 +734,8 @@ class UserTable implements ServiceLocatorAwareInterface
         $user = $this->tableGateway->selectWith($select)->current();
 
         if($user/* && ($user->u_role_id == \Admin\Model\User::ROLE_ADMIN || $this->checkClientAdministrationAccess($user))*/) {
-            $password = sha1($user->u_email . time());
-            $password = substr($password, 0, 6);
-
-            $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'reset_password', 'uId' => $user->u_id, 'password' => $password));
+            $password = $this->generatePassword();
+            $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'reset_password', 'uId' => $user->u_id, 'password' => htmlspecialchars($password)));
             $this->setNewPassword($user->u_id, $password);
             //$this->tableGateway->update(array('u_forgot_password' => 0), array('u_id' => $user->u_id));
             

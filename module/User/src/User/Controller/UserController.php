@@ -104,8 +104,12 @@ class UserController extends AbstractActionController
             $form->setInputFilter($user->getSimpleInputFilter($this->getServiceLocator(), $id, $uId, true));
             $form->setData($location);
 
-            if (($location['u_password'] != '') && ($location['u_password'] != $location['u_confirm_password'])) {
-                $passwordWrong = true;
+            if ($location['u_password'] != '') {
+                if (!$this->getUserTable()->checkPassword($location['u_password'])) {
+                    $passwordWrong = 1;
+                } elseif ($location['u_password'] != $location['u_confirm_password']) {
+                    $passwordWrong = 2;
+                }
             }
 
             if ($form->isValid() && !$passwordWrong) {
@@ -125,7 +129,7 @@ class UserController extends AbstractActionController
 
                 $this->redirect()->toRoute('user', array('controller' => 'user', 'action' => 'account'));
 
-            } else {var_dump($form->getMessages());exit;
+            } else {
                 foreach ($form->getMessages() as $messageId => $message) {
                     //echo "Validation failure '$messageId': $message\n";
                     //die;
