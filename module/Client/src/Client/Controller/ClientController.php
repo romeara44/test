@@ -259,11 +259,10 @@ class ClientController extends AbstractActionController
                         }
                         
                         if($request->getPost('save_send_email')) {
-                            $password = sha1($user->u_email . time());
-                            $password = substr($password, 0, 6);
+                            $password = $this->getServiceLocator()->get('Admin\Model\UserTable')->generatePassword();
                             $this->getServiceLocator()->get('Admin\Model\UserTable')->setNewPassword($uId, $password);
 
-                            $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'createuser', 'uId' => $uId, 'password' => $password));
+                            $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'createuser', 'uId' => $uId, 'password' => htmlspecialchars($password)));
                             $this->flashMessenger()->addSuccessMessage('Client saved and invitation has been sent');
                         } else {
                             $this->flashMessenger()->addSuccessMessage('Client saved');
@@ -330,11 +329,10 @@ class ClientController extends AbstractActionController
         $id = (int) $this->params('id');
 
         $user = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUser($id);
-        $password = sha1($user->u_email . time());
-        $password = substr($password, 0, 6);
+        $password = $this->getServiceLocator()->get('Admin\Model\UserTable')->generatePassword();
         $this->getServiceLocator()->get('Admin\Model\UserTable')->setNewPassword($id, $password);
 
-        $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'createuser', 'uId' => $id, 'password' => $password));
+        $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'createuser', 'uId' => $id, 'password' => htmlspecialchars($password)));
         $this->flashMessenger()->addSuccessMessage('Invitation has been sent');
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Send client invite "' . $id . '"');

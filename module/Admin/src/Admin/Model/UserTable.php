@@ -295,8 +295,7 @@ class UserTable implements ServiceLocatorAwareInterface
             if (isset($user->u_sent_password) && ($user->u_sent_password == 0)) {
                 $data['u_sent_password'] = 0;
             } else {
-                $password = sha1($user->u_email . time());
-                $password = substr($password, 0, 6);
+                $password = $this->generatePassword();
                 $data['u_password'] = sha1($password);
             }
 
@@ -305,7 +304,7 @@ class UserTable implements ServiceLocatorAwareInterface
 
             if (isset($user->u_sent_password) && ($user->u_sent_password == 0)) {
             } else {
-                $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'createuser', 'uId' => $id, 'password' => $password));
+                $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'createuser', 'uId' => $id, 'password' => htmlspecialchars($password)));
             }
         } else {
             if ($this->getUser($id)) {
@@ -352,8 +351,7 @@ class UserTable implements ServiceLocatorAwareInterface
         if (isset($user->u_sent_password) && ($user->u_sent_password == 0)) {
             $data['u_sent_password'] = 0;
         } else {
-            $password = sha1($user->u_email . time());
-            $password = substr($password, 0, 6);
+            $password = $this->generatePassword();
             $data['u_password'] = sha1($password);
         }
 
@@ -364,7 +362,7 @@ class UserTable implements ServiceLocatorAwareInterface
         } else {
             $link = "http://" . $_SERVER['HTTP_HOST'] . '/user/confirm/' . $id . '/'. $data['u_hash'];
             $link = '<a href="' . $link . '">' . $link . '</a>';
-            $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'registeruser', 'uId' => $id, 'password' => $password, 'link' => $link));
+            $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'registeruser', 'uId' => $id, 'password' => htmlspecialchars($password), 'link' => $link));
         }
         
 
@@ -689,7 +687,7 @@ class UserTable implements ServiceLocatorAwareInterface
         }
     }
 
-    public function generatePassword($password_length)
+    public function generatePassword($password_length = 8)
     {
         $str = '';
         $chars = 'abcdefghijklmnopqrstuvwxyz';

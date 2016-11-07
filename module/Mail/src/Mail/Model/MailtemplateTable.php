@@ -155,8 +155,7 @@ class MailtemplateTable
         $password = '';
         if (isset($params['post']['passwordToSent']) && $params['post']['passwordToSent'] && isset($params['post']['passwordUId']) && ($params['post']['passwordUId'])) {
             $user = $sl->get('Admin\Model\UserTable')->getUser($params['post']['passwordUId']);
-            $password = sha1($user->u_email . time());
-            $password = substr($password, 0, 6);
+            $password = $sl->get('Admin\Model\UserTable')->generatePassword();
             $sl->get('Admin\Model\UserTable')->setNewPassword($params['post']['passwordUId'], $password);
         }
 
@@ -179,7 +178,7 @@ class MailtemplateTable
         $message = $htmlTemplateText;
 
         if ($password) {
-            $message = str_replace('********', $password, $message);
+            $message = str_replace('********', htmlspecialchars($password), $message);
         }
 
 
