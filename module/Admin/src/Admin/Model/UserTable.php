@@ -702,7 +702,7 @@ class UserTable implements ServiceLocatorAwareInterface
         $chars_count = rand(1, $password_length - 3);
         $up_chars_count = rand(1, $password_length - $chars_count - 2);
         $digits_count = rand(1, $password_length - $chars_count - $up_chars_count - 1);
-        $spec_chars_count = rand(1, $password_length - $chars_count - $up_chars_count - $digits_count);
+        $spec_chars_count = $password_length - $chars_count - $up_chars_count - $digits_count;
 
         for ($i=0; $i < $chars_count; $i++) { 
             $ind = rand(0, $chars_length);
