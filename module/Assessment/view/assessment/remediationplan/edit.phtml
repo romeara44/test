@@ -112,6 +112,8 @@ use Assessment\Model\Assessment;
 <table cellpadding="0" cellspacing="0">
     <thead>
         <tr>
+            <th>Likelihood<br /> of Threat</th>
+            <th>Potential<br /> Impact</th>
             <th>Risk score</th>
             <th>Threat</th>
             <th>Action plan</th>
@@ -174,6 +176,10 @@ use Assessment\Model\Assessment;
         <?php $notesTaskAssessmentsText = $this->noteTable->getNotesForRemedTask($rpa->rpa_id, $adrId, 'text'); ?>
 
         <tr>
+            <td class="tdSmall"><?php echo $rpa->rpa_risk_score; ?>
+            </td>
+            <td class="tdSmall"><?php echo $rpa->rpa_risk_level; ?>
+            </td>
             <td class="tdSmall"><?php echo \Assessment\Model\Remediationplanaction::$levelsNames[$rpa->rpa_risk_level] ?></td>
             <td class="tdSmall">
                 <?php $rpaThreat = str_replace('Â', '', $rpa->rpa_threat); ?>
@@ -222,7 +228,7 @@ use Assessment\Model\Assessment;
                                 </div>
                             <?php endif; ?>
                         </td>
-                        <?php $colspan = 5; ?>
+                        <?php $colspan = 7; ?>
                     <?php endforeach; ?>
             </tr>
             
@@ -258,7 +264,7 @@ use Assessment\Model\Assessment;
                                 </div>
                             <?php endif; ?>
                         </td>
-                        <?php $colspan = 5; ?>
+                        <?php $colspan = 7; ?>
                     <?php endforeach; ?>
             </tr>
         <?php //endif; ?>
