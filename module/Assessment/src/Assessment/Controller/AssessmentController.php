@@ -216,7 +216,8 @@ class AssessmentController extends AbstractActionController
         $id = (int) $this->params('id');
         $location = (int) $this->params('location');
 
-        $rows = array();
+        $rows = [];
+        $rows[] = array('', 'Safeguard / Question', 'specification / Likelyhood', 'Citation / Impact');
         $aObj = null;
 
         if ($id) {
@@ -233,9 +234,10 @@ class AssessmentController extends AbstractActionController
 
         if ($aObj && $location) {            
             $roles = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type, true);
+            $risk_scores = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionOptionTable')->getOptionsRiskScores();
             
             foreach ($roles as $role) {
-                $rows[] = $role->ar_name;
+                $rows[] = array($role->ar_name, '', '', '');
                 $questions = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionTable')->getQuestions($aObj->a_type, $role->ar_id, $aObj->a_id, $location, $aObj);
                 $answers = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionAnswerTable')->getAqas($id, $location, $role->ar_id);
 
@@ -243,13 +245,16 @@ class AssessmentController extends AbstractActionController
                     foreach ($question['elements'] as $questionEl) {      
                         $aqTitle = str_replace('Â', '', $questionEl['aq_title']);   
                         $answer = '';               
-                        $isYes = false;                        
+                        $isYes = false;  
+                        $answerScore = 0;                      
                         if (isset($answers[$questionEl['aq_id']])) {
+                            $option_id = $answers[$questionEl['aq_id']]['answerId'];
+                            $answerScore = (int)$risk_scores[$option_id];
                             $_options = $questionEl['_options'];
                             $_optionsT = explode(',', $_options);                        
                             foreach ($_optionsT as $_option) {
                                 $_optionT = explode('::', $_option);
-                                if ($answers[$questionEl['aq_id']]['answerId'] == $_optionT[0]) {
+                                if ($option_id == $_optionT[0]) {
                                     $answer = $_optionT[1];
                                     if ($questionEl['aq_id'] == 14) {
                                         $isYes = ($_optionT[1] == 'No') ? true : false;
@@ -260,26 +265,51 @@ class AssessmentController extends AbstractActionController
                                 }
                             }
                         } 
+
+                        $riskLevel = 0;
+                        if (($answerScore >= 6) && ($answerScore < 10)) {
+                            $riskLevel = 1;
+                        } elseif ($answerScore >= 10) {
+                            $riskLevel = 2;
+                        }
+
+                        if ($option_id == 3) {
+                            $riskLevel = 3;
+                        }
                         
-                        $rows[] = array($aqTitle, $answer);
+                        $rows[] = array('', $aqTitle, $answerScore, $riskLevel);
 
                         if ($isYes && isset($questionEl['children'])) {
                             foreach ($questionEl['children'] as $questionElChild) { 
-                                $aqTitle = str_replace('Â', '', $questionElChild['aq_title']);                                   
+                                $aqTitle = str_replace('Â', '', $questionElChild['aq_title']);
+                                $answerScore = 0;                                    
                                 $answer = '';
                                 if (isset($answers[$questionElChild['aq_id']])) {
+                                    $option_id = $answers[$questionElChild['aq_id']]['answerId'];
+                                    $answerScore = (int)$risk_scores[$option_id];
                                     $_options = $questionElChild['_options'];
                                     $_optionsT = explode(',', $_options);
                                     foreach ($_optionsT as $_option) {
                                         $_optionT = explode('::', $_option);
-                                        if ($answers[$questionElChild['aq_id']]['answerId'] == $_optionT[0]) {
+                                        if ($option_id == $_optionT[0]) {
                                             $answer = $_optionT[1];
                                             break;
                                         }
                                     }
                                 }
+
+                                $riskLevel = 0;
+                                if (($answerScore >= 6) && ($answerScore < 10)) {
+                                    $riskLevel = 1;
+                                } elseif ($answerScore >= 10) {
+                                    $riskLevel = 2;
+                                }
+
+                                if ($option_id == 3) {
+                                    $riskLevel = 3;
+                                }
                                 
-                                $rows[] = array($aqTitle, $answer);
+                                $rows[] = array('', $aqTitle, $answerScore, $riskLevel);
                             }
                         }
                     }

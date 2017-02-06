@@ -49,6 +49,22 @@ class AssessmentQuestionOptionTable implements ServiceLocatorAwareInterface
         return $row;
     }
 
+    public function getOptionsRiskScores()
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('aqo_active = 1');
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        $rows = array();
+
+        foreach ($resultSet as $row) {
+            $rows[$row->aqo_id] = $row->aqo_risk_score;
+        }
+
+        return $rows;
+    }
+
     public function saveOption(AssessmentQuestionOption $aqo)
     {
         $id = (int) $aqo->aqo_id;
