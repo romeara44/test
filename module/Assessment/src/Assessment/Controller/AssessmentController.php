@@ -246,7 +246,8 @@ class AssessmentController extends AbstractActionController
                         $aqTitle = str_replace('Â', '', $questionEl['aq_title']);   
                         $answer = '';               
                         $isYes = false;  
-                        $answerScore = 0;                      
+                        $answerScore = 0; 
+                        $option_id = 0;                     
                         if (isset($answers[$questionEl['aq_id']])) {
                             $option_id = $answers[$questionEl['aq_id']]['answerId'];
                             $answerScore = (int)$risk_scores[$option_id];
@@ -282,7 +283,8 @@ class AssessmentController extends AbstractActionController
                         if ($isYes && isset($questionEl['children'])) {
                             foreach ($questionEl['children'] as $questionElChild) { 
                                 $aqTitle = str_replace('Â', '', $questionElChild['aq_title']);
-                                $answerScore = 0;                                    
+                                $answerScore = 0; 
+                                $option_id = 0;                                     
                                 $answer = '';
                                 if (isset($answers[$questionElChild['aq_id']])) {
                                     $option_id = $answers[$questionElChild['aq_id']]['answerId'];
