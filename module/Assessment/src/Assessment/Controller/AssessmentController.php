@@ -217,7 +217,7 @@ class AssessmentController extends AbstractActionController
         $location = (int) $this->params('location');
 
         $rows = [];
-        $rows[] = array('', 'Safeguard / Question', 'specification / Likelyhood', 'Citation / Impact');
+        $rows[] = array('', 'Safeguard / Question', 'specification / Likelyhood', 'Citation / Impact', '');
         $aObj = null;
 
         if ($id) {
@@ -237,11 +237,13 @@ class AssessmentController extends AbstractActionController
             $risk_scores = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionOptionTable')->getOptionsRiskScores();
             
             foreach ($roles as $role) {
-                $rows[] = array($role->ar_name, '', '', '');
+                $rows[] = array($role->ar_name, '', '', '', '');
                 $questions = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionTable')->getQuestions($aObj->a_type, $role->ar_id, $aObj->a_id, $location, $aObj);
                 $answers = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionAnswerTable')->getAqas($id, $location, $role->ar_id);
 
                 foreach ($questions as $question) {
+                    $rows[] = array('', $question['cat']['aqc_description'], $question['cat']['aqc_specification'], $question['cat']['aqc_citation'], '');
+                    $rows[] = array('', '', '', '', '');
                     foreach ($question['elements'] as $questionEl) {      
                         $aqTitle = str_replace('Â', '', $questionEl['aq_title']);   
                         $answer = '';               
@@ -278,7 +280,7 @@ class AssessmentController extends AbstractActionController
                             $riskLevel = 3;
                         }
                         
-                        $rows[] = array('', $aqTitle, $answerScore, $riskLevel);
+                        $rows[] = array('', $aqTitle, $answerScore, $riskLevel, $answer);
 
                         if ($isYes && isset($questionEl['children'])) {
                             foreach ($questionEl['children'] as $questionElChild) { 
@@ -311,10 +313,11 @@ class AssessmentController extends AbstractActionController
                                     $riskLevel = 3;
                                 }
                                 
-                                $rows[] = array('', $aqTitle, $answerScore, $riskLevel);
+                                $rows[] = array('', $aqTitle, $answerScore, $riskLevel, $answer);
                             }
-                        }
+                        }                        
                     }
+                    $rows[] = array('', '', '', '', '');
                 }
             }            
         }
