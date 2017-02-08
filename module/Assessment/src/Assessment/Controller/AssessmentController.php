@@ -217,7 +217,7 @@ class AssessmentController extends AbstractActionController
         $location = (int) $this->params('location');
 
         $rows = [];
-        $rows[] = array('', 'Safeguard / Question', 'specification / Likelyhood', 'Citation / Impact', 'Answers');
+        $rows[] = array('', 'Safeguard / Question', 'specification / Likelyhood', 'Citation / Impact', 'Answers / Yes - 4, No - 2');
         $aObj = null;
 
         if ($id) {
@@ -279,12 +279,6 @@ class AssessmentController extends AbstractActionController
                         if ($option_id == 3) {
                             $riskLevel = 3;
                         }
-
-                        if ($answer == 'Yes') {
-                            $answer = 'Yes - 4';
-                        } elseif ($answer == 'No') {
-                            $answer = 'No - 2';
-                        }
                         
                         $rows[] = array('', $aqTitle, $answerScore, $riskLevel, $answer);
 
@@ -317,12 +311,6 @@ class AssessmentController extends AbstractActionController
 
                                 if ($option_id == 3) {
                                     $riskLevel = 3;
-                                }
-
-                                if ($answer == 'Yes') {
-                                    $answer = 'Yes - 4';
-                                } elseif ($answer == 'No') {
-                                    $answer = 'No - 2';
                                 }
                                 
                                 $rows[] = array('', $aqTitle, $answerScore, $riskLevel, $answer);
