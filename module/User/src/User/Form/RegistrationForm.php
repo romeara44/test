@@ -126,7 +126,7 @@ class RegistrationForm extends Form
 
         $dirdata = $_SERVER['DOCUMENT_ROOT'] . '/data';
 
-        $captchaImage = new CaptchaImage(  array(
+        /*$captchaImage = new CaptchaImage(  array(
                 'font' => $dirdata . '/fonts/arial.ttf',
                 'width' => 250,
                 'height' => 100,
@@ -144,7 +144,7 @@ class RegistrationForm extends Form
                 'label' => 'Please verify you are human',
                 'captcha' => $captchaImage,
             ),
-        ));
+        ));*/
 
         $this->add(array(
             'name' => 'submit',

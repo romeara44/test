@@ -116,6 +116,7 @@ class UserController extends AbstractActionController
 
                 if ($location['u_password'] != '') {
                     $this->getUserTable()->setNewPassword($id, $location['u_password']);
+                    $this->flashMessenger()->addSuccessMessage('Password change was successful');
                 }
 
                 $location['u_senior_consultant_u_id'] = $userObj->u_senior_consultant_u_id;
@@ -158,6 +159,11 @@ class UserController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
 
+        $captcha_error = false;
+        $application_vars = new \Zend\Session\Container('application_vars');
+        $google_recaptcha_secret = $application_vars->storage['google_recaptcha_secret'];
+        $google_recaptcha_key = $application_vars->storage['google_recaptcha_key'];
+
         $form = new RegistrationForm($this->getServiceLocator(), $this->getRequest()->getBaseUrl().'/data/captcha/');
 
         $request = $this->getRequest();
@@ -167,8 +173,14 @@ class UserController extends AbstractActionController
             $user = new User();
             $form->setInputFilter($user->getRegistrationInputFilter($this->getServiceLocator()));
             $form->setData($request->getPost());
+            
+            $recaptcha = new \ReCaptcha\ReCaptcha($google_recaptcha_secret);
+            $resp = $recaptcha->verify($_POST['g-recaptcha-response'], $_SERVER['REMOTE_ADDR']);
+            if (!$resp->isSuccess()) {
+                $captcha_error = true;
+            }
 
-            if ($form->isValid()) {
+            if ($form->isValid() && !$captcha_error) {
 
                 $location['u_senior_consultant_u_id'] = null;
                 $location['u_company_id']             = null;
@@ -210,7 +222,9 @@ class UserController extends AbstractActionController
         }
 
         return array(
-            'form' => $form
+            'form' => $form,
+            'google_recaptcha_key' => $google_recaptcha_key,
+            'captcha_error' => $captcha_error,
         );
     }
 
@@ -219,6 +233,11 @@ class UserController extends AbstractActionController
         if ($this->hasIdentity()) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
+
+        $captcha_error = false;
+        $application_vars = new \Zend\Session\Container('application_vars');
+        $google_recaptcha_secret = $application_vars->storage['google_recaptcha_secret'];
+        $google_recaptcha_key = $application_vars->storage['google_recaptcha_key'];
 
         $form = new RegistrationForm($this->getServiceLocator(), $this->getRequest()->getBaseUrl().'/data/captcha/');
 
@@ -230,7 +249,13 @@ class UserController extends AbstractActionController
             $form->setInputFilter($user->getRegistrationInputFilter($this->getServiceLocator()));
             $form->setData($request->getPost());
 
-            if ($form->isValid()) {
+            $recaptcha = new \ReCaptcha\ReCaptcha($google_recaptcha_secret);
+            $resp = $recaptcha->verify($_POST['g-recaptcha-response'], $_SERVER['REMOTE_ADDR']);
+            if (!$resp->isSuccess()) {
+                $captcha_error = true;
+            }
+
+            if ($form->isValid() && !$captcha_error) {
 
                 $location['u_senior_consultant_u_id'] = null;
                 $location['u_company_id']             = null;
@@ -298,7 +323,9 @@ class UserController extends AbstractActionController
         }
 
         return array(
-            'form' => $form
+            'form' => $form,
+            'google_recaptcha_key' => $google_recaptcha_key,
+            'captcha_error' => $captcha_error,
         );
     }
 

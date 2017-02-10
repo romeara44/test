@@ -118,16 +118,13 @@ $form->setAttribute('method', 'post');
         </p>
 
         <p class="registation_captcha">
-            <?php
-            $fn = $form->get('captcha');
-            echo $this->formLabel($fn);
-            ?>
+            Please verify you are human:
             <div class="registation_captcha_wrap">
-                <?php
-                echo $this->formElement($fn);
-                echo $this->formElementErrors($fn);
-                ?>
+                <div class="g-recaptcha" data-sitekey="<?= $this->google_recaptcha_key ?>"></div>
             </div>
+            <?php if ($this->captcha_error) : ?>
+                <label class="error">Enter correct captcha</label>
+            <?php endif; ?>
         </p>
 
         <div class="cboth"></div>

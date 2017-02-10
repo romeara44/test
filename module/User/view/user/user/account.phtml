@@ -27,11 +27,11 @@ $form->setAttribute('method', 'post');
             <p>
                 <label for="u_password">New password</label>
                 <input type="text" value="" class="form-control" name="u_password">
-                <span class="description_text">"Should contain at least 8 characters, at least one upper case letter, at lease 1 lower case character, at least one number, at least one special character"</span>
+                <span class="description_text">"Must contain at least 8 characters, at least one upper case letter, at lease 1 lower case character, at least one number, at least one special character"</span>
             </p>
             <?php
             if ($this->passwordWrong == 1): ?>
-                <ul><li>Password doesn\'t match</li></ul>
+                <ul><li>Password doesn’t match the requirements above</li></ul>
             <?php endif; ?>
             <p>
                 <label for="u_confirm_password">Confirm password</label>
@@ -39,7 +39,7 @@ $form->setAttribute('method', 'post');
             </p>
             <?php
             if ($this->passwordWrong == 2): ?>
-                <ul><li>Password doesn\'t match</li></ul>
+                <ul><li>Passwords do not match</li></ul>
             <?php endif; ?>
 
             <h2>User Details</h2>

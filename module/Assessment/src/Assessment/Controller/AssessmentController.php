@@ -217,22 +217,33 @@ class AssessmentController extends AbstractActionController
         $location = (int) $this->params('location');
 
         $rows = [];
-        $rows[] = array('', 'Safeguard / Question', 'specification / Likelyhood', 'Citation / Impact', 'Answers / Yes - 4, No - 2');
+        
         $aObj = null;
 
         if ($id) {
             $aObj = $this->getAssessmentTable()->getAssessment($id);
         }
 
+        if ($location) {
+            $address = $this->getAddressTable()->getAddress($location);
+            $location_name = $address->adr_name;
+        }
+
         if ($id && !$location) {
             $addresses = $this->getAddressTable()->getAddresses($id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
             foreach ($addresses->buffer() as $key => $address) {
                 $location = $address->adr_id;
+                $location_name = $address->adr_name;
                 break;
             }
         }
 
-        if ($aObj && $location) {            
+        if ($aObj && $location) { 
+            $header = Assessment::$typesNames[$aObj->a_type] . ' conducted for ' . $location_name .
+            ' on ' .date('F d Y', strtotime($aObj->a_create_date));
+            $rows[] = array($header, '', '', '', '');
+            $rows[] = array('', '', '', '', '');
+            $rows[] = array('', 'Safeguard / Question', 'specification / Likelyhood', 'Citation / Impact', 'Answer');       
             $roles = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type, true);
             $risk_scores = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionOptionTable')->getOptionsRiskScores();
             
@@ -242,7 +253,7 @@ class AssessmentController extends AbstractActionController
                 $answers = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionAnswerTable')->getAqas($id, $location, $role->ar_id);
 
                 foreach ($questions as $question) {
-                    $rows[] = array('', $question['cat']['aqc_description'], $question['cat']['aqc_specification'], $question['cat']['aqc_citation'], '');
+                    $rows[] = array('', $question['cat']['aqc_description'], $question['cat']['aqc_specification'], str_replace('Â', '', $question['cat']['aqc_citation']), '');
                     $rows[] = array('', '', '', '', '');
                     foreach ($question['elements'] as $questionEl) {      
                         $aqTitle = str_replace('Â', '', $questionEl['aq_title']);   
@@ -324,9 +335,12 @@ class AssessmentController extends AbstractActionController
         $csvContent = '';
         foreach ($rows as $row) {
             if (is_array($row)) {
-                $csvContent .= '"' . implode('","', $row) . '"' . "\n";
+                foreach ($row as $value) {
+                    $csvContent .= '"' . str_replace('"', '""', $value) . '",';
+                }
+                $csvContent = rtrim($csvContent, ',') . "\n";
             } else {
-                $csvContent .= $row . "\n";
+                $csvContent .= '"' . str_replace('"', '""', $row) . '"' . "\n";
             }
         }
         

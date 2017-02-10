@@ -188,6 +188,10 @@ class AuthController extends AbstractActionController
 
         $showCaptcha = $captchaContainer->offsetExists('show');
 
+        $application_vars = new \Zend\Session\Container('application_vars');
+        $google_recaptcha_secret = $application_vars->storage['google_recaptcha_secret'];
+        $google_recaptcha_key = $application_vars->storage['google_recaptcha_key'];
+
         $request = $this->getRequest();
 
         $form = new AuthForm($this->getRequest()->getBaseUrl() . '/data/captcha/');        
@@ -196,12 +200,22 @@ class AuthController extends AbstractActionController
 
         $showCompany = 0;
         if ($request->isPost()) {
-            
+            $captcha_error = false;
+            if ($showCaptcha) {
+                $recaptcha = new \ReCaptcha\ReCaptcha($google_recaptcha_secret);
+                $resp = $recaptcha->verify($_POST['g-recaptcha-response'], $_SERVER['REMOTE_ADDR']);
+                if (!$resp->isSuccess()) {
+                    $captcha_error = true;
+                }
+            }
+
             $user = new \Admin\Model\User();
             $form->setInputFilter($user->getLoginInputFilter($this->getServiceLocator()));
             $form->setData($request->getPost());
-
-            if ($form->isValid()) {
+                
+            if ($captcha_error) {
+                $flashMessagesErrors[] = 'Enter correct captcha';
+            } elseif ($form->isValid()) {
                 $follow = true;
                 $company_id = $request->getPost('u_company_id');
                 if (!$company_id) {
@@ -337,25 +351,20 @@ class AuthController extends AbstractActionController
                             }
                             
                         }
-                        $captchaContainer->offsetSet('show', 1);                    
+                        $captchaContainer->offsetSet('show', 1);                 
                     }
                 }
             } else {
-                if(count($form->getMessages('captcha'))) {
-                    $captchaMessages       = $form->getMessages('captcha');
-                    $flashMessagesErrors[] = array_pop($captchaMessages);
-                } else {
-                    $flashMessagesErrors[] = 'Wrong email or password. Please try again.';
-                }
-                $captchaContainer->offsetSet('show', 1);
+                $flashMessagesErrors[] = 'Wrong email or password. Please try again.';
+                //$captchaContainer->offsetSet('show', 1);
             }
         }
 
         $showCaptcha = $captchaContainer->offsetExists('show');
 
-        if($showCaptcha) {
+        /*if($showCaptcha) {
             $form->addCaptcha();
-        }
+        }*/
 
         $view = new ViewModel;
 
@@ -363,6 +372,7 @@ class AuthController extends AbstractActionController
             'form' => $form,
             'showCaptcha' => $showCaptcha,
             'showCompany' => $showCompany,
+            'google_recaptcha_key' => $google_recaptcha_key,
         ));
 
         $this->layout( 'layout/layout_login' );

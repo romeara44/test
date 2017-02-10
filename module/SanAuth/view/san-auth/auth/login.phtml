@@ -23,15 +23,10 @@
         </div>
     <?php endif; ?>
 
-    <?php if($this->showCaptcha): ?>
-        <?php
-            $fn = $form->get('captcha');
-            echo $this->formLabel($fn);
-        ?>
+    <?php if($this->showCaptcha): ?>        
+        Please verify you are human:
         <div class="login-captcha-wrap">
-            <?php
-            echo $this->formElement($fn->setAttributes(array('class'=>'form-control', "required" => "true")));
-            ?>
+            <div class="g-recaptcha" data-sitekey="<?= $this->google_recaptcha_key ?>"></div>
         </div>
     <?php endif; ?>
 
