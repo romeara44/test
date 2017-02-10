@@ -160,9 +160,10 @@ class UserController extends AbstractActionController
         }
 
         $captcha_error = false;
-        $application_vars = new \Zend\Session\Container('application_vars');
-        $google_recaptcha_secret = $application_vars->storage['google_recaptcha_secret'];
-        $google_recaptcha_key = $application_vars->storage['google_recaptcha_key'];
+        $config = $this->getServiceLocator()->get('config');
+        
+        $google_recaptcha_secret = $config['application_vars']['google_recaptcha_secret'];
+        $google_recaptcha_key = $config['application_vars']['google_recaptcha_key'];
 
         $form = new RegistrationForm($this->getServiceLocator(), $this->getRequest()->getBaseUrl().'/data/captcha/');
 
@@ -235,9 +236,10 @@ class UserController extends AbstractActionController
         }
 
         $captcha_error = false;
-        $application_vars = new \Zend\Session\Container('application_vars');
-        $google_recaptcha_secret = $application_vars->storage['google_recaptcha_secret'];
-        $google_recaptcha_key = $application_vars->storage['google_recaptcha_key'];
+        $config = $this->getServiceLocator()->get('config');
+        
+        $google_recaptcha_secret = $config['application_vars']['google_recaptcha_secret'];
+        $google_recaptcha_key = $config['application_vars']['google_recaptcha_key'];
 
         $form = new RegistrationForm($this->getServiceLocator(), $this->getRequest()->getBaseUrl().'/data/captcha/');
 
