@@ -39,6 +39,7 @@ class Assessment
     public $a_update_u_id;
     public $a_active;
 
+    public $a_finish_date;
     public $a_create_date;
     public $a_update_date;
     public $_client_name;
@@ -73,6 +74,8 @@ class Assessment
         $this->a_update_date     = (isset($data['a_update_date'])) ? $data['a_update_date'] : null;
 
         $this->_client_name     = (isset($data['_client_name'])) ? $data['_client_name'] : null;
+
+        $this->a_finish_date     = (isset($data['a_finish_date'])) ? $data['a_finish_date'] : null;
     }
 
     public function getArrayCopy()

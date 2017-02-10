@@ -247,7 +247,7 @@ class AssessmentController extends AbstractActionController
                 $header .= ' in process as of ' . date('F d Y');
             }
 
-            $rows[] = array($header, 'Date:' . date('F d Y'), '', '', '');
+            $rows[] = array('Report generation date:' . date('F d Y'), $header, '', '', '');
             $rows[] = array('', '', '', '', '');
             $rows[] = array('', 'Safeguard / Question', 'specification / Likelyhood', 'Citation / Impact', 'Answer');       
             $roles = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type, true);
