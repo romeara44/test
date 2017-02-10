@@ -31,6 +31,7 @@ class AssessmentController extends AbstractActionController
     protected $companyTable;
     protected $businessassociateTable;
     protected $assessmentTable;
+    protected $remediationplanTable;
     protected $addressTable;
     protected $userTable;
     protected $noteTable;
@@ -99,6 +100,15 @@ class AssessmentController extends AbstractActionController
             $this->assessmentTable = $sm->get('Assessment\Model\AssessmentTable');
         }
         return $this->assessmentTable;
+    }
+
+    public function getRemediationplanTable()
+    {
+        if (!$this->remediationplanTable) {
+            $sm = $this->getServiceLocator();
+            $this->remediationplanTable = $sm->get('Assessment\Model\RemediationplanTable');
+        }
+        return $this->remediationplanTable;
     }
 
     public function getNoteTable()
@@ -240,9 +250,10 @@ class AssessmentController extends AbstractActionController
 
         if ($aObj && $location) { 
             $header = Assessment::$typesNames[$aObj->a_type] . ' conducted for ' . $location_name;
-            if ($aObj->a_status == Assessment::STATUS_CLOSED) {
+            if ($this->getAssessmentTable()->checkLocationFinished($id, $location)) {
+                $rp = $this->getRemediationplanTable()->getRemediationplanByAIdAdrId($id, $location);
                 $header .= ' completed from ' . date('F d Y', strtotime($aObj->a_create_date)) .
-                    ' to ' . date('F d Y', strtotime($aObj->a_finish_date));
+                    ' to ' . date('F d Y', strtotime($rp->rp_create_date));
             } else {
                 $header .= ' in process as of ' . date('F d Y');
             }

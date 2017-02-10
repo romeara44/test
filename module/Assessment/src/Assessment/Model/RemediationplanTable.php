@@ -388,6 +388,26 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
         return $row;
     }
 
+    public function getRemediationplanByAIdAdrId($id, $adr_id)
+    {
+        $id  = (int) $id;
+
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('rp_a_id = ' . $id);
+        if ($adr_id) {
+            $select->where('rp_adr_id IS NULL OR rp_adr_id = ' . $adr_id);
+        }        
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        $row = $resultSet->current();
+        if (!$row) {
+            return false;
+        }
+
+        return $row;
+    }
+
     public function saveRemediationplan(Remediationplan $rp)
     {
         $data = array(
