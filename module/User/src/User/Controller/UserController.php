@@ -130,10 +130,10 @@ class UserController extends AbstractActionController
 
                 $this->redirect()->toRoute('user', array('controller' => 'user', 'action' => 'account'));
 
-            } else {
+            } else {var_dump($form->getMessages());exit;
                 foreach ($form->getMessages() as $messageId => $message) {
-                    echo "Validation failure '$messageId': $message\n";
-                    die;
+                    //echo "Validation failure '$messageId': $message\n";
+                    //die;
                 }
             }
         } else {
