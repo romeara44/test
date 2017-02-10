@@ -132,8 +132,8 @@ class UserController extends AbstractActionController
 
             } else {
                 foreach ($form->getMessages() as $messageId => $message) {
-                    //echo "Validation failure '$messageId': $message\n";
-                    //die;
+                    echo "Validation failure '$messageId': $message\n";
+                    die;
                 }
             }
         } else {

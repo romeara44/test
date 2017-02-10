@@ -524,6 +524,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
 
         $data['a_all_steps_finished'] = 1;
         $data['a_status'] = 100;
+        $data['a_finish_date'] = time();
         $this->tableGateway->update($data, array('a_id' => $id));
 
         return true;

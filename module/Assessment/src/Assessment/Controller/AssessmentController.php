@@ -239,9 +239,15 @@ class AssessmentController extends AbstractActionController
         }
 
         if ($aObj && $location) { 
-            $header = Assessment::$typesNames[$aObj->a_type] . ' conducted for ' . $location_name .
-            ' on ' .date('F d Y', strtotime($aObj->a_create_date));
-            $rows[] = array($header, '', '', '', '');
+            $header = Assessment::$typesNames[$aObj->a_type] . ' conducted for ' . $location_name;
+            if ($aObj->a_status == Assessment::STATUS_CLOSED) {
+                $header .= ' completed from ' . date('F d Y', strtotime($aObj->a_create_date)) .
+                    ' to ' . date('F d Y', strtotime($aObj->a_finish_date));
+            } else {
+                $header .= ' in process as of ' . date('F d Y');
+            }
+
+            $rows[] = array($header, 'Date:' . date('F d Y'), '', '', '');
             $rows[] = array('', '', '', '', '');
             $rows[] = array('', 'Safeguard / Question', 'specification / Likelyhood', 'Citation / Impact', 'Answer');       
             $roles = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type, true);
