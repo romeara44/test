@@ -26,7 +26,7 @@ $form->setAttribute('method', 'post');
             <h2>New password</h2>
             <p>
                 <label for="u_password">New password</label>
-                <input type="text" value="" class="form-control" name="u_password" value="<?= $this->password ?>">
+                <input type="text" class="form-control" name="u_password" value="<?= $this->password ?>">
                 <span class="description_text">"Must contain at least 8 characters, at least one upper case letter, at lease 1 lower case character, at least one number, at least one special character"</span>
             </p>
             <?php
@@ -35,7 +35,7 @@ $form->setAttribute('method', 'post');
             <?php endif; ?>
             <p>
                 <label for="u_confirm_password">Confirm password</label>
-                <input type="text" value="" class="form-control" name="u_confirm_password"
+                <input type="text" class="form-control" name="u_confirm_password"
                     value="<?= $this->confirm_password ?>">
             </p>
             <?php
