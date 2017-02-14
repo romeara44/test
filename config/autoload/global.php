@@ -36,10 +36,6 @@ return array(
         'secure_db_key_file' => ROOT_PATH . '/../c147572b91c6719b26c5.dbkey',
         'secure_file_key_file' => ROOT_PATH . '/../ccb3177cdb1f576a6d31.filekey',
         'assessment_interview_autosave_interval' => 1,
-        //'google_recaptcha_key' => '6LdCFRUUAAAAAMbnBVvPt-4KnQsmcVBpprkqaoNP',//local
-        //'google_recaptcha_secret' => '6LdCFRUUAAAAALoU0IRyzAAuiTVpy5liVADCYxCO',//local
-        'google_recaptcha_key' => '6LeyJhUUAAAAACn3t_y1m0-JiVDvRulwQYGcU6eX',//hipaa-carosh.projestic.com
-        'google_recaptcha_secret' => '6LeyJhUUAAAAAFAg-3CHyHru5NYXaGCZomz5VItK',//hipaa-carosh.projestic.com
     )
 );
 

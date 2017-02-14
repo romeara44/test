@@ -9,6 +9,8 @@
 
 namespace User\Controller;
 
+require(__DIR__ . '/../../../../../vendor/google/recaptcha/src/autoload.php');
+
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Admin\Model\User;
@@ -95,6 +97,8 @@ class UserController extends AbstractActionController
         }
 
         $passwordWrong = false;
+        $password = '';
+        $confirm_password = '';
         $request = $this->getRequest();
         if ($request->isPost()) {
             $location = $request->getPost();
@@ -117,6 +121,8 @@ class UserController extends AbstractActionController
                 if ($location['u_password'] != '') {
                     $this->getUserTable()->setNewPassword($id, $location['u_password']);
                     $this->flashMessenger()->addSuccessMessage('Password change was successful');
+                } else {
+                    $this->flashMessenger()->addSuccessMessage('Profile has been modified');
                 }
 
                 $location['u_senior_consultant_u_id'] = $userObj->u_senior_consultant_u_id;
@@ -126,15 +132,17 @@ class UserController extends AbstractActionController
                 $user->exchangeArray($location);
                 $this->getUserTable()->saveUser($user);
 
-                $this->flashMessenger()->addSuccessMessage('Profile has been modified');
-
                 $this->redirect()->toRoute('user', array('controller' => 'user', 'action' => 'account'));
 
-            } else {var_dump($form->getMessages());exit;
+            } else {
                 foreach ($form->getMessages() as $messageId => $message) {
                     //echo "Validation failure '$messageId': $message\n";
                     //die;
                 }
+            }
+            if ($passwordWrong) {
+                $password = $location['u_password'];
+                $confirm_password = $location['u_confirm_password'];
             }
         } else {
             if ((int) $id) {
@@ -148,6 +156,8 @@ class UserController extends AbstractActionController
         return array(
             'form' => $form,
             'passwordWrong' => $passwordWrong,
+            'password' => $password,
+            'confirm_password' => $confirm_password,
             'uId' => $id,
             'email' => $userObj->u_email
         );

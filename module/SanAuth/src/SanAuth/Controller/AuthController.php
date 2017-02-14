@@ -2,6 +2,8 @@
 
 namespace SanAuth\Controller;
 
+require(__DIR__ . '/../../../../../vendor/google/recaptcha/src/autoload.php');
+
 use SanAuth\Form\AuthForm;
 use SanAuth\Form\ForgetForm;
 use SanAuth\Form\NewPasswordForm;
