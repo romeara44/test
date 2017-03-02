@@ -272,6 +272,7 @@ class UserTable implements ServiceLocatorAwareInterface
             'u_zip' => $user->u_zip,
             'u_state_id' => $user->u_state_id,
             'u_confirmed' => isset($user->u_confirmed) ? $user->u_confirmed : 1,
+            'u_renewal_date' => $user->u_renewal_date,
         );
 
         if (!(int) $user->u_senior_consultant_u_id) {

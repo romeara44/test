@@ -65,6 +65,8 @@ class User
     public $u_locked_unlocked_date;
     public $u_modules_access_code;
     public $u_modules_access_code_created;
+    public $u_create_date;
+    public $u_renewal_date;
 
     public $_rolename;
     public $_username;
@@ -114,6 +116,8 @@ class User
         $this->u_locked_unlocked_date     = (isset($data['u_locked_unlocked_date'])) ? $data['u_locked_unlocked_date'] : null;
         $this->u_modules_access_code     = (isset($data['u_modules_access_code'])) ? $data['u_modules_access_code'] : null;
         $this->u_modules_access_code_created     = (isset($data['u_modules_access_code_created'])) ? $data['u_modules_access_code_created'] : null;
+        $this->u_create_date     = (isset($data['u_create_date'])) ? $data['u_create_date'] : null;
+        $this->u_renewal_date     = (isset($data['u_renewal_date'])) ? $data['u_renewal_date'] : null;
         $this->_username     = (isset($data['_username'])) ? $data['_username'] : null;
     }
 

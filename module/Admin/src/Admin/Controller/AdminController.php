@@ -141,12 +141,15 @@ class AdminController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $user = new User();
+            $post = $request->getPost();
+            $u_renewal_date = \DateTime::createFromFormat('m/d/Y', $post['u_renewal_date']);
+            $post['u_renewal_date'] = $u_renewal_date->format('Y-m-d');
             $uId = is_object($userObj) ? $userObj->u_id : 0;
             $form->setInputFilter($user->getSimpleInputFilter($this->getServiceLocator(), $id, $uId));
             $form->setData($request->getPost());
 
             if ($form->isValid()) {
-                $post = $request->getPost();
+                
                 $post['u_confirmed'] = $uId ? $userObj->u_confirmed : null;
                 $post['u_company_id'] = $post['u_company_id'] ? $post['u_company_id'] : (is_object($userObj) ? $userObj->u_company_id : null);
 
@@ -201,6 +204,7 @@ class AdminController extends AbstractActionController
         return array(
             'form' => $form,
             'uId' => $id,
+            'userObj' => $userObj,
             'roleId' => is_object($userObj) ? $userObj->u_role_id : -1,
             'isActive' => is_object($userObj) ? $userObj->u_active : -1,
             'username' => is_object($userObj) ? $userObj->u_firstname . ' ' . $userObj->u_lastname : '',

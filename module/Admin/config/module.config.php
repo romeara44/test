@@ -38,6 +38,23 @@ return array(
         ),
     ),
 
+    'console' => array(
+        'router' => array(
+            'routes' => array(
+                'renewal-reminder' => array(
+                    //'type'    => 'simple',       // <- simple route is created by default, we can skip that
+                    'options' => array(
+                        'route'    => 'users renewal',
+                        'defaults' => array(
+                            'controller' => 'Admin\Controller\Index',
+                            'action'     => 'renewal'
+                        )
+                    )
+                )
+            ),
+        ),
+    ),
+
     'view_manager' => array(
         'template_path_stack' => array(
             'practice' => __DIR__ . '/../view',

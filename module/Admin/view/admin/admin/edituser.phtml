@@ -159,6 +159,18 @@ $_options = array(0 => 'Current Month', 1 => 'Last Month', 2 => 'Last 3 Months',
                     ?>
                 </p>
 
+                <p>
+                    <?php
+                    $fn = $form->get('u_renewal_date');
+                    if ($this->uId):
+                        $fn->setValue($this->formatDateA($this->userObj->u_renewal_date, false, true));
+                    endif;
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'u_renewal_date', 'readonly' => 'readonly')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+
                 <h2>Address</h2>
 
                 <p>
@@ -205,9 +217,9 @@ $_options = array(0 => 'Current Month', 1 => 'Last Month', 2 => 'Last 3 Months',
                 <div class="form-buttons">
                     <input type="submit" value="Save" class="form-button" />
                     <?php if ($this->isActive == 0): ?>
-                        <input onclick="window.location.href='/admin/unarchiveuser/<?php echo $this->uId ?>'" type="button" value="Unarchive user" class="form-button" />
+                        <input onclick="window.location.href='/admin/unarchiveuser/<?php echo $this->uId ?>'" type="button" value="Activate user" class="form-button" />
                     <?php elseif ($this->isActive == 1): ?>
-                        <input onclick="window.location.href='/admin/deleteuser/<?php echo $this->uId ?>'" type="button" value="Archive user" class="form-button" />
+                        <input onclick="window.location.href='/admin/deleteuser/<?php echo $this->uId ?>'" type="button" value="Deactivate user" class="form-button" />
                     <?php endif; ?>
 
                     <div class="fleft">or</div>
@@ -458,7 +470,7 @@ $_options = array(0 => 'Current Month', 1 => 'Last Month', 2 => 'Last 3 Months',
 
 <script>
     jQuery(document).ready(function(){
-
+        $( "#u_renewal_date" ).datepicker({dateFormat: 'mm/dd/yy'});
         //Conditional logic for account types
         $('#user').submit(function() {
             $('#user select, #user input').removeAttr('disabled');

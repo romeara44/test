@@ -1,0 +1,2 @@
+ALTER TABLE `users` ADD `u_renewal_date` TIMESTAMP NOT NULL ;
+update `users` set `u_renewal_date` = TIMESTAMPADD(YEAR,1,u_create_date);
