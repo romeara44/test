@@ -4,6 +4,7 @@ return array(
     'controllers' => array(
         'invokables' => array(
             'Admin\Controller\Admin' => 'Admin\Controller\AdminController',
+            'Admin\Controller\Index' => 'Admin\Controller\IndexController',
         ),
     ),
 
@@ -42,7 +43,6 @@ return array(
         'router' => array(
             'routes' => array(
                 'renewal-reminder' => array(
-                    //'type'    => 'simple',       // <- simple route is created by default, we can skip that
                     'options' => array(
                         'route'    => 'users renewal',
                         'defaults' => array(

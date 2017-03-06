@@ -1,2 +1,3 @@
 ALTER TABLE `users` ADD `u_renewal_date` TIMESTAMP NOT NULL ;
 update `users` set `u_renewal_date` = TIMESTAMPADD(YEAR,1,u_create_date);
+INSERT INTO `mail_templates` (`mt_id`, `mt_name`, `mt_key`, `mt_subject`, `mt_text`, `mt_active`, `mt_create_date`) VALUES (NULL, '', 'renewaluser', 'User renewal reminder', '<div style="font-size: 24px; color: #189696"><Full Name>,</div> <br /> Text goes here... <br /> Please do not hesitate to contact us with any questions.', '0', CURRENT_TIMESTAMP);

@@ -977,4 +977,31 @@ class UserTable implements ServiceLocatorAwareInterface
         return $this->tableGateway->selectWith($select);
     }
 
+    public function getUsersByRenewalDate($time)
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->columns(array('u_id', 'u_company_id'));
+        $select->where('DATE(u_renewal_date) = "' . date('Y-m-d', $time) . '"');
+        $select->where('u_active = 1');
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        return $resultSet;
+    }
+
+    public function getAdminUserId()
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->columns(array('u_id'));
+        $select->where('u_role_id = ' . User::ROLE_ADMIN);
+        $select->where('u_active = 1');
+
+        $resultSet = $this->tableGateway->selectWith($select);
+        $row       = $resultSet->current();
+        $adminId = 0;
+        if ($row) {
+            $adminId = $row->u_id;
+        }
+        return $adminId;
+    }
 }
