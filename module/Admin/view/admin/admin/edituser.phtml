@@ -219,9 +219,9 @@ $_options = array(0 => 'Current Month', 1 => 'Last Month', 2 => 'Last 3 Months',
                 <div class="form-buttons">
                     <input type="submit" value="Save" class="form-button" />
                     <?php if ($this->isActive == 0): ?>
-                        <input onclick="window.location.href='/admin/unarchiveuser/<?php echo $this->uId ?>'" type="button" value="Activate user" class="form-button" />
+                        <input onclick="window.location.href='/admin/activateuser/<?php echo $this->uId ?>'" type="button" value="Activate user" class="form-button" />
                     <?php elseif ($this->isActive == 1): ?>
-                        <input onclick="window.location.href='/admin/deleteuser/<?php echo $this->uId ?>'" type="button" value="Deactivate user" class="form-button" />
+                        <input onclick="window.location.href='/admin/deactivateuser/<?php echo $this->uId ?>'" type="button" value="Deactivate user" class="form-button" />
                     <?php endif; ?>
 
                     <div class="fleft">or</div>
