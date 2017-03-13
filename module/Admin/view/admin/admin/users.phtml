@@ -73,11 +73,11 @@
                     <td><?php echo $this->formatDateA($user->u_renewal_date) ?></td>
                     <td class="aright">
                         <a href="/admin/edituser/<?php echo $user->u_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
-                        <?php $deleteUrl = '/admin/deleteuser/' . $user->u_id; ?>
+                        <?php $deleteUrl = '/admin/deactivateuser/' . $user->u_id; ?>
                         <?php if ($user->u_active == 1): ?>
-                            <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
+                            <a href="#deactivation-box-modal" onclick="$('#deactivateYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"  title="Deactivate"><i class="fa fa-trash-o"></i></a>
                         <?php else : ?>  
-                            <a href="/admin/unarchiveuser/<?php echo $user->u_id ?>" class="">Activate</a> 
+                            <a href="/admin/activateuser/<?php echo $user->u_id ?>" class="">Activate</a> 
                         <?php endif; ?>
                     </td>
                 </tr>

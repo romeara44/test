@@ -224,26 +224,26 @@ class AdminController extends AbstractActionController
         );
     }
 
-    public function deleteuserAction()
+    public function deactivateuserAction()
     {
         $id = $this->params('id');
 
         $this->getUserTable()->deleteUser($id);
-        $this->flashMessenger()->addSuccessMessage('User has been deleted');
+        $this->flashMessenger()->addSuccessMessage('User has been deactivated');
 
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete client "' . $id . '"');
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Deactivate client "' . $id . '"');
 
         return $this->redirect()->toRoute('admin', array('controller' => 'admin', 'action' => 'users'));
     }
 
-    public function unarchiveuserAction()
+    public function activateuserAction()
     {
         $id = $this->params('id');
 
         $this->getUserTable()->unarchiveUser($id);
-        $this->flashMessenger()->addSuccessMessage('User has been unarchived');
+        $this->flashMessenger()->addSuccessMessage('User has been activated');
 
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Unarchive client "' . $id . '"');
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Activate client "' . $id . '"');
 
         return $this->redirect()->toRoute('admin', array('controller' => 'admin', 'action' => 'users'));
     }
