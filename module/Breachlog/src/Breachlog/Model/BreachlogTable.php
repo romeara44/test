@@ -112,6 +112,8 @@ class BreachlogTable implements ServiceLocatorAwareInterface
 
             $select->join(array('c' => 'companies'), 'bl_c_id = c_id', array('_client_name' => 'c_name'), 'left');
 
+            $select->where('c_active = 1');
+
             if ($orderBy) {
                 $order = $order ? $order : 'ASC';
                 $select->order($orderBy . ' ' . $order);
@@ -206,6 +208,8 @@ class BreachlogTable implements ServiceLocatorAwareInterface
         } else {
             $where_str = DbCrypt::decryptField('bl_name', false) . ' LIKE "%' . $searchValue . '%" OR c.c_name LIKE "%' . $searchValue . '%"';
         }
+
+        $select->where('c_active = 1');
 
         $select->where($where_str);
 

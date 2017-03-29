@@ -210,6 +210,10 @@ class CompanyController extends AbstractActionController
                 return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
             } else {
                 $post = $request->getPost();
+                $c_renewal_date = \DateTime::createFromFormat('m/d/Y', $post['c_renewal_date']);
+                if ($c_renewal_date) {
+                   $post['c_renewal_date'] = $c_renewal_date->format('Y-m-d'); 
+                }                
                 $post['c_owner_u_id'] = $identity['u_id'];
                 $post['c_update_u_id'] = $identity['u_id'];
 

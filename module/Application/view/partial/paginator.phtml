@@ -6,6 +6,7 @@
             <?php
             $params = array('action' => $action, 'page' => 1, 'order_by' => $order_by, 'order' => $order);
             isset($role) ? ($params['roleFilter'] = $roleFilter) : '';
+            isset($activeFilter) ? ($params['activeFilter'] = $activeFilter) : '';
             if ($this->controller == 'search'):
                 $params['searchValue'] = $searchValue;
             elseif (isset($search) && !empty($search)):
@@ -20,6 +21,8 @@
             <?php if (isset($this->previous)): ?>
                 <?php
                     $params = array('action' => $action, 'page' => $this->previous, 'order_by' => $order_by, 'order' => $order);
+                    isset($role) ? ($params['roleFilter'] = $roleFilter) : '';
+                    isset($activeFilter) ? ($params['activeFilter'] = $activeFilter) : '';
                     if ($this->controller == 'search'):
                         $params['searchValue'] = $searchValue;
                     elseif (isset($search) && !empty($search)):
@@ -41,6 +44,7 @@
                     <?php
                     $params = array('action' => $action, 'page' => $page, 'order_by' => $order_by, 'order' => $order);
                     isset($role) ? ($params['roleFilter'] = $roleFilter) : '';
+                    isset($activeFilter) ? ($params['activeFilter'] = $activeFilter) : '';
                     if ($this->controller == 'search'):
                         $params['searchValue'] = $searchValue;
                     elseif (isset($search) && !empty($search)):
@@ -63,6 +67,7 @@
                 <?php
                 $params = array('action' => $action, 'page' => $this->next, 'order_by' => $order_by, 'order' => $order);
                 isset($role) ? ($params['roleFilter'] = $roleFilter) : '';
+                isset($activeFilter) ? ($params['activeFilter'] = $activeFilter) : '';
                 if ($this->controller == 'search'):
                     $params['searchValue'] = $searchValue;
                 elseif (isset($search) && !empty($search)):
@@ -80,6 +85,7 @@
             <?php
             $params = array('action' => $action, 'page' => $this->last, 'order_by' => $order_by, 'order' => $order);
             isset($role) ? ($params['roleFilter'] = $roleFilter) : '';
+            isset($activeFilter) ? ($params['activeFilter'] = $activeFilter) : '';
             if ($this->controller == 'search'):
                 $params['searchValue'] = $searchValue;
             elseif (isset($search) && !empty($search)):

@@ -82,6 +82,8 @@ class AccountingRequestTable implements ServiceLocatorAwareInterface
                 $select->where('ar_active = ' . $roleFilter);
             }
 
+            $select->where('c_active = 1');
+
             if ($orderBy) {
                 $order = $order ? $order : 'ASC';
                 $select->order($orderBy . ' ' . $order);

@@ -142,8 +142,6 @@ class AdminController extends AbstractActionController
         if ($request->isPost()) {
             $user = new User();
             $post = $request->getPost();
-            $u_renewal_date = \DateTime::createFromFormat('m/d/Y', $post['u_renewal_date']);
-            $post['u_renewal_date'] = $u_renewal_date->format('Y-m-d');
             $uId = is_object($userObj) ? $userObj->u_id : 0;
             $form->setInputFilter($user->getSimpleInputFilter($this->getServiceLocator(), $id, $uId));
             $form->setData($request->getPost());

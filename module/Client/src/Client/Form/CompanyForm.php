@@ -185,6 +185,15 @@ class CompanyForm extends Form
             ),
         ));
 
+        $this->add(array(
+            'name' => 'c_renewal_date',
+            'attributes' => array(
+                'type'  => 'text',
+            ),
+            'options' => array(
+                'label' => 'Renewal Date',
+            ),
+        ));
 
         $this->add(array(
             'name' => 'c_users_limit',

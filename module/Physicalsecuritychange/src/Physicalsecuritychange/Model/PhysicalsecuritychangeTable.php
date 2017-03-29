@@ -79,6 +79,8 @@ class PhysicalsecuritychangeTable implements ServiceLocatorAwareInterface
 
             $select->where("psc_create_u_id = " . $identity['u_id']);
 
+            $select->where('c_active = 1');
+
             $select->group('psc_id');
 
             $paginator = new Paginator($paginatorAdapter);

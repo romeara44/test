@@ -84,6 +84,8 @@ class AssessmentTable implements ServiceLocatorAwareInterface
                                   )
                             );
 
+            $select->where('c_active = 1');
+
             $order = $order ? $order : 'ASC';
 
             if ($orderBy) {
@@ -149,6 +151,8 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         if ($where_str) {
             $select->where($where_str);
         }
+
+        $select->where('c_active = 1');
 
         return $select;
     }

@@ -108,6 +108,7 @@ class ClientController extends AbstractActionController
         $order = $this->params()->fromRoute('order') ? $this->params()->fromRoute('order') : 'DESC';
         $page = $this->params()->fromRoute('page') ? (int) $this->params()->fromRoute('page') : 1;
         $roleFilter = $this->params()->fromRoute('roleFilter') ? (int) $this->params()->fromRoute('roleFilter') : 0;
+        $activeFilter = $this->params()->fromRoute('activeFilter') ? (int) $this->params()->fromRoute('activeFilter') : 1;
 
         if ($roleFilter == 1) {
             $this->layout()->searchRoleFilter = 'company';
@@ -127,7 +128,7 @@ class ClientController extends AbstractActionController
         );
 
         $sortCol = isset($mappingSortCol[$orderBy]) ? $mappingSortCol[$orderBy] : 'c_id';
-        $paginator = $this->getCompanyTable()->getCompanies(true, $sortCol, $order,  $mappingTypeItem[$roleFilter], $this->getIdentity());
+        $paginator = $this->getCompanyTable()->getCompanies(true, $sortCol, $order,  $mappingTypeItem[$roleFilter], $this->getIdentity(), $activeFilter);
         $paginator->setCurrentPageNumber($page);
         $paginator->setItemCountPerPage(10);
 
@@ -138,6 +139,7 @@ class ClientController extends AbstractActionController
             'paginator' => $paginator,
             'hasIdentity' => $this->hasIdentity(),
             'roleFilter' => $roleFilter,
+            'activeFilter' => $activeFilter,
             'checkClientLimitCompany' => $this->getCompanyTable()->checkClientLimitCompany()
         ));
 

@@ -52,6 +52,8 @@ class Company
     public $c_parent_c_id;
     public $_c_child_c_ids;
 
+    public $c_renewal_date;
+
     protected $inputFilter;
 
     public function exchangeArray($data)
@@ -84,6 +86,9 @@ class Company
         $this->c_parent_type     = (isset($data['c_parent_type'])) ? $data['c_parent_type'] : null;
         $this->c_child_type     = (isset($data['c_child_type'])) ? $data['c_child_type'] : null;
         $this->_c_child_c_ids     = (isset($data['_c_child_c_ids'])) ? $data['_c_child_c_ids'] : null;
+
+        $this->c_create_date     = (isset($data['c_create_date'])) ? $data['c_create_date'] : null;
+        $this->c_renewal_date     = (isset($data['c_renewal_date'])) ? $data['c_renewal_date'] : null;
     }
 
     public function getArrayCopy()

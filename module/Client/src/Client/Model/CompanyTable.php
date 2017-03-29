@@ -41,7 +41,7 @@ class CompanyTable implements ServiceLocatorAwareInterface
         return $resultSet;
     }*/
 
-    public function getCompanies($paginated = false, $orderBy = null, $order = null, $typeItems = 'all', $identity = null, $searchValue = null, $params = array())
+    public function getCompanies($paginated = false, $orderBy = null, $order = null, $typeItems = 'all', $identity = null, $activeFilter = 1)
     {
         if ($paginated) {
             $select = new Select(array('c' => 'companies'));
@@ -56,10 +56,10 @@ class CompanyTable implements ServiceLocatorAwareInterface
             $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = c_id', array('cc_consultant_id'), 'left');
             if (in_array($typeItems, array('all', 'contacts'))) {
                 $select->join(array('u' => 'users'), 'u_company_id = c_id', array('u_id', 'u_firstname', 'u_lastname', 'u_office_phone', '_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)'), '_id' => 'u_id', '_c_active' => new \Zend\Db\Sql\Expression('u.u_active')), 'left');
-                if ($identity['u_role_id'] == User::ROLE_ADMIN) {
-                    $select->where('u_active IN (0, 1)');
-                } else {
+                if ($activeFilter == 1) {
                     $select->where('u_active = 1');
+                } elseif ($activeFilter == 2) {
+                    $select->where('u_active = 0');
                 }
 
                 $select->where('u_id != ' . $identity['u_id']);
@@ -103,10 +103,10 @@ class CompanyTable implements ServiceLocatorAwareInterface
 
             if ($typeItems == 'companies') {
                 $select->columns(array('*', '_name' => 'c_name', '_id' => 'c_id', '_c_active' => new \Zend\Db\Sql\Expression('c.c_active')));
-                if ($identity['u_role_id'] == User::ROLE_ADMIN) {
-                    $select->where('c_active IN (0, 1)');
-                } else {
+                if ($activeFilter == 1) {
                     $select->where('c_active = 1');
+                } elseif ($activeFilter == 2) {
+                    $select->where('c_active = 0');
                 }
             }
 
@@ -116,12 +116,12 @@ class CompanyTable implements ServiceLocatorAwareInterface
                 $selectCom = new Select(array('c2' => 'companies'));
                 $resultSetPrototype = new ResultSet();
                 $resultSetPrototype->setArrayObjectPrototype(new Company());
-                $selectCom->columns(array('*', new \Zend\Db\Sql\Expression('NULL'), new \Zend\Db\Sql\Expression('NULL'), new \Zend\Db\Sql\Expression('NULL'), new \Zend\Db\Sql\Expression('NULL'), '_name' => 'c_name', '_id' => 'c_id', '_c_active' => 'c_active'));
-                $selectCom->join(array('cc2' => 'company_consultants'), 'cc2.cc_company_id = c_id', array('cc_consultant_id'), 'left');
-                if ($identity['u_role_id'] == User::ROLE_ADMIN) {
-                    $select->where('c_active IN (0, 1)');
-                } else {
+                $selectCom->columns(array('*', new \Zend\Db\Sql\Expression('NULL'), new \Zend\Db\Sql\Expression('NULL'), new \Zend\Db\Sql\Expression('NULL'), new \Zend\Db\Sql\Expression('NULL'), new \Zend\Db\Sql\Expression('NULL'), '_name' => 'c_name', '_id' => 'c_id', '_c_active' => 'c_active'));
+                $selectCom->join(array('cc2' => 'company_consultants'), 'cc2.cc_company_id = c_id', array(), 'left');
+                if ($activeFilter == 1) {
                     $selectCom->where('c_active = 1');
+                } elseif ($activeFilter == 2) {
+                    $selectCom->where('c_active = 0');
                 }
                 if ($identity) {
                     if ($identity['u_role_id'] == \Admin\Model\User::ROLE_SALES_REP) {
@@ -201,9 +201,9 @@ class CompanyTable implements ServiceLocatorAwareInterface
             }
         }
 
-        if ($identity['u_role_id'] != User::ROLE_ADMIN) {
+        //if ($identity['u_role_id'] != User::ROLE_ADMIN) {
             $select->where('c_active = 1');
-        }
+        //}
 
         $select->group('c_id');
 
@@ -368,6 +368,10 @@ class CompanyTable implements ServiceLocatorAwareInterface
             'c_type'    => 0,
             'c_parent_c_id'    => 0,
         );
+
+        if ($company->c_renewal_date) {
+            $data['c_renewal_date'] = $company->c_renewal_date;
+        }
 
         if (in_array($identity['u_role_id'], array(User::ROLE_SALES_REP, User::ROLE_SENIOR_CONSULTANT, User::ROLE_ADMIN))) {
             $data['c_rel_type'] = $company->c_rel_type;
@@ -828,5 +832,17 @@ class CompanyTable implements ServiceLocatorAwareInterface
             $locations[$r->adr_id] = $r->adr_name;
         }
         return $locations;
+    }
+
+    public function getCompaniesByRenewalDate($time)
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->columns(array('c_id', 'u_company_id'));
+        $select->where('DATE(c_renewal_date) = "' . date('Y-m-d', $time) . '"');
+        $select->where('c_active = 1');
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        return $resultSet;
     }
 }

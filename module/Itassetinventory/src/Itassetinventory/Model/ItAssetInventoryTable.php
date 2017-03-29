@@ -88,6 +88,8 @@ class ItAssetInventoryTable implements ServiceLocatorAwareInterface
                 $select->where('iai_active = ' . $roleFilter);
             }
 
+            $select->where('c_active = 1');
+
             $order = $order ? $order : 'ASC';
 
             if ($orderBy) {

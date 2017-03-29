@@ -7,9 +7,14 @@ $identity = $authService->getIdentity();
 
 <div class="page-title">
     <h1 class="fleft">Clients</h1>
-    <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 0)); ?>" class="label <?php echo $roleFilter == 0 ? ' selected ' : '' ?>">All</a>
-    <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 1)); ?>" class="label <?php echo $roleFilter == 1 ? ' selected ' : '' ?>">Companies</a>
-    <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 2)); ?>" class="label <?php echo $roleFilter == 2 ? ' selected ' : '' ?>">Contacts</a>
+    <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 0, 'activeFilter' => $activeFilter)); ?>" class="label <?php echo $roleFilter == 0 ? ' selected ' : '' ?>">All</a>
+    <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 1, 'activeFilter' => $activeFilter)); ?>" class="label <?php echo $roleFilter == 1 ? ' selected ' : '' ?>">Companies</a>
+    <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 2, 'activeFilter' => $activeFilter)); ?>" class="label <?php echo $roleFilter == 2 ? ' selected ' : '' ?>">Contacts</a>
+    <?php if (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_SENIOR_CONSULTANT))
+        || $identity['u_company_id_admin']) : ?>
+    <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => $roleFilter, 'activeFilter' => 1)); ?>" class="label <?php echo $activeFilter == 1 ? ' selected ' : '' ?>">Active</a>
+    <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => $roleFilter, 'activeFilter' => 2)); ?>" class="label <?php echo $activeFilter == 2 ? ' selected ' : '' ?>">Inactive</a>
+    <?php endif;?>
     <?php if ($identity['u_role_id'] != \Admin\Model\User::ROLE_TRAIL) : ?>
     <a href="/client/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Contact</a>
     <?php if($checkClientLimitCompany): ?>
@@ -26,7 +31,7 @@ $identity = $authService->getIdentity();
         <tr>
             <?php $classSort = ($order_by == 'id') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
-                <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => 'id', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => 'id', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'activeFilter' => $activeFilter)); ?>">
                     ID <i class="fa <?php echo $classSort ?>"></i>
                 </a>
             </th>
@@ -35,19 +40,21 @@ $identity = $authService->getIdentity();
 
             <?php $classSort = ($order_by == 'name') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
-                <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => 'name', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => 'name', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'activeFilter' => $activeFilter)); ?>">
                     Name <i class="fa <?php echo $classSort ?>"></i>
                 </a>
             </th>
 
             <?php $classSort = ($order_by == 'company') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
-                <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => 'company', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => 'company', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'activeFilter' => $activeFilter)); ?>">
                     Company <i class="fa <?php echo $classSort ?>"></i>
                 </a>
             </th>
 
             <th>Phone </th>
+            <th>Created </th>
+            <th>Renewal Date </th>
             <th>&nbsp;</th>
         </tr>
     </thead>
@@ -74,22 +81,19 @@ $identity = $authService->getIdentity();
                         <a href="/company/edit/<?php echo $company->c_id ?>"><?php echo $company->c_name ?></a>
                     <?php endif; ?>
                 </td>
-                <td><?php echo ($isUser) ? $company->u_office_phone : $company->c_phone ?></td>
+                <td><?php echo ($isUser) ? '' : $company->c_phone ?></td>
+                <td><?php echo ($isUser) ? '' : ($company->c_create_date != '0000-00-00 00:00:00') ? $this->formatDateA($company->c_create_date) : '' ?></td>
+                <td><?php echo ($isUser) ? '' : ($company->c_renewal_date != '0000-00-00 00:00:00') ? $this->formatDateA($company->c_renewal_date) : '' ?></td>                
                 <td class="aright">
                     <a href="/<?php echo ($isUser) ? 'client' : 'company' ?>/edit/<?php echo ($isUser) ? $company->u_id : $company->c_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
                     <?php if ($identity['u_role_id'] != \Admin\Model\User::ROLE_TRAIL) : ?>
-                    <?php if ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
                         <?php if ($company->_c_active): ?>
                             <?php $deleteUrl = '/' . (($isUser) ? 'client' : 'company') . '/delete/' . (($isUser) ? $company->u_id : $company->c_id); ?>
-                            <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
+                            <a href="#deactivation-box-modal" onclick="$('#deactivateYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete" title="Deactivate"><i class="fa fa-trash-o"></i></a>
                         <?php else: ?>
                             <?php $unarchiveUrl = '/' . (($isUser) ? 'client' : 'company') . '/unarchive/' . (($isUser) ? $company->u_id : $company->c_id); ?>
-                            <a href="<?php echo $unarchiveUrl ?>" class="confirmation-modal i-delete">Unarchive</a>
+                            <a href="<?php echo $unarchiveUrl ?>" class="confirmation-modal i-delete">Activate</a>
                         <?php endif; ?>
-                    <?php elseif($identity['u_company_id'] != $company->c_id):?>
-                        <?php $deleteUrl = '/' . (($isUser) ? 'client' : 'company') . '/delete/' . (($isUser) ? $company->u_id : $company->c_id); ?>
-                        <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
-                    <?php endif; ?>
                     <?php endif; ?>
                 </td>
             </tr>
@@ -101,7 +105,7 @@ $identity = $authService->getIdentity();
     $this->paginator,
     'sliding',
     array('partial/paginator.phtml', 'Client'),
-    array('route' => 'list', 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'roleFilter' => $roleFilter, 'role' => 1, 'controller' => 'client', 'action' => 'list')
+    array('route' => 'list', 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'roleFilter' => $roleFilter, 'activeFilter' => $activeFilter, 'role' => 1, 'controller' => 'client', 'action' => 'list')
 );
 ?>
 

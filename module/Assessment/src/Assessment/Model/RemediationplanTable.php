@@ -93,6 +93,8 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
                                   )
                             );
 
+            $select->where('c_active = 1');
+
             $order = $order ? $order : 'ASC';
 
             if ($orderBy) {
@@ -171,6 +173,8 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
         if ($where_str) {
             $select->where($where_str);
         }
+
+        $select->where('c_active = 1');
 
         return $select;
     }

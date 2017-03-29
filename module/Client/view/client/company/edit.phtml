@@ -152,6 +152,23 @@ $form->setAttribute('method', 'post');
                 echo $this->formElementErrors($fn);
                 ?>
             </p>
+
+            <?php if (in_array($this->roleId, array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_SENIOR_CONSULTANT))) : ?>
+                <p>
+                    <?php
+                    $fn = $form->get('c_renewal_date');
+                    if ($this->cId):
+                        $fn->setValue($this->formatDateA($this->companyObj->c_renewal_date, false, true));
+                    else:
+                        $fn->setValue($this->formatDateA(date('Y-m-d', strtotime('+1 year')), false, true));
+                    endif;
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'c_renewal_date', 'readonly' => 'readonly')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+            <?php endif; ?>
+
             <?php if ($this->roleId == \Admin\Model\User::ROLE_ADMIN && $ownerContact && in_array($ownerContact->u_role_id, array(\Admin\Model\User::ROLE_CLIENT, \Admin\Model\User::ROLE_PARTIAL))): ?>
                 <p>
                     <?php
@@ -469,7 +486,7 @@ $form->setAttribute('method', 'post');
 
     var browseFilesCounter = 0;
     $(document).ready(function() {
-
+        $( "#c_renewal_date" ).datepicker({dateFormat: 'mm/dd/yy'});
         $('#fromDate, #toDate').datepicker({dateFormat: 'mm/dd/yy'});
 
         $('#browseFile').click(function() {

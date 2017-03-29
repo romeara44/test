@@ -14,7 +14,7 @@ return array(
             'client' => array(
                 'type'    => 'segment',
                 'options' => array(
-                    'route'    => '/client[/:action][/:id][/page/:page][/order_by/:order_by][/:order][/roleFilter/:roleFilter][/company/:company][/lock/:lock]',
+                    'route'    => '/client[/:action][/:id][/page/:page][/order_by/:order_by][/:order][/roleFilter/:roleFilter][/activeFilter/:activeFilter][/company/:company][/lock/:lock]',
                     'constraints' => array(
                         'action' => '(?!\bpage\b)(?!\border_by\b)[a-zA-Z][a-zA-Z0-9_-]*',
                         'id'     => '[0-9]+',
@@ -23,6 +23,7 @@ return array(
                         'order_by' => '[a-zA-Z][a-zA-Z0-9_-]*',
                         'order' => 'ASC|DESC',
                         'roleFilter' => '[0-9]+',
+                        'activeFilter' => '[0-9]+',
                         'lock' => '[0-9]+',
                     ),
                     'defaults' => array(
@@ -53,6 +54,22 @@ return array(
             ),
 
 
+        ),
+    ),
+
+    'console' => array(
+        'router' => array(
+            'routes' => array(
+                'renewal-reminder' => array(
+                    'options' => array(
+                        'route'    => 'clients renewal',
+                        'defaults' => array(
+                            'controller' => 'Client\Controller\Index',
+                            'action'     => 'renewal'
+                        )
+                    )
+                )
+            ),
         ),
     ),
 

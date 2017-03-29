@@ -159,20 +159,6 @@ $_options = array(0 => 'Current Month', 1 => 'Last Month', 2 => 'Last 3 Months',
                     ?>
                 </p>
 
-                <p>
-                    <?php
-                    $fn = $form->get('u_renewal_date');
-                    if ($this->uId):
-                        $fn->setValue($this->formatDateA($this->userObj->u_renewal_date, false, true));
-                    else:
-                        $fn->setValue($this->formatDateA(date('Y-m-d', strtotime('+1 year')), false, true));
-                    endif;
-                    echo $this->formLabel($fn);
-                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'u_renewal_date', 'readonly' => 'readonly')));
-                    echo $this->formElementErrors($fn);
-                    ?>
-                </p>
-
                 <h2>Address</h2>
 
                 <p>
@@ -472,7 +458,6 @@ $_options = array(0 => 'Current Month', 1 => 'Last Month', 2 => 'Last 3 Months',
 
 <script>
     jQuery(document).ready(function(){
-        $( "#u_renewal_date" ).datepicker({dateFormat: 'mm/dd/yy'});
         //Conditional logic for account types
         $('#user').submit(function() {
             $('#user select, #user input').removeAttr('disabled');

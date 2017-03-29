@@ -71,16 +71,6 @@ class UserForm extends Form
         ));
 
         $this->add(array(
-            'name' => 'u_renewal_date',
-            'attributes' => array(
-                'type'  => 'text',
-            ),
-            'options' => array(
-                'label' => 'Renewal Date',
-            ),
-        ));
-
-        $this->add(array(
             'name' => 'u_firstname',
             'attributes' => array(
                 'type'  => 'text',

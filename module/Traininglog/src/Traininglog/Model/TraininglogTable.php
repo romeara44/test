@@ -104,6 +104,8 @@ class TraininglogTable implements ServiceLocatorAwareInterface
                 }
             }
 
+            $select->where('c.c_active = 1');
+
             $select->group('tl_id');
 
             $paginator = new Paginator($paginatorAdapter);

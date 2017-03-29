@@ -154,9 +154,9 @@ class UserTable implements ServiceLocatorAwareInterface
 
         //$select->where('u_role_id = 5'); // without admin
 
-        if ($identity['u_role_id'] != User::ROLE_ADMIN) {
+        //if ($identity['u_role_id'] != User::ROLE_ADMIN) {
             $select->where('u_active = 1');
-        }
+        //}
 
         $select->group('u_id');
 
@@ -272,7 +272,6 @@ class UserTable implements ServiceLocatorAwareInterface
             'u_zip' => $user->u_zip,
             'u_state_id' => $user->u_state_id,
             'u_confirmed' => isset($user->u_confirmed) ? $user->u_confirmed : 1,
-            'u_renewal_date' => $user->u_renewal_date,
         );
 
         if (!(int) $user->u_senior_consultant_u_id) {
@@ -975,18 +974,6 @@ class UserTable implements ServiceLocatorAwareInterface
         $select->where('u_active = 1');
 
         return $this->tableGateway->selectWith($select);
-    }
-
-    public function getUsersByRenewalDate($time)
-    {
-        $select = $this->tableGateway->getSql()->select();
-        $select->columns(array('u_id', 'u_company_id'));
-        $select->where('DATE(u_renewal_date) = "' . date('Y-m-d', $time) . '"');
-        $select->where('u_active = 1');
-
-        $resultSet = $this->tableGateway->selectWith($select);
-
-        return $resultSet;
     }
 
     public function getAdminUserId()

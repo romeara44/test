@@ -89,6 +89,8 @@ class DisclosureRecordTable implements ServiceLocatorAwareInterface
                 $select->where('dr_active = ' . $roleFilter);
             }
 
+            $select->where('c_active = 1');
+
             $select->group('dr_id');
 
             if ($orderBy) {
