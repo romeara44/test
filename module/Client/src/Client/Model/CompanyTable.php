@@ -470,6 +470,27 @@ class CompanyTable implements ServiceLocatorAwareInterface
         return $id;
     }
 
+    public function saveRenewalData($c_id, $post)
+    {
+        $data = array();
+
+        $c_renewal_date = \DateTime::createFromFormat('m/d/Y', $post['c_renewal_date']);
+        if ($c_renewal_date) {
+           $data['c_renewal_date'] = $c_renewal_date->format('Y-m-d'); 
+        }        
+        if (isset($post['c_renewal_email_recipients'])) {
+           $data['c_renewal_email_recipients'] = implode(',', $post['c_renewal_email_recipients']); 
+        } else {
+            $data['c_renewal_email_recipients'] = '';
+        }
+        if (isset($post['c_deny_renewal_email_sending'])) {
+           $data['c_deny_renewal_email_sending'] = 1; 
+        } else {
+            $data['c_deny_renewal_email_sending'] = 0;
+        }
+        $this->tableGateway->update($data, array('c_id' => $c_id));
+    }
+
     public function addClientCompany(Company $company)
     {
         $data = array(
@@ -834,15 +855,33 @@ class CompanyTable implements ServiceLocatorAwareInterface
         return $locations;
     }
 
-    public function getCompaniesByRenewalDate($time)
+    public function getCompaniesForRenewalDateNotification($time)
     {
         $select = $this->tableGateway->getSql()->select();
-        $select->columns(array('c_id', 'u_company_id'));
+        $select->columns(array('c_id',));
         $select->where('DATE(c_renewal_date) = "' . date('Y-m-d', $time) . '"');
         $select->where('c_active = 1');
 
         $resultSet = $this->tableGateway->selectWith($select);
 
         return $resultSet;
+    }
+
+    public function getCompaniesForRenewalDateEmailing($time)
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->columns(array('c_id', 'c_renewal_email_recipients'));
+        $select->where('DATE(c_renewal_date) = "' . date('Y-m-d', $time) . '"');
+        $select->where('c_active = 1');
+        $select->where('c_deny_renewal_email_sending != 1');
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        return $resultSet;
+    }
+
+    public function incrementRenewalDate()
+    {
+        $this->tableGateway->update(array('c_renewal_date' => date('Y-m-d', strtotime('+1 year'))), 'DATE(c_renewal_date) = "' . date('Y-m-d') . '"');
     }
 }

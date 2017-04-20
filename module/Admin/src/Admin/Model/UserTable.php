@@ -178,7 +178,7 @@ class UserTable implements ServiceLocatorAwareInterface
         $users = array();
         foreach ($resultSet as $rs) {
             if ($rs->u_id == $primaryContactId) {
-                $users[] = $rs;
+                $users[$rs->u_id] = $rs;
                 break;
             }
         }
@@ -188,7 +188,7 @@ class UserTable implements ServiceLocatorAwareInterface
             if ($primaryContactId && ($rs->u_id == $primaryContactId)) {
                 continue;
             } else {
-                $users[] = $rs;
+                $users[$rs->u_id] = $rs;
             }
         }
 
@@ -765,7 +765,8 @@ class UserTable implements ServiceLocatorAwareInterface
         return isset($company->c_id) &&
               ( $identity['u_role_id'] == User::ROLE_ADMIN ||
                 ($identity['u_company_id_admin'] && $company->c_id == $identity['u_company_id_admin']) ||
-                ($company->c_consultant_u_id && $company->c_consultant_u_id == $identity['u_id'])
+                ($company->c_consultant_u_id && $company->c_consultant_u_id == $identity['u_id']) ||
+                $identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT
               );
     }
 

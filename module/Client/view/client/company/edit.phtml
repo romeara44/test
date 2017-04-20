@@ -153,22 +153,6 @@ $form->setAttribute('method', 'post');
                 ?>
             </p>
 
-            <?php if (in_array($this->roleId, array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_SENIOR_CONSULTANT))) : ?>
-                <p>
-                    <?php
-                    $fn = $form->get('c_renewal_date');
-                    if ($this->cId):
-                        $fn->setValue($this->formatDateA($this->companyObj->c_renewal_date, false, true));
-                    else:
-                        $fn->setValue($this->formatDateA(date('Y-m-d', strtotime('+1 year')), false, true));
-                    endif;
-                    echo $this->formLabel($fn);
-                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'c_renewal_date', 'readonly' => 'readonly')));
-                    echo $this->formElementErrors($fn);
-                    ?>
-                </p>
-            <?php endif; ?>
-
             <?php if ($this->roleId == \Admin\Model\User::ROLE_ADMIN && $ownerContact && in_array($ownerContact->u_role_id, array(\Admin\Model\User::ROLE_CLIENT, \Admin\Model\User::ROLE_PARTIAL))): ?>
                 <p>
                     <?php
@@ -443,6 +427,44 @@ $form->setAttribute('method', 'post');
             <div class="administrationBlockWrap lockedUsers">
 
             </div>
+
+            <?php if (in_array($this->roleId, array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_SENIOR_CONSULTANT))) : ?>
+            <h3>Renewal date</h3>
+            <div class="administrationBlockWrap">
+            <form action="/company/edit/<?php echo $this->cId ?>" name="" id="" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="renewalform" value="1" />
+                <p>
+                    <?php
+                    $fn = $formRenewal->get('c_renewal_date');
+                    $fn->setValue($this->formatDateA($this->companyObj->c_renewal_date, false, true));
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'c_renewal_date', 'readonly' => 'readonly')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php $fn = $formRenewal->get('c_renewal_email_recipients');
+                    echo $this->formLabel($fn);
+                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    $fn = $formRenewal->get('c_deny_renewal_email_sending');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <div class="cboth"><br /></div>
+                <div class="form-buttons">
+                    <input type="submit" value="Save" class="form-button" />
+                </div>
+                <div class="cboth"><br /></div>
+            </form>
+            </div>
+            <?php endif; ?>
         </div>
     <?php endif; ?>
 </div>

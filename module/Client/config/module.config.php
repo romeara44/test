@@ -5,6 +5,7 @@ return array(
         'invokables' => array(
             'Client\Controller\Client' => 'Client\Controller\ClientController',
             'Client\Controller\Company' => 'Client\Controller\CompanyController',
+            'Client\Controller\Index' => 'Client\Controller\IndexController',
         ),
     ),
 

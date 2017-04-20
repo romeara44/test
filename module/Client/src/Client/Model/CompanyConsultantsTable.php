@@ -94,4 +94,16 @@ class CompanyConsultantsTable implements ServiceLocatorAwareInterface
         return $companies;
     }
 
+    public function getConsultantIdForCompany($c_id)
+    {
+        if(!$c_id) return array();
+
+        $select = $this->tableGateway->getSql()->select();
+        $select->columns(array('cc_consultant_id',));
+        $select->join(array('u' => 'users'), 'cc_consultant_id = u_id', array(), 'inner');
+        $select->where("cc_company_id =" . $c_id);
+        $select->order('u_role_id');
+
+        return $this->tableGateway->selectWith($select)->current();
+    }
 }

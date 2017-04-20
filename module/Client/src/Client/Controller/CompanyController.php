@@ -11,6 +11,7 @@ namespace Client\Controller;
 
 use Client\Form\CompanyForm;
 use Note\Form\NoteForm;
+use Client\Form\RenewalForm;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Client\Model\Company;
@@ -118,6 +119,7 @@ class CompanyController extends AbstractActionController
 
         $id = (int) $this->params('id');
         $noteform = $request->isPost() && (int) $request->getPost('noteform');
+        $renewalform = $request->isPost() && (int) $request->getPost('renewalform');
         $rolesform = $request->isPost() && (int) $request->getPost('rolesform');
         $roleFilter = $this->params()->fromRoute('roleFilter') ? (int) $this->params()->fromRoute('roleFilter') : 0;
 
@@ -139,6 +141,7 @@ class CompanyController extends AbstractActionController
 
         $form = new CompanyForm($this->getServiceLocator(), $id);
         $formNote = new NoteForm($this->getServiceLocator());
+        
         $companyObj = null;
         $contacts = null;
         $primaryContactId = null;
@@ -169,9 +172,13 @@ class CompanyController extends AbstractActionController
 
         $addresses = array();
         $identity = $this->getIdentity();
+        $formRenewal = new RenewalForm($this->getServiceLocator(), $companyObj);
 
         if ($request->isPost()) {
-            if ($noteform) {
+            if ($renewalform) {                
+                $this->getCompanyTable()->saveRenewalData($id, $request->getPost());
+                return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
+            } elseif ($noteform) {
                 $note = new Note();
                 $formNote->setInputFilter($note->getInputFilter($this->getServiceLocator(), $id));
                 $formNote->setData($request->getPost());
@@ -210,10 +217,7 @@ class CompanyController extends AbstractActionController
                 return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
             } else {
                 $post = $request->getPost();
-                $c_renewal_date = \DateTime::createFromFormat('m/d/Y', $post['c_renewal_date']);
-                if ($c_renewal_date) {
-                   $post['c_renewal_date'] = $c_renewal_date->format('Y-m-d'); 
-                }                
+                                
                 $post['c_owner_u_id'] = $identity['u_id'];
                 $post['c_update_u_id'] = $identity['u_id'];
 
@@ -267,6 +271,7 @@ class CompanyController extends AbstractActionController
         return array(
             'form' => $form,
             'formNote' => $formNote,
+            'formRenewal' => $formRenewal,
             'cId' => $id,
             'addresses' => $addresses,
             'contacts' => $contacts,

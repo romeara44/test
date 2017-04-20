@@ -107,6 +107,17 @@ class MailtemplateTable
             if (isset($params['link'])) {
                 $mt->mt_text = str_replace('<link>', $params['link'], $mt->mt_text);
             }
+            $mt->mt_text = str_replace('<Full Name>', $addToName, $mt->mt_text);
+        }
+
+        if (isset($params['cId'])) {
+            $company = $sl->get('Client\Model\CompanyTable')->getClientCompany($params['cId']);
+            if ($company) {
+                $mt->mt_text = str_replace('<Company name>', $company->c_name, $mt->mt_text);
+                $mt->mt_text = str_replace('<Company Renewal Date - 30 days>', date('m/d/Y', strtotime('-30 days', strtotime($company->c_renewal_date))), $mt->mt_text);
+                $mt->mt_text = str_replace('<Company Renewal Date>', date('m/d/Y', strtotime($company->c_renewal_date)), $mt->mt_text);
+                $mt->mt_text = str_replace('<Company Details page link>', 'http://hipaa.loc/company/edit/' . $company->c_id, $mt->mt_text);
+            }
         }
 
         if (isset($params['brpId'])) {

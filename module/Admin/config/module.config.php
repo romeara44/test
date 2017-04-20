@@ -4,7 +4,6 @@ return array(
     'controllers' => array(
         'invokables' => array(
             'Admin\Controller\Admin' => 'Admin\Controller\AdminController',
-            'Admin\Controller\Index' => 'Admin\Controller\IndexController',
         ),
     ),
 
