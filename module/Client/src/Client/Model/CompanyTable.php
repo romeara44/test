@@ -369,10 +369,6 @@ class CompanyTable implements ServiceLocatorAwareInterface
             'c_parent_c_id'    => 0,
         );
 
-        if ($company->c_renewal_date) {
-            $data['c_renewal_date'] = $company->c_renewal_date;
-        }
-
         if (in_array($identity['u_role_id'], array(User::ROLE_SALES_REP, User::ROLE_SENIOR_CONSULTANT, User::ROLE_ADMIN))) {
             $data['c_rel_type'] = $company->c_rel_type;
             if ($company->c_rel_type == \Client\Model\Company::RELATION_TYPE_PARENT) {
@@ -387,6 +383,7 @@ class CompanyTable implements ServiceLocatorAwareInterface
         $id = (int) $company->c_id;
 
         if (!$id) {
+            $data['c_renewal_date'] = new \Zend\Db\Sql\Expression('TIMESTAMPADD(YEAR,1,NOW())');
             $data['c_owner_u_id'] = $company->c_owner_u_id;
             $ownerContact         = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUser($company->c_owner_u_id);
             if($ownerContact && in_array($ownerContact->u_role_id, array(User::ROLE_CLIENT, User::ROLE_PARTIAL))) {

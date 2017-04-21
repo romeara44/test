@@ -150,6 +150,7 @@ class CompanyController extends AbstractActionController
         $existsCompanyRoles = array();
         $ownerContact = null;
         $notes = null;
+        $formRenewal = null;
 
         if ($id) {
             $companyObj = $this->getCompanyTable()->getCompany($id);
@@ -168,11 +169,11 @@ class CompanyController extends AbstractActionController
             $existsCompanyRoles = $this->getServiceLocator()->get('Client\Model\CompanyRolesTable')->getExistsCompanyRoles($id);
 
             $ownerContact = $this->getUserTable()->getUser($companyObj->c_owner_u_id);
+            $formRenewal = new RenewalForm($this->getServiceLocator(), $companyObj);
         }
 
         $addresses = array();
-        $identity = $this->getIdentity();
-        $formRenewal = new RenewalForm($this->getServiceLocator(), $companyObj);
+        $identity = $this->getIdentity();        
 
         if ($request->isPost()) {
             if ($renewalform) {                
