@@ -146,7 +146,7 @@
                                         $_fileName = $_file[0];
                                         $_fileId = $_file[1];
                                         ?>
-                                        <span style="float: left; margin-right: 5px;" class="<?php echo (!$this->isPdf) ? $this->renderPictoIcon($_fileName) : ''; ?>"></span><a href="http://<?php echo $_SERVER['HTTP_HOST'] ?>/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+                                        <span style="float: left; margin-right: 5px;" class="<?php echo (!$this->isPdf) ? $this->renderPictoIcon($_fileName) : ''; ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                         <?php endforeach; ?>
