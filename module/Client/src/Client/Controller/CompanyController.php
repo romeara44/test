@@ -297,10 +297,10 @@ class CompanyController extends AbstractActionController
         $identity = $this->getIdentity();
         $id       = $this->params('id');
 
-        if($identity['u_company_id'] != $id) {
+        //if($identity['u_company_id'] != $id) {
             $this->getCompanyTable()->deleteCompany($id);
             $this->flashMessenger()->addSuccessMessage('Company has been deleted');
-        }
+        //}
 
         $this->getLogTable()->saveUserFileLog('Delete company "' . $id . '"');
 

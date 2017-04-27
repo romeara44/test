@@ -44,7 +44,7 @@ class IndexController extends AbstractActionController
             }
 
             foreach ($recepients as $id) {
-                $mail_table->sendMail($this->getServiceLocator(), array('templateKey' => 'renewaluser', 'uId' => $id));
+                $mail_table->sendMail($this->getServiceLocator(), array('templateKey' => 'renewaluser', 'uId' => $id, 'cId' => $client->c_id));
             }
         }
 

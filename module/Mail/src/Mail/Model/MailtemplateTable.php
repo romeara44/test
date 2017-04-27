@@ -116,7 +116,8 @@ class MailtemplateTable
                 $mt->mt_text = str_replace('<Company name>', $company->c_name, $mt->mt_text);
                 $mt->mt_text = str_replace('<Company Renewal Date - 30 days>', date('m/d/Y', strtotime('-30 days', strtotime($company->c_renewal_date))), $mt->mt_text);
                 $mt->mt_text = str_replace('<Company Renewal Date>', date('m/d/Y', strtotime($company->c_renewal_date)), $mt->mt_text);
-                $mt->mt_text = str_replace('<Company Details page link>', 'http://hipaa.loc/company/edit/' . $company->c_id, $mt->mt_text);
+                $mt->mt_text = str_replace('<Company Details page link>', 'https://hipaa.carosh.com/company/edit/' . $company->c_id, $mt->mt_text);
+                $mt->mt_text = str_replace('<client_deactivate_link>', 'https://hipaa.carosh.com/company/delete/' . $company->c_id, $mt->mt_text);
             }
         }
 

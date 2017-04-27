@@ -30,8 +30,14 @@ class RenewalForm extends Form
         foreach ($userTable->getUsersByRole(array(\Admin\Model\User::ROLE_SENIOR_CONSULTANT)) as $key => $r) {
             $consultants[$key] = $r;
         }
+        if ($companyObj->c_primary_contact_u_id) {
+            $primary_contact = $userTable->getUser($companyObj->c_primary_contact_u_id);
+            if ($primary_contact) {
+                $consultants[$companyObj->c_primary_contact_u_id] = $primary_contact->u_firstname . ' ' . $primary_contact->u_lastname;
+            }            
+        }
         foreach ($userTable->getUsersByCompany($companyObj->c_id) as $key => $r) {
-            $consultants[$key] = $r->u_firstname . ' ' . $r->u_lastname;;
+            $consultants[$key] = $r->u_firstname . ' ' . $r->u_lastname;
         }
 
         $recipients = array();

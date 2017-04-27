@@ -5,7 +5,7 @@ ADD `c_deny_renewal_email_sending` tinyint(1) NOT NULL DEFAULT 0;
 update `companies` set `c_renewal_date` = TIMESTAMPADD(YEAR,1,c_create_date);
 update `companies`
 set `c_renewal_email_recipients` = CONCAT(63, IF(c_primary_contact_u_id IS NOT NULL, CONCAT(',', c_primary_contact_u_id), ''));
-INSERT INTO `mail_templates` (`mt_id`, `mt_name`, `mt_key`, `mt_subject`, `mt_text`, `mt_active`, `mt_create_date`) VALUES (NULL, '', 'renewaluser', 'User renewal reminder', '<div style="font-size: 24px; color: #189696"><Full Name>,</div> <br /> Text goes here... <br /> Please do not hesitate to contact us with any questions.', '0', CURRENT_TIMESTAMP);
+INSERT INTO `mail_templates` (`mt_id`, `mt_name`, `mt_key`, `mt_subject`, `mt_text`, `mt_active`, `mt_create_date`) VALUES (NULL, '', 'renewaluser', 'User renewal reminder', '<div style="font-size: 24px; color: #189696"><Full Name>,</div> <br /> <a href="<client_deactivate_link>">Deactivate client</a> <br /> Please do not hesitate to contact us with any questions.', '0', CURRENT_TIMESTAMP);
 INSERT INTO `mail_templates` (`mt_id`, `mt_name`, `mt_key`, `mt_subject`, `mt_text`, `mt_active`, `mt_create_date`) VALUES (NULL, '', 'renewalnotification', 'Renewal notification', '<div style="font-size: 24px; color: #189696">Dear <Full Name>,</div> <br /> The Client <Company name> is going to receive the renewal email on <Company Renewal Date - 30 days> as their renewal date is <Company Renewal Date>. 
 You can change the renewal date or recipients list, or deny the email sending on the  Administration tab for the Company Details page, following by this <a href="<Company Details page link>">link</a>.
  <br /> Please do not hesitate to contact us with any questions.', '0', CURRENT_TIMESTAMP);
