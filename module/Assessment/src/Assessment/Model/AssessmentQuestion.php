@@ -68,7 +68,7 @@ class AssessmentQuestion
                 'name'     => 'aq_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Int'),
+                    array('name' => 'Digits'),
                 ),
             )));
        }

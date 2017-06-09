@@ -91,7 +91,7 @@ class Assessment
                 'name'     => 'a_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Int'),
+                    array('name' => 'Digits'),
                 ),
             )));
 

@@ -36,7 +36,7 @@ class Traininglogtype
                 'name'     => 'tlt_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Int'),
+                    array('name' => 'Digits'),
                 ),
             )));
 
@@ -53,7 +53,7 @@ class Traininglogtype
                 'name'     => 'tlt_company_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Int'),
+                    array('name' => 'Digits'),
                 ),
             )));
 

@@ -41,7 +41,7 @@ class Sitesetting
                 'name'     => 'ss_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Int'),
+                    array('name' => 'Digits'),
                 ),
             )));
 

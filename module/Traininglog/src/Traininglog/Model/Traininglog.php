@@ -79,7 +79,7 @@ class Traininglog
                 'name'     => 'tl_company_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Int'),
+                    array('name' => 'Digits'),
                 ),
             )));
 
@@ -87,7 +87,7 @@ class Traininglog
                 'name'     => 'tl_id',
                 'required' => false,
                 'filters'  => array(
-                    array('name' => 'Int'),
+                    array('name' => 'Digits'),
                 ),
             )));
 
@@ -114,7 +114,7 @@ class Traininglog
                 'name'     => 'tl_tlt_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Int'),
+                    array('name' => 'Digits'),
                 ),
             )));
 

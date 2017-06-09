@@ -112,7 +112,7 @@ class Company
                 'name'     => 'c_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Int'),
+                    array('name' => 'Digits'),
                 ),
             )));
 
@@ -120,7 +120,7 @@ class Company
                 'name'     => 'c_users_limit',
                 'required' => false,
                 'filters'  => array(
-                    array('name' => 'Int'),
+                    array('name' => 'Digits'),
                 ),
             )));
 

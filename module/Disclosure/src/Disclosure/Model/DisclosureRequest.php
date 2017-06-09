@@ -50,7 +50,7 @@ class DisclosureRequest
                 'name'     => 'dr_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Int'),
+                    array('name' => 'Digits'),
                 ),
             )));
 

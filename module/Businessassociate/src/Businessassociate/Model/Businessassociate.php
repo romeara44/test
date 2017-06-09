@@ -107,7 +107,7 @@ class Businessassociate
                 'name'     => 'ba_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Int'),
+                    array('name' => 'Digits'),
                 ),
             )));
 

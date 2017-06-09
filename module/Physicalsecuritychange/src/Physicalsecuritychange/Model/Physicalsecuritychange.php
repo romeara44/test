@@ -58,7 +58,7 @@ class Physicalsecuritychange
                 'name'     => 'psc_c_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Int'),
+                    array('name' => 'Digits'),
                 ),
             )));
 
@@ -66,7 +66,7 @@ class Physicalsecuritychange
                 'name'     => 'psc_adr_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Int'),
+                    array('name' => 'Digits'),
                 ),
             )));
 
@@ -74,7 +74,7 @@ class Physicalsecuritychange
                 'name'     => 'psc_change_type',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Int'),
+                    array('name' => 'Digits'),
                 ),
             )));
 

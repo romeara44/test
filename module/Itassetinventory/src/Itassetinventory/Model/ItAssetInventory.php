@@ -61,7 +61,7 @@ class ItAssetInventory
                 'name'     => 'iai_id',
                 'required' => $isEdit,
                 'filters'  => array(
-                    array('name' => 'Int'),
+                    array('name' => 'Digits'),
                 ),
             )));
 
