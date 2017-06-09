@@ -78,7 +78,7 @@ class DisclosureRecord
                 'name'     => 'dr_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Digits'),
+                    array('name' => 'Int'),
                 ),
             )));
 

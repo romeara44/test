@@ -38,7 +38,7 @@ class CompanyRoles
                 'name'     => 'cr_id',
                 'required' => false,
                 'filters'  => array(
-                    array('name' => 'Digits'),
+                    array('name' => 'Int'),
                 ),
             )));
 
@@ -46,7 +46,7 @@ class CompanyRoles
                 'name'     => 'cr_ar_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Digits'),
+                    array('name' => 'Int'),
                 ),
             )));
 
@@ -54,7 +54,7 @@ class CompanyRoles
                 'name'     => 'cr_c_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Digits'),
+                    array('name' => 'Int'),
                 ),
             )));
 
@@ -62,7 +62,7 @@ class CompanyRoles
                 'name'     => 'cr_u_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Digits'),
+                    array('name' => 'Int'),
                 ),
             )));
 

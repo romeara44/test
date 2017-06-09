@@ -68,7 +68,7 @@ class VerbalLog
                 'name'     => 'vl_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Digits'),
+                    array('name' => 'Int'),
                 ),
             )));
 
@@ -76,7 +76,7 @@ class VerbalLog
                 'name'     => 'vl_active',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Digits'),
+                    array('name' => 'Int'),
                 ),
             )));
 
@@ -84,7 +84,7 @@ class VerbalLog
                 'name'     => 'vl_is_fees',
                 'required' => false,
                 'filters'  => array(
-                    array('name' => 'Digits'),
+                    array('name' => 'Int'),
                 ),
             )));
 
@@ -92,7 +92,7 @@ class VerbalLog
                 'name'     => 'vl_is_extensions',
                 'required' => false,
                 'filters'  => array(
-                    array('name' => 'Digits'),
+                    array('name' => 'Int'),
                 ),
             )));
 

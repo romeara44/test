@@ -78,7 +78,7 @@ class AccountingRequest
                 'name'     => 'ar_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Digits'),
+                    array('name' => 'Int'),
                 ),
             )));
 

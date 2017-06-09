@@ -32,7 +32,7 @@ class Planprogress
                 'name'     => 'company',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Digits'),
+                    array('name' => 'Int'),
                 ),
             )));
 

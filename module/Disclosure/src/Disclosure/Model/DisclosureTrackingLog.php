@@ -62,7 +62,7 @@ class DisclosureTrackingLog
                 'name'     => 'dtl_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Digits'),
+                    array('name' => 'Int'),
                 ),
             )));
 
@@ -70,7 +70,7 @@ class DisclosureTrackingLog
                 'name'     => 'dtl_active',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Digits'),
+                    array('name' => 'Int'),
                 ),
             )));
 

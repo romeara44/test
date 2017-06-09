@@ -116,7 +116,7 @@ class Remediationplan
                 'name'     => 'rp_c_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Digits'),
+                    array('name' => 'Int'),
                 ),
                 'validators' => array(
                     array(
@@ -132,7 +132,7 @@ class Remediationplan
                 'name'     => 'rp_performed_u_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Digits'),
+                    array('name' => 'Int'),
                 ),
                 'validators' => array(
                     array(

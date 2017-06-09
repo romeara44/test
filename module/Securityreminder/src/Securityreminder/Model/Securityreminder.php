@@ -53,7 +53,7 @@ class Securityreminder
                 'name'     => 'sr_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Digits'),
+                    array('name' => 'Int'),
                 ),
             )));
 
@@ -80,7 +80,7 @@ class Securityreminder
                 'name'     => 'sr_dt_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Digits'),
+                    array('name' => 'Int'),
                 ),
             )));
 
@@ -88,7 +88,7 @@ class Securityreminder
                 'name'     => 'sr_developed_by_u_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Digits'),
+                    array('name' => 'Int'),
                 ),
             )));
 

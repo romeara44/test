@@ -83,7 +83,7 @@ class Breachlog
                 'name'     => 'bl_id',
                 'required' => true,
                 'filters'  => array(
-                    array('name' => 'Digits'),
+                    array('name' => 'Int'),
                 ),
             )));
 
@@ -206,7 +206,7 @@ class Breachlog
                 'name'     => 'bl_approver_u_id',
                 'required' => false,
                 'filters'  => array(
-                    array('name' => 'Digits'),
+                    array('name' => 'Int'),
                 )
             )));
             
@@ -214,7 +214,7 @@ class Breachlog
                 'name'     => 'bl_accepter_u_id',
                 'required' => false,
                 'filters'  => array(
-                    array('name' => 'Digits'),
+                    array('name' => 'Int'),
                 )
             )));
 
