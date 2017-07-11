@@ -1,5 +1,14 @@
-
-
+<?php if (count($this->loc_rps) > 1) : ?>
+<div class="tab_nav">
+    <ul class="ul_tabs">
+    <?php foreach ($this->loc_rps as $rp_id => $loc_name): ?>
+        <li <?php echo $this->id == $rp_id ? 'class="active_tab"' : ''; ?> >
+        <a href="/remediationplan/edit/<?php echo $rp_id; ?>" class="panel-tabs"><?php echo $loc_name; ?></a>
+        </li>
+    <?php endforeach; ?>
+    </ul>
+</div>
+<?php endif; ?>
 <div class="page-title">
     <h1 class="fleft">Remediation Plan for <?php echo (!$this->isPdf) ? '<br/>' : '' ?><?php echo $this->rpObj->_client_name ?>
     <?php foreach ($this->actions as $rpa): ?>
@@ -103,9 +112,7 @@
             <th>Risk score</th>
             <th>Threat</th>
             <th>Action plan</th>
-            <?php if ($this->isPdf): ?>
-                <th>Policy number</th>
-            <?php endif; ?>
+            <th>Policy number</th>
             <?php $classSort = ($order_by == 'status') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
                 <a href="<?php echo $this->url('remediationplan', array('action' => 'edit', 'id' => $this->id, 'order_by' => 'status', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
@@ -170,9 +177,7 @@
                 <?php echo str_replace('Â', '', $rpaThreat); ?>
             </td>
             <td class="tdSmall"><?php echo $rpa->rpa_action_plan ?></td>
-            <?php if ($this->isPdf): ?>
-                <td class="tdSmall"><?php echo $rpa->rpa_policy ?></td>
-            <?php endif; ?>
+            <td class="tdSmall"><?php echo $rpa->rpa_policy ?></td>
             <td class="acenter"><?php echo \Assessment\Model\Remediationplanaction::$statusesNames[$rpa->rpa_status] ?></td>
             <td><?php echo $rpa->_contact_name ?></td>
             <td><?php echo $rpa->_approver_name ?></td>
@@ -181,7 +186,8 @@
                 <a href="/remediationplan/edittask/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>" id="edittask<?php echo $rpa->rpa_id ?>" class="fancybox" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
                 <?php /* <a href="/remediationplan/planemail/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>" class="fancybox" title="Email Assignee"><i class="fa fa-envelope"></i></a> &nbsp; */ ?>
                 <?php if ($this->writable): ?>
-                    <a href="/remediationplan/deletetask/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>" class="i-delete" title="Delete"><i class="fa fa-trash-o"></i></a>
+                    <?php $deleteUrl = '/remediationplan/deletetask/' . $rpa->rpa_id . '/rpId/' . $rpObj->rp_id; ?>
+                    <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete" title="Delete"><i class="fa fa-trash-o"></i></a>
                 <?php endif; ?>
                 <?php if ($notesTaskAtt->count() || ($notesTaskAssessments && $notesTaskAssessments->count())): ?>
                     <a style="margin-left: 10px;" href="" class="attachments" rel="<?php echo $rpa->rpa_id ?>" title="View Attachments"><i class="fa fa-paperclip"></i></a>
@@ -276,7 +282,7 @@
         ?>
         <?php
         $fn = $formNote->get('note_item_type');
-        $fn->setValue(4);
+        $fn->setValue(\Note\Model\Note::NOTE_RP);
         echo $this->formHidden($fn);
         ?>
         <?php

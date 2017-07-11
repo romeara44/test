@@ -37,12 +37,12 @@ class ClientController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
         $identity = $this->getIdentity();
-        if (!in_array($identity['u_role_id'], array(1, 2, 3, 4, 5, 7))) {
+        if (!in_array($identity['u_role_id'], array(1, 2, 3, 4, 5, 7, 8))) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         } else if ($identity['u_first_login'] == 1) {
             return $this->redirect()->toRoute('user', array('controller' => 'user', 'action' => 'acceptprivacyterms'));
         } else if($identity['u_role_id'] == 5 && !$identity['u_company_id_admin']) {
-            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+            //return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
 
         return parent::onDispatch($e);
@@ -148,19 +148,19 @@ class ClientController extends AbstractActionController
 
     public function editAction()
     {
+        if (!$this->hasIdentity()) {
+            $this->flashMessenger()->addErrorMessage('You must log in');
+            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+        }
+        
+        $identity = $this->getIdentity();
+
         $request = $this->getRequest();
 
         $id = (int) $this->params('id');
         $noteform = $request->isPost() && (int) $request->getPost('noteform');
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $id);
-
-        $identity = $this->getIdentity();
-
-        if (!$this->hasIdentity()) {
-            $this->flashMessenger()->addErrorMessage('You must log in');
-            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
-        }
 
         $form = new ClientForm($this->getServiceLocator());
         $formNote = new NoteForm($this->getServiceLocator());
@@ -173,6 +173,7 @@ class ClientController extends AbstractActionController
         $clientLimitMsg = '';
         $setTrainingManager = true;
         $setTrainingManagerMsg = '';
+        $training_managers = array();
 
         if ((int) $id) {
             $userObj = $this->getUserTable()->getUser($id);
@@ -182,6 +183,7 @@ class ClientController extends AbstractActionController
             $clientObj = $this->getCompanyTable()->getCompany($userObj->u_company_id);
             $primaryAddressObj = $this->getAddressTable()->getAddress($clientObj->c_primary_adr_id);
             $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_CONTACT);
+            $training_managers = $this->getServiceLocator()->get('Client\Model\CompanyTrainingManagersTable')->getTrainingManagersIdsForCompany($userObj->u_company_id);
         }
 
         $request = $this->getRequest();
@@ -189,11 +191,10 @@ class ClientController extends AbstractActionController
             if (!$noteform) {
                 $user = new User();
                 $uId = is_object($userObj) ? $userObj->u_id : 0;
-
-                $form->setInputFilter($user->getClientInputFilter($this->getServiceLocator(), $id, $uId));
-                $form->setData($request->getPost());
-
                 $post = $request->getPost();
+                $form->setInputFilter($user->getClientInputFilter($this->getServiceLocator(), $id, $uId, $post));
+                $form->setData($post);
+                
                 if($form->isValid()) {
                     if(!$id && $post['u_company_id'] && !$this->getUserTable()->checkCompanyLimitClient($post['u_company_id'])) {
                         $clientLimitMsg = 'You cannot create more than ' . $this->getServiceLocator()->get('Client\Model\CompanyTable')->getUsersLimit($post['u_company_id']) . ' user for company.';
@@ -201,11 +202,16 @@ class ClientController extends AbstractActionController
                     }
 
                     $iisTrainingManager = isset($post['is_training_manager']) ? 1 : 0;
-                    $curTrainingManager = $this->getCompanyTable()->getTrainingManager($post['u_company_id']);
+                    
+                    if (!$id || $userObj->u_company_id != $post['u_company_id']) {
+                        $training_managers = $this->getServiceLocator()->get('Client\Model\CompanyTrainingManagersTable')->getTrainingManagersIdsForCompany($post['u_company_id']);
+                    }                    
 
-                    if($iisTrainingManager && $post['u_company_id'] && $curTrainingManager && (int)$curTrainingManager != (int)$id) {
-                        $setTrainingManagerMsg = 'Company already has training manager!';
-                        $setTrainingManager = false;
+                    if($iisTrainingManager) {                        
+                        if (count($training_managers) > 2 && !in_array($id, $training_managers)) {
+                            $setTrainingManagerMsg = 'Company cannot has more than 3 training managers!';
+                            $setTrainingManager = false;
+                        }                        
                     }
 
                     if ($clienLimit && $setTrainingManager) {
@@ -239,9 +245,13 @@ class ClientController extends AbstractActionController
                         }
 
                         if ($iisTrainingManager) {
-                            $this->getCompanyTable()->setTrainingManager($post['u_company_id'], $uId);
-                        } else if(!$iisTrainingManager) {
-                            $this->getCompanyTable()->unsetTrainingManager($uId);
+                            if (!in_array($uId, $training_managers)) {
+                                $this->getServiceLocator()->get('Client\Model\CompanyTrainingManagersTable')->addTrainingManagerForCompany($post['u_company_id'], $uId);
+                            }
+                        } else {
+                            if (in_array($uId, $training_managers)) {
+                                $this->getServiceLocator()->get('Client\Model\CompanyTrainingManagersTable')->deleteTrainingManagerForCompany($post['u_company_id'], $uId);
+                            }
                         }
                         
                         if($request->getPost('save_send_email')) {
@@ -306,7 +316,8 @@ class ClientController extends AbstractActionController
             'clientLimitMsg' => $clientLimitMsg,
             'setTrainingManagerMsg' => $setTrainingManagerMsg,
             'checkClientLimitCompany' => $this->getCompanyTable()->checkClientLimitCompany(),
-            'administrationAccess' => $this->getUserTable()->checkClientAdministrationAccess($userObj)
+            'administrationAccess' => $this->getUserTable()->checkClientAdministrationAccess($userObj),
+            'training_managers' => $training_managers,
         );
     }
 

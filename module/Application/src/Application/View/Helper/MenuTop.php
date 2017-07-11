@@ -31,6 +31,7 @@ class MenuTop extends AbstractHelper
 
     public function __invoke($sl)
     {
+        $this->sl = $sl;
         if ($this->_checkIfAllowRenderMenu($sl)) {
             //return '';
         }
@@ -51,6 +52,23 @@ class MenuTop extends AbstractHelper
     private function _prepareItems()
     {
         $identity = $this->getIdentity();
+        $clientObj = $this->sl->get('Client\Model\CompanyTable')->getClientCompany($identity['u_company_id']);
+
+        if($identity['u_company_id_admin']) {
+            $is_company_admin = 1;
+        } else {
+            $is_company_admin = 0;
+        }
+        if(is_object($clientObj) && $clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $identity['u_id']) {
+            $is_primary_contact = 1;
+        } else {
+            $is_primary_contact = 0;
+        }
+        if($this->sl->get('Client\Model\CompanyTrainingManagersTable')->getTrainingManagerCompaniesIds($identity['u_id'])) {
+            $is_training_manager = 1;
+        } else {
+            $is_training_manager = 0;
+        }
 
         if ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN) { // items for logged in
             $this->_prepareItemsForAdmin();
@@ -58,19 +76,113 @@ class MenuTop extends AbstractHelper
             $this->_prepareItemsForConsultant();
         } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_CONSULTANT) {
             $this->_prepareItemsForConsultant();
-        } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_CLIENT) {
-            if($identity['u_company_id_admin']) {
-                $this->_prepareItemsForClientCompanyAdmin($identity);
-            } else {
-                $this->_prepareItemsForClient($identity);
-            }
+        } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_CLIENT) {            
+            $this->_prepareItemsForClient($identity, $is_company_admin, $is_primary_contact, $is_training_manager);
         } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_SALES_REP) {
             $this->_prepareItemsForSalesRep();
         } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_BUSINESS_ASSOCIATE) {
             // nothing
         } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_PARTIAL) {
-            $this->_prepareItemsForPartial();
+            $this->_prepareItemsForPartial($identity, $is_training_manager);
+        } elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_TRAIL) {
+            $this->_prepareItemsForTrail();
         }
+    }
+
+    private function _prepareItemsForTrail()
+    {
+        $this->items = array(
+            array(
+                'title' => 'Dashboard',
+                'url' => '/dashboard/trail'
+            ),
+            array(
+                'title' => 'Clients',
+                'url' => '/client/list',
+                'items' => array(
+                    array('title' => 'All Clients',
+                          'url' => '/client/list',
+                        ),
+                )
+            ),
+            array(
+                'title' => 'Assessments',
+                'url' => '/assessment/list',
+            ),
+            array(
+                'title' => 'Incident Response',
+                'url' => '/breachlog/list',
+                'disabled' => true,
+                'items' => array(
+                    array('title' => 'Breach Logs',
+                          'url' => '/breachlog/list',
+                          'disabled' => true
+                        ),
+                    array('title' => 'Breach Remediation Plans',
+                          'url' => '/breachremediationplan/list',
+                          'disabled' => true
+                        )
+                )
+            ),
+            array(
+                'title' => 'Remediation Plans',
+                'url' => '/remediationplan/list',
+                'disabled' => true
+            ),
+            array(
+                'title' => 'Trainings',
+                'url' => '/traininglog/list',
+                'disabled' => true,
+                'items' => array(
+                    array('title' => 'Training Logs',
+                          'url' => '/traininglog/list',
+                          'disabled' => true
+                        ),
+                    array('title' => 'Security Reminder',
+                          'url' => '/securityreminder/list',
+                          'disabled' => true
+                        )
+                )
+            ),
+            array(
+                'title' => 'Forms and Logs',
+                'url' => '/itassetinventory/list',
+                'disabled' => true,
+                'items' => array(
+                    array('title' => 'IT Asset Inventory',
+                          'url' => '/itassetinventory/list',
+                          'disabled' => true
+                        ),
+                    array('title' => 'Physical Security Changes',
+                          'url' => '/physicalsecuritychange/list',
+                          'disabled' => true
+                        ),
+                    array('title' => 'Disclosure Records',
+                          'url' => '/disclosurerecord/list',
+                          'disabled' => true
+                        ),
+                    array('title' => 'Requests for Accounting of Disclosure Records',
+                          'url' => '/accountingrequest/list',
+                          'disabled' => true
+                        ),
+                )
+            ),
+            array(
+                'title' => 'Reporting',
+                'url' => '/reporting/auditbreach',
+                'disabled' => true,
+                'items' => array(
+                    array('title' => 'Audit/Breach',
+                          'url' => '/reporting/auditbreach',
+                          'disabled' => true
+                        ),
+                    array('title' => 'Plans Progress',
+                          'url' => '/reporting/planprogress',
+                          'disabled' => true
+                        )
+                )
+            )
+        );
     }
 
     private function _prepareItemsForAdmin()
@@ -130,26 +242,30 @@ class MenuTop extends AbstractHelper
                         ),
                     array('title' => 'Security Reminder',
                          'url' => '/securityreminder/list',
+                        ),
+                    array('title' => 'Employee Master List',
+                         'url' => '/traininglog/employeemasterlist',
                         )
                 )
             ),
             array(
-                'title' => 'Disclosures',
-                'url' => '/disclosurerequest/list',
-                'class' => 'with-access',
+                'title' => 'Forms and Logs',
+                'url' => '/itassetinventory/list',
                 'items' => array(
-                    array('title' => 'Requests',
-                            'url' => '/disclosurerequest/list',
+                    array('title' => 'IT Asset Inventory',
+                            'url' => '/itassetinventory/list',
+                        ),
+                    array('title' => 'Physical Security Changes',
+                            'url' => '/physicalsecuritychange/list',
+                        ),
+                    array('title' => 'Disclosure Records',
+                            'url' => '/disclosurerecord/list',
                             'class' => 'with-access'
                         ),
-                    array('title' => 'Disclosure Tracking Logs',
-                         'url' => '/disclosuretrackinglog/list',
-                         'class' => 'with-access',
+                    array('title' => 'Requests for Accounting of Disclosure Records',
+                            'url' => '/accountingrequest/list',
+                            'class' => 'with-access'
                         ),
-                    array('title' => 'Verbal Logs',
-                         'url' => '/verballog/list',
-                         'class' => 'with-access',
-                        )
                 )
             ),
             array(
@@ -228,26 +344,30 @@ class MenuTop extends AbstractHelper
                         ),
                     array('title' => 'Security Reminder',
                          'url' => '/securityreminder/list',
+                        ),
+                    array('title' => 'Employee Master List',
+                         'url' => '/traininglog/employeemasterlist',
                         )
                 )
             ),
             array(
-                'title' => 'Disclosures',
-                'url' => '/disclosurerequest/list',
-                'class' => 'with-access',
+                'title' => 'Forms and Logs',
+                'url' => '/itassetinventory/list',
                 'items' => array(
-                    array('title' => 'Requests',
-                            'url' => '/disclosurerequest/list',
+                    array('title' => 'IT Asset Inventory',
+                            'url' => '/itassetinventory/list',
+                        ),
+                    array('title' => 'Physical Security Changes',
+                            'url' => '/physicalsecuritychange/list',
+                        ),
+                    array('title' => 'Disclosure Records',
+                            'url' => '/disclosurerecord/list',
                             'class' => 'with-access'
                         ),
-                    array('title' => 'Disclosure Tracking Logs',
-                         'url' => '/disclosuretrackinglog/list',
-                         'class' => 'with-access'
+                    array('title' => 'Requests for Accounting of Disclosure Records',
+                            'url' => '/accountingrequest/list',
+                            'class' => 'with-access'
                         ),
-                    array('title' => 'Verbal Logs',
-                         'url' => '/verballog/list',
-                         'class' => 'with-access'
-                        )
                 )
             ),
             array(
@@ -269,25 +389,42 @@ class MenuTop extends AbstractHelper
         );
     }
 
-    private function _prepareItemsForClient($identity)
+    private function _prepareItemsForClient($identity, $is_company_admin, $is_primary_contact, $is_training_manager)
     {
-        $this->items = array(
-            array(
+        //var_dump($identity, $is_company_admin, $is_primary_contact, $is_training_manager);
+        $this->items = array();
+
+        $this->items[] = array(
                 'title' => 'Dashboard',
                 'url' => '/dashboard/client',
-            ),
-            array(
+            );
+
+        $items_clients = array();
+
+        if ($is_company_admin || $is_primary_contact) {
+            $items_clients[] = array('title' => 'Business Associates',
+                  'url' => '/businessassociate/list',
+            );
+        }
+
+        if ($is_company_admin || $is_primary_contact || $is_training_manager) {
+            $items_clients[] = array('title' => 'All Clients',
+                          'url' => '/client/list',
+                        );
+            $items_clients[] = array('title' => 'Create Contact',
+                          'url' => '/client/edit',
+                        );
+        }
+
+        if ($items_clients) {
+            $this->items[] = array(
                 'title' => 'Clients',
                 'url' => '/client/list',
-                'items' => array(
-                    array('title' => 'Business Associates',
-                          'url' => '/businessassociate/list',
-                    )
-                )
-            )
-        );
+                'items' => $items_clients,
+                );
+        }
 
-        if($identity['u_grant_to_breach']) {
+        if($identity['u_grant_to_breach'] || $is_company_admin || $is_primary_contact) {
             $this->items[] = array(
                                 'title' => 'Incident Response',
                                 'url' => '/breachlog/list',
@@ -305,60 +442,104 @@ class MenuTop extends AbstractHelper
                             );
         }
 
-        $this->items = array_merge($this->items, array(
-                                                        array(
-                                                            'title' => 'Assessments',
-                                                            'url' => '/assessment/list',
-                                                        ),
-                                                        array(
-                                                            'title' => 'Remediation Plans',
-                                                            'url' => '/remediationplan/list',
-                                                        ),
-                                                        array(
-                                                            'title' => 'Trainings',
-                                                            'url' => '/traininglog/list',
-                                                            'items' => array(
-                                                                array('title' => 'Training Logs',
-                                                                      'url' => '/traininglog/list'
-                                                                    ),
-                                                                array('title' => 'Security Reminder',
-                                                                      'url' => '/securityreminder/list',
-                                                                    )
-                                                            )
-                                                        ),
-                                                        array(
-                                                            'title' => 'Reporting',
-                                                            'url' => '/reporting/auditbreach',
-                                                            'items' => array(
-                                                                array('title' => 'Audit/Breach',
-                                                                        'url' => '/reporting/auditbreach'
-                                                                    ),
-                                                                array('title' => 'Plans Progress',
-                                                                     'url' => '/reporting/planprogress',
-                                                                    )
-                                                            )
-                                                        )
-                                                    )
-                                                );
-
-        if($identity['u_grant_to_disclosures']) {
+        if ($is_company_admin || $is_primary_contact) {
             $this->items[] = array(
-                                'title' => 'Disclosures',
-                                'url' => '/disclosurerequest/list',
-                                'class' => 'with-access',
+                                    'title' => 'Assessments',
+                                    'url' => '/assessment/list',
+                                );
+            $this->items[] = array(
+                                    'title' => 'Remediation Plans',
+                                    'url' => '/remediationplan/list',
+                                );
+        }
+                                                        
+        if ($is_company_admin || $is_primary_contact || $is_training_manager) {
+            if ($is_training_manager) {
+                $this->items[] = array(
+                                'title' => 'Trainings',
+                                'url' => '/traininglog/list',
                                 'items' => array(
-                                    array('title' => 'Requests',
-                                            'url' => '/disclosurerequest/list',
-                                            'class' => 'with-access'
+                                    array('title' => 'Training Logs',
+                                          'url' => '/traininglog/list'
                                         ),
-                                    array('title' => 'Disclosure Tracking Logs',
-                                         'url' => '/disclosuretrackinglog/list',
-                                         'class' => 'with-access'
+                                    array('title' => 'Security Reminder',
+                                          'url' => '/securityreminder/list',
                                         ),
-                                    array('title' => 'Verbal Logs',
-                                         'url' => '/verballog/list',
-                                         'class' => 'with-access'
+                                    array('title' => 'Employee Master List',
+                                         'url' => '/traininglog/employeemasterlist',
                                         )
+                                )
+                            );
+            } else {
+                $this->items[] = array(
+                                'title' => 'Trainings',
+                                'url' => '/traininglog/list',
+                                'items' => array(
+                                    array('title' => 'Training Logs',
+                                          'url' => '/traininglog/list'
+                                        ),
+                                    array('title' => 'Security Reminder',
+                                          'url' => '/securityreminder/list',
+                                        )
+                                )
+                            );
+            }
+            
+        }     
+
+        $this->items[] = array(
+                            'title' => 'Reporting',
+                            'url' => '/reporting/auditbreach',
+                            'items' => array(
+                                array('title' => 'Audit/Breach',
+                                        'url' => '/reporting/auditbreach'
+                                    ),
+                                array('title' => 'Plans Progress',
+                                     'url' => '/reporting/planprogress',
+                                    )
+                            )
+                        );
+
+        if ($is_company_admin || $is_primary_contact) {
+            $this->items[] = array(
+                                    'title' => 'Forms and Logs',
+                                    'url' => '/itassetinventory/list',
+                                    'items' => array(
+                                        array('title' => 'IT Asset Inventory',
+                                                'url' => '/itassetinventory/list',
+                                            ),
+                                        array('title' => 'Physical Security Changes',
+                                                'url' => '/physicalsecuritychange/list',
+                                            )
+                                )
+                            );
+            if($identity['u_grant_to_disclosures']) {
+                $this->items[count($this->items) - 1]['items'] = array_merge($this->items[count($this->items) - 1]['items'],
+                                    array(
+                                        array('title' => 'Disclosure Records',
+                                                'url' => '/disclosurerecord/list',
+                                                'class' => 'with-access'
+                                            ),
+                                        array('title' => 'Requests for Accounting of Disclosure Records',
+                                                'url' => '/accountingrequest/list',
+                                                'class' => 'with-access'
+                                            ),
+                                    )
+                                );
+            }
+        } else if($identity['u_grant_to_disclosures']) {
+            $this->items[] = array(
+                                    'title' => 'Disclosure Requests',
+                                    'url' => '/disclosurerequest/list',
+                                    'items' => array(                                       
+                                        array('title' => 'Disclosure Records',
+                                                'url' => '/disclosurerecord/list',
+                                                'class' => 'with-access'
+                                            ),
+                                        array('title' => 'Requests for Accounting of Disclosure Records',
+                                                'url' => '/accountingrequest/list',
+                                                'class' => 'with-access'
+                                            ),
                                 )
                             );
         }
@@ -445,31 +626,36 @@ class MenuTop extends AbstractHelper
                                                     )
                                                 );
 
+        $this->items[] = array(
+                                'title' => 'Forms and Logs',
+                                'url' => '/itassetinventory/list',
+                                'items' => array(
+                                    array('title' => 'IT Asset Inventory',
+                                            'url' => '/itassetinventory/list',
+                                        ),
+                                    array('title' => 'Physical Security Changes',
+                                            'url' => '/physicalsecuritychange/list',
+                                        )
+                            )
+                        );
 
         if($identity['u_grant_to_disclosures']) {
-            $this->items[] = array(
-                                'title' => 'Disclosures',
-                                'url' => '/disclosurerequest/list',
-                                'class' => 'with-access',
-                                'items' => array(
-                                    array('title' => 'Requests',
-                                            'url' => '/disclosurerequest/list',
+            $this->items[count($this->items) - 1]['items'] = array_merge($this->items[count($this->items) - 1]['items'],
+                                array(
+                                    array('title' => 'Disclosure Records',
+                                            'url' => '/disclosurerecord/list',
                                             'class' => 'with-access'
                                         ),
-                                    array('title' => 'Disclosure Tracking Logs',
-                                         'url' => '/disclosuretrackinglog/list',
-                                         'class' => 'with-access'
+                                    array('title' => 'Requests for Accounting of Disclosure Records',
+                                            'url' => '/accountingrequest/list',
+                                            'class' => 'with-access'
                                         ),
-                                    array('title' => 'Verbal Logs',
-                                         'url' => '/verballog/list',
-                                         'class' => 'with-access'
-                                        )
                                 )
                             );
         }
     }
 
-    private function _prepareItemsForPartial()
+    private function _prepareItemsForPartial($identity, $is_training_manager)
     {
         $this->items = array(
             array(
@@ -520,7 +706,10 @@ class MenuTop extends AbstractHelper
                 'url' => '/remediationplan/list',
                 'disabled' => true
             ),
-            array(
+        );
+
+        if ($is_training_manager) {
+            $this->items[] = array(
                 'title' => 'Trainings',
                 'url' => '/traininglog/list',
                 'items' => array(
@@ -531,8 +720,9 @@ class MenuTop extends AbstractHelper
                          'url' => '/securityreminder/list',
                         )
                 )
-            )
-        );
+            );
+        }
+        
     }
 
     private function _prepareItemsForSalesRep()

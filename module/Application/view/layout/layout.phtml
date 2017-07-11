@@ -171,6 +171,11 @@
 
     <script type="text/javascript">
         jQuery(document).ready(function() {
+            $.datepicker.setDefaults({
+              changeMonth: true,
+            changeYear: true,
+            yearRange: "-80:+05"
+            });
             jQuery('.confirmation-box').hover(
                 function() {
                     jQuery('.confirmation-box').stop(true, true).show();
@@ -256,6 +261,10 @@
         }
         $('li.disabled a').click(function() {
             $('.need-activation-box').show().animate({opacity: 1.0}, 3000).fadeOut(1000);
+        })
+
+        $('a.disabled').click(function(e) {
+            e.preventDefault();
         })
     </script>
 </html>

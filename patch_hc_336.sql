@@ -1,0 +1,2 @@
+UPDATE `assessments_questions_categories` SET `aqc_policy` = 'TS-145' WHERE `aqc_id` = 34;
+UPDATE `assessments_questions` SET `aq_title` = 'Is there a risk of inappropriate access to the practice’s buidlings/facilities where electronic information systems are housed' WHERE `aq_id` = 552;

@@ -15,8 +15,9 @@ $form->setAttribute('method', 'post');
 
 <div class="page-title">
     <h1 class="fleft"><?php if ($this->cId): ?>Company Details<?php else: ?>Add New Company<?php endif; ?></h1>
+    <?php if($roleId != \Admin\Model\User::ROLE_TRAIL) : ?>
     <a href="/client/edit/company/<?php echo $this->cId ?>" class="button"><i class="fa fa-plus-circle"></i> Add New Contact</a>
-
+    <?php endif; ?>
     <?php if ($this->cId): ?>
         <ul id="tabs-nav">
             <li><a href="#tab1">Details</a></li>
@@ -95,7 +96,7 @@ $form->setAttribute('method', 'post');
                     </p>
                 <?php endif;?>
                 <h2>Company Information</h2>
-            <?php endif; ?>            
+            <?php endif; ?> 
 
             <p>
                 <?php
@@ -175,6 +176,10 @@ $form->setAttribute('method', 'post');
                     </h2>
                     <div id="<?php echo ($counter == 1) ? 'location' : '' ?>">
                         <p>
+                            <label for="exists_adr_name[<?php echo $address->adr_id ?>]">Name</label>
+                            <input type="text" value="<?php echo $address->adr_name ?>" class="form-control" name="exists_adr_name[<?php echo $address->adr_id ?>]">
+                        </p>
+                        <p>
                             <label for="exists_adr_address1[<?php echo $address->adr_id ?>]">Address 1</label>
                             <input type="text" value="<?php echo $address->adr_address1 ?>" class="form-control" name="exists_adr_address1[<?php echo $address->adr_id ?>]">
                         </p>
@@ -208,6 +213,14 @@ $form->setAttribute('method', 'post');
             <?php if (!$this->cId || !count($this->addresses)): ?>
                 <h2>Primary Location</h2>
                 <div id="location">
+                    <p>
+                        <?php
+                        $fn = $form->get('adr_name[]');
+                        echo $this->formLabel($fn);
+                        echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                        echo $this->formElementErrors($fn);
+                        ?>
+                    </p>
                     <p>
                         <?php
                         $fn = $form->get('adr_address1[]');
@@ -258,9 +271,11 @@ $form->setAttribute('method', 'post');
 
             <div class="cboth"></div>
             <div class="form-buttons">
-                <input id="save" type="submit" name="save" value="Save" class="form-button" />
-                <input id="saveAndContinue" type="submit" name="save_continue" value="Save and Continue" class="form-button" />
-                <div class="fleft">or</div>
+                <?php if ($this->roleId != \Admin\Model\User::ROLE_TRAIL): ?>
+                    <input id="save" type="submit" name="save" value="Save" class="form-button" />
+                    <input id="saveAndContinue" type="submit" name="save_continue" value="Save and Continue" class="form-button" />
+                    <div class="fleft">or</div>
+                <?php endif;?>
                 <a href="/client/list" class="cancel">Cancel</a>
             </div>
         <?php echo $this->form()->closeTag() ?>
@@ -310,8 +325,10 @@ $form->setAttribute('method', 'post');
 
                 <div class="cboth"></div>
                 <div class="form-buttons">
-                    <input type="submit" value="Save" class="form-button" />
-                    <div class="fleft">or</div>
+                    <?php if ($this->roleId != \Admin\Model\User::ROLE_TRAIL): ?>
+                        <input type="submit" value="Save" class="form-button" />
+                        <div class="fleft">or</div>
+                    <?php endif;?>
                     <a href="/company/list" class="cancel">Cancel</a>
                 </div>
                 <div class="cboth"><br /></div>
@@ -375,13 +392,13 @@ $form->setAttribute('method', 'post');
                 <?php $counterRoles++; endforeach; ?>
 
                 <div class="cboth"><br /></div>
-
                 <div class="form-buttons">
-                    <input type="submit" value="Save" class="form-button" />
-                    <div class="fleft">or</div>
+                    <?php if ($this->roleId != \Admin\Model\User::ROLE_TRAIL): ?>
+                        <input type="submit" value="Save" class="form-button" />
+                        <div class="fleft">or</div>
+                    <?php endif;?>
                     <a href="/company/list" class="cancel">Cancel</a>
                 </div>
-
                 <div class="cboth"><br /></div>
             </form>
         </div>
@@ -412,7 +429,6 @@ $form->setAttribute('method', 'post');
         </div>
     <?php endif; ?>
 </div>
-
 <?php if ($this->cId && is_array($contacts) && (count($contacts))): ?>
     <div class="col-right">
         <h3 style="padding-top: 0;">Related Contacts</h3>
@@ -423,23 +439,29 @@ $form->setAttribute('method', 'post');
                 <?php if ($user->u_id == $primaryContactId): ?>
                     <span class="label primary">Primary Contact</span>
                 <?php endif; ?>
-                <?php if ($user->u_id == $trainingManagerId): ?>
+                <?php if (in_array($user->u_id, $trainingManagerIds)): ?>
                     <span class="label primary">Training Manager</span>
                 <?php endif; ?>
                 <?php if ($user->u_company_id_admin == $cId): ?>
                     <span class="label primary">Company Admin</span>
                 <?php endif; ?>
+                <?php if ($user->u_grant_to_disclosures): ?>
+                    <span class="label primary">Grant to Disclosures</span>
+                <?php endif; ?>
+                <?php if ($user->u_grant_to_breach): ?>
+                    <span class="label primary">Grant to Breach</span>
+                <?php endif; ?>
                 <br class="cboth" />
                 <em style="font-weight: 400;"><?php echo $user->u_title ?></em>
             </h5>
             <p><small>Office Phone:</small> <?php echo $user->u_office_phone ?> <?php echo $user->u_office_phone_inner != '' ? ' x ' . $user->u_office_phone_inner : '' ?><br /><small>Email:</small> <a href="mailto:<?php echo $user->u_email ?>"><?php echo $user->u_email ?></a></p>
-            <p><a href="/client/edit/<?php echo $user->u_id ?>" class="button"><i class="fa fa-pencil"></i> Contact Details</a></p>
+            <p><a href="/client/edit/<?php echo $user->u_id ?>" class="button
+                <?php if ($roleId == \Admin\Model\User::ROLE_TRAIL) : ?> disabled<?php endif; ?>"><i class="fa fa-pencil"></i> Contact Details</a></p>
 
             <div class="cboth"><br /></div>
         <?php endforeach; ?>
     </div>
 <?php endif; ?>
-
 
 <div class="cboth"><br /></div>
 
@@ -595,6 +617,10 @@ $form->setAttribute('method', 'post');
                     }
                 });
             });
+
+            <?php if ($roleId == \Admin\Model\User::ROLE_TRAIL) : ?>
+            $('input[type=submit]').prop('disabled', true);
+            <?php endif; ?>
         });
     });
 </script>

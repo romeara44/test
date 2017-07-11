@@ -69,16 +69,41 @@ class TraininglogTable implements ServiceLocatorAwareInterface
             $select->join(array('tr' => 'trainers'), new \Zend\Db\Sql\Expression('CONCAT(tl_trainer_type, "_", tl_trainer_id) = CONCAT("trainer", "_", tr.tr_id)'), array(), 'left');
             $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('CONCAT(tl_trainer_type, "_", tl_trainer_id) = CONCAT("user", "_", u.u_id)'), array(), 'left');
             $select->join(array('u2' => 'users'), new \Zend\Db\Sql\Expression('tl_create_u_id = u2.u_id'), array(), 'left');
+            $select->join(array('c' => 'companies'), 'tl_company_id = c.c_id', array('_tl_company_name' => 'c_name'), 'left');
+            $select->join(array('c2' => 'companies'), 'u2.u_company_id = c2.c_id', array(), 'left');
+            $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = tl_company_id', array(), 'left');
 
             if ($orderBy) {
                 $order = $order ? $order : 'ASC';
                 $select->order($orderBy . ' ' . $order);
             }
-            if($identity['u_company_id']) {
-                $select->where("u2.u_company_id = " . $identity['u_company_id']);
-            } else {
-                $select->where("u2.u_company_id IS NULL ");
+
+            if ($identity['u_role_id'] != User::ROLE_ADMIN) {
+                if($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
+                    $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
+                    $ids[] = $identity['u_id'];
+                    $select->where('(tl_create_u_id IN (' . implode(',', $ids) . ') OR cc.cc_consultant_id IN (' . implode(',', $ids) . '))');
+                } elseif ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
+                    $select->where("(tl_create_u_id = " . $identity['u_id']
+                                   . ' OR cc_consultant_id = ' . $identity['u_id']
+                                   . ')');
+                } elseif ($identity['u_role_id'] == User::ROLE_CLIENT) {
+                    if ($identity['u_company_id']) {
+                        $ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getConsultantsIdsForCompany($identity['u_company_id']);
+                        if ($ids) {
+                            $select->where('(tl_create_u_id = ' . $identity['u_id'] .
+                                ' OR (tl_company_id = ' . $identity['u_company_id'] . ' AND tl_create_u_id IN (' . implode(',', $ids) . ')))');
+                        } else {
+                            $select->where('tl_create_u_id = ' . $identity['u_id']);
+                        }
+                    } else {
+                        $select->where('tl_create_u_id = ' . $identity['u_id']);
+                    }
+                } else {
+                    $select->where('tl_create_u_id = ' . $identity['u_id']);
+                }
             }
+
             $select->group('tl_id');
 
             $paginator = new Paginator($paginatorAdapter);
@@ -171,34 +196,51 @@ class TraininglogTable implements ServiceLocatorAwareInterface
         foreach ($regulations as $rs) {
             $row->_tl_cur_regulations[$rs->_tl_tlrg_id] = $rs->_tl_tlrg_rg_id;
         }
+
+        if ($row->_tl_eml_items) {
+            $row->_tl_eml_items   = explode("\n", $row->_tl_eml_items);
+        }
+
         return $row;
     }
 
-    public function getTrainers()
+    public function getTrainers($cId = null)
     {
         $authService = new \Zend\Authentication\AuthenticationService();
         $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
         $identity = $authService->getIdentity();
 
-        $result = array();
+        $resultUsers = array();
+        $resultTrainers = array();
 
         $users    = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUsersByCompany($identity['u_company_id']);
         $trainers = $this->getServiceLocator()->get('Traininglog\Model\TrainerTable')->getTrainersByCompany($identity['u_company_id']);
 
-        foreach ($users as $key => $user) {
-            $result['user_' . $user->u_id] = $user->u_firstname . ' ' . $user->u_lastname;
+        if($cId) {
+            $selectedCompanyUsers = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUsersForTrainersList($cId);
+        } else {
+            $selectedCompanyUsers = [];
         }
+
+        foreach ($users as $key => $user) {
+            $resultUsers['user_' . $user->u_id] = $user->u_firstname . ' ' . $user->u_lastname;
+        }
+        foreach ($selectedCompanyUsers as $key => $user) {
+            $resultUsers['user_' . $user->u_id] = $user->u_firstname . ' ' . $user->u_lastname;
+        }
+
+        natcasesort($resultUsers);
 
         if($trainers->count() > 0) {
             foreach ($trainers as $key => $trainer) {
-                $result['trainer_' . $trainer->tr_id] = $trainer->tr_name;
+                $resultTrainers['trainer_' . $trainer->tr_id] = $trainer->tr_name;
             }
 
         }
 
-        natcasesort($result);
+        natcasesort($resultTrainers);
 
-        return $result;
+        return $resultUsers + $resultTrainers;
     }
 
     public function saveTraininglog(Traininglog $traininglog)
@@ -208,12 +250,19 @@ class TraininglogTable implements ServiceLocatorAwareInterface
         $identity = $authService->getIdentity();
 
         $data = array(
+            'tl_company_id'     => $traininglog->tl_company_id,
             'tl_title'          => $traininglog->tl_title,
             'tl_tlt_id'         => $traininglog->tl_tlt_id,
             'tl_conducted_date' => $traininglog->tl_conducted_date,
             'tl_hire_date'      => $traininglog->tl_hire_date,
             'tl_attendees'      => $traininglog->tl_attendees
         );
+
+        if ($traininglog->_tl_eml_items) {
+            $data['_tl_eml_items']   = implode("\n", $traininglog->_tl_eml_items);
+        } else {
+            $data['_tl_eml_items']   = '';
+        }
 
         if($traininglog->_tl_trainer != '-1') {
             $data['tl_trainer_id']   = $traininglog->tl_trainer_id;

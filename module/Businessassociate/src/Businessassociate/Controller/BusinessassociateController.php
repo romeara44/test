@@ -29,6 +29,7 @@ class BusinessassociateController extends AbstractActionController
     protected $userTable;
     protected $noteTable;
     protected $mailtemplateTable;
+    protected $companyRolesTable;
 
     public function onDispatch(\Zend\Mvc\MvcEvent $e)
     {
@@ -184,7 +185,30 @@ class BusinessassociateController extends AbstractActionController
         $identity = $this->getIdentity();
         $request = $this->getRequest();
         if ($request->isPost()) {
-            if (!$noteform) {
+            if ($noteform) {
+
+                $note = new Note();
+                $formNote->setInputFilter($note->getInputFilter($this->getServiceLocator(), $id));
+                $formNote->setData($request->getPost());
+
+                if ($formNote->isValid()) {
+                    $post = $request->getPost();
+                    $note->exchangeArray($request->getPost());
+                    $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
+                    $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
+
+                    $this->getServiceLocator()->get('Businessassociate\Model\BusinessassociatereportTable')->saveReports($id, $request->getFiles());
+
+                    $this->flashMessenger()->addSuccessMessage('Note saved');
+
+                    return $this->redirect()->toRoute('businessassociate', array('controller' => 'company', 'action' => 'list'));
+                } else {
+                    if ((int) $id) {
+                        $form->bind($baObj);
+                    }
+                }               
+                
+            } else {
                 $ba = new Businessassociate();
                 $post = $request->getPost();
                 $uId = is_object($baObj) ? $baObj->ba_contact_u_id : 0;
@@ -234,25 +258,6 @@ class BusinessassociateController extends AbstractActionController
                         //$addresses = $this->getAddressTable()->getAddresses($id, \Client\Model\AddressItem::COMPANY_TYPE);
                     }
                 }
-            } else {
-                $note = new Note();
-                $formNote->setInputFilter($note->getInputFilter($this->getServiceLocator(), $id));
-                $formNote->setData($request->getPost());
-
-                if ($formNote->isValid()) {
-                    $post = $request->getPost();
-                    $note->exchangeArray($request->getPost());
-                    $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-                    $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
-
-                    $this->flashMessenger()->addSuccessMessage('Note saved');
-
-                    return $this->redirect()->toRoute('businessassociate', array('controller' => 'company', 'action' => 'list'));
-                } else {
-                    if ((int) $id) {
-                        $form->bind($baObj);
-                    }
-                }
             }
 
         } else {
@@ -290,6 +295,8 @@ class BusinessassociateController extends AbstractActionController
 
         $questions = $this->getServiceLocator()->get('Businessassociate\Model\BusinessassociatequestionTable')->getBusinessassociatequestions();
 
+        $reportFiles = $this->getServiceLocator()->get('Businessassociate\Model\BusinessassociatereportTable')->getReportsFiles($id);
+
         return array(
             'form' => $form,
             'formNote' => $formNote,
@@ -302,7 +309,8 @@ class BusinessassociateController extends AbstractActionController
             'signoff' => isset($baObj->ba_status) && ($baObj->ba_status == 1) ? 1 : 0,
             'signoffDate' => isset($baObj->ba_sign_off_date) ? $baObj->ba_sign_off_date : '',
             'checkIfUserAnswered' => $checkIfUserAnswered,
-            'companyRolesMsg' => $companyRolesMsg
+            'companyRolesMsg' => $companyRolesMsg,
+            'reportFiles' => $reportFiles,
         );
     }
 
@@ -489,5 +497,40 @@ class BusinessassociateController extends AbstractActionController
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Sign off business associate "' . $id . '"');
 
         return $this->redirect()->toRoute('businessassociate', array('controller' => 'businessassociate', 'action' => 'list'));
+    }
+
+    public function importAction() {
+        $non_imported_assessments_ids = [];
+        $assessments = $this->getServiceLocator()->get('Assessment\Model\AssessmentTable')->getForImport();
+        foreach ($assessments as $assessment) {
+            $flag = 1;
+            $ass_addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($assessment->a_id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
+            foreach ($ass_addresses as $key => $ass_address) {
+                $notes = $this->getNoteTable()->getNotes($assessment->a_id, \Note\Model\Note::NOTE_ABAL, $ass_address->adr_id);
+                $abals = $this->getServiceLocator()->get('Assessment\Model\AssessmentBusinessAssociateLocationTable')->getAbalsByLocation($assessment->a_id, $ass_address->adr_id);
+                $reportFiles = $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationReportTable')->getReportsFiles($assessment->a_id, $ass_address->adr_id, 5);
+                foreach ($abals as $abal) {
+                    if (!$abal->abal_ba_id) continue;
+                    if (!$this->getBusinessassociateTable()->getBusinessassociate($abal->abal_ba_id)) continue;
+                    foreach ($notes->buffer() as $note) {
+                        $note_dest = new Note;
+                        $note_dest->note_item_type = \Note\Model\Note::NOTE_BUSINESSASSOCIATE;
+                        $note_dest->note_item_id = $abal->abal_ba_id;
+                        if (!$this->getNoteTable()->copyNote($note, $note_dest)) {
+                            $flag = 0;
+                        }
+                    } 
+                    foreach ($reportFiles->buffer() as $report) {
+                        if (!$this->getServiceLocator()->get('Businessassociate\Model\BusinessassociatereportTable')->createReportFromAssessmentInventoryLocationReport($abal->abal_ba_id, $report)) {
+                            $flag = 0;
+                        }
+                    }                   
+                }
+            }
+            if (!$flag) {
+                $non_imported_assessments_ids[] = $assessment->a_id;
+            }
+        }
+        var_dump($non_imported_assessments_ids);die();
     }
 }

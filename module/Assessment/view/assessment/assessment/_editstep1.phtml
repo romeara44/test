@@ -83,16 +83,17 @@ $form->setAttribute('method', 'post');
 
         <div class="cboth"></div>
 
-        <div id="step1">
+        <div id="step1" <?php if (!$this->aId): ?>style="display:none"<?php endif; ?>>
 
-            <h2>Step 1 of 5 - Enter Locations</h2>
+            <h2>Edit <?php echo $this->locationName; ?></h2>
 
             <div class="col-left">
 
                 <?php if ($this->aId): ?>
                     <?php $counter = 1;
 
-                    foreach ($this->addresses as $address): ?>
+                    foreach ($this->addresses as $address):
+                        if ($this->location != $address->adr_id) continue; ?>
                         <h2>
                             <?php if ($counter == 1): ?>
                             <?php else: ?>
@@ -263,7 +264,7 @@ $form->setAttribute('method', 'post');
                     </div>
                 <?php endif; ?>
 
-                <?php if (!$this->isClosed): ?>
+                <?php if (!$this->isClosed && false): ?>
                     <p style="border-top: 0">
                         <a id="addLocationButton" href="javascript:" onclick="return addLocation()" class="button"><i class="fa fa-plus-circle"></i> Add Additional Location</a>
                     </p>
@@ -274,10 +275,12 @@ $form->setAttribute('method', 'post');
 
         <div class="cboth"></div>
         <div class="form-buttons">
+            <?php if (!$this->locationFinished): ?>
             <?php if (!$this->isClosed): ?>
                 <input id="saveAndContinue" type="button" value="Save and Continue" class="form-button" />
                 <input id="save" type="button" value="Save" class="form-button" />
                 <div class="fleft">or</div>
+            <?php endif; ?>
             <?php endif; ?>
             <a href="/assessment/list" class="cancel">Cancel</a>
         </div>
@@ -414,55 +417,6 @@ $form->setAttribute('method', 'post');
             } else {
                 $('#sa1').hide();
             }
-            
-            if ($('#assessmentType').val() == 1) {
-
-                $('input[name="adr_name[]"]').each(function(i, v) {
-                    var elem = $(v);
-                    if (elem.val() == '') {
-                        valid = 0;
-                        elem.closest('p').next('ul').show();
-                    } else {
-                        elem.closest('p').next('ul').hide();
-                    }
-                });
-                $('input[name="adr_address1[]"]').each(function(i, v) {
-                    var elem = $(v);
-                    if (elem.val() == '') {
-                        valid = 0;
-                        elem.closest('p').next('ul').show();
-                    } else {
-                        elem.closest('p').next('ul').hide();
-                    }
-                });
-                $('input[name="adr_city[]"]').each(function(i, v) {
-                    var elem = $(v);
-                    if (elem.val() == '') {
-                        valid = 0;
-                        elem.closest('p').next('ul').show();
-                    } else {
-                        elem.closest('p').next('ul').hide();
-                    }
-                });
-                $('select[name="adr_state_id[]"]').each(function(i, v) {
-                    var elem = $(v);
-                    if (elem.val() < 1) {
-                        valid = 0;
-                        elem.closest('p').next('ul').show();
-                    } else {
-                        elem.closest('p').next('ul').hide();
-                    }
-                });
-                $('input[name="adr_zip[]"]').each(function(i, v) {
-                    var elem = $(v);
-                    if (elem.val() == '') {
-                        valid = 0;
-                        elem.closest('p').next('ul').show();
-                    } else {
-                        elem.closest('p').next('ul').hide();
-                    }
-                });
-            }
             return valid;
         }
         <?php endif; ?>
@@ -476,10 +430,10 @@ $form->setAttribute('method', 'post');
         //Conditional logic for assesment type
         jQuery('#assessmentType').change(function(){
             if(jQuery(this).val() == 2) {
-                jQuery('#step1').hide();
+                //jQuery('#step1').hide();
                 $('#inviteClientLinkP').hide();
             } else {
-                jQuery('#step1').show();
+                //jQuery('#step1').show();
                 $('#inviteClientLinkP').show();
             }
         });

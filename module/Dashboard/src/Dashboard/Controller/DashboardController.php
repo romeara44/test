@@ -137,6 +137,29 @@ class DashboardController extends AbstractActionController
         return $viewModel;
     }
 
+    public function trailAction()
+    {
+        $container = new Container('activity');
+        $container->activity = time();
+        $container = new Container('files');
+        $identity  = $this->getIdentity();
+        
+        if ($container->item != '') {
+            $container->item = '';
+            $this->redirect()->toUrl($container->item);
+        }
+
+        $container = new Container('files');
+
+        $viewModel = new ViewModel(array(
+            'usRoleId' => $identity['u_role_id']
+        ));
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open trail user dashboard page');
+
+        return $viewModel;
+    }
+
     public function consultantAction()
     {
         $identity = $this->getIdentity();

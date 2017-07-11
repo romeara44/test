@@ -14,7 +14,7 @@ $form->setAttribute('method', 'post');
 ?>
 <div class="page-title">
     <h1 class="fleft"><?php if (!$uId): ?>Add New Contact<?php else: ?>Contact Details<?php endif; ?></h1>
-    <?php if($checkClientLimitCompany): ?>
+    <?php if($checkClientLimitCompany && $identity['u_role_id'] != \Admin\Model\User::ROLE_TRAIL): ?>
         <a href="/company/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Company</a>
     <?php endif; ?>
     
@@ -77,37 +77,39 @@ $form->setAttribute('method', 'post');
                 ?>
             </p>
 
+            <?php if(!(is_object($userObj) && $userObj->u_role_id == \Admin\Model\User::ROLE_TRAIL)) : ?>
             <?php if($identity['u_role_id'] != \Admin\Model\User::ROLE_PARTIAL) :?>
                 <p style="padding: 2px 0 12px 0; line-height: 14px; border-top: 0;">
                     <label>&nbsp;</label>
-                    <?php if(in_array($identity['u_role_id'], array(1, 2))) :?>
+                    <?php if(in_array($identity['u_role_id'], array(1, 2, 3))) :?>
                         <input type="checkbox" name="is_primary_contact" <?php if(is_object($clientObj) && $clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $userObj->u_id) :?>checked="checked"<?php endif; ?> id="primaryContact" class="checkbox" value="1" />
                         <label for="primaryContact" class="checkbox">Primary Contact</label>
                     <?php endif; ?>
                     <?php if (!$uId || $userObj->u_role_id < \Admin\Model\User::ROLE_PARTIAL): ?>
-                        <span id="companyIdAdminWrap" <?php if(!(in_array($identity['u_role_id'], array(1, 2)) || (is_object($clientObj) && $clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $identity['u_id']))) :?>style="display:none"<?php endif; ?>>
+                        <span id="companyIdAdminWrap" <?php if(!(in_array($identity['u_role_id'], array(1, 2, 3)) || (is_object($clientObj) && $clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $identity['u_id']))) :?>style="display:none"<?php endif; ?>>
                             <input type="checkbox" name="u_company_id_admin" <?php if(is_object($userObj) && $userObj->u_company_id_admin && $userObj->u_company_id_admin == $userObj->u_company_id):?>checked <?php endif; ?> id="companyIdAdmin" class="checkbox" value="<?php echo $userObj ? $userObj->u_company_id_admin : '' ?>"
-                            <?php if(!(in_array($identity['u_role_id'], array(1, 2)) || (is_object($clientObj) && $clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $identity['u_id']))) :?> disabled="true"<?php endif; ?> />
+                            <?php if(!(in_array($identity['u_role_id'], array(1, 2, 3)) || (is_object($clientObj) && $clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $identity['u_id']))) :?> disabled="true"<?php endif; ?> />
                             <label for="companyIdAdmin" class="checkbox">Company Admin</label>
                         </span>
                     <?php endif; ?>
                 </p>
                 <p style="padding: 2px 0 12px 0; line-height: 14px; border-top: 0;">
                     <label>&nbsp;</label>
-                    <?php if ((!$uId || $userObj->u_role_id < \Admin\Model\User::ROLE_PARTIAL) && $identity['u_role_id'] == 1): ?>
+                    <?php if ((!$uId || $userObj->u_role_id < \Admin\Model\User::ROLE_PARTIAL) && in_array($identity['u_role_id'], array(1, 2))): ?>
                         <input type="checkbox" name="u_grant_to_disclosures" <?php if(is_object($userObj) && $userObj->u_grant_to_disclosures):?>checked <?php endif; ?> id="grantToDisclosures"  class="checkbox" value="1"/>
                             <label for="grantToDisclosures" class="checkbox">Grant To Disclosures</label>
                     <?php endif; ?>
-                    <input type="checkbox" name="is_training_manager" <?php if(is_object($clientObj) && $clientObj->c_training_manager_u_id && $clientObj->c_training_manager_u_id == $userObj->u_id):?>checked <?php endif; ?> id="trainingManager" class="checkbox" value="1" />
+                    <input type="checkbox" name="is_training_manager" <?php if(is_object($userObj) && in_array($userObj->u_id, $training_managers)):?>checked <?php endif; ?> id="trainingManager" class="checkbox" value="1" />
                     <label for="trainingManager" class="checkbox">Training Manager</label>
                 </p>
                 <p style="padding: 2px 0 12px 0; line-height: 14px; border-top: 0;">
                     <label>&nbsp;</label>
-                    <?php if ((!$uId || $userObj->u_role_id < \Admin\Model\User::ROLE_PARTIAL) && $identity['u_role_id'] == 1): ?>
+                    <?php if ((!$uId || $userObj->u_role_id < \Admin\Model\User::ROLE_PARTIAL) && in_array($identity['u_role_id'], array(1, 2))): ?>
                         <input type="checkbox" name="u_grant_to_breach" <?php if(is_object($userObj) && $userObj->u_grant_to_breach):?>checked <?php endif; ?> id="grantToBreach" class="checkbox" value="1"/>
                             <label for="grantToBreach" class="checkbox">Grant To Breach</label>
                     <?php endif; ?>
                 </p>
+            <?php endif; ?>
             <?php endif; ?>
 
             <input type="hidden" name="identity_u_role_id" id="identity_u_role_id" value="<?php echo $identity['u_role_id'] ?>" disabled="true" />
@@ -246,13 +248,15 @@ $form->setAttribute('method', 'post');
 
             <div class="cboth"></div>
             <div class="form-buttons">
-                <input type="submit"  name="save" value="Save" class="form-button" />
-                <?php if ($this->uId): ?>
-                    <a href="/client/sendinvite/<?php echo $this->uId ?>" class="form-button">Send Invite Email</a>
-                <?php else: ?>
-                    <input type="submit" name="save_send_email" value="Save & Send Invite Email" class="form-button" />
+                <?php if ($identity['u_role_id'] != \Admin\Model\User::ROLE_TRAIL): ?>
+                    <input type="submit"  name="save" value="Save" class="form-button" />
+                    <?php if ($this->uId): ?>
+                        <a href="/client/sendinvite/<?php echo $this->uId ?>" class="form-button">Send Invite Email</a>
+                    <?php else: ?>
+                        <input type="submit" name="save_send_email" value="Save & Send Invite Email" class="form-button" />
+                    <?php endif; ?>
+                    <div class="fleft">or</div>
                 <?php endif; ?>
-                <div class="fleft">or</div>
                 <a href="/client/list" class="cancel">Cancel</a>
             </div>
 
@@ -303,8 +307,10 @@ $form->setAttribute('method', 'post');
 
                 <div class="cboth"></div>
                 <div class="form-buttons">
-                    <input type="submit" value="Save" class="form-button" />
-                    <div class="fleft">or</div>
+                    <?php if($identity['u_role_id'] != \Admin\Model\User::ROLE_TRAIL): ?>
+                        <input type="submit" value="Save" class="form-button" />
+                        <div class="fleft">or</div>
+                    <?php endif; ?>
                     <a href="/company/list" class="cancel">Cancel</a>
                 </div>
                 <div class="cboth"><br /></div>
@@ -499,5 +505,9 @@ $form->setAttribute('method', 'post');
                 $(this).val($('#u_company_id option:selected').val());
             }
         })
+
+        <?php if ($identity['u_role_id'] == \Admin\Model\User::ROLE_TRAIL) : ?>
+            $('input[type=submit]').prop('disabled', true);
+        <?php endif; ?>
     });
 </script>

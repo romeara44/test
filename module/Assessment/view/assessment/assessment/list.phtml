@@ -8,8 +8,7 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
 
 <div class="page-title">
     <h1 class="fleft">Assessments</h1>
-
-    <?php if (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT)) || ($identity['u_role_id'] == \Admin\Model\User::ROLE_CLIENT && $identity['u_company_id_admin'])): ?>
+    <?php if (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_TRAIL)) || ($identity['u_role_id'] == \Admin\Model\User::ROLE_CLIENT && $identity['u_company_id_admin'])): ?>
         <a href="/assessment/edit/0/step/1" class="button"><i class="fa fa-clipboard"></i> Start New Assessment</a>
     <?php endif; ?>
     <div class="cboth"></div>
@@ -29,9 +28,9 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
             </th>
 
             <?php if (!$isClientRole): ?>
-                <?php $classSort = ($order_by == 'cId') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+                <?php $classSort = ($order_by == 'cName') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
                 <th>
-                    <a href="<?php echo $this->url('assessment', array('action' => 'list', 'page' => $page, 'order_by' => 'cId', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    <a href="<?php echo $this->url('assessment', array('action' => 'list', 'page' => $page, 'order_by' => 'cName', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
                         Client <i class="fa <?php echo $classSort ?>"></i>
                     </a>
                 </th>
@@ -128,7 +127,6 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
                             <a href="/assessment/unarchive/<?php echo $a->a_id ?>" class="">Unarchive</a>
                         <?php endif; ?>
                     <?php endif; ?>
-
                 </td>
             </tr>
 

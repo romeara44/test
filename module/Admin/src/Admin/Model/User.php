@@ -17,6 +17,7 @@ class User
     const ROLE_CLIENT = 5;
     const ROLE_BUSINESS_ASSOCIATE = 6;
     const ROLE_PARTIAL = 7;
+    const ROLE_TRAIL = 8;
 
     /*
      * u_active
@@ -284,7 +285,7 @@ class User
         return $this->inputFilter;
     }
 
-    public function getClientInputFilter($sl, $isEdit = false, $uId = 0)
+    public function getClientInputFilter($sl, $isEdit = false, $uId = 0, $post = null)
     {
         if (!$this->inputFilter) {
             $inputFilter = new InputFilter();
@@ -357,7 +358,7 @@ class User
             )));
 
             //if (!$isEdit) {
-                $ee = new \Mylib\Validator\EmailExists($sl, $uId);
+                $ee = new \Mylib\Validator\EmailExists($sl, $uId, $post);
 
                 $inputFilter->add($factory->createInput(array(
                     'name'     => 'u_email',

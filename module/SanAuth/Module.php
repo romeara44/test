@@ -49,7 +49,7 @@ $sharedManager->attach(‘Zend\Mvc\Application’, ‘dispatch’, array($this, 
 		
                 'AuthService' => function($sm) {
                     $dbAdapter      = $sm->get('Zend\Db\Adapter\Adapter');
-                    $dbTableAuthAdapter  = new DbTableAuthAdapter($dbAdapter, 'users', 'u_email', 'u_password', 'SHA1(?)');
+                    $dbTableAuthAdapter  = new DbTableAuthAdapter($dbAdapter, 'users', 'u_id', 'u_password', 'SHA1(?)');
 
                     $authService = new AuthenticationService();
                     $authService->setAdapter($dbTableAuthAdapter);

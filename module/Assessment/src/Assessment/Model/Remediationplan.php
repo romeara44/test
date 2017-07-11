@@ -53,6 +53,8 @@ class Remediationplan
     public $_u_id;
     public $_u_name;
     public $_ar_id;
+    public $rp_adr_id;
+    public $_location_name;
 
     protected $inputFilter;
 
@@ -95,7 +97,8 @@ class Remediationplan
         $this->_u_id     = (isset($data['_u_id'])) ? $data['_u_id'] : null;
         $this->_u_name     = (isset($data['_u_name'])) ? $data['_u_name'] : null;
         $this->_ar_id     = (isset($data['_ar_id'])) ? $data['_ar_id'] : null;
-
+        $this->rp_adr_id     = (isset($data['rp_adr_id'])) ? $data['rp_adr_id'] : null;
+        $this->_location_name     = (isset($data['_location_name'])) ? $data['_location_name'] : null;
     }
 
     public function getArrayCopy()

@@ -5,7 +5,7 @@ use Zend\Form\Form;
 
 class TraininglogForm extends Form
 {
-    public function __construct($sl)
+    public function __construct($sl, $tlObj = null)
     {
         parent::__construct('user');
         $this->setAttribute('method', 'post');
@@ -13,6 +13,47 @@ class TraininglogForm extends Form
         $authService = new \Zend\Authentication\AuthenticationService();
         $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
         $identity = $authService->getIdentity();
+
+        $list = array();
+        if ($tlObj && $tlObj->tl_company_id) {
+            $list = $sl->get('Traininglog\Model\EmployeemasterlistTable')->getEmployeemasterlist($tlObj->tl_company_id);
+        }
+
+        /*if($list) {
+            $list = array('-1' => 'Please select') + $list;
+        }*/
+
+        $this->add(array(
+            'name' => '_tl_eml_items',
+            'type' => 'Zend\Form\Element\Select',
+            'attributes' => array(
+                'multiple' => 'multiple',
+            ),
+            'options' => array(
+                'label' => 'Attendees',
+                'value_options' => $list,
+            ),
+        ));
+
+        $companies = array();
+        
+        $companyTable = $sl->get('Client\Model\CompanyTable');
+        foreach ($companyTable->getCompaniesPairs() as $key => $r) {
+            $companies[$key] = $r;
+        }
+
+        if(count($companies) > 0) {
+            $companies = array('' => 'Please select') + $companies;
+        }
+
+        $this->add(array(
+            'name' => 'tl_company_id',
+            'type' => 'Zend\Form\Element\Select',
+            'options' => array(
+                'label' => 'Company',
+                'value_options' => $companies
+            ),
+        ));
 
         $this->add(array(
             'name' => 'tl_title',
@@ -54,24 +95,6 @@ class TraininglogForm extends Form
             ),
         ));
 
-        $regulationTable = $sl->get('Traininglog\Model\RegulationTable');
-
-        $regulations = $regulationTable->getRegulationsWithCategories();
-        array_unshift($regulations, 'Please Select');
-        $regulations['-1'] = 'Other';
-        
-        $this->add(array(
-            'name' => '_tl_cur_regulations',
-            'type' => 'Zend\Form\Element\Select',
-            'attributes' => array(
-                'multiple' => 'multiple',
-            ),
-            'options' => array(
-                'label' => 'Type',
-                'value_options' => $regulations
-            ),
-        ));
-
         $this->add(array(
             'name' => 'tl_conducted_date',
             'attributes' => array(
@@ -92,13 +115,14 @@ class TraininglogForm extends Form
             ),
         ));
 
+        $tlCId = is_object($tlObj) ? $tlObj->tl_company_id : null;
         $traininglogTable = $sl->get('Traininglog\Model\TraininglogTable');
         $trainers[''] = 'Please Select';
-        foreach ($traininglogTable->getTrainers() as $key => $r) {
+        foreach ($traininglogTable->getTrainers($tlCId) as $key => $r) {
             $trainers[$key] = $r;
         }
 
-        $trainers['-1'] = 'Other';
+        $trainers['-1'] = 'Other';        
 
         $this->add(array(
             'name' => '_tl_trainer',

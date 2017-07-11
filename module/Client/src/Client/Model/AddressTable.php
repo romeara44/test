@@ -92,6 +92,7 @@ class AddressTable implements ServiceLocatorAwareInterface
     public function saveAddress(Address $address)
     {
         $data = array(
+            'adr_name' => $address->adr_name,
             'adr_address1' => $address->adr_address1,
             'adr_address2' => $address->adr_address2,
             'adr_city' => $address->adr_city,

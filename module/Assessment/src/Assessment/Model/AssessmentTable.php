@@ -57,6 +57,8 @@ class AssessmentTable implements ServiceLocatorAwareInterface
                     $where_str .= 'a_consultant_u_id IN (' . implode(',', $ids) . ')';
                 } elseif ($identity['u_role_id'] == User::ROLE_CLIENT && $identity['u_company_id']) {
                     $where_str .= 'a_c_id = ' . $identity['u_company_id'];
+                } elseif ($identity['u_role_id'] == User::ROLE_TRAIL && $identity['u_company_id']) {
+                    $where_str .= 'a_c_id = ' . $identity['u_company_id'];
                 }
 
                 $companies_ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getCompaniesIdsForConsultant($identity['u_id']);
@@ -76,14 +78,20 @@ class AssessmentTable implements ServiceLocatorAwareInterface
             }
 
             $select->join(array('c' => 'companies'), 'a_c_id = c_id', array('_client_name' => 'c_name'), 'left');
+            $select->columns(array( '*'
+                                  , '_status' => new \Zend\Db\Sql\Expression('IF(assessments.a_status = ' . Assessment::STATUS_INPROGRESS . ', "' . Assessment::$statusesNames[Assessment::STATUS_INPROGRESS] . '", "' . Assessment::$statusesNames[Assessment::STATUS_CLOSED] . '")')
+                                  , '_type' => new \Zend\Db\Sql\Expression('IF(assessments.a_type = ' . Assessment::TYPE_SECURITY_RISK . ', "' . Assessment::$typesNames[Assessment::TYPE_SECURITY_RISK] . '", "' . Assessment::$typesNames[Assessment::TYPE_PRIVACY_RISK] . '")')
+                                  )
+                            );
 
             $order = $order ? $order : 'ASC';
 
-            $orders[] = 'a_version_index ' . $order;
-            $orders[] = 'a_id ASC';
             if ($orderBy) {
                 $orders[] = $orderBy . ' ' . $order;
             }
+
+            $orders[] = 'a_version_index ' . $order;
+            $orders[] = 'a_id ASC';
 
             $select->order($orders);
 
@@ -99,24 +107,47 @@ class AssessmentTable implements ServiceLocatorAwareInterface
     public function getSearchResultsSelect($searchValue, $identity)
     {
         $select = $this->tableGateway->getSql()->select();
-        $select->where('a_active = 1');
+
         $select->where('c_name LIKE "%' . $searchValue . '%"');
 
-        $select->columns(array('_id' => new \Zend\Db\Sql\Expression('a_id'), '_name' => new \Zend\Db\Sql\Expression('c_name'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("assessment")'), new \Zend\Db\Sql\Expression('NULL')));
+        $select->columns(array('_id' => new \Zend\Db\Sql\Expression('a_id'),
+                               '_name' => new \Zend\Db\Sql\Expression('c_name'),
+                               '_item_type' => new \Zend\Db\Sql\Expression('a_type'),
+                               '_type' => new \Zend\Db\Sql\Expression('CONCAT("assessment")'),
+                               '_status' => new \Zend\Db\Sql\Expression('a_status'),
+                               '_date' => new \Zend\Db\Sql\Expression('a_create_date')
+                               )
+                        );
         $select->join(array('c' => 'companies'), 'a_c_id = c_id', array(), 'left');
 
+        $where_str = '';
         if ($identity['u_role_id'] == \Admin\Model\User::ROLE_CONSULTANT) {
-            $select->where('a_owner_u_id = ' . $identity['u_id']);
-        }
-
-        if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
-            $select->where('a_consultant_u_id = ' . $identity['u_id']);
+            $where_str .= 'a_owner_u_id = ' . $identity['u_id'];
         } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
             $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
             $ids[] = $identity['u_id'];
-            $select->where('a_consultant_u_id IN (' . implode(',', $ids) . ')');
-        } elseif ($identity['u_role_id'] == User::ROLE_CLIENT) {
-            $select->where('a_c_id = ' . $identity['u_company_id']);
+            $where_str .= 'a_consultant_u_id IN (' . implode(',', $ids) . ')';
+        } elseif ($identity['u_role_id'] == User::ROLE_CLIENT && $identity['u_company_id']) {
+            $where_str .= 'a_c_id = ' . $identity['u_company_id'];
+        }
+
+        if ($identity['u_role_id'] != User::ROLE_ADMIN) {
+            $companies_ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getCompaniesIdsForConsultant($identity['u_id']);
+            if ($companies_ids) {
+                if ($where_str) {
+                    $where_str = '(' . $where_str . ' OR a_c_id IN (' . implode(',', $companies_ids) . '))';
+                  } else {
+                    $where_str = 'a_c_id IN (' . implode(',', $companies_ids) . ')';
+                  }
+            }
+            if ($where_str) {
+                $where_str .= ' AND a_active = 1';
+            } else {
+                $where_str = 'a_active = 1';
+            }
+        }
+        if ($where_str) {
+            $select->where($where_str);
         }
 
         return $select;
@@ -159,6 +190,16 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         }
 
         return ($row->_client_name);
+    }
+
+    public function getForImport()
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('a_type = ' . Assessment::TYPE_SECURITY_RISK);
+        //$select->where('a_id = 110');
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        return $resultSet;
     }
 
     public function getAssessment($id)
@@ -245,11 +286,16 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         if ($id == 0) {
             if ($data['a_type'] == 2) { // if privacy
                 $aSec = $this->isPrivacyCreatePossible($data['a_c_id']);
-                if ((int) $aSec->a_parent_a_id){
-                    $data['a_security_a_id'] = $aSec->a_parent_a_id;
+                if ($aSec) {
+                    if ((int) $aSec->a_parent_a_id){
+                        $data['a_security_a_id'] = $aSec->a_parent_a_id;
+                    } else {
+                        $data['a_security_a_id'] = $aSec->a_id;
+                    }
                 } else {
-                    $data['a_security_a_id'] = $aSec->a_id;
+                    $data['a_security_a_id'] = 0;
                 }
+                
             }
 
             $this->tableGateway->insert($data);
@@ -262,9 +308,9 @@ class AssessmentTable implements ServiceLocatorAwareInterface
             if (!(int) $a->a_version_index) {
                 $this->tableGateway->update(array('a_version_index' => $id), array('a_id' => $id));
             }
-            if ($data['a_type'] == 2) { // if privacy
-                $this->copyAdresses($id, $data['a_c_id']);
-            }
+            //if ($data['a_type'] == 2) { // if privacy
+                $this->copyAdresses($id, $data['a_c_id'], $data['a_type']);
+            //}
         } else {
             if ($this->getAssessment($id)) {
                 $data['a_update_date'] = new \Zend\Db\Sql\Expression('NOW()');
@@ -447,6 +493,68 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         return true;
     }
 
+    public function checkAllLocationsFinished($id)
+    {
+        $a = $this->getAssessment($id);
+
+        $addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
+        $assessmentsRoles = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($a->a_type);
+
+        if (!count($addresses)) {
+            return false;
+        }
+
+        if ($a->a_type == 1) {
+            foreach ($addresses->buffer() as $address) {
+                if (!(int) $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->checkStep($id, $address->adr_id)) {
+                    return false;
+                }
+            }
+        }        
+
+        foreach ($addresses->buffer() as $address) {
+            foreach ($assessmentsRoles->buffer() as $ar) {
+                $questions = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionTable')->getQuestions($a->a_type, $ar->ar_id, $a->a_id, $address->adr_id, $a);
+                if (!(int) $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionAnswerTable')->checkStep($id, $address->adr_id, $ar->ar_id, $questions)) {
+                    return false;
+                }
+
+            }
+        }
+
+        $data['a_all_steps_finished'] = 1;
+        $data['a_status'] = 100;
+        $this->tableGateway->update($data, array('a_id' => $id));
+
+        return true;
+    }
+
+    public function checkLocationFinished($id, $location)
+    {
+        $a = $this->getAssessment($id);
+
+        $addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
+        $assessmentsRoles = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($a->a_type);
+
+        if (!count($addresses)) {
+            return false;
+        }
+
+        if ($a->a_type == 1 && !(int) $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->checkStep($id, $location)) {
+            return false;
+        }
+
+        foreach ($assessmentsRoles->buffer() as $ar) {
+            $questions = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionTable')->getQuestions($a->a_type, $ar->ar_id, $a->a_id, $location, $a);
+            if (!(int) $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionAnswerTable')->checkStep($id, $location, $ar->ar_id, $questions)) {
+                return false;
+            }
+
+        }
+
+        return true;
+    }
+
 
     public function checkStepFinished($id, $stepNum, $isNew = false)
     {
@@ -490,7 +598,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
 
             foreach ($addresses->buffer() as $address) {
                 foreach ($assessmentsRoles->buffer() as $ar) {
-                    $questions = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionTable')->getQuestions($a->a_type, $ar->ar_id, $a->a_id, $address->adr_id);
+                    $questions = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionTable')->getQuestions($a->a_type, $ar->ar_id, $a->a_id, $address->adr_id, $a);
                     if (!(int) $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionAnswerTable')->checkStep($id, $address->adr_id, $ar->ar_id, $questions)) {
                         $value = 0;
                         break;
@@ -519,6 +627,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
 
         if ($a['a_type'] == 1) {
             for ($i = 1; $i <= 5; $i++) {
+                if ($i == 3 || $i == 4) continue;
                 if (!$a['a_step' . $i . '_finished']) {
                     $stepsAllFinished = 0;
                 }
@@ -795,7 +904,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         foreach ($addresses->buffer() as $address) {
             $steps[2][$address->adr_id] = (int) $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->checkStep($id, $address->adr_id);
         }
-
+/*
         foreach ($addresses->buffer() as $address) {
             $steps[3][$address->adr_id] = (int) $this->getServiceLocator()->get('Assessment\Model\AssessmentInventoryLocationItemTable')->checkStep($id, $address->adr_id);
         }
@@ -803,10 +912,10 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         foreach ($addresses->buffer() as $address) {
             $steps[4][$address->adr_id] = (int) $this->getServiceLocator()->get('Assessment\Model\AssessmentBusinessAssociateLocationTable')->checkStep($id, $address->adr_id);
         }
-
+*/
         foreach ($addresses->buffer() as $address) {
             foreach ($assessmentsRoles->buffer() as $ar) {
-                $questions = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionTable')->getQuestions($a->a_type, $ar->ar_id, $a->a_id, $address->adr_id);
+                $questions = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionTable')->getQuestions($a->a_type, $ar->ar_id, $a->a_id, $address->adr_id, $a);
                 $steps[5][$address->adr_id][$ar->ar_id] = (int) $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionAnswerTable')->checkStep($id, $address->adr_id, $ar->ar_id, $questions);
             }
         }
@@ -819,7 +928,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
         $select->where('a_c_id = ' . $cId);
         $select->where('a_type = 1');
-        $select->where('DATE_FORMAT(a_create_date, "%Y") = "' . date("Y") . '"');
+        //$select->where('DATE_FORMAT(a_create_date, "%Y") = "' . date("Y") . '"');
 
         $select->where('a_active = 1');
         $select->order('a_id DESC');
@@ -834,11 +943,11 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         return $row;
     }
 
-    public function copyAdresses($aId, $cId)
+    public function copyAdresses($aId, $cId, $a_type = 2)
     {
-        $select = $this->tableGateway->getSql()->select();
+        /*$select = $this->tableGateway->getSql()->select();
         $select->where('a_c_id = ' . $cId);
-        $select->where('a_type = 1');
+        $select->where('a_type = ' . $a_type);
         $select->where('DATE_FORMAT(a_create_date, "%Y") = "' . date("Y") . '"');
 
         $select->order('a_id DESC');
@@ -847,10 +956,10 @@ class AssessmentTable implements ServiceLocatorAwareInterface
 
         $resultSet = $this->tableGateway->selectWith($select);
 
-        $row = $resultSet->current();
+        $row = $resultSet->current();*/
 
-        $addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($row->a_id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
-
+        $addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($cId, \Client\Model\AddressItem::COMPANY_TYPE);
+        $i = 1;
         foreach ($addresses->buffer() as $address) {
             $oldAddressId = $address->adr_id;
             // save to address table
@@ -871,6 +980,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
             $addressItem->exchangeArray($addressItemData);
 
             $addressItemId = $addressItemTable->saveAddressItem($addressItem);
+            if ($a_type == 2)  break;
         }
 
         return true;
@@ -905,7 +1015,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         return true;
     }
 
-    public function _createRemediationPlan($aId)
+    public function _createRemediationPlan($aId, $location)
     {
         $aDb = $this->getServiceLocator()->get('Assessment\Model\AssessmentTable');
         $a = $aDb->getAssessment($aId);
@@ -931,7 +1041,8 @@ class AssessmentTable implements ServiceLocatorAwareInterface
         $dataRp['rp_consultant_u_id'] = $a->a_consultant_u_id;
         $dataRp['rp_performed_u_id'] = $identity['u_id'];
         $dataRp['rp_remediation_date'] = new \Zend\Db\Sql\Expression('NOW()');
-        $dataRp['rp_incident_date'] = $a->a_create_date;        
+        $dataRp['rp_incident_date'] = $a->a_create_date;   
+        $dataRp['rp_adr_id'] = $location;     
 
         $rpDb = $this->getServiceLocator()->get('Assessment\Model\RemediationplanTable');
         $rpDb->setServiceLocator($this->getServiceLocator());
@@ -943,6 +1054,7 @@ class AssessmentTable implements ServiceLocatorAwareInterface
 
         $addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($aId, \Client\Model\AddressItem::ASSESSMENT_TYPE);
         foreach ($addresses->buffer() as $addressKey => $address) {
+            if ($address->adr_id != $location) continue;
             $cats = $catsDb->getCategoriesByType($a->a_type, $addressKey, $company);
             if ($a->a_security_a_id) {
                 $this->getServiceLocator()->get('Assessment\Model\RemediationplanTable')->setServiceLocator($this->getServiceLocator());
@@ -958,19 +1070,42 @@ class AssessmentTable implements ServiceLocatorAwareInterface
             $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_ADD, \Application\Model\LogsTable::ITEM_TYPE_RP, $rpId);
 
             $arlc = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->getArlcByLocation($aId, $address->adr_id);
-            foreach ($cats->buffer() as $catKey => $cat) {
 
+            foreach ($cats->buffer() as $catKey => $cat) {
                 $rpa = new Remediationplanaction();
 
                 $answerScore = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionAnswerTable')->getAnswersScore($aId, $cat->aqc_id, $address->adr_id);
+                $task = $cat->aqc_citation;
 
-                $task = $cat->aqc_citation . '-' . $cat->aqc_specification . ' - ' . $cat->aqc_description;
+                if ($cat->aqc_specification) {
+                    if ($task) {
+                        $task .= '-';
+                    }
+                    $task .= $cat->aqc_specification;
+                }
+                if ($cat->aqc_description) {
+                    if ($task) {
+                        $task .= '-';
+                    }
+                    $task .= $cat->aqc_description;
+                }
 
-                if (($task == '- - ') || ($task == '- -') || ($task == '')) {
+                if ($task == '') {
                     continue;
                 }
                 $rpaData['rpa_rp_id'] = $rpId;
-                $rpaData['rpa_contact_u_id'] = $arlc[$cat->aqc_ar_id];
+
+                if (empty($arlc[$cat->aqc_ar_id])) {
+                    $role = $this->getServiceLocator()->get('Client\Model\CompanyRolesTable')->getCompanyRoleByCompanyAndRole($a->a_c_id, $cat->aqc_ar_id);
+                    if ($role) {
+                        $rpaData['rpa_contact_u_id'] = $role->cr_u_id;
+                    } else {
+                        $rpaData['rpa_contact_u_id'] = 0;
+                    }                    
+                } else {
+                    $rpaData['rpa_contact_u_id'] = $arlc[$cat->aqc_ar_id];
+                }
+                
                 $rpaData['rpa_approver_u_id'] = $approval_authority_role->cr_u_id;
 
                 $rpaData['rpa_threat'] = $task;

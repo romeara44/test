@@ -38,7 +38,20 @@ $identity = $authService->getIdentity();
                     Result <i class="fa <?php echo $classSort ?>"></i>
                 </a>
             </th>
-
+            <?php if(in_array($this->roleFilter, array('a', 'assessment', 'remediationplan'))): ?>
+                <?php $classSort = ($order_by == 'status') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+                <th>
+                    <a href="<?php echo $this->url('search', array('action' => 'search', 'page' => $page, 'order_by' => 'status', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'searchValue' => $this->searchValue)); ?>">
+                        Status <i class="fa <?php echo $classSort ?>"></i>
+                    </a>
+                </th>
+                <?php $classSort = ($order_by == 'date') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+                <th>
+                    <a href="<?php echo $this->url('search', array('action' => 'search', 'page' => $page, 'order_by' => 'date', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'searchValue' => $this->searchValue)); ?>">
+                        Date <i class="fa <?php echo $classSort ?>"></i>
+                    </a>
+                </th>
+            <?php endif; ?>
         </tr>
     </thead>
     <tbody>
@@ -47,31 +60,51 @@ $identity = $authService->getIdentity();
                 <tr>
                     <td>Company</td>
                     <td><a href="/company/edit/<?php echo $result['_id'] ?>"><?php echo $result['_name'] ?></a></td>
+                    <?php if($this->roleFilter == 'a'): ?>
+                        <td></td>
+                        <td></td>
+                    <?php endif; ?>
                 </tr>
             <?php elseif ($result['_type'] == 'contact'): ?>
                 <tr>
                     <td>Contact</td>
                     <td><a href="/client/edit/<?php echo $result['_id'] ?>"><?php echo $result['_name'] ?></a></td>
+                    <?php if($this->roleFilter == 'a'): ?>
+                        <td></td>
+                        <td></td>
+                    <?php endif; ?>
                 </tr>
             <?php elseif ($result['_type'] == 'user'): ?>
                 <tr>
                     <td>User</td>
                     <td><a href="/admin/edituser/<?php echo $result['_id'] ?>"><?php echo $result['_name'] ?></a></td>
+                    <?php if($this->roleFilter == 'a'): ?>
+                        <td></td>
+                        <td></td>
+                    <?php endif; ?>
                 </tr>
             <?php elseif ($result['_type'] == 'breachlog'): ?>
                 <tr>
                     <td>Breach log</td>
                     <td><a href="/breachlog/edit/<?php echo $result['_id'] ?>"><?php echo $result['_name'] ?></a></td>
+                    <?php if($this->roleFilter == 'a'): ?>
+                        <td></td>
+                        <td></td>
+                    <?php endif; ?>
                 </tr>
             <?php elseif ($result['_type'] == 'assessment'): ?>
                 <tr>
-                    <td>Assessment</td>
-                    <td><a href="/assessment/edit/<?php echo $result['_id'] ?>"><?php echo $result['_name'] ?></a></td>
+                    <td><?= \Assessment\Model\Assessment::$typesNames[$result['_item_type']]?></td>
+                    <td><a href="/assessment/editlist/<?php echo $result['_id'] ?>"><?php echo $result['_name'] ?></a></td>
+                    <td><?php echo \Assessment\Model\Assessment::$statusesNames[$result['_status']] ?></td>
+                    <td><?php echo ($result['_date'] != '0000-00-00 00:00:00') ? $this->formatDateA($result['_date']) : '' ?></td>
                 </tr>
             <?php elseif ($result['_type'] == 'remediationplan'): ?>
                 <tr>
-                    <td>Remediation Plan</td>
+                    <td><?= \Assessment\Model\Assessment::$typesNames[$result['_item_type']]?></td>
                     <td><a href="/remediationplan/edit/<?php echo $result['_id'] ?>"><?php echo $result['_name'] ?></a></td>
+                    <td><?php echo \Assessment\Model\Remediationplan::$statusesNames[$result['_status']] ?></td>
+                    <td><?php echo ($result['_date'] != '0000-00-00 00:00:00') ? $this->formatDateA($result['_date']) : '' ?></td>
                 </tr>
             <?php endif; ?>
 

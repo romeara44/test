@@ -62,7 +62,11 @@ class UserTable implements ServiceLocatorAwareInterface
             );
 
             $select->join(array('r' => 'roles'), 'role_id = u_role_id', array('_rolename' => 'role_name'), 'left');
-
+            $select->columns(array( '*'
+                                  , '_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)')
+                                  , '_active' => new \Zend\Db\Sql\Expression('IF(u_active = ' . User::STATUS_ACTIVE . ', "Active", "Archived")')
+                                  )
+                            );
             /*if ($identity['u_role_id'] == User::ROLE_ADMIN) {
                 $select->where('u_active = 1');
             }
@@ -95,11 +99,18 @@ class UserTable implements ServiceLocatorAwareInterface
     public function getSearchResultsUsersSelect($searchValue, $identity)
     {
         $select = $this->tableGateway->getSql()->select();
-        
+
         $select->where('u_active = 1');
         $select->where('(u_firstname LIKE "%' . $searchValue . '%" OR u_lastname LIKE "%' . $searchValue . '%")');
 
-        $select->columns(array('_id' => 'u_id', '_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("user")'), new \Zend\Db\Sql\Expression('NULL')));
+        $select->columns(array('_id' => 'u_id',
+                               '_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'),
+                               '_item_type' => new \Zend\Db\Sql\Expression('NULL'),
+                               '_type' => new \Zend\Db\Sql\Expression('CONCAT("user")'),
+                               new \Zend\Db\Sql\Expression('NULL'),
+                               new \Zend\Db\Sql\Expression('NULL')
+                               )
+                        );
 
         $select->where('u_role_id <> 1'); // without admin
 
@@ -112,35 +123,34 @@ class UserTable implements ServiceLocatorAwareInterface
         $select->join(array('compa' => 'companies'), 'u_company_id = compa.c_id', array(), 'left');
         $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = compa.c_id', array(), 'left');
 
-        if($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
-            $select->where('u_senior_consultant_u_id = ' . $identity['u_id']);
-        } elseif($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
-            if($identity['u_company_id_admin']) {
-                $select->where('(u_senior_consultant_u_id = ' . $identity['u_id'] . ' OR u_company_id = ' . $identity['u_company_id_admin'] . ') AND u_id != ' . $identity['u_id']);
-            } else {
-                 $select->where('u_senior_consultant_u_id = ' . $identity['u_id']);
-            }
-        }
+        $select->where('u_id != ' . $identity['u_id']);
 
         if ($identity['u_role_id'] == User::ROLE_SALES_REP) {
             $select->where('c_owner_u_id = ' . $identity['u_id']);
         } elseif (in_array($identity['u_role_id'], array(User::ROLE_CONSULTANT))) {
-            $select->where('c_owner_u_id = ' . $identity['u_id'] . ' OR cc.cc_consultant_id = ' . $identity['u_id']);
+            $select->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR cc.cc_consultant_id = ' . $identity['u_id'] . ' OR u_senior_consultant_u_id = ' . $identity['u_id'] . ')');
         } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
             $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
             $ids[] = $identity['u_id'];
-            $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR cc.cc_consultant_id IN (' . implode(',', $ids) . '))');
+            $select->where('(c_owner_u_id IN (' . implode(',', $ids) . ') OR cc.cc_consultant_id IN (' . implode(',', $ids) . ') OR u_senior_consultant_u_id IN (' . implode(',', $ids) . '))');
         } else if($identity['u_role_id'] == User::ROLE_CLIENT || $identity['u_role_id'] == User::ROLE_PARTIAL) {
             if($identity['u_company_id_admin']) {
-                $select->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR c_id = ' . $identity['u_company_id_admin'] . ')');
+                $select->where('(c_owner_u_id = ' . $identity['u_id'] . ' OR c_id = ' . $identity['u_company_id_admin'] . ' OR u_senior_consultant_u_id = ' . $identity['u_id'] . ' OR u_company_id = ' . $identity['u_company_id_admin'] . ')');
             } else {
-                $select->where('c_owner_u_id = ' . $identity['u_id']);
+                $select->where('(c_owner_u_id = ' . $identity['u_id'] . 'OR u_senior_consultant_u_id = ' . $identity['u_id'] . ')');
             }
         }
         
         $select->where('(u_firstname LIKE "%' . $searchValue . '%" OR u_lastname LIKE "%' . $searchValue . '%" OR compa.c_name LIKE "%' . $searchValue . '%")');
 
-        $select->columns(array('_id' => 'u_id', '_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("contact")'), new \Zend\Db\Sql\Expression('NULL')));
+        $select->columns(array('_id' => 'u_id',
+                               '_name' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'),
+                               '_item_type' => new \Zend\Db\Sql\Expression('NULL'),
+                               '_type' => new \Zend\Db\Sql\Expression('CONCAT("contact")'), 
+                               '_status' => new \Zend\Db\Sql\Expression('NULL'),
+                               '_date' => new \Zend\Db\Sql\Expression('NULL')
+                               )
+                        );
 
         //$select->where('u_role_id = 5'); // without admin
 
@@ -218,9 +228,13 @@ class UserTable implements ServiceLocatorAwareInterface
         return $row;
     }
 
-    public function getUserByEmail($email)
+    public function getUserByEmail($email, $company_id = null)
     {
-        $rowset = $this->tableGateway->select(array('u_email' => $email));
+        $params = array('u_email' => $email);
+        if ($company_id) {
+            $params['u_company_id'] = $company_id;
+        }
+        $rowset = $this->tableGateway->select($params);
         $row = $rowset->current();
         if (!$row) {
             return false;
@@ -264,7 +278,7 @@ class UserTable implements ServiceLocatorAwareInterface
             unset($data['u_senior_consultant_u_id']);
         }
 
-        if($identity['u_role_id'] == User::ROLE_ADMIN) {
+        if($identity['u_role_id'] == User::ROLE_ADMIN || $identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
             $data['u_grant_to_disclosures'] = $user->u_grant_to_disclosures ? $user->u_grant_to_disclosures : 0;
             $data['u_grant_to_breach'] = $user->u_grant_to_breach ? $user->u_grant_to_breach : 0;
         }
@@ -395,7 +409,7 @@ class UserTable implements ServiceLocatorAwareInterface
 
         if($adminId) {
             $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'forgot_password_request', 'uId' => $adminId, 'forgot_password_user' => $user));
-            $this->tableGateway->update(array('u_forgot_password' => 1), array('u_id' => $user->u_id));
+            //$this->tableGateway->update(array('u_forgot_password' => 1), array('u_id' => $user->u_id));
             return true;
         }
 
@@ -425,11 +439,15 @@ class UserTable implements ServiceLocatorAwareInterface
         return true;
     }
 
-    public function checkIfUserExists($email, $uId = 0)
+    public function checkIfUserExists($email, $uId = 0, $u_company_id = 0)
     {
         $select = $this->tableGateway->getSql()->select();
         $select->where('u_email = "' . $email . '"');
         $select->where('u_active = 1');
+
+        if ($u_company_id) {
+            $select->where('u_company_id = ' . $u_company_id);
+        }
 
         if ($uId) {
             $select->where('u_id <> ' . $uId);
@@ -457,9 +475,14 @@ class UserTable implements ServiceLocatorAwareInterface
 
     public function setNewPassword($uid, $password)
     {
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('u_id = ' . $uid);
+
+        $user = $this->tableGateway->selectWith($select)->current();
+
         $data['u_password'] = sha1($password);
         $data['u_sent_password'] = 1;
-        $this->tableGateway->update($data, array('u_id' => $uid));
+        $this->tableGateway->update($data, array('u_email' => $user->u_email));
 
         return true;
     }
@@ -586,7 +609,7 @@ class UserTable implements ServiceLocatorAwareInterface
         
         $this->tableGateway->update($data, array('u_id' => $id));
 
-        $this->getServiceLocator()->get('Client\Model\CompanyTable')->unsetTrainingManager($id);
+        $this->getServiceLocator()->get('Client\Model\CompanyTrainingManagersTable')->deleteTrainingManager($id);
 
         return true;
     }
@@ -669,7 +692,7 @@ class UserTable implements ServiceLocatorAwareInterface
 
             $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'reset_password', 'uId' => $user->u_id, 'password' => $password));
             $this->setNewPassword($user->u_id, $password);
-            $this->tableGateway->update(array('u_forgot_password' => 0), array('u_id' => $user->u_id));
+            //$this->tableGateway->update(array('u_forgot_password' => 0), array('u_id' => $user->u_id));
             
             return true;
         }
@@ -739,7 +762,7 @@ class UserTable implements ServiceLocatorAwareInterface
                 }
             }
 
-            $this->tableGateway->update($data, array('u_id' => $user->u_id));
+            $this->tableGateway->update($data, array('u_email' => $user->u_email));
         }
 
         return $locked;
@@ -881,6 +904,33 @@ class UserTable implements ServiceLocatorAwareInterface
         }
 
         return false;
+    }
+
+    public function getUsersForTrainersList($cId)
+    {
+        $company = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getClientCompany($cId);
+
+        $select = $this->tableGateway->getSql()->select();
+        $select->join(array('cc' => 'company_consultants'), 'cc.cc_consultant_id = u_id', array(), 'left');
+
+        $uIds = array();
+
+        if($company->c_consultant_u_id) {
+            $uIds[] = $company->c_consultant_u_id;
+        }
+        if($training_managers = $this->getServiceLocator()->get('Client\Model\CompanyTrainingManagersTable')->getTrainingManagersIdsForCompany($cId)) {
+            $uIds = array_merge($uIds, $training_managers);
+        }
+
+        if($uIds) {
+            $select->where('(cc.cc_company_id = ' . $company->c_id . ' OR u_id IN (' . implode(',', $uIds) . '))');
+        } else {
+            $select->where('cc.cc_company_id = ' . $company->c_id);
+        }
+
+        $select->where('u_active = 1');
+
+        return $this->tableGateway->selectWith($select);
     }
 
 }

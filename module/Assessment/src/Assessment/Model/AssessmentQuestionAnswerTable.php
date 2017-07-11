@@ -109,7 +109,7 @@ class AssessmentQuestionAnswerTable implements ServiceLocatorAwareInterface
                 }
             }
         }
-
+//var_dump(count($answers), $counterQuestionsToAnswered); exit;
         return (count($answers) == $counterQuestionsToAnswered) ? true : false;
     }
 
@@ -196,7 +196,7 @@ class AssessmentQuestionAnswerTable implements ServiceLocatorAwareInterface
         $select->where('aqa_adr_id = ' . $adrId);
 
         $resultSet = $this->tableGateway->selectWith($select);
-
+ //print_r($select->getSqlString());exit;
         $row = $resultSet->current();
         if (!$row) {
             return false;

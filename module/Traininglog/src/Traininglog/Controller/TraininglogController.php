@@ -21,6 +21,7 @@ use Traininglog\Model\Traininglogtype;
 use Traininglog\Model\Traininglog;
 use Zend\Session\Container;
 use Zend\View\Model\JsonModel;
+use Traininglog\Form\EmployeemasterlistForm;
 
 class TraininglogController extends AbstractActionController
 {
@@ -109,6 +110,15 @@ class TraininglogController extends AbstractActionController
         return $this->companyRolesTable;
     }
 
+    public function getEmployeemasterlistTable()
+    {
+        if (!isset($this->employeemasterlistTable)) {
+            $sm = $this->getServiceLocator();
+            $this->employeemasterlistTable = $sm->get('Traininglog\Model\EmployeemasterlistTable');
+        }
+        return $this->employeemasterlistTable;
+    }
+
     public function hasIdentity()
     {
         $authService = new \Zend\Authentication\AuthenticationService();
@@ -173,7 +183,6 @@ class TraininglogController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
 
-        $form     = new TraininglogForm($this->getServiceLocator());
         $formNote = new NoteForm($this->getServiceLocator());
 
         $notes = null;
@@ -188,6 +197,8 @@ class TraininglogController extends AbstractActionController
             $comments          = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_TLC);
         }
         
+        $form = new TraininglogForm($this->getServiceLocator(), $tlObj);
+
         $request = $this->getRequest();
         if ($request->isPost()) {
             $tl = new Traininglog();
@@ -199,15 +210,15 @@ class TraininglogController extends AbstractActionController
 
             $ymds['tl_conducted_date'] = \DateTime::createFromFormat('m/d/Y', $post['tl_conducted_date']);
             $ymds['tl_hire_date']      = \DateTime::createFromFormat('m/d/Y', $post['tl_hire_date']);
-            
             foreach($ymds as $ymdKey => $ymd) {
                 if (is_object($ymd)) {
                     $post[$ymdKey] = $ymd->format('Y-m-d');
                 } else {
-                    $post[$ymdKey] = '';
+                    $post[$ymdKey] = '0000-00-00';
                 }
             }
-            
+            $tl->tl_company_id           = (isset($post['tl_company_id']))           ? $post['tl_company_id']           : null;
+            $form = new TraininglogForm($this->getServiceLocator(), $tl);
             $form->setInputFilter($tl->getInputFilter($this->getServiceLocator(), $id));
             $form->setData($post);
 
@@ -222,6 +233,10 @@ class TraininglogController extends AbstractActionController
                         }
                         fclose($handle);
                     }
+                }
+
+                if ($tl->_tl_cur_regulations) {
+                    $tl->_tl_cur_regulations = explode(',', $tl->_tl_cur_regulations);
                 }
 
                 $tlId = $this->getTraininglogTable()->saveTraininglog($tl);
@@ -336,6 +351,53 @@ class TraininglogController extends AbstractActionController
 
         return $this->redirect()->toRoute('traininglog', array('controller' => 'traininglog', 'action' => 'list'));
 
+    }
+
+    public function gettrainersAction()
+    {
+        $cId = $this->params('id');
+
+        $trainers = $this->getTraininglogTable()->getTrainers($cId);
+
+        $list = $this->getEmployeemasterlistTable()->getEmployeemasterlist($cId);
+
+        /*if($list) {
+            $list = array('-1' => 'Please select') + $list;
+        }*/
+
+        return new JsonModel(array('trainers' => $trainers, 'list' => $list));
+    }
+
+    public function employeemasterlistAction()
+    {
+        $identity = $this->getIdentity();
+        if (!in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_CLIENT,
+            \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_CONSULTANT))) {
+            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+        }
+
+        if ($identity['u_role_id'] == \Admin\Model\User::ROLE_CLIENT) {
+            $clientObj = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getClientCompany($identity['u_company_id']);
+            if($this->getServiceLocator()->get('Client\Model\CompanyTrainingManagersTable')->getTrainingManagerCompaniesIds($identity['u_id'])) {
+            } else {
+                return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+            }            
+        }
+
+        $request = $this->getRequest(); 
+        if ($request->isPost()) {
+            $this->getEmployeemasterlistTable()->saveEmployeemasterlists($request->getPost());
+            return $this->redirect()->toRoute('traininglog', array('controller' => 'traininglog', 'action' => 'employeemasterlist'));
+        
+        } else {
+            $form = new EmployeemasterlistForm($this->getServiceLocator());
+            $lists = $this->getEmployeemasterlistTable()->getEmployeemasterlists();
+        }
+
+        return array(
+            'lists' => $lists,
+            'form' => $form,
+        );
     }
 
 }

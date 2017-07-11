@@ -188,111 +188,157 @@ class AuthController extends AbstractActionController
 
         $showCaptcha = $captchaContainer->offsetExists('show');
 
-        $form = new AuthForm($this->getRequest()->getBaseUrl() . '/data/captcha/');
-
         $request = $this->getRequest();
+
+        $form = new AuthForm($this->getRequest()->getBaseUrl() . '/data/captcha/');        
 
         $flashMessagesErrors = array();
 
+        $showCompany = 0;
         if ($request->isPost()) {
-
+            
             $user = new \Admin\Model\User();
             $form->setInputFilter($user->getLoginInputFilter($this->getServiceLocator()));
             $form->setData($request->getPost());
 
             if ($form->isValid()) {
-                $usersDb = $this->getServiceLocator()->get('Admin\Model\UserTable');
-                $user    = $usersDb->getUserByEmail($request->getPost('u_email'));
-
-                if($user) {
-                    if(!$user->u_active || $user->u_locked || !$user->u_confirmed) {
-                        $this->getSessionStorage()->forgetMe();
-                        $this->getAuthService()->clearIdentity();
-
-                        if($user->u_locked) {
-                            $this->flashMessenger()->addErrorMessage('You are locked. Please contact admin.');
-                            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_AUTH_LOCKED, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $user->u_id);
-                        } else {
-                            $this->flashMessenger()->addErrorMessage('Wrong email or password. Please try again.');
+                $follow = true;
+                $company_id = $request->getPost('u_company_id');
+                if (!$company_id) {
+                    $users    = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getCompaniesByUserEmail($request->getPost('u_email'));
+                
+                    if ($users->count() > 1) {
+                        
+                        $companies = array();
+                        foreach ($users as $user) {
+                            if ($user->c_id) {
+                                $companies[$user->c_id] = $user->c_name;
+                            }
                         }
-
-                        $captchaContainer->offsetSet('show', 1);
-
-                        return $this->redirect()->toRoute('auth', array('controller' => 'auth', 'action' => 'authenticate'));
-                    }
-
-                    $config = $this->getServiceLocator()->get('config');
-
-                    if(file_exists($config['application_vars']['secure_db_key_file']) && file_exists($config['application_vars']['secure_file_key_file'])) {
-                        $config['application_vars']['secure_db_key']   = file_get_contents($config['application_vars']['secure_db_key_file']);
-                        $config['application_vars']['secure_file_key'] = file_get_contents($config['application_vars']['secure_file_key_file']);
-                    } else {
-                        $this->getSessionStorage()->forgetMe();
-                        $this->getAuthService()->clearIdentity();
-
-                        return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
-                    }
-
-                    $container = new Container('application_vars');
-                    $container->storage = $config['application_vars'];
-                }
-
-                $this->getAuthService()->getAdapter()
-                                       ->setIdentity($request->getPost('u_email'))
-                                       ->setCredential($request->getPost('u_password'));
-
-                $result = $this->getAuthService()->authenticate();
-
-                if ($result->isValid()) {
-                    //check if it has rememberMe :
-                    if ($request->getPost('u_remember_me') == 1) {
-                        $this->getSessionStorage()->setRememberMe(1);
-                        //set storage again
-                        $this->getAuthService()->setStorage($this->getSessionStorage());
-                    }
-
-                    $this->getAuthService()->setStorage($this->getSessionStorage());
-
-                    $dataStorage['u_email']                  = $request->getPost('u_email');
-                    $dataStorage['u_firstname']              = $user->u_firstname;
-                    $dataStorage['u_title']                  = $user->u_title;
-                    $dataStorage['u_lastname']               = $user->u_lastname;
-                    $dataStorage['u_role_id']                = $user->u_role_id;
-                    $dataStorage['u_id']                     = $user->u_id;
-                    $dataStorage['u_senior_consultant_u_id'] = $user->u_senior_consultant_u_id;
-                    $dataStorage['u_company_id']             = $user->u_company_id;
-                    $dataStorage['u_office_phone']           = $user->u_office_phone;
-                    $dataStorage['u_register']               = $user->u_register;
-                    $dataStorage['u_first_login']            = $user->u_first_login;
-                    $dataStorage['u_company_id_admin']       = $user->u_company_id_admin;
-                    $dataStorage['u_grant_to_disclosures']   = $user->u_grant_to_disclosures;
-                    $dataStorage['u_grant_to_breach']        = $user->u_grant_to_breach;
-                    $dataStorage['has_modules_access']       = $user->u_role_id == \Admin\Model\User::ROLE_ADMIN ? 1 : 0;
-
-                    $this->getAuthService()->getStorage()->write($dataStorage);
-
-                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Authenticate');
-
-                    $this->getServiceLocator()->get('Admin\Model\UserTable')->updateFailedLoginCount($user, true);
-                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_AUTH_SUCCESS, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $user->u_id);
-
-                    $this->flashmessenger()->addSuccessMessage('Log in');
-
-                    $captchaContainer->offsetUnset('show');
-
-                    return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
-                } else {
-                    if(isset($user->u_id)) {
-                        if ($this->getServiceLocator()->get('Admin\Model\UserTable')->updateFailedLoginCount($user)) {
-                            $flashMessagesErrors[] = 'You are locked. Please contact admin.';
-                            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_AUTH_LOCKED, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $user->u_id);
+                        $companies_count = count($companies);
+                        if ($companies_count > 1) {
+                            $follow = false;
+                            $form->add(array(
+                                'name' => 'u_company_id',
+                                'type' => 'Zend\Form\Element\Select',
+                                'options' => array(
+                                    'label' => 'Company',
+                                    'value_options' => $companies
+                                ),
+                            ));
+                            $flashMessagesErrors[] = 'Please select your company.';
+                            $showCompany = 1;
+                        } elseif ($companies_count == 1) {
+                            reset($companies);
+                            $company_id = key($companies);
                         } else {
-                            $flashMessagesErrors[] = 'Wrong email or password. Please try again.';
-                            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_AUTH_FAILED, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $user->u_id);
+                            $follow = false;
+                            $flashMessagesErrors[] = 'There are more than one user with this email.';
                         }
                         
                     }
-                    $captchaContainer->offsetSet('show', 1);                    
+                }
+                 
+                if ($follow) {
+
+                    $usersDb = $this->getServiceLocator()->get('Admin\Model\UserTable');
+                    $user    = $usersDb->getUserByEmail($request->getPost('u_email'), $company_id);
+
+                    if($user) {
+                        if(!$user->u_active || $user->u_locked || !$user->u_confirmed) {
+                            $this->getSessionStorage()->forgetMe();
+                            $this->getAuthService()->clearIdentity();
+
+                            if($user->u_locked) {
+                                $this->flashMessenger()->addErrorMessage('You are locked. Please contact admin.');
+                                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_AUTH_LOCKED, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $user->u_id);
+                            } else {
+                                $this->flashMessenger()->addErrorMessage('Wrong email or password. Please try again.');
+                            }
+
+                            $captchaContainer->offsetSet('show', 1);
+
+                            return $this->redirect()->toRoute('auth', array('controller' => 'auth', 'action' => 'authenticate'));
+                        }                    
+
+                        $config = $this->getServiceLocator()->get('config');
+
+                        if(file_exists($config['application_vars']['secure_db_key_file']) && file_exists($config['application_vars']['secure_file_key_file'])) {
+                            $config['application_vars']['secure_db_key']   = file_get_contents($config['application_vars']['secure_db_key_file']);
+                            $config['application_vars']['secure_file_key'] = file_get_contents($config['application_vars']['secure_file_key_file']);
+                        } else {
+                            $this->getSessionStorage()->forgetMe();
+                            $this->getAuthService()->clearIdentity();
+
+                            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+                        }
+
+                        $container = new Container('application_vars');
+                        $container->storage = $config['application_vars'];
+                    }
+
+                    $result = 0;
+
+                    if ($user) {
+                        $this->getAuthService()->getAdapter()
+                                           ->setIdentity($user->u_id)
+                                           ->setCredential($request->getPost('u_password'));
+
+                        $result = $this->getAuthService()->authenticate();
+                        $result = $result->isValid();
+                    }
+
+                    if ($result) {
+                        //check if it has rememberMe :
+                        if ($request->getPost('u_remember_me') == 1) {
+                            $this->getSessionStorage()->setRememberMe(1);
+                            //set storage again
+                            $this->getAuthService()->setStorage($this->getSessionStorage());
+                        }
+
+                        $this->getAuthService()->setStorage($this->getSessionStorage());
+
+                        $dataStorage['u_email']                  = $request->getPost('u_email');
+                        $dataStorage['u_firstname']              = $user->u_firstname;
+                        $dataStorage['u_title']                  = $user->u_title;
+                        $dataStorage['u_lastname']               = $user->u_lastname;
+                        $dataStorage['u_role_id']                = $user->u_role_id;
+                        $dataStorage['u_id']                     = $user->u_id;
+                        $dataStorage['u_senior_consultant_u_id'] = $user->u_senior_consultant_u_id;
+                        $dataStorage['u_company_id']             = $user->u_company_id;
+                        $dataStorage['u_office_phone']           = $user->u_office_phone;
+                        $dataStorage['u_register']               = $user->u_register;
+                        $dataStorage['u_first_login']            = $user->u_first_login;
+                        $dataStorage['u_company_id_admin']       = $user->u_company_id_admin;
+                        $dataStorage['u_grant_to_disclosures']   = $user->u_grant_to_disclosures;
+                        $dataStorage['u_grant_to_breach']        = $user->u_grant_to_breach;
+                        $dataStorage['has_modules_access']       = $user->u_role_id == \Admin\Model\User::ROLE_ADMIN ? 1 : 0;
+
+                        $this->getAuthService()->getStorage()->write($dataStorage);
+
+                        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Authenticate');
+
+                        $this->getServiceLocator()->get('Admin\Model\UserTable')->updateFailedLoginCount($user, true);
+                        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_AUTH_SUCCESS, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $user->u_id);
+
+                        $this->flashmessenger()->addSuccessMessage('Log in');
+
+                        $captchaContainer->offsetUnset('show');
+
+                        return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+                    } else {
+                        if(isset($user->u_id)) {
+                            if ($this->getServiceLocator()->get('Admin\Model\UserTable')->updateFailedLoginCount($user)) {
+                                $flashMessagesErrors[] = 'You are locked. Please contact admin.';
+                                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_AUTH_LOCKED, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $user->u_id);
+                            } else {
+                                $flashMessagesErrors[] = 'Wrong email or password. Please try again.';
+                                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_AUTH_FAILED, \Application\Model\LogsTable::ITEM_TYPE_CLIENT, $user->u_id);
+                            }
+                            
+                        }
+                        $captchaContainer->offsetSet('show', 1);                    
+                    }
                 }
             } else {
                 if(count($form->getMessages('captcha'))) {
@@ -316,6 +362,7 @@ class AuthController extends AbstractActionController
         $view->setVariables(array(
             'form' => $form,
             'showCaptcha' => $showCaptcha,
+            'showCompany' => $showCompany,
         ));
 
         $this->layout( 'layout/layout_login' );

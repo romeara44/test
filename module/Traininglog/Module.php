@@ -89,6 +89,17 @@ class Module
                         $resultSetPrototype = new ResultSet();
                         $resultSetPrototype->setArrayObjectPrototype(new \Traininglog\Model\Traininglog());
                         return new TableGateway('training_logs', $dbAdapter, null, $resultSetPrototype);
+                },
+                'Traininglog\Model\EmployeemasterlistTable' =>  function($sm) {
+                        $tableGateway = $sm->get('EmployeemasterlistTableGateway');
+                        $table = new \Traininglog\Model\EmployeemasterlistTable($tableGateway);
+                        return $table;
+                },
+                'EmployeemasterlistTableGateway' => function ($sm) {
+                        $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                        $resultSetPrototype = new ResultSet();
+                        $resultSetPrototype->setArrayObjectPrototype(new \Traininglog\Model\Employeemasterlist());
+                        return new TableGateway('employee_master_list', $dbAdapter, null, $resultSetPrototype);
                 }
             ),
         );

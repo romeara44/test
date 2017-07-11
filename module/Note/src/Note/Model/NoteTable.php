@@ -248,4 +248,97 @@ class NoteTable implements ServiceLocatorAwareInterface
 
         return true;
     }
+
+    public function copyNote(Note $note_source, Note $note_dest)
+    {
+        $data = array(
+            'note_text' => $note_dest->note_text ? $note_dest->note_text : $note_source->note_text,
+            'note_u_id' => $note_dest->note_u_id ? $note_dest->note_u_id : $note_source->note_u_id,
+            'note_item_type' => $note_dest->note_item_type ? $note_dest->note_item_type : $note_source->note_item_type,
+            'note_item_id' => $note_dest->note_item_id ? $note_dest->note_item_id : $note_source->note_item_id,
+            'note_encrypted' => $note_dest->note_encrypted ? $note_dest->note_encrypted : $note_source->note_encrypted,
+            'note_subitem_id' => $note_dest->note_subitem_id ? $note_dest->note_subitem_id : $note_source->note_subitem_id,
+            'note_create_date' => $note_dest->note_create_date ? $note_dest->note_create_date : $note_source->note_create_date,
+            'note_active' => $note_dest->note_active ? $note_dest->note_active : $note_source->note_active,
+        );
+
+        $id = (int) $note_dest->note_id;
+        
+        if ($id == 0) {
+            $this->tableGateway->insert($data);
+            $id = $this->tableGateway->lastInsertValue;
+            $note_dest->note_id = $id;
+        } else {
+            if ($this->getNote($id)) {
+                $this->tableGateway->update($data, array('note_id' => $id));
+            } else {
+                return false;
+            }
+        }
+
+        if (!$id) return false;
+
+        if($note_source->_files) {
+            return $this->_copyFiles($note_source, $note_dest);
+        }
+
+        return $id;
+    }
+
+    public function _copyFiles(Note $note_source, Note $note_dest)
+    {
+        $files = [];
+
+        $files = explode(',', $note_source->_files);
+
+        $notesFolder = 'public/data/notefiles';
+        if (!is_dir($notesFolder)) {
+            mkdir($notesFolder);
+        }
+
+        if (!is_dir($notesFolder . '/' . $note_dest->note_id)) {
+            mkdir($notesFolder . '/' . $note_dest->note_id);
+        }
+
+        $filesTable = $this->getServiceLocator()->get('Application\Model\FilesTable');
+        $notesFilesTable = $this->getServiceLocator()->get('Note\Model\NotesFilesTable');
+
+        foreach ($files as $file) {
+            $arr = explode('::', $file);
+            if (empty($arr[1])) return false;
+
+            $f_id_source = $arr[1];
+
+            $file_source = $filesTable->getFile($f_id_source);
+            if (!$file_source) return false;
+
+            $dataFile = array();
+
+            $dataFile['f_name']      = $file_source->f_name;
+            $dataFile['f_type']      = $file_source->f_type;
+            $dataFile['f_encrypted'] = $file_source->f_encrypted;
+            $dataFile['f_create_date'] = $file_source->f_create_date;
+
+            $f_id_dest = $filesTable->saveFile($dataFile);
+            if (!$f_id_dest) return false;
+
+            if (file_exists($notesFolder . '/' . $note_source->note_id . '/' . $f_id_source)) {
+                if (!copy($notesFolder . '/' . $note_source->note_id . '/' . $f_id_source, $notesFolder . '/' . $note_dest->note_id . '/' . $f_id_dest)) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+            
+
+            $notesDataFile = array();
+            $notesDataFile['nf_f_id'] = $f_id_dest;
+            $notesDataFile['nf_note_id'] = $note_dest->note_id;
+
+            $nf_id = $notesFilesTable->saveFile($notesDataFile);
+            if (!$nf_id) return false;            
+        }
+
+        return $note_dest->note_id;
+    }
 }

@@ -36,6 +36,10 @@ class BodyClass extends AbstractHelper
 
         if ($identity['u_role_id'] == 1) {
             return 'admin';
+        } elseif ($identity['u_role_id'] == 2) {
+            return 'consultant';
+        } elseif ($identity['u_role_id'] == 3) {
+            return 'consultant';
         } elseif ($identity['u_role_id'] == 4) {
             return 'sales-rep';
         } elseif ($identity['u_role_id'] == 5) {

@@ -1,0 +1,306 @@
+<?php
+
+// within a view script
+$form = $this->form;
+$form->prepare();
+
+// Assuming the "contact/process" route exists...
+$form->setAttribute('action', '/itAssetInventory/edit');
+
+// Set the method attribute for the form
+$form->setAttribute('method', 'post');
+
+// Render the opening tag
+?>
+
+<style>
+    .labelBold label {
+        font-weight: 700;
+    }
+    #step1 {
+        margin-top: 30px;
+    }
+</style>
+
+<div class="page-title">
+    <h1 class="fleft">
+        <?php if ($this->iaiId): ?>
+            IT Asset Inventory Log for <?php echo $this->iaiObj->_c_name; ?>
+        <?php else: ?>
+            New IT Asset Inventory Log
+        <?php endif; ?>
+    </h1>
+
+    <div class="cboth"></div>
+</div>
+
+
+<div class="it-asset-inventory-wrap">
+    <form action="/itassetinventory/edit/<?php echo $this->iaiId ? $this->iaiId : 0 ?>" method="post" enctype="multipart/form-data" name="itAssetInventory" id="itAssetInventory">
+        <div class="col-left">
+        <?php
+            $fn = $form->get('iai_id');
+            echo $this->formHidden($fn);
+        ?>
+
+        <h2 style="padding-top: 0">Select Client</h2>
+
+        <p class="labelBold">
+            <?php $fn = $form->get('iai_c_id');
+            echo $this->formLabel($fn);
+            echo $this->formSelect($fn->setAttributes(array('class'=>'form-control required', 'id' => 'iai_c_id')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+        <ul style="display: none" id="s1"><li>Value is required and can't be empty</li></ul>
+
+        <p class="labelBold">
+            <?php $fn = $form->get('iai_location_id');
+            echo $this->formLabel($fn);
+            echo $this->formSelect($fn->setAttributes(array('class'=>'form-control required', 'id' => 'iai_location_id')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+        <ul style="display: none" id="s1"><li>Value is required and can't be empty</li></ul>
+
+        <h2>Select Assessment Type</h2>
+
+        <p class="labelBold">
+            <?php $fn = $form->get('iai_type_id');
+            echo $this->formLabel($fn);
+            echo $this->formSelect($fn->setAttributes(array('class'=>'form-control required', 'id' => 'iai_type_id')));
+            echo $this->formElementErrors($fn);
+            ?>
+        </p>
+        <ul style="display: none" id="sa1"><li>Value is required and can't be empty</li></ul>
+
+
+        <div class="cboth"></div>
+
+        <p style="border: 0;">
+            <a id="browseFile_report" href="javascript:" class="button"><i class="fa fa-plus-circle"></i> Upload Report...</a>
+            <br /><br /><br />
+        </p>
+
+        <div class="cboth"></div>
+        <div id="filesToUploadBox_report">
+
+        </div>
+                <?php if ($this->iaiId && is_object($reports) && ($reports->count())): ?>
+            <?php foreach ($reports as $report): ?>
+                <div class="note">
+                    <strong><?php echo $report->_username ?></strong> <small> on <?php echo $report->_note_create_date_format ?></small><br />
+                    <p>
+                        <?php echo $report->note_text ?><br />
+                        <?php if ($report->_files != ''): ?>
+                            <?php
+                            $_files = explode(',', $report->_files);
+                            ?>
+                            <strong>Reports:</strong><br />
+                            <?php foreach ($_files as $_file): ?>
+                                <?php
+                                $_file = explode('::', $_file);
+                                $_fileName = $_file[0];
+                                $_fileId = $_file[1];
+                                ?>
+                                <span style="float: left; margin-right: 5px;" class="''?>"></span><a href="/files/get/note/<?php echo $report->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </p>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+        <div class="cboth"></div>
+
+        <p>
+            <strong style="line-height: 30px;">Notes</strong><br />
+            <?php
+            $fn = $formNote->get('note_text');
+            echo $this->formTextarea($fn->setAttributes(array('style' => 'width: 450px;')));
+            echo $this->formElementErrors($fn);
+            ?>
+
+        </p>
+        <p style="border: 0;">
+            <a id="browseFile_notes" href="javascript:" class="button"><i class="fa fa-plus-circle"></i> Browse Files...</a>
+            <br /><br /><br />
+        </p>
+
+        <div class="cboth"></div>
+        <div id="filesToUploadBox_notes">
+
+        </div>
+        
+        <div class="cboth"></div>
+        
+        <?php if ($this->iaiId && is_object($notes) && ($notes->count())): ?>
+            <?php foreach ($notes as $note): ?>
+                <div class="note">
+                    <strong><?php echo $note->_username ?></strong> <small> on <?php echo $note->_note_create_date_format ?></small><br />
+                    <p>
+                        <?php echo $note->note_text ?><br />
+                        <?php if ($note->_files != ''): ?>
+                            <?php
+                            $_files = explode(',', $note->_files);
+                            ?>
+                            <strong>Notes:</strong><br />
+                            <?php foreach ($_files as $_file): ?>
+                                <?php
+                                $_file = explode('::', $_file);
+                                $_fileName = $_file[0];
+                                $_fileId = $_file[1];
+                                ?>
+                                <span style="float: left; margin-right: 5px;" class="''?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </p>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+        
+        <div class="cboth"></div>
+    </div>
+
+    <div id="manualEntryFormWrap">
+        <?php foreach ($this->assetInvs as $iaiit): ?>
+            <?php if ($iaiit->iaiit_id < 3): ?>
+                <h5 style="padding-top: 14px;"><?php echo $iaiit->iaiit_name ?></h5>
+                <div class="cboth"></div>
+            <?php endif; ?>
+
+            <?php echo $this->partial('itassetinventory/itassetinventory/partials/_inventory_item' . $iaiit->iaiit_id . '.phtml', 
+                                      array('type_id' => $iaiit->iaiit_id,
+                                            'items' => isset($this->items[$iaiit->iaiit_id]) ? $this->items[$iaiit->iaiit_id] :[],
+                                            'files' => isset($this->reportsFiles[$iaiit->iaiit_id]) ? $this->reportsFiles[$iaiit->iaiit_id] : null
+                                            )
+                                      ); 
+            ?>
+
+            <h5 style="padding-top: 2px; padding-bottom: 15px;">Report files</h5>
+            <p>
+                <a href="javascript:" id="browseFile_items<?php echo $iaiit->iaiit_id ?>" class="button" href="javascript:"><i class="fa fa-plus-circle"></i> Upload report...</a>
+            </p>
+
+            <div class="cboth"></div>
+            <div id="filesToUploadBox_items<?php echo $iaiit->iaiit_id ?>">
+
+            </div>
+
+            <div class="cboth"></div>
+
+            <?php if ($this->iaiId && isset($this->itemReports[$iaiit->iaiit_id])): ?>
+                <div style="margin-bottom: 20px;">
+                    <?php foreach ($this->itemReports[$iaiit->iaiit_id] as $_file): ?>
+                        <?php
+                        $_fileName = $_file->_filename;
+                        $_fileId = $_file->iair_f_id;
+                        ?>
+                        <span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/it_asset/<?php echo $_file->iair_iai_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
+            <div class="cboth"></div>
+
+            <?php endforeach; ?>
+
+        </div>
+
+        <div class="cboth"></div>
+        <div class="form-buttons">
+            <button id="save" type="submit" class="form-button" />Save</div>
+            <a href="/itassetinventory/list" class="cancel">Cancel</a>
+        </div>
+
+    <?php echo $this->form()->closeTag() ?>
+</div>
+
+<div class="cboth"><br /></div>
+
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        $('#itAssetInventory').validate();
+        var manualTypeId = <?php echo $manualTypeId?>;
+        var browseFilesCounter = 0;
+
+        $(document).ready(function() {
+            $('a[id^=browseFile_]').click(function() {
+                var type  = $(this).attr('id').split('_');
+                var count = browseFilesCounter;
+                
+
+                if(count > 0) {
+                    var lastFile = $('.files_' + type[1]).last();
+                    if(lastFile.val() == '') {
+                        lastFile.click();
+                        return;
+                    }
+                }
+
+                $('#filesToUploadBox_' + type[1]).append('<input type="file" class="files_' + type[1] + '" name="' + type[1] + '[]" id="file_' + type[1] + '_' + count + '" />');
+
+                $('#file_' + type[1] + '_' + count).click();
+                 ++browseFilesCounter;
+            });
+        });
+
+        $("#iai_c_id").change(function(){
+            getCompanyLocations()
+        });
+
+        function getCompanyLocations()
+        {
+            var cId = $("#iai_c_id option:selected").val();
+            
+            if(cId != undefined && cId != '') {
+                $.ajax({
+                    type:"GET",
+                    url:"/itassetinventory/getcompanylocations/" + cId,
+                    dataType:"json",
+                    success: function(data){
+                        var html = '<option value="">Select Location</option>';
+                        $.each(data, function(index, value) {
+                            html += '<option value="' + index + '">' + value + '</option>';
+                        });
+                        $('#iai_location_id').html(html);
+                    }
+                });
+            }
+        }
+
+       $('#itAssetInventory').on('click', '.deleteIaiiTableRow', function() {
+            $(this).closest('tr').remove();
+       });
+
+       $('#iai_type_id').change(function() {
+            if($('#iai_type_id option:selected').val() == manualTypeId) {
+                $('#manualEntryFormWrap').show();
+           } else {
+                $('#manualEntryFormWrap').hide();
+           }
+       });
+
+       if($('#iai_type_id option:selected').val() == manualTypeId) {
+            $('#manualEntryFormWrap').show();
+       }
+    });
+
+    function AddIaiiTableRow(typeId)
+    {
+       var counter = parseInt($("#IaiiTableType" + typeId + " tr:last td:first").text());
+       if(isNaN(counter)) counter = 0;
+       $("#IaiiTableRowType" + typeId).clone().removeAttr("id").show().appendTo($("#IaiiTableRowType" + typeId).parent());
+       $("#IaiiTableType" + typeId + " tr:last td:first").text(++counter + '.');
+       $("#IaiiTableType" + typeId + " tr:last").find('input').each(function(indx, elem) {
+            $(elem).prop('disabled', false);
+            $(elem).prop('id', $(elem).prop('id') + counter);
+            if($(elem).hasClass('required')) {
+                $('#' + elem.prop('id')).rules( "add", {required: true});
+            }
+           
+       })
+   }
+</script>

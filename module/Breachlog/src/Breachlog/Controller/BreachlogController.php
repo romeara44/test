@@ -153,7 +153,7 @@ class BreachlogController extends AbstractActionController
         $mappingSortCol = array(
             'id' => 'bl_id',
             'name' => 'bl_name',
-            'cId' => 'bl_c_id',
+            'cName' => 'c_name',
             'date' => 'bl_date_of_occurrence',
             'reportable' => 'bl_reportable'
         );
@@ -266,6 +266,11 @@ class BreachlogController extends AbstractActionController
                 if(isset($post['questions'][11]) && $post['questions'][11] == 2) $post['bl_date_of_occurrence'] = '';
                 $bl->exchangeArray($post);
                 $this->getBreachlogTable()->setServiceLocator($this->getServiceLocator());
+
+                if ($bl->_bl_cur_regulations) {
+                    $bl->_bl_cur_regulations = explode(',', $bl->_bl_cur_regulations);
+                }
+
                 $blId = $this->getBreachlogTable()->saveBreachlog($bl);
 
                 // save answers

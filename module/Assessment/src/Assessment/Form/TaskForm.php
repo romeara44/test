@@ -71,6 +71,7 @@ class TaskForm extends Form
                 'value_options' => array(
                     0 => \Assessment\Model\Remediationplanaction::$statusesNames[\Assessment\Model\Remediationplanaction::STATUS_TODO],
                     10 => \Assessment\Model\Remediationplanaction::$statusesNames[\Assessment\Model\Remediationplanaction::STATUS_PENDING_APPROVAL],
+                    30 => \Assessment\Model\Remediationplanaction::$statusesNames[\Assessment\Model\Remediationplanaction::STATUS_PENDING_IMPLEMENTATION],
                     20 => \Assessment\Model\Remediationplanaction::$statusesNames[\Assessment\Model\Remediationplanaction::STATUS_COMPLETED],
                 ),
             )

@@ -16,6 +16,7 @@
             <a href="<?php echo $this->url('admin', array('action' => 'users', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 5)); ?>" class="label <?php echo $roleFilter == 5 ? ' selected ' : '' ?>">Clients</a>
             <a href="<?php echo $this->url('admin', array('action' => 'users', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 6)); ?>" class="label <?php echo $roleFilter == 6 ? ' selected ' : '' ?>">Business Associates</a>
             <a href="<?php echo $this->url('admin', array('action' => 'users', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 7)); ?>" class="label <?php echo $roleFilter == 7 ? ' selected ' : '' ?>">Partial</a>
+            <a href="<?php echo $this->url('admin', array('action' => 'users', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 8)); ?>" class="label <?php echo $roleFilter == 8 ? ' selected ' : '' ?>">Trail User</a>
         <?php else: ?>
             <a href="<?php echo $this->url('admin', array('action' => 'users', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 0)); ?>" class="label <?php echo $roleFilter == 0 ? ' selected ' : '' ?>">All</a>
             <a href="<?php echo $this->url('admin', array('action' => 'users', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 5)); ?>" class="label <?php echo $roleFilter == 5 ? ' selected ' : '' ?>">Clients</a>
@@ -50,9 +51,9 @@
                     Account Type <i class="fa <?php echo $classSort ?>"></i>
                 </th>
 
-                <?php $classSort = ($order_by == 'status') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+                <?php $classSort = ($order_by == 'active') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
                 <th>
-                    <a href="<?php echo $this->url('admin', array('action' => 'users', 'page' => $page, 'order_by' => 'status', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    <a href="<?php echo $this->url('admin', array('action' => 'users', 'page' => $page, 'order_by' => 'active', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
                     Status <i class="fa <?php echo $classSort ?>"></i>
                 <th>Phone</th>
                 <th>&nbsp;</th>

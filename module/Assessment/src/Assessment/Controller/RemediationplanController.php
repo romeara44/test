@@ -47,7 +47,7 @@ class RemediationplanController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
         $identity = $this->getIdentity();
-        if (!in_array($identity['u_role_id'], array(1, 2, 3, 5))) {
+        if (!in_array($identity['u_role_id'], array(1, 2, 3, 5,8))) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         } else if ($identity['u_first_login'] == 1) {
             return $this->redirect()->toRoute('user', array('controller' => 'user', 'action' => 'acceptprivacyterms'));
@@ -146,10 +146,10 @@ class RemediationplanController extends AbstractActionController
 
         $mappingSortCol = array(
             'id' => 'rp_id',
-            'status' => 'rp_status',
-            'type' => 'rp_type',
+            'status' => '_status',
+            'type' => '_type',
             'date' => 'rp_incident_date',
-            'cId' => 'rp_c_id',
+            'cName' => 'c_name',
         );
 
         $sortCol = isset($mappingSortCol[$orderBy]) ? $mappingSortCol[$orderBy] : 'rp_id';
@@ -158,13 +158,19 @@ class RemediationplanController extends AbstractActionController
         $paginator->setCurrentPageNumber($page);
         $paginator->setItemCountPerPage(10);
 
+        $res = [];
+        foreach ($paginator as $rp) {
+            $res[$rp->rp_a_id][] = $rp;
+        }
+
         $view = new ViewModel(array(
             'order_by' => $orderBy,
             'order' => $order,
             'page' => $page,
             'paginator' => $paginator,
             'hasIdentity' => $this->hasIdentity(),
-            'roleFilter' => $roleFilter
+            'roleFilter' => $roleFilter,
+            'res' => $res,
         ));
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open remediationplan list page');
@@ -304,13 +310,26 @@ class RemediationplanController extends AbstractActionController
                 }
             }
         }
-
+        $loc_rps = [];
         if ($rpObj->rp_a_id) {
             $complianceOfficersIds = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->getComplianceOfficers($rpObj->rp_a_id);
             $complianceOfficers = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUsersByIds($complianceOfficersIds);
             foreach ($complianceOfficers as $key => $r) {
                 $contacts[$key] = $r;
                 $contactsApr[$key] = $r;
+            }
+            $rps = $this->getRemediationplanTable()->getRpLocs($rpObj->rp_a_id);
+
+            foreach ($rps as $rp) {
+                $loc_actions = $this->getRemediationplanactionTable()->getRemediationplanactions($rp->rp_id);
+                foreach ($loc_actions as $rpa){
+                    if($rpa->rpa_adr_id === null){
+                        $loc_rps[$rp->rp_id] = 'Additional Tasks';
+                    } else {
+                        $loc_rps[$rp->rp_id] = $rpa->_location_name;
+                    }        
+                    break;
+                }
             }
         }
         $view = new ViewModel(array(
@@ -328,7 +347,8 @@ class RemediationplanController extends AbstractActionController
             'order_by' => $orderBy,
             'order' => $order,
             'urlOrder' => $order == 'ASC' ? 'DESC' : 'ASC',
-            'roleFilter' => $roleFilter
+            'roleFilter' => $roleFilter,            
+            'loc_rps' => $loc_rps,
         ));
 
         if ($type == 'pdf') {
@@ -460,7 +480,7 @@ class RemediationplanController extends AbstractActionController
 
             $rpa->rpa_threat = str_replace('Â', '', $rpa->rpa_threat);
             $rpa->rpa_threat = str_replace('§', utf8_decode('§'), $rpa->rpa_threat);
-
+            $rpa->rpa_threat = trim($rpa->rpa_threat, '- ');
             //echo $rpa->rpa_threat;
             //die;
             $csvList[] = array(
@@ -951,6 +971,10 @@ class RemediationplanController extends AbstractActionController
 
         $output = array();
         parse_str($values, $output);
+
+        if (!empty($output['rpa_target_date'])) {
+            $output['rpa_target_date'] = \DateTime::createFromFormat('m/d/Y', $output['rpa_target_date'])->format('Y-m-d');
+        }
 
         $rpa = new Remediationplanaction();
 

@@ -1,0 +1,1 @@
+ALTER TABLE `training_logs` ADD `tl_company_id` INT NOT NULL ;

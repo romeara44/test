@@ -47,7 +47,7 @@ class AssessmentQuestionCategoryTable implements ServiceLocatorAwareInterface
         $select->where('aq_type = ' . $type);
         $select->where('aq_active = 1');
 
-        if ($company) {
+        if ($company && $type == \Assessment\Model\Assessment::TYPE_SECURITY_RISK) {
             if ($company->c_rel_type == \Client\Model\Company::RELATION_TYPE_CHILD && $company->c_type == \Client\Model\Company::CHILD_TYPE_LOCATION_ONLY) {
                 $additional_location = 1;
             }

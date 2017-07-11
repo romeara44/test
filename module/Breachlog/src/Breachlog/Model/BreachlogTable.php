@@ -159,7 +159,14 @@ class BreachlogTable implements ServiceLocatorAwareInterface
     {
         $select = $this->tableGateway->getSql()->select();
 
-        $select->columns(array('_id' => 'bl_id', '_name' => DbCrypt::decryptField('bl_name'), '_type' => new \Zend\Db\Sql\Expression('CONCAT("breachlog")'), new \Zend\Db\Sql\Expression('NULL')));
+        $select->columns(array('_id' => 'bl_id',
+                               '_name' => DbCrypt::decryptField('bl_name'),
+                               '_item_type' => new \Zend\Db\Sql\Expression('NULL'),
+                               '_type' => new \Zend\Db\Sql\Expression('CONCAT("breachlog")'),
+                               new \Zend\Db\Sql\Expression('NULL'),
+                               new \Zend\Db\Sql\Expression('NULL')
+                               )
+                        );
 
         $select->join(array('c' => 'companies'), 'bl_c_id = c_id', array(), 'left');
 

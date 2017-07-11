@@ -252,7 +252,8 @@ body {
 	padding: 0;
 	display: block;
 }
-#nav ul li li a {
+#nav ul li li a,
+.consultant #nav ul li li a {
 	color: #fff;
 	height: auto;
 	padding: 10px 16px 10px 17px;
@@ -289,7 +290,7 @@ body {
 	border-color: transparent transparent transparent #ffffff;
 }
 
-.admin #nav ul li a, .sales-rep #nav ul li a, .client #nav ul li a { padding: 0 12px}
+.consultant #nav ul li a, .admin #nav ul li a, .sales-rep #nav ul li a, .client #nav ul li a { padding: 0 10px}
 .client #nav ul li li a, .sales-rep #nav ul li li a, .admin #nav ul li li a{
 	padding: 10px 16px 10px 17px;
 }
@@ -325,7 +326,7 @@ h6 { padding: 8px 0 12px 0; font-size: 12px; line-height: 16px; }
 	border-bottom: 4px solid #e1ebf0;
 }
 
-.page-title h1.fleft { width: auto; padding-right: 25px; }
+.page-title h1.fleft, .page-title h2.fleft { width: auto; padding-right: 25px; font-weight: 300;}
 
 .page-title .label { float: left; margin: 24px 5px 0 0; }
 
@@ -921,8 +922,9 @@ cite { font-weight: bold; }
 
 /* Modals */
 
-.fancybox-wrap {
+.fancybox-wrap, .fancybox-inner {
 	/*top: 180px !important;*/
+	width: 850px !important;
 }
 
 .fancybox-skin {
@@ -1121,6 +1123,46 @@ tr.login-unsuccess td {
 	overflow: hidden;
 	margin-bottom: 30px;
 }
+.it-asset-inventory-wrap input[type="file"]{
+	clear: both
+}
+.it-asset-inventory-list.page-title {
+    padding-bottom: 20px;
+}
+.it-asset-inventory-wrap .buttonAdd {
+	float: right;
+}
+.it-asset-inventory-wrap .it-inventory-items-table input{
+	margin: 0;
+}
+.it-asset-inventory-wrap label.error{
+	margin: 0;
+	line-height: 12px;
+}
+.it-asset-inventory-wrap .it-inventory-items-table input{
+	margin: 0;
+}
+#manualEntryFormWrap .it-inventory-items-table {
+	margin-bottom: 6px;
+}
+#manualEntryFormWrap .it-inventory-items-table td {
+	vertical-align: top;
+}
+#manualEntryFormWrap .it-inventory-items-table td.acenter {
+	vertical-align: middle;
+}
+#manualEntryFormWrap .it-inventory-items-table td input {
+	width: 95%;
+}
+#manualEntryFormWrap .it-inventory-items-table td label.error{
+	width: 240px;
+}
+#manualEntryFormWrap .buttonAdd  {
+	margin: 0;
+}
+#manualEntryFormWrap {
+	display: none;
+}
 /* Tables */
 
 table {
@@ -1155,6 +1197,7 @@ table thead tr th, table tr th {
 
 table.traininglogs thead tr th, table.traininglogs tr th {
 	font-size: 14px;
+	white-space: normal
 }
 
 table thead tr th .fa, table tr th .fa { margin-left: 6px; }
@@ -1484,3 +1527,65 @@ form.chart select {
 
 #footer strong { color: #8f97a1; font-weight: 600; }
 
+.tab_nav {
+    border-bottom: 3px solid #c7d8e2;
+    width: 100%;
+}
+.ul_tabs:after{
+	clear: both;
+	display: table;
+	content: '';
+}
+.ul_tabs{
+	padding: 0;
+	margin: 0 -2px;
+}
+.ul_tabs li a{
+	text-decoration: none;
+	padding: 10px 19px 10px;
+	display: inline-block;
+	line-height: 22px;
+}
+.ul_tabs li a:hover{
+	background: #0d3253;
+	color:#fff;
+}
+.ul_tabs li{
+	position: relative;
+    display: inline-block;
+    font-weight: 300;
+    background: #c7d8e2;
+    float: left;
+    margin: 0 2px;
+    color: #1c1b1d;
+    font-size: 14px;
+    line-height: 16px;
+    cursor: pointer;
+    padding:0;
+}
+.tab_nav ul li.active_tab {
+    color: #fff;
+    background: #0d3253;
+}
+.tab_nav ul li.active_tab a{
+	color:#fff;
+}
+.tab_nav ul li.active_tab a:hover{
+	cursor: default;
+}
+.tab-panels {
+    border: 1px solid #c7d8e2;
+    border-top: 1px #252959;
+    padding:30px 0;
+}
+
+#psc-items input {
+	width: 120px;
+}
+
+#psc-items thead tr th {
+	white-space: normal;
+	font-size: 14px;
+}
+
+.tr-selected { background: #f7f8fb; }

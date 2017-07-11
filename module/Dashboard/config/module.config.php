@@ -42,4 +42,10 @@ return array(
         ),
     ),
 
+    'view_helpers' => array(
+        'invokables' => array(
+            'getConsultant' => 'Application\View\Helper\GetConsultant',
+        )
+    )
+
 );

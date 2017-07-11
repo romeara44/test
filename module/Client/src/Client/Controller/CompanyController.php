@@ -38,7 +38,7 @@ class CompanyController extends AbstractActionController
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
         $identity = $this->getIdentity();
-        if (!in_array($identity['u_role_id'], array(1, 2, 3, 4, 5, 7))) {
+        if (!in_array($identity['u_role_id'], array(1, 2, 3, 4, 5, 7, 8))) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         } else if ($identity['u_first_login'] == 1) {
             return $this->redirect()->toRoute('user', array('controller' => 'user', 'action' => 'acceptprivacyterms'));
@@ -142,7 +142,7 @@ class CompanyController extends AbstractActionController
         $companyObj = null;
         $contacts = null;
         $primaryContactId = null;
-        $trainingManagerId = null;
+        $trainingManagerIds = null;
         $checkHasPartial = null;
         $existsCompanyRoles = array();
         $ownerContact = null;
@@ -158,7 +158,8 @@ class CompanyController extends AbstractActionController
             $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_COMPANY);
 
             $primaryContactId = $companyObj->c_primary_contact_u_id;
-            $trainingManagerId = $companyObj->c_training_manager_u_id;
+
+            $trainingManagerIds = $this->getServiceLocator()->get('Client\Model\CompanyTrainingManagersTable')->getTrainingManagersIdsForCompany($id);
 
             $checkHasPartial = $this->getUserTable()->checkHasPartial($id);
             $existsCompanyRoles = $this->getServiceLocator()->get('Client\Model\CompanyRolesTable')->getExistsCompanyRoles($id);
@@ -208,24 +209,24 @@ class CompanyController extends AbstractActionController
                 }
                 return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
             } else {
+                $post = $request->getPost();
+                $post['c_owner_u_id'] = $identity['u_id'];
+                $post['c_update_u_id'] = $identity['u_id'];
 
+                if (!$id) {
+                    $post['c_primary_contact_u_id'] = $identity['u_id'];
+                }
+                    
                 $company = new Company();
-                $company->exchangeArray($request->getPost());
-                $form->setData($request->getPost());
+                $company->exchangeArray($post);
+                $form->setData($post);
                 $form->setInputFilter($company->getInputFilter($this->getServiceLocator(), $id));                
 
-                if ($form->isValid()) {
-                    $post = $request->getPost();
-                    $post['c_owner_u_id'] = $identity['u_id'];
-                    $post['c_update_u_id'] = $identity['u_id'];
-
-                    if (!$id) {
-                        $post['c_primary_contact_u_id'] = $identity['u_id'];
-                    }
+                if ($form->isValid()) {                    
                     
                     $this->getCompanyTable()->setServiceLocator($this->getServiceLocator());
                     $companyId = $this->getCompanyTable()->saveCompany($company);
-                    $this->getCompanyTable()->saveAddresses($companyId, $request->getPost());
+                    $this->getCompanyTable()->saveAddresses($companyId, $post);
 
                     $this->flashMessenger()->addSuccessMessage('Company saved');
 
@@ -269,7 +270,7 @@ class CompanyController extends AbstractActionController
             'companyObj' => $companyObj,
             'assessmentsRoles' => $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles(),
             'primaryContactId'=> $primaryContactId,
-            'trainingManagerId'=> $trainingManagerId,
+            'trainingManagerIds'=> $trainingManagerIds,
             'roleId' => $identity['u_role_id'],
             'checkClientLimitCompany' => $checkClientLimitCompany,
             'checkHasPartial' => $checkHasPartial,
@@ -438,4 +439,36 @@ class CompanyController extends AbstractActionController
         return $view;
     }
 
+    public function getAddressesAction()
+    {
+        $id = (int) $this->params('id');
+
+        $addresses = $this->getAddressTable()->getAddresses($id, \Client\Model\AddressItem::COMPANY_TYPE);
+
+        $res = array();
+
+        foreach ($addresses as $address) {
+            $res[] = $address;
+        }
+
+        return $this->getResponse()->setContent(json_encode(array('addresses' => $res)));
+    }
+
+    public function importAction()
+    {
+        $companies = $this->getCompanyTable()->getCompanies();
+        foreach ($companies as $company) {
+            $addresses = $this->getAddressTable()->getAddresses($company->c_id, \Client\Model\AddressItem::COMPANY_TYPE);
+            foreach ($addresses as $key => $address) {
+                if ($address->adr_name) continue;
+                if ($key) {
+                    $address->adr_name = 'Location #' . ($key + 1);
+                } else {
+                    $address->adr_name = 'Primary Location';
+                }
+                $this->getAddressTable()->saveAddress($address);
+            }
+        }
+        die();
+    }
 }
