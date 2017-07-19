@@ -703,7 +703,7 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
         $select->columns(array(new \Zend\Db\Sql\Expression('DISTINCT(u1.u_id) as u_id')));
         $select->where('rp_id = ' . $id);
-        $select->join(array('arlc' => 'assessments_roles_locations_contacts'), 'arlc.arlc_a_id = rp_a_id', array(), 'inner');
+        $select->join(array('arlc' => 'assessments_roles_locations_contacts'), 'arlc.arlc_a_id = rp_a_id and arlc.arlc_adr_id = rp_adr_id', array(), 'inner');
         $select->join(array('ar' => 'assessments_roles'), 'arlc.arlc_ar_id = ar.ar_id', array('_ar_id' => 'ar_id'), 'inner');
         $select->join(array('u1' => 'users'), 'arlc.arlc_u_id = u1.u_id', array('_u_id' => 'u_id', '_u_name' => new \Zend\Db\Sql\Expression('CONCAT(u1.u_firstname, " ", u1.u_lastname)')), 'inner');
         $select->where('ar.ar_id IN(8,9,10)');

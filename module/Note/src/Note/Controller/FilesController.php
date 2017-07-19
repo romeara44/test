@@ -18,6 +18,7 @@ class FilesController extends AbstractActionController
 {
     protected $fileTable;
     protected $noteFilesTable;
+    protected $noteTable;
 
     public function onDispatch(\Zend\Mvc\MvcEvent $e)
     {
@@ -54,6 +55,14 @@ class FilesController extends AbstractActionController
         return $this->noteFilesTable;
     }
 
+    public function getNoteTable()
+    {
+        if (!isset($this->noteTable)) {
+            $sm = $this->getServiceLocator();
+            $this->noteTable = $sm->get('Note\Model\NoteTable');
+        }
+        return $this->noteTable;
+    }
 
     public function getIdentity()
     {
@@ -167,4 +176,38 @@ class FilesController extends AbstractActionController
         }
     }
 
+    public function deleteAction()
+    {
+        $noteId = (int) $this->params('note_id');
+        $fId = (int) $this->params('file_id');
+        if (!$this->hasIdentity()) {
+            exit;
+        }
+
+        $docRoot = $_SERVER['DOCUMENT_ROOT'];
+
+        $filepath = $docRoot . '/data/notefiles/' . $noteId . '/' . $fId;
+
+        if ($fId > 0 && (file_exists($filepath))) {            
+            $this->getNotefilesTable()->deleteFileByFId($fId);
+            $this->getFileTable()->deleteFileById($fId);
+            unlink($filepath);
+            $note = $this->getNoteTable()->getNote($noteId);
+            if ($note && $note->note_text == '') {
+                $files = $this->getNotefilesTable()->getFilesByNoteId($noteId);
+                if ($files->count()) {
+                    echo '1';
+                } else {
+                    $this->getNoteTable()->deleteNote($noteId);
+                    echo '0';
+                }
+            } else {
+                echo '1';
+            }            
+            exit;
+        } else {
+            echo "Sorry, such file doesn't exist";
+            die;
+        }
+    }
 }

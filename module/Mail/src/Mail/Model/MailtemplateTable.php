@@ -71,8 +71,10 @@ class MailtemplateTable
         //error_reporting(255);
         //ini_set('display_errors', 1);
         $mt = null;
+        $templateKey = '';
         if (isset($params['templateKey'])) {
-            $mt = $this->getMailtemplateByKey($params['templateKey']);
+            $templateKey = $params['templateKey'];
+            $mt = $this->getMailtemplateByKey($params['templateKey']);            
         }
 
         $user = null;
@@ -153,8 +155,7 @@ class MailtemplateTable
         $password = '';
         if (isset($params['post']['passwordToSent']) && $params['post']['passwordToSent'] && isset($params['post']['passwordUId']) && ($params['post']['passwordUId'])) {
             $user = $sl->get('Admin\Model\UserTable')->getUser($params['post']['passwordUId']);
-            $password = sha1($user->u_email . time());
-            $password = substr($password, 0, 6);
+            $password = $sl->get('Admin\Model\UserTable')->generatePassword();
             $sl->get('Admin\Model\UserTable')->setNewPassword($params['post']['passwordUId'], $password);
         }
 
@@ -172,12 +173,12 @@ class MailtemplateTable
             $mail->addReplyTo('hipaa@hipaa.carosh.com', 'HIPAA Suite');
         }
 
-        $htmlTemplateText = $this->_getHtmlTemplate($sl, $text);
+        $htmlTemplateText = $this->_getHtmlTemplate($sl, $text, $templateKey);
 
         $message = $htmlTemplateText;
 
         if ($password) {
-            $message = str_replace('********', $password, $message);
+            $message = str_replace('********', htmlspecialchars($password), $message);
         }
 
 
@@ -284,7 +285,7 @@ class MailtemplateTable
 
     }
 
-    public function _getHtmlTemplate($sl, $content)
+    public function _getHtmlTemplate($sl, $content, $templateKey = '')
     {
         $renderer = new PhpRenderer();
 
@@ -318,6 +319,7 @@ class MailtemplateTable
             'consultant_email' => $consultantEmail,
             'consultant_phone' => $consultantPhone,
             'consultant_role'  => $sl->get('Admin\Model\RoleTable')->getRoleName($identity['u_role_id']),
+            'templateKey' => $templateKey,
         ));
         $model->setTemplate('mail/mailtemplate');
 

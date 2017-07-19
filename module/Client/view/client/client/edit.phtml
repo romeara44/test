@@ -407,11 +407,9 @@ $form->setAttribute('method', 'post');
         });
     });
 
-    jQuery(document).ready(function() {
-
-        $('#companyAddress').click(function() {
-            var ca = $(this);
-            if ($(ca).is(':checked')) {
+    jQuery(document).ready(function() {        
+        $('#companyAddress').change(function() {
+            if ($(this).prop('checked') && $('#u_company_id').val()) {
                 $('#u_address1').val(primaryAddress1);
                 $('#u_address2').val(primaryAddress2);
                 $('#u_city').val(primaryCity);
@@ -419,7 +417,6 @@ $form->setAttribute('method', 'post');
                 $('#u_zip').val(primaryZip);
             }
         });
-
 
         $('#u_company_id').change(function() {
 
@@ -454,13 +451,13 @@ $form->setAttribute('method', 'post');
                             $('#companyIdAdminWrap').css('display', 'none');
                             $('#companyIdAdmin').attr('disabled', true);
                         }
-                        <?php if (!$this->uId): ?>
-                        $('#u_address1').val(primaryAddress1);
-                        $('#u_address2').val(primaryAddress2);
-                        $('#u_city').val(primaryCity);
-                        $('#u_state_id').val(primaryState);
-                        $('#u_zip').val(primaryZip);
-                        <?php endif; ?>
+                        if ($('#companyAddress').prop('checked')) {
+                            $('#u_address1').val(primaryAddress1);
+                            $('#u_address2').val(primaryAddress2);
+                            $('#u_city').val(primaryCity);
+                            $('#u_state_id').val(primaryState);
+                            $('#u_zip').val(primaryZip);
+                        }                        
                     }
                 }
             });
@@ -474,7 +471,8 @@ $form->setAttribute('method', 'post');
     var companyId = <?php echo (int) $this->cId ?>;
     jQuery(function() {
         if (companyId) {
-            $('#u_company_id option[value="' + companyId + '"]').attr('selected', 'selected');
+            $('#u_company_id').val(companyId);
+            //$('#u_company_id option[value="' + companyId + '"]').attr('selected', 'selected');
         }
         $('#user').validate();
         $("input[name=u_cell_phone], input[name=u_office_phone], input[name=u_direct_phone], input[name=u_other_phone], input[name=u_fax]").mask("(999) 999-9999");
@@ -508,6 +506,10 @@ $form->setAttribute('method', 'post');
 
         <?php if ($identity['u_role_id'] == \Admin\Model\User::ROLE_TRAIL) : ?>
             $('input[type=submit]').prop('disabled', true);
+        <?php endif; ?>
+
+        <?php if (!is_object($clientObj)): ?>
+            $('#companyAddress').click();
         <?php endif; ?>
     });
 </script>

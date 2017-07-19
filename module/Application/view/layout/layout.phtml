@@ -37,80 +37,83 @@
     </head>
 
     <body class="<?php echo ($this->bodyClass != '') ?  $this->bodyClass : $this->bodyClass() ?>">
+        <div class="wrapper_all">
 
-        <?php if (isset($flashMessagesSuccess) && count($flashMessagesSuccess)) : ?>
-            <div class="confirmation-box">
-                <?php foreach ($flashMessagesSuccess as $msg) : ?>
-                    <p><?php echo $msg; ?></p>
-                <?php endforeach; ?>
-            </div>
-            <script type="text/javascript">
-                jQuery('.confirmation-box').stop().show().animate({opacity: 1.0}, 3000).fadeOut(1000);
-            </script>
-        <?php endif; ?>
-        <?php if (isset($flashMessagesErrors) && count($flashMessagesErrors)) : ?>
-            <div class="confirmation-box-error">
-                <?php foreach ($flashMessagesErrors as $msg) : ?>
-                    <p><?php echo $msg; ?></p>
-                <?php endforeach; ?>
-            </div>
-            <script type="text/javascript">
-                jQuery('.confirmation-box-error').stop().show().animate({opacity: 1.0}, 3000).fadeOut(1000);
-            </script>
-        <?php endif; ?>
-
-        <?php
-            $authService = new \Zend\Authentication\AuthenticationService();
-            $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
-            $identity = $authService->getIdentity();
-            $uRoleId = $identity['u_role_id'];
-        ?>
-
-        <div id="header-wrap" <?php if ($uRoleId == 6): ?>style="height: 110px;"<?php endif ?>>
-            <div id="header" <?php if ($uRoleId == 6): ?>style="height: 110px;"<?php endif ?>>
-                <div id="logo"><img src="/images/logo-main.png" alt="HIPAA Suite" title="HIPAA Suite"/></a></div>
-            <?php if ($uRoleId): ?>
-                <div id="top-links">
-                    Welcome, <?php echo $this->userName(); ?><br />
-                    <?php if ($uRoleId == \Admin\Model\User::ROLE_ADMIN): ?>
-                        <a href="/sitesetting">Site Settings</a><br />
-                    <?php endif ?>
-                    <a href="/user/account">My Profile</a><br />
-                    <a href="/auth/logout">Logout</a>
+            <?php if (isset($flashMessagesSuccess) && count($flashMessagesSuccess)) : ?>
+                <div class="confirmation-box">
+                    <?php foreach ($flashMessagesSuccess as $msg) : ?>
+                        <p><?php echo $msg; ?></p>
+                    <?php endforeach; ?>
                 </div>
-                    <?php if (!in_array($uRoleId, array(5, 6, 7))): ?>
-                        <div id="top-search">
-                            <form id="formLogin" method="POST" action="/search/search">
-                                <input type="hidden" name="roleFilter" value="<?php echo empty($this->searchRoleFilter) ? '' : $this->searchRoleFilter; ?>">
-                                <a href="javascript:" onclick="$('#formLogin').submit()" id="search-button"></a>
-                                <input type="text" name="search" id="search" value="<?php echo (isset($this->query) && $this->query != '') ? $query : 'Search' ?>" onfocus="if (this.value=='Search') this.value='';" onblur="if (this.value=='') this.value='Search';" />
-                            </form>
-                        </div>
-                    <?php elseif($uRoleId != \Admin\Model\User::ROLE_PARTIAL): ?>
-                        <div id="top-contact">
-                            <?php $uConsultant = $this->getConsultant($sl); ?>
-                            <strong>Your Consultant</strong> &mdash; <?php echo is_object($uConsultant) ? $uConsultant->u_firstname : '' ?> <?php echo is_object($uConsultant) ? $uConsultant->u_lastname : ''?><br />
-                            <span><?php echo is_object($uConsultant) ? $uConsultant->u_office_phone : '' ?> &nbsp; | &nbsp; <a href="mailto:<?php echo is_object($uConsultant) ? $uConsultant->u_email : ''?>"><?php echo is_object($uConsultant) ? $uConsultant->u_email : '' ?></a></span>
-                        </div>
+                <script type="text/javascript">
+                    jQuery('.confirmation-box').stop().show().animate({opacity: 1.0}, 3000).fadeOut(1000);
+                </script>
+            <?php endif; ?>
+            <?php if (isset($flashMessagesErrors) && count($flashMessagesErrors)) : ?>
+                <div class="confirmation-box-error">
+                    <?php foreach ($flashMessagesErrors as $msg) : ?>
+                        <p><?php echo $msg; ?></p>
+                    <?php endforeach; ?>
+                </div>
+                <script type="text/javascript">
+                    jQuery('.confirmation-box-error').stop().show().animate({opacity: 1.0}, 3000).fadeOut(1000);
+                </script>
+            <?php endif; ?>
+
+            <?php
+                $authService = new \Zend\Authentication\AuthenticationService();
+                $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+                $identity = $authService->getIdentity();
+                $uRoleId = $identity['u_role_id'];
+            ?>
+
+            <div id="header-wrap" <?php if ($uRoleId == 6): ?>style="height: 110px;"<?php endif ?>>
+                <div id="header" <?php if ($uRoleId == 6): ?>style="height: 110px;"<?php endif ?>>
+                    <div id="logo"><img src="/images/logo-main.png" alt="HIPAA Suite" title="HIPAA Suite"/></a></div>
+                <?php if ($uRoleId): ?>
+                    <div id="top-links">
+                        Welcome, <?php echo $this->userName(); ?><br />
+                        <?php if ($uRoleId == \Admin\Model\User::ROLE_ADMIN): ?>
+                            <a href="/sitesetting">Site Settings</a><br />
+                        <?php endif ?>
+                        <a href="/user/account">My Profile</a><br />
+                        <a href="/auth/logout">Logout</a>
+                    </div>
+                        <?php if (!in_array($uRoleId, array(5, 6, 7))): ?>
+                            <div id="top-search">
+                                <form id="formLogin" method="POST" action="/search/search">
+                                    <input type="hidden" name="roleFilter" value="<?php echo empty($this->searchRoleFilter) ? '' : $this->searchRoleFilter; ?>">
+                                    <a href="javascript:" onclick="$('#formLogin').submit()" id="search-button"></a>
+                                    <input type="text" name="search" id="search" value="<?php echo (isset($this->query) && $this->query != '') ? $query : 'Search' ?>" onfocus="if (this.value=='Search') this.value='';" onblur="if (this.value=='') this.value='Search';" />
+                                </form>
+                            </div>
+                        <?php elseif($uRoleId != \Admin\Model\User::ROLE_PARTIAL): ?>
+                            <div id="top-contact">
+                                <?php $uConsultant = $this->getConsultant($sl); ?>
+                                <strong>Your Consultant</strong> &mdash; <?php echo is_object($uConsultant) ? $uConsultant->u_firstname : '' ?> <?php echo is_object($uConsultant) ? $uConsultant->u_lastname : ''?><br />
+                                <span><?php echo is_object($uConsultant) ? $uConsultant->u_office_phone : '' ?> &nbsp; | &nbsp; <a href="mailto:<?php echo is_object($uConsultant) ? $uConsultant->u_email : ''?>"><?php echo is_object($uConsultant) ? $uConsultant->u_email : '' ?></a></span>
+                            </div>
+                        <?php endif; ?>
+                        <?php if ($uRoleId != 6): ?>
+                            <div id="nav">
+                                <?php echo $this->menuTop($sl); ?>
+                            </div>
+                        <?php endif; ?>
                     <?php endif; ?>
-                    <?php if ($uRoleId != 6): ?>
-                        <div id="nav">
-                            <?php echo $this->menuTop($sl); ?>
-                        </div>
-                    <?php endif; ?>
-                <?php endif; ?>
-            </div>
-        </div>
-
-
-        <div id="wrap">
-            <div id="canvas">
-                <?php echo $this->content; ?>
-
+                </div>
             </div>
 
-            <div class="cboth"></div>
 
+            <div id="wrap">
+                <div id="canvas">
+                    <?php echo $this->content; ?>
+
+                </div>
+
+                <div class="cboth"></div>
+
+            </div>
+            <div class="clear"></div>
         </div>
 
 
@@ -240,6 +243,10 @@
         });
 
         var secLeftInterval  = null;
+
+        var funcOnLogout  = null;
+        var needLogout  = true;
+
         function setCheckActivity()
         {
             var check = setInterval(function() {
@@ -252,7 +259,13 @@
                         secLeftInterval = setInterval(function() {
                             $('#secLeft').html(--secLeft);
                             if (secLeft == 0) {
-                                document.location.href = '/auth/logout';
+                                console.log(typeof funcOnLogout)
+                                if (typeof funcOnLogout == 'function') {
+                                    funcOnLogout();
+                                }
+                                if (needLogout) {
+                                    document.location.href = '/auth/logout';
+                                }                                
                             }
                         }, 1000);
                     }

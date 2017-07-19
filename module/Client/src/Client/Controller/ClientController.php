@@ -174,6 +174,7 @@ class ClientController extends AbstractActionController
         $setTrainingManager = true;
         $setTrainingManagerMsg = '';
         $training_managers = array();
+        $cId = (int) $this->params('company');
 
         if ((int) $id) {
             $userObj = $this->getUserTable()->getUser($id);
@@ -184,6 +185,9 @@ class ClientController extends AbstractActionController
             $primaryAddressObj = $this->getAddressTable()->getAddress($clientObj->c_primary_adr_id);
             $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_CONTACT);
             $training_managers = $this->getServiceLocator()->get('Client\Model\CompanyTrainingManagersTable')->getTrainingManagersIdsForCompany($userObj->u_company_id);
+        } elseif ($cId) {
+            $compObj = $this->getCompanyTable()->getCompany($cId);
+            $primaryAddressObj = $this->getAddressTable()->getAddress($compObj->c_primary_adr_id);
         }
 
         $request = $this->getRequest();
@@ -255,11 +259,10 @@ class ClientController extends AbstractActionController
                         }
                         
                         if($request->getPost('save_send_email')) {
-                            $password = sha1($user->u_email . time());
-                            $password = substr($password, 0, 6);
+                            $password = $this->getServiceLocator()->get('Admin\Model\UserTable')->generatePassword();
                             $this->getServiceLocator()->get('Admin\Model\UserTable')->setNewPassword($uId, $password);
 
-                            $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'createuser', 'uId' => $uId, 'password' => $password));
+                            $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'createuser', 'uId' => $uId, 'password' => htmlspecialchars($password)));
                             $this->flashMessenger()->addSuccessMessage('Client saved and invitation has been sent');
                         } else {
                             $this->flashMessenger()->addSuccessMessage('Client saved');
@@ -312,7 +315,7 @@ class ClientController extends AbstractActionController
             'formNote' => $formNote,
             'notes' => $notes,
             'identity' => $identity,
-            'cId' => (int) $this->params('company'),
+            'cId' => $cId,
             'clientLimitMsg' => $clientLimitMsg,
             'setTrainingManagerMsg' => $setTrainingManagerMsg,
             'checkClientLimitCompany' => $this->getCompanyTable()->checkClientLimitCompany(),
@@ -326,11 +329,10 @@ class ClientController extends AbstractActionController
         $id = (int) $this->params('id');
 
         $user = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUser($id);
-        $password = sha1($user->u_email . time());
-        $password = substr($password, 0, 6);
+        $password = $this->getServiceLocator()->get('Admin\Model\UserTable')->generatePassword();
         $this->getServiceLocator()->get('Admin\Model\UserTable')->setNewPassword($id, $password);
 
-        $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'createuser', 'uId' => $id, 'password' => $password));
+        $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'createuser', 'uId' => $id, 'password' => htmlspecialchars($password)));
         $this->flashMessenger()->addSuccessMessage('Invitation has been sent');
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Send client invite "' . $id . '"');

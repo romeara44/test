@@ -81,18 +81,16 @@ $form->setAttribute('method', 'post');
                         <select name="arlc[<?php echo $this->location ?>][<?php echo $ar['ar_id'] ?>]" id="" class="contactSelect w225">
                             <option value="">Select Contact</option>
                             <option value="">---</option>
-
+                            <?php $selected = ''; ?>
+                            <?php if (isset($this->arlcContacts) && isset($this->arlcContacts[$ar['ar_id']])):
+                                $selected = $this->arlcContacts[$ar['ar_id']];
+                            elseif (isset($this->rolesAdr1[$ar['ar_id']])):
+                                 $selected = $this->rolesAdr1[$ar['ar_id']];
+                            elseif (isset($this->companyRoles) && isset($this->companyRoles[$ar['ar_id']])):
+                                $selected = $this->companyRoles[$ar['ar_id']];
+                            endif; ?>
                             <?php foreach ($this->contacts as $u): ?>
-                                <?php $selected = ''; ?>
-                                <?php if (isset($this->arlcContacts) && isset($this->arlcContacts[$ar['ar_id']]) && ($this->arlcContacts[$ar['ar_id']] == $u->u_id)):
-                                    $selected = ' SELECTED ';
-                                elseif (isset($this->rolesAdr1[$ar['ar_id']]) && ($this->rolesAdr1[$ar['ar_id']] == $u->u_id)):
-                                     $selected = ' SELECTED ';
-                                elseif (isset($this->companyRoles) && isset($this->companyRoles[$ar['ar_id']]) && ($this->companyRoles[$ar['ar_id']] == $u->u_id)):
-                                    $selected = ' SELECTED ';
-                                endif; ?>
-
-                                <option <?php echo $selected ?> value="<?php echo $u->u_id ?>"><?php echo $u->u_firstname . ' ' . $u->u_lastname ?></option>
+                                <option <?php echo $selected == $u->u_id ? 'SELECTED' : '' ?> value="<?php echo $u->u_id ?>"><?php echo $u->u_firstname . ' ' . $u->u_lastname ?></option>
                             <?php endforeach; ?>
 
                             <option value="addNewContactSelect">&rarr; Add New Contact</option>

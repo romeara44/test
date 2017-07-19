@@ -37,5 +37,8 @@ class FilesTable
         return $row;
     }
 
-
+    public function deleteFileById($id)
+    {
+        $this->tableGateway->delete('f_id = ' . $id);
+    }
 }

@@ -133,7 +133,7 @@ class NoteTable implements ServiceLocatorAwareInterface
                               )
                             );
 
-        $select->join(array('u' => 'users'), 'note_u_id = u_id', array('_username' => 'CONCAT(u_firstname, " ", u_lastname)'));
+        $select->join(array('u' => 'users'), 'note_u_id = u_id', array('_username' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)')));
 
         $select->where('note_id = ' . $id);
 
@@ -340,5 +340,14 @@ class NoteTable implements ServiceLocatorAwareInterface
         }
 
         return $note_dest->note_id;
+    }
+
+    public function deleteNote($id)
+    {
+        $data['note_id'] = $id;
+        $data['note_active'] = 0;
+        $this->tableGateway->delete(array('note_id' => $id));
+
+        return true;
     }
 }

@@ -65,6 +65,10 @@ $identity = $authService->getIdentity();
     </thead>
     <tbody>
         <?php foreach ($this->paginator as $tl): ?>
+            <?php
+            $trainingMaterials = $this->noteTable->getNotes($tl->tl_id, \Note\Model\Note::NOTE_TLT);
+            $comments          = $this->noteTable->getNotes($tl->tl_id, \Note\Model\Note::NOTE_TLC);
+            ?>
             <tr>
                 <td><?php echo $tl->tl_title ?></td>
                 <td><?php echo $tl->_tlt_name ?></td>
@@ -77,7 +81,7 @@ $identity = $authService->getIdentity();
                 <td><?php echo $this->textHelper($tl->_tl_comment, 20); ?></td>
                 <td style="white-space: nowrap;" class="aright">
                     <?php if ($tl->_tl_attachment): ?>
-                        <i class="fa fa-paperclip"></i> &nbsp;
+                        <a style="margin-left: 10px;" href="" class="attachments" rel="<?php echo $tl->tl_id ?>" title="View Attachments"><i class="fa fa-paperclip"></i></a> &nbsp;
                     <?php endif; ?>
                     <a href="/traininglog/edit/<?php echo $tl->tl_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
                     <?php if ($tl->tl_active): ?>
@@ -88,7 +92,35 @@ $identity = $authService->getIdentity();
                     <?php endif; ?>
                 </td>
             </tr>
-
+            <tr class="expandable" id="attachments<?php echo $tl->tl_id ?>">
+                <td>&nbsp;</td>
+                <?php $colspan = 2; ?>
+                <?php foreach (array('Training materials' => $trainingMaterials, 'Reports' => $comments) as $keyAtt => $notes): ?>
+                <td colspan="<?php echo $colspan ?>">
+                    <div>
+                        <div><strong><?php echo $keyAtt ?>:</strong></div>
+                        <div>
+                        <?php foreach ($notes as $note): ?>
+                            <?php if ($note->_files != ''): ?>
+                                <?php
+                                $_files = explode(',', $note->_files);
+                                ?>
+                                <?php foreach ($_files as $_file): ?>
+                                    <?php
+                                    $_file = explode('::', $_file);
+                                    $_fileName = $_file[0];
+                                    $_fileId = $_file[1];
+                                    ?>
+                                    <span style="float: left; margin-right: 5px;" class="i-file"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                        </div>
+                    </div>
+                </td>
+                <?php $colspan = 6; ?>
+                <?php endforeach; ?>
+            </tr>
         <?php endforeach; ?>
     </tbody>
 </table>
@@ -133,6 +165,18 @@ $identity = $authService->getIdentity();
                     window.location.href = $(this).attr('action');
                 } else if(search !== undefined) {
                     window.location.href = $(this).attr('action') + '/search/' + search;
+                }
+            });
+
+            jQuery('.expandable').hide();
+            jQuery('.attachments').click(function(e) {
+                e.preventDefault();
+                var $this = $(this);
+                var idA = $this.attr('rel');
+                if(jQuery('#attachments' + idA).is(':visible')) {
+                    jQuery('#attachments' + idA).slideUp();
+                } else {
+                    jQuery('#attachments' + idA).slideDown();
                 }
             });
         });
