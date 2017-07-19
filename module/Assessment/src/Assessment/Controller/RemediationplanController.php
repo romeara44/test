@@ -232,7 +232,7 @@ class RemediationplanController extends AbstractActionController
 
                 if ($post['save_and_copy_button']) {
                     $id = $this->getRemediationplanTable()->clonePlan($id, $post);
-                } else if($post['signedoff'] == 1){
+                } else if($post['signedoff_clone'] == 1){
                     $this->getRemediationplanTable()->clonePlan($id, $post, true);
                 }
                 

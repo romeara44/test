@@ -613,8 +613,6 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
     public function clonePlan($id, $post = false, $signedOffCopy = false)
     {
         $rp = $this->getRemediationplan($id);
-
-        $changed = false;
         
         if(!$signedOffCopy) {
             // writable to false

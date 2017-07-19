@@ -1347,7 +1347,8 @@ form ul li {
 
 /* Confirmation */
 
-#confirmation-box-modal {
+#confirmation-box-modal,
+#confirmation-sign-off-modal {
     display: none;
     z-index: 10000;
     width: 500px;
@@ -1355,7 +1356,8 @@ form ul li {
     text-align: center;
 }
 
-#confirmation-box-modal .form-buttons {
+#confirmation-box-modal .form-buttons,
+#confirmation-sign-off-modal .form-buttons {
     width: 140px;
     margin: 0 auto;
     border: 0;
