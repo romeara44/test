@@ -222,7 +222,7 @@ use Assessment\Model\Assessment;
                                 </div>
                             <?php endif; ?>
                         </td>
-                        <?php $colspan = 5; ?>
+                        <?php $colspan = 7; ?>
                     <?php endforeach; ?>
             </tr>
             
@@ -258,13 +258,14 @@ use Assessment\Model\Assessment;
                                 </div>
                             <?php endif; ?>
                         </td>
-                        <?php $colspan = 5; ?>
+                        <?php $colspan = 7; ?>
                     <?php endforeach; ?>
             </tr>
         <?php //endif; ?>
     <?php endforeach; ?>
     </tbody>
 </table>
+
 <?php if ($this->writable && !$this->isPdf): ?>
     <p><a href="/remediationplan/edittask/0/rpId/<?php echo $rpObj->rp_id ?>" class="fancybox button fright"><i class="fa fa-plus-circle"></i> Add</a></p>
 
