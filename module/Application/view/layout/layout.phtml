@@ -15,7 +15,7 @@
         <link rel="apple-touch-icon" sizes="57x57" href="/images/apple-touch-icon-iphone.png" />
         <!-- Le styles -->
         <?php echo $this->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon'))
-            ->prependStylesheet($this->basePath() . '/css/style.css')
+            ->prependStylesheet($this->basePath() . '/css/style.css?v=1')
             ->prependStylesheet($this->basePath() . '/css/font-awesome.css')
             ->prependStylesheet($this->basePath() . '/css/jquery.fancybox.css')
             ->prependStylesheet($this->basePath() . '/css/jquery-ui.min.css')
@@ -33,7 +33,7 @@
         <script type="text/javascript" src="/js/jquery.fancybox.pack.js"></script>
         <script type="text/javascript" src="/js/jquery.maskedinput.min.js"></script>
         <script type="text/javascript" src="/js/Chart.min.js"></script>
-
+        <script src='https://www.google.com/recaptcha/api.js'></script>
     </head>
 
     <body class="<?php echo ($this->bodyClass != '') ?  $this->bodyClass : $this->bodyClass() ?>">
