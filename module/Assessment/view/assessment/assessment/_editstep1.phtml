@@ -465,11 +465,11 @@ $form->setAttribute('method', 'post');
                 <?php $locationId = 'location' . $counterAdr;
             endif; ?>
 
-            $('#<?php echo $locationId ?> input[name="adr_address1[]"]').val('<?php echo $address->adr_address1 ?>');
-            $('#<?php echo $locationId ?> input[name="adr_address2[]"]').val('<?php echo $address->adr_address2 ?>');
-            $('#<?php echo $locationId ?> input[name="adr_city[]"]').val('<?php echo $address->adr_city ?>');
+            $('#<?php echo $locationId ?> input[name="adr_address1[]"]').val('<?php echo addslashes($address->adr_address1) ?>');
+            $('#<?php echo $locationId ?> input[name="adr_address2[]"]').val('<?php echo addslashes($address->adr_address2) ?>');
+            $('#<?php echo $locationId ?> input[name="adr_city[]"]').val('<?php echo addslashes($address->adr_city) ?>');
             $('#<?php echo $locationId ?> input[name="adr_zip[]"]').val('<?php echo $address->adr_zip ?>');
-            $('#<?php echo $locationId ?> select[name="adr_state_id[]"] option[value="<?php echo $address->adr_state_id ?>"]').attr('selected', 'selected');
+            $('#<?php echo $locationId ?> select[name="adr_state_id[]"] option[value="<?php echo addslashes($address->adr_state_id) ?>"]').attr('selected', 'selected');
             $('#<?php echo $locationId ?> input[name="adr_zip[]"]').val('<?php echo $address->adr_zip ?>');
 
 
