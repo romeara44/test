@@ -312,9 +312,9 @@ class AssessmentTable implements ServiceLocatorAwareInterface
             if (!(int) $a->a_version_index) {
                 $this->tableGateway->update(array('a_version_index' => $id), array('a_id' => $id));
             }
-            //if ($data['a_type'] == 2) { // if privacy
+            if (!$clone) {
                 $this->copyAdresses($id, $data['a_c_id'], $data['a_type']);
-            //}
+            }
         } else {
             if ($this->getAssessment($id)) {
                 $data['a_update_date'] = new \Zend\Db\Sql\Expression('NOW()');
