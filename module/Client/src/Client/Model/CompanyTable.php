@@ -180,7 +180,8 @@ class CompanyTable implements ServiceLocatorAwareInterface
                                '_item_type' => new \Zend\Db\Sql\Expression('NULL'),
                                '_type' => new \Zend\Db\Sql\Expression('CONCAT("company")'),
                                new \Zend\Db\Sql\Expression('NULL'),
-                               new \Zend\Db\Sql\Expression('NULL')
+                               new \Zend\Db\Sql\Expression('NULL'),
+                               '_active' => 'c_active',
                                )
                         );
         $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = c_id', array(), 'left');

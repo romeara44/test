@@ -108,7 +108,8 @@ class UserTable implements ServiceLocatorAwareInterface
                                '_item_type' => new \Zend\Db\Sql\Expression('NULL'),
                                '_type' => new \Zend\Db\Sql\Expression('CONCAT("user")'),
                                new \Zend\Db\Sql\Expression('NULL'),
-                               new \Zend\Db\Sql\Expression('NULL')
+                               new \Zend\Db\Sql\Expression('NULL'),
+                               '_active' => 'u_active',
                                )
                         );
 
@@ -148,7 +149,8 @@ class UserTable implements ServiceLocatorAwareInterface
                                '_item_type' => new \Zend\Db\Sql\Expression('NULL'),
                                '_type' => new \Zend\Db\Sql\Expression('CONCAT("contact")'), 
                                '_status' => new \Zend\Db\Sql\Expression('NULL'),
-                               '_date' => new \Zend\Db\Sql\Expression('NULL')
+                               '_date' => new \Zend\Db\Sql\Expression('NULL'),
+                               '_active' => 'u_active',
                                )
                         );
 

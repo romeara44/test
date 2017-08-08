@@ -117,7 +117,8 @@ class AssessmentTable implements ServiceLocatorAwareInterface
                                '_item_type' => new \Zend\Db\Sql\Expression('a_type'),
                                '_type' => new \Zend\Db\Sql\Expression('CONCAT("assessment")'),
                                '_status' => new \Zend\Db\Sql\Expression('a_status'),
-                               '_date' => new \Zend\Db\Sql\Expression('a_create_date')
+                               '_date' => new \Zend\Db\Sql\Expression('a_create_date'),
+                               '_active' => 'a_active',
                                )
                         );
         $select->join(array('c' => 'companies'), 'a_c_id = c_id', array(), 'left');

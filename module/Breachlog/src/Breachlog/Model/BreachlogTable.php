@@ -166,7 +166,8 @@ class BreachlogTable implements ServiceLocatorAwareInterface
                                '_item_type' => new \Zend\Db\Sql\Expression('NULL'),
                                '_type' => new \Zend\Db\Sql\Expression('CONCAT("breachlog")'),
                                new \Zend\Db\Sql\Expression('NULL'),
-                               new \Zend\Db\Sql\Expression('NULL')
+                               new \Zend\Db\Sql\Expression('NULL'),
+                               '_active' => 'bl_active',
                                )
                         );
 
