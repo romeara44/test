@@ -26,7 +26,7 @@ $form->setAttribute('method', 'post');
 
 </style>
 
-<div id="canvas">
+
     <div class="page-title">
         <h1 class="fleft"><?php if (!$this->baId): ?>Add New Business Associate<?php else: ?>Business Associate Details<?php endif; ?></h1>
         <?php if ($this->baId): ?>
@@ -478,7 +478,6 @@ $form->setAttribute('method', 'post');
 
                 <div class="cboth"></div>
                 <div id="filesReportsToUploadBox">
-
                 </div>
 
                 <?php
@@ -513,7 +512,6 @@ $form->setAttribute('method', 'post');
 
                 <div class="cboth"></div>
                 <div id="filesToUploadBox">
-
                 </div>
 
                 <div class="cboth"></div>
@@ -523,8 +521,7 @@ $form->setAttribute('method', 'post');
                     <div class="fleft">or</div>
                     <a href="/company/list" class="cancel">Cancel</a>
                 </div>
-                <div class="cboth"><br /></div>
-
+                <div class="cboth"></div>
             </form>
 
             <?php if ($this->baId && is_object($notes) && ($notes->count())): ?>
@@ -558,9 +555,7 @@ $form->setAttribute('method', 'post');
     <?php endif; ?>
 
     </div>
-    <div class="cboth"><br /></div>
-
-</div>
+    <div class="cboth"></div>
 
 <script type="text/javascript">
 

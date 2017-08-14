@@ -62,6 +62,12 @@ body {
 	background: #fff;
 }
 
+#canvas:after{
+	content:'';
+	clear: both;
+	display: table;
+}
+
 .col-left {
 	float: left;
 	width: 600px;
@@ -98,9 +104,10 @@ body {
 .ba #header-wrap { height: 110px; }
 
 #header {
-	width: 980px;
+	width: 1200px;
 	height: 157px;
 	margin: 0 auto;
+	padding: 0 40px;
 }
 .ba #header { height: 110px; }
 
@@ -1294,9 +1301,10 @@ table tfoot tr td {
 
 #footer {
 	clear: both;
-	width: 980px;
+	/*width: 980px;*/
+	width: 1200px;
 	margin: 0 auto;
-	padding: 0;
+	padding: 0 40px;
 	color: #8f97a1;
 	font-size: 13px;
 	line-height: 20px;
@@ -1518,9 +1526,9 @@ form.chart select {
 
 #footer {
     clear: both;
-    width: 980px;
+    width: 1200px;
     margin: 0 auto;
-    padding: 0;
+    padding: 0 40px;
     color: #8f97a1;
     font-size: 13px;
     line-height: 20px;
