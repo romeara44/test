@@ -172,10 +172,19 @@
                 <strong>Attachments:</strong><br />
                 <?php foreach ($notes as $note): ?>
                     <div class="note">
-                        <strong><?php echo $note->_username ?></strong> <small> on <?php echo $note->_note_create_date_format ?></small><br />
+                        <strong><?php echo $note->_username ?></strong> <small> on <?php echo $note->_note_create_date_format ?></small>
+                        <?php if ($note->note_text != ''): ?>
+                        <?php if ($note->note_active) : ?>
+                            <a title="Delete" href="/files/archive/note/<?php echo $note->note_id ?>" class="ajax-delete-link"><i class="fa fa-trash-o"></i></a>
+                        <?php elseif ($this->isAdmin) : ?>
+                            <a href="/files/unarchive/note/<?php echo $note->note_id ?>" class="ajax-activate-link">Activate</a>
+                        <?php endif; ?>
+                        <?php endif; ?>
+                        <br />
                         <p>
                             <?php if ($note->note_text != ''): ?>
-                                <?php echo $note->note_text ?><br />
+                                <?php echo $note->note_text ?>                                
+                                <br />
                             <?php endif; ?>
                             <?php if ($note->_files != ''): ?>
                                 <?php
@@ -186,9 +195,17 @@
                                     $_file = explode('::', $_file);
                                     $_fileName = $_file[0];
                                     $_fileId = $_file[1];
+                                    $_active = $_file[2];
                                     ?>
-                                    <input type="checkbox" class="attachment_checkbox" value="<?php echo $_fileId?>" checked="checked"><span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
-
+                                    <?php if ($_active || $this->isAdmin): ?>
+                                    <input type="checkbox" class="attachment_checkbox" value="<?php echo $_fileId?>" checked="checked"><span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a>
+                                    <?php if ($_active) : ?>
+                                        <span>&nbsp;</span><a title="Delete" href="/files/archive/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="ajax-delete-link"><i class="fa fa-trash-o"></i></a>
+                                    <?php elseif ($this->isAdmin) : ?>
+                                        <span>&nbsp;</span><a href="/files/unarchive/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="ajax-activate-link">Activate</a>
+                                    <?php endif; ?>
+                                    <br/>
+                                    <?php endif; ?>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </p>
@@ -265,6 +282,40 @@
             
             return attsIds.join(',');
         }
+
+        $('body').on('click', '.ajax-delete-link', function(e) {
+            e.preventDefault();
+            if (confirm('Are you sure you want to delete this attachment?')) {
+                $.ajax({
+                    type:"POST",
+                    url:$(this).prop('href'),
+                    success: function(data){
+                        if (data == '1') {
+                            window.parent.location.reload();
+                        } else {
+                            alert(data);
+                        }
+                    }
+                });
+            }
+            return false;
+        });
+
+        $('body').on('click', '.ajax-activate-link', function(e) {
+            e.preventDefault();
+            $.ajax({
+                type:"POST",
+                url:$(this).prop('href'),
+                success: function(data){
+                    if (data == '1') {
+                        window.parent.location.reload();
+                    } else {
+                        alert(data);
+                    }
+                }
+            });
+            return false;
+        });
     });
 
 </script>

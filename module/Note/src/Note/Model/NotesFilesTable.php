@@ -36,6 +36,7 @@ class NotesFilesTable
 
         $select = $this->tableGateway->getSql()->select();
         $select->where('nf_note_id = ' . $noteId);
+        $select->where('nf_active = 1');
 
         $resultSet = $this->tableGateway->selectWith($select);
 
@@ -60,5 +61,15 @@ class NotesFilesTable
         }
 
         return $row['nf_note_id'];
+    }
+
+    public function archiveFileByFId($id)
+    {
+        $this->tableGateway->update(array('nf_active' => 0), array('nf_f_id' => $id));
+    }
+
+    public function unarchiveFileByFId($id)
+    {
+        $this->tableGateway->update(array('nf_active' => 1), array('nf_f_id' => $id));
     }
 }

@@ -180,9 +180,6 @@ class FilesController extends AbstractActionController
     {
         $noteId = (int) $this->params('note_id');
         $fId = (int) $this->params('file_id');
-        if (!$this->hasIdentity()) {
-            exit;
-        }
 
         $docRoot = $_SERVER['DOCUMENT_ROOT'];
 
@@ -209,5 +206,39 @@ class FilesController extends AbstractActionController
             echo "Sorry, such file doesn't exist";
             die;
         }
+    }
+
+    public function archiveAction()
+    {
+        $noteId = (int) $this->params('note_id');
+        $fId = (int) $this->params('file_id');
+     
+        if ($fId) {
+            $this->getNotefilesTable()->archiveFileByFId($fId);
+            $note = $this->getNoteTable()->getNote($noteId);
+            if ($note && $note->note_text == '') {
+                $files = $this->getNotefilesTable()->getFilesByNoteId($noteId);
+                if (!$files->count()) {
+                    $this->getNoteTable()->archiveNote($noteId);
+                }
+            }
+        } else {
+            $this->getNoteTable()->archiveNote($noteId);
+        }       
+        echo '1';
+        exit;
+    }
+
+    public function unarchiveAction()
+    {
+        $noteId = (int) $this->params('note_id');
+        $fId = (int) $this->params('file_id');
+     
+        $this->getNoteTable()->unarchiveNote($noteId);
+        if ($fId) {
+            $this->getNotefilesTable()->unarchiveFileByFId($fId);
+        }   
+        echo '1';
+        exit;
     }
 }

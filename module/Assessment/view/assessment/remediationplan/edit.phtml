@@ -215,7 +215,14 @@ use Assessment\Model\Assessment;
                                         <?php $notesTask->buffer() ?>
                                         <?php foreach ($notesTask as $note): ?>
                                             <?php if ($note->note_text != ''): ?>
-                                                <div><?php echo $note->note_text ?></div>
+                                                <div>
+                                                    <?php if ($note->note_active) : ?>
+                                                        <a title="Delete" href="#del-att-box-modal" class="confirmation-modal i-delete" onclick="$('#delAttYes').attr('href', '/files/archive/note/<?php echo $note->note_id ?>');"><i class="fa fa-trash-o"></i></a><br />
+                                                    <?php elseif ($this->isAdmin) : ?>
+                                                        <a href="/files/unarchive/note/<?php echo $note->note_id ?>" class="ajax-link">Activate</a><br />
+                                                    <?php endif; ?>
+                                                    <?php echo $note->note_text ?>
+                                                </div>
                                             <?php endif; ?>
                                         <?php endforeach; ?>
                                     </div>
@@ -236,6 +243,7 @@ use Assessment\Model\Assessment;
                                     <div><strong><?php echo $keyAtt ?>:</strong></div>
                                     <div>
                                         <?php foreach ($notesTask as $note): ?>
+                                        <div class="note">
                                             <?php if ($note->_files != ''): ?>
                                                 <?php
                                                 $_files = explode(',', $note->_files);
@@ -245,14 +253,22 @@ use Assessment\Model\Assessment;
                                                     $_file = explode('::', $_file);
                                                     $_fileName = $_file[0];
                                                     $_fileId = $_file[1];
+                                                    $_active = $_file[2];
                                                     ?>
                                                     <?php if (!$this->isPdf): ?>
-                                                        <?php if ($note->_files != ''): ?>
-                                                            <span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+                                                        <?php if ($_active || $this->isAdmin): ?>
+                                                            <span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a>
+                                                            <?php if ($_active) : ?>
+                                                            <span>&nbsp;</span><a title="Delete" href="#del-att-box-modal" class="confirmation-modal i-delete" onclick="$('#delAttYes').attr('href', '/files/archive/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>');"><i class="fa fa-trash-o"></i></a>
+                                                            <?php elseif ($this->isAdmin) : ?>
+                                                            <span>&nbsp;</span><a href="/files/unarchive/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="ajax-link">Activate</a>
+                                                            <?php endif; ?>
+                                                            <br/>
                                                         <?php endif; ?>
                                                     <?php endif; ?>
                                                 <?php endforeach; ?>
                                             <?php endif; ?>
+                                        </div>
                                         <?php endforeach; ?>
                                     </div>
                                 </div>
@@ -329,22 +345,39 @@ use Assessment\Model\Assessment;
     <?php if ($this->id && is_object($notes) && ($notes->count())): ?>
         <?php foreach ($notes as $note): ?>
             <div class="note">
-                <strong><?php echo $note->_username ?></strong> <small> on <?php echo $note->_note_create_date_format ?></small><br />
+                <strong><?php echo $note->_username ?></strong> <small> on <?php echo $note->_note_create_date_format ?></small>
+                <?php if ($note->note_active) : ?>
+                    <a title="Delete" href="#del-att-box-modal" class="confirmation-modal i-delete" onclick="$('#delAttYes').attr('href', '/files/archive/note/<?php echo $note->note_id ?>');"><i class="fa fa-trash-o"></i></a>
+                <?php elseif ($this->isAdmin) : ?>
+                    <a href="/files/unarchive/note/<?php echo $note->note_id ?>" class="ajax-link">Activate</a>
+                <?php endif; ?>
+                <br />
                 <p>
                     <?php echo $note->note_text ?><br />
                     <?php if ($note->_files != ''): ?>
                         <?php
                         $_files = explode(',', $note->_files);
-                        ?>
-                        <strong>Attachments:</strong><br />
-                        <?php foreach ($_files as $_file): ?>
+                        $att_title = false;
+                        ?>                        
+                        <?php foreach ($_files as $i => $_file): ?>
                             <?php
                             $_file = explode('::', $_file);
                             $_fileName = $_file[0];
                             $_fileId = $_file[1];
+                            $_active = $_file[2];
                             ?>
-                            <span style="float: left; margin-right: 5px;" class="<?php echo !$this->isPdf ? $this->renderPictoIcon($_fileName) : ''; ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
-
+                            <?php if ($_active || $this->isAdmin) : ?>
+                                <?php if (!$att_title) : $att_title = true; ?>
+                                    <strong>Attachments:</strong><br />
+                                <?php endif; ?>
+                            <span style="float: left; margin-right: 5px;" class="<?php echo !$this->isPdf ? $this->renderPictoIcon($_fileName) : ''; ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a>
+                            <?php if ($_active) : ?>
+                            <span>&nbsp;</span><a title="Delete" href="#del-att-box-modal" class="confirmation-modal i-delete" onclick="$('#delAttYes').attr('href', '/files/archive/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>');"><i class="fa fa-trash-o"></i></a>
+                            <?php elseif ($this->isAdmin) : ?>
+                            <span>&nbsp;</span><a href="/files/unarchive/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="ajax-link">Activate</a>
+                            <?php endif; ?>   
+                            <br/>
+                            <?php endif; ?>                            
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </p>
@@ -599,6 +632,20 @@ use Assessment\Model\Assessment;
             }
         });
 
+        $('body').on('click', '.ajax-link', function(e) {
+            e.preventDefault();
+            $.ajax({
+                type:"POST",
+                url:$(this).prop('href'),
+                success: function(data){
+                    if (data == '1') {
+                        location.reload();
+                    } else {
+                        alert(data);
+                    }
+                }
+            });
+        });
     });
 
 </script>

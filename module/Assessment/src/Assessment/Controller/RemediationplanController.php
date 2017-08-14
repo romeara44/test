@@ -643,6 +643,8 @@ class RemediationplanController extends AbstractActionController
         $id = (int) $this->params('id');
         $rpId = $this->params('rpId');
 
+        $identity = $this->getIdentity();
+
         $rpObj = $this->getRemediationplanTable()->getRemediationplan($rpId);
         $notes = null;
         $rpaObj = false;
@@ -735,6 +737,7 @@ class RemediationplanController extends AbstractActionController
             'notes' => $notes,
             'writable' => is_object($rpObj) ? $rpObj->rp_writable : false,
             'rpaObj' => is_object($rpaObj) ? $rpaObj : false,
+            'isAdmin' => $identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN ? true : false,
         ));
 
         $viewModel->setTemplate('assessment/remediationplan/modaltemplate.phtml');

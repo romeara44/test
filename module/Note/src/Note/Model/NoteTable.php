@@ -52,7 +52,7 @@ class NoteTable implements ServiceLocatorAwareInterface
 
         $select->join(array('u' => 'users'), 'note_u_id = u_id', array('_username' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)'), '_note_create_date_format' => new \Zend\Db\Sql\Expression("DATE_FORMAT(note_create_date, '%b %D, %Y')")));
 
-        $select->join(array('nf' => 'notes_files'), 'note_id = nf_note_id', array('*', '_files' => new \Zend\Db\Sql\Expression('GROUP_CONCAT(CONCAT(f_name, "::", f_id))')), 'left');
+        $select->join(array('nf' => 'notes_files'), 'note_id = nf_note_id', array('*', '_files' => new \Zend\Db\Sql\Expression('GROUP_CONCAT(CONCAT(f_name, "::", f_id, "::", nf_active))')), 'left');
         $select->join(array('f' => 'files'), 'nf_f_id = f_id', array('*'), 'left');
 
         $select->where('note_item_type = ' . $itemType);
@@ -66,6 +66,14 @@ class NoteTable implements ServiceLocatorAwareInterface
         
         if ($subItemId) {
             $select->where('note_subitem_id = ' . $subItemId);
+        }
+
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
+        if ($identity && $identity['u_role_id'] != \Admin\Model\User::ROLE_ADMIN) {
+            $select->where("note_active = 1");
         }
 
         $select->group(array('note_id'));
@@ -349,5 +357,15 @@ class NoteTable implements ServiceLocatorAwareInterface
         $this->tableGateway->delete(array('note_id' => $id));
 
         return true;
+    }
+
+    public function archiveNote($id)
+    {
+        $this->tableGateway->update(array('note_active' => 0), array('note_id' => $id));
+    }
+
+    public function unarchiveNote($id)
+    {
+        $this->tableGateway->update(array('note_active' => 1), array('note_id' => $id));
     }
 }

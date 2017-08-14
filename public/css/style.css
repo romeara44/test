@@ -1349,7 +1349,8 @@ form ul li {
 
 #confirmation-box-modal,
 #confirmation-sign-off-modal,
-#deactivation-box-modal {
+#deactivation-box-modal,
+#del-att-box-modal {
     display: none;
     z-index: 10000;
     width: 500px;
@@ -1359,6 +1360,7 @@ form ul li {
 
 #confirmation-box-modal .form-buttons,
 #confirmation-sign-off-modal .form-buttons,
+#del-att-box-modal .form-buttons,
 #deactivation-box-modal .form-buttons {
     width: 145px;
     margin: 0 auto;
