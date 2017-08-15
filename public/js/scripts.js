@@ -1,6 +1,21 @@
+var heightWhiteBlock = function(){
+    if($('#canvas').length){
+        $('#canvas').css('min-height', window.innerHeight - $('#header-wrap').outerHeight() - $('#footer-wrap').outerHeight());
+
+
+        console.log(window.innerHeight);
+        console.log($('#header-wrap').outerHeight());
+        console.log($('#footer-wrap').outerHeight());
+    }
+};
+
+
 
 jQuery(document).ready(function() {
-
+    heightWhiteBlock();
+    $(window).resize(function(){
+        heightWhiteBlock();
+    });
 	jQuery('.fancybox').each(function() {
 	
 		var width = jQuery(this).attr("width");
