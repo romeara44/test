@@ -37,6 +37,13 @@ class RemediationplanactionTable implements ServiceLocatorAwareInterface
         $rpId  = (int) $rpId;
 
         $select = $this->tableGateway->getSql()->select();
+
+        $select->columns(
+            array('*',
+                '_rpa_latest_action_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(rpa_latest_action_date, "%m/%d/%Y")'),
+            )
+        );
+
         $select->where('rpa_rp_id = ' . $rpId);
         $select->where('rpa_active = 1');
 
@@ -44,7 +51,8 @@ class RemediationplanactionTable implements ServiceLocatorAwareInterface
         $select->join(array('u2' => 'users'), new \Zend\Db\Sql\Expression('rpa_approver_u_id = u2.u_id'), array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)')), 'left');
         $select->join(array('adr' => 'addresses'), new \Zend\Db\Sql\Expression('adr_id = rpa_adr_id'), array('_location_name' => new \Zend\Db\Sql\Expression('adr_name')), 'left');
 
-        $orderStr = '-rpa_adr_id DESC, _rpa_risk_level_sort DESC';
+        $orderStr = '';//'-rpa_adr_id DESC, _rpa_risk_level_sort DESC';
+        $orderStr = '-rpa_adr_id DESC';
         
         $order = $order ? $order : 'ASC';
         

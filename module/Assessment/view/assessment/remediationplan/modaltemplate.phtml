@@ -45,7 +45,7 @@
 
 <?php if ($added): ?>
     <script type="text/javascript">
-        window.parent.location.href = '/remediationplan/edit/<?php echo $this->rpId ?>';
+        window.parent.location.href = '/remediationplan/<?php echo $type ?>/<?php echo $this->rpId ?>';
         parent.jQuery.fancybox.close();
     </script>
 <?php endif; ?>
@@ -56,7 +56,7 @@
 
     <div id="wrap">
 
-        <form action="/remediationplan/edittask/<?php echo $this->id ?>/rpId/<?php echo $this->rpId ?>" name="" id="formTask" method="POST" enctype="multipart/form-data" class="col2" >
+        <form action="/remediationplan/edittask/<?php echo $this->id ?>/rpId/<?php echo $this->rpId ?>/type/<?php echo $type ?>" name="" id="formTask" method="POST" enctype="multipart/form-data" class="col2" >
             <?php
             $fn = $formTask->get('rpa_id');
             echo $this->formHidden($fn);

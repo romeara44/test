@@ -149,14 +149,14 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
             <tr <?php if ($multiple) : ?>class="assess-<?php echo $rp->rp_a_id ?>" <?php endif; ?> >
                 <td><?php echo $rowId ?><?php echo $postFix ?></td>
                 <?php if (!$isClientRole): ?>
-                    <td class="<?php echo $classBold ?>" style="padding-left: <?php echo $paddingVersion ?>px"><?php if ($isVersion): ?><i class="fa fa-code-fork"></i> &nbsp; <?php endif ?><a href="/remediationplan/edit/<?php echo $rp->rp_id ?>"><?php echo $client_name; ?><?php echo !$rp->rp_a_id ? ' <span class="remediationplan_imported_list">(imported)</span>' : ''?></a></td>
+                    <td class="<?php echo $classBold ?>" style="padding-left: <?php echo $paddingVersion ?>px"><?php if ($isVersion): ?><i class="fa fa-code-fork"></i> &nbsp; <?php endif ?><a href="/remediationplan/summary/<?php echo $rp->rp_id ?>"><?php echo $client_name; ?><?php echo !$rp->rp_a_id ? ' <span class="remediationplan_imported_list">(imported)</span>' : ''?></a></td>
                 <?php endif; ?>
                 <td class="<?php echo $classBold ?>"><?php echo \Assessment\Model\Remediationplan::$statusesNames[$rp->rp_status]  ?></td>
                 <td class="<?php echo $classBold ?>"><?php echo \Assessment\Model\Assessment::$typesNames[$rp->rp_type] ?></td>
                 <td class="<?php echo $classBold ?>"><?php echo $rp->rp_incident_date ? $this->formatDateA($rp->rp_incident_date) : '-'?></td>
                 <td style="white-space: nowrap;" class="aright <?php echo $classBold ?>">
                     <?php if ($rp->rp_status != \Assessment\Model\Remediationplan::STATUS_CLOSED) : ?>
-                    <a class="<?php echo $classBold ?>" href="/remediationplan/edit/<?php echo $rp->rp_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+                    <a class="<?php echo $classBold ?>" href="/remediationplan/summary/<?php echo $rp->rp_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
                     <?php endif; ?>
                     <?php if (!$isClientRole): ?>
                         <?php if ($rp->rp_active): ?>
