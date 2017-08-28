@@ -38,7 +38,7 @@ body {
 .wrapper_all{
 	min-height: 100%;
 	background: #fff;
-	min-width:1000px;
+	min-width:1200px;
 	margin:0 auto -156px;
 	background: #c7d8e2 url(../images/wrap-bg.png) center top repeat-y;
 }
@@ -55,11 +55,25 @@ body {
 }
 
 #canvas {
-	width: 1200px;
+	max-width: 1280px;
 	height: 100%;
 	margin: 0 auto;
 	padding: 25px 40px 50px;
 	background: #fff;
+	min-height: calc(100vh - 157px - 156px);
+	box-sizing: border-box;
+}
+
+#canvas:after{
+	content:'';
+	clear: both;
+	display: table;
+}
+
+#canvas:after{
+	content:'';
+	clear: both;
+	display: table;
 }
 
 .col-left {
@@ -98,9 +112,10 @@ body {
 .ba #header-wrap { height: 110px; }
 
 #header {
-	width: 980px;
+	max-width: 1200px;
 	height: 157px;
 	margin: 0 auto;
+	padding: 0 40px;
 }
 .ba #header { height: 110px; }
 
@@ -936,7 +951,7 @@ cite { font-weight: bold; }
 
 .fancybox-wrap, .fancybox-inner {
 	/*top: 180px !important;*/
-	width: 850px !important;
+	/*width: 850px !important;*/
 }
 
 .fancybox-skin {
@@ -1294,9 +1309,10 @@ table tfoot tr td {
 
 #footer {
 	clear: both;
-	width: 980px;
+	/*width: 980px;*/
+	max-width: 1200px;
 	margin: 0 auto;
-	padding: 0;
+	padding: 0 40px;
 	color: #8f97a1;
 	font-size: 13px;
 	line-height: 20px;
@@ -1514,13 +1530,13 @@ form.chart select {
     margin: 0;
     padding: 32px 0 42px 0;
     background: #0a2a47 url(../images/footer-bg.png) left top repeat-x;
+    min-width: 1200px;
 }
 
 #footer {
     clear: both;
-    width: 980px;
     margin: 0 auto;
-    padding: 0;
+    padding: 0 40px;
     color: #8f97a1;
     font-size: 13px;
     line-height: 20px;
