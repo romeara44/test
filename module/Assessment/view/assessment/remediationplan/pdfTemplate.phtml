@@ -45,6 +45,7 @@
             <th>Assignee</th>
             <th>Approver</th>
             <th>Target Date</th>
+            <th>Status change date</th>
         </tr>
     </thead>
     <tbody>
@@ -84,6 +85,7 @@
             <td><?php echo $rpa->_contact_name ?></td>
             <td><?php echo $rpa->_approver_name ?></td>
             <td><?php echo $rpa->_rpa_target_date_formatted ?></td>
+            <td><?php echo $rpa->rpa_latest_action_date ? $rpa->_rpa_latest_action_date_formatted : ''; ?></td>
         </tr>
     <?php endforeach; ?>
     </tbody>

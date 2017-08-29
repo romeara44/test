@@ -220,7 +220,7 @@ use Assessment\Model\Assessment;
                                                     <?php if ($note->note_active) : ?>
                                                         <a title="Delete" href="#del-att-box-modal" class="confirmation-modal i-delete" onclick="$('#delAttYes').attr('href', '/files/archive/note/<?php echo $note->note_id ?>');"><i class="fa fa-trash-o"></i></a><br />
                                                     <?php elseif ($this->isAdmin) : ?>
-                                                        <a href="/files/unarchive/note/<?php echo $note->note_id ?>" class="ajax-link">Activate</a><br />
+                                                        <a href="/files/unarchive/note/<?php echo $note->note_id ?>" class="ajax-link">Unarchive</a><br />
                                                     <?php endif; ?>
                                                     <?php echo $note->note_text ?>
                                                 </div>
@@ -262,7 +262,7 @@ use Assessment\Model\Assessment;
                                                             <?php if ($_active) : ?>
                                                             <span>&nbsp;</span><a title="Delete" href="#del-att-box-modal" class="confirmation-modal i-delete" onclick="$('#delAttYes').attr('href', '/files/archive/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>');"><i class="fa fa-trash-o"></i></a>
                                                             <?php elseif ($this->isAdmin) : ?>
-                                                            <span>&nbsp;</span><a href="/files/unarchive/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="ajax-link">Activate</a>
+                                                            <span>&nbsp;</span><a href="/files/unarchive/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="ajax-link">Unarchive</a>
                                                             <?php endif; ?>
                                                             <br/>
                                                         <?php endif; ?>
@@ -350,7 +350,7 @@ use Assessment\Model\Assessment;
                 <?php if ($note->note_active) : ?>
                     <a title="Delete" href="#del-att-box-modal" class="confirmation-modal i-delete" onclick="$('#delAttYes').attr('href', '/files/archive/note/<?php echo $note->note_id ?>');"><i class="fa fa-trash-o"></i></a>
                 <?php elseif ($this->isAdmin) : ?>
-                    <a href="/files/unarchive/note/<?php echo $note->note_id ?>" class="ajax-link">Activate</a>
+                    <a href="/files/unarchive/note/<?php echo $note->note_id ?>" class="ajax-link">Unarchive</a>
                 <?php endif; ?>
                 <br />
                 <p>
@@ -375,7 +375,7 @@ use Assessment\Model\Assessment;
                             <?php if ($_active) : ?>
                             <span>&nbsp;</span><a title="Delete" href="#del-att-box-modal" class="confirmation-modal i-delete" onclick="$('#delAttYes').attr('href', '/files/archive/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>');"><i class="fa fa-trash-o"></i></a>
                             <?php elseif ($this->isAdmin) : ?>
-                            <span>&nbsp;</span><a href="/files/unarchive/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="ajax-link">Activate</a>
+                            <span>&nbsp;</span><a href="/files/unarchive/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="ajax-link">Unarchive</a>
                             <?php endif; ?>   
                             <br/>
                             <?php endif; ?>                            

@@ -177,7 +177,7 @@
                         <?php if ($note->note_active) : ?>
                             <a title="Delete" href="/files/archive/note/<?php echo $note->note_id ?>" class="ajax-delete-link"><i class="fa fa-trash-o"></i></a>
                         <?php elseif ($this->isAdmin) : ?>
-                            <a href="/files/unarchive/note/<?php echo $note->note_id ?>" class="ajax-activate-link">Activate</a>
+                            <a href="/files/unarchive/note/<?php echo $note->note_id ?>" class="ajax-activate-link">Unarchive</a>
                         <?php endif; ?>
                         <?php endif; ?>
                         <br />
@@ -202,7 +202,7 @@
                                     <?php if ($_active) : ?>
                                         <span>&nbsp;</span><a title="Delete" href="/files/archive/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="ajax-delete-link"><i class="fa fa-trash-o"></i></a>
                                     <?php elseif ($this->isAdmin) : ?>
-                                        <span>&nbsp;</span><a href="/files/unarchive/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="ajax-activate-link">Activate</a>
+                                        <span>&nbsp;</span><a href="/files/unarchive/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="ajax-activate-link">Unarchive</a>
                                     <?php endif; ?>
                                     <br/>
                                     <?php endif; ?>

@@ -649,6 +649,7 @@ class RemediationplanController extends AbstractActionController
             'Assignee',
             'Approver',
             'Target Date',
+            'Status change date',
         );
         $csvList[] = '';
         
@@ -669,6 +670,7 @@ class RemediationplanController extends AbstractActionController
                 $rpa->_contact_name,
                 $rpa->_approver_name,
                 ($rpa->rpa_target_date != '0000-00-00') ? substr($rpa->rpa_target_date, 0, 10) : '',
+                ($rpa->rpa_latest_action_date != '0000-00-00') ? substr($rpa->rpa_latest_action_date, 0, 10) : '',
             );
 
             $notesTask = $this->noteTable->getNotes($rpa->rpa_id, \Note\Model\Note::NOTE_RPA);
