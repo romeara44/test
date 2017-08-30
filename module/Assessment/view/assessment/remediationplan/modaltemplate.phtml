@@ -291,7 +291,7 @@
                     url:$(this).prop('href'),
                     success: function(data){
                         if (data == '1') {
-                            window.parent.location.reload();
+                            window.location.reload();
                         } else {
                             alert(data);
                         }
@@ -308,7 +308,7 @@
                 url:$(this).prop('href'),
                 success: function(data){
                     if (data == '1') {
-                        window.parent.location.reload();
+                        window.location.reload();
                     } else {
                         alert(data);
                     }

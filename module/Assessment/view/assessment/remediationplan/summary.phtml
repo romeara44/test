@@ -656,10 +656,26 @@ use Assessment\Model\Assessment;
             });
         });
 
-        $('a.draggable').each(function( index, value ) {console.log(value, $(value).data('downloadurl'))
+        $('a.draggable').each(function( index, value ) {
           value.addEventListener('dragstart',function(evt){
             evt.dataTransfer.setData('DownloadURL',$(value).data('downloadurl'));
           },false);
+        });
+
+        jQuery('.fancybox').each(function() {
+    
+            var width = jQuery(this).attr("width");
+            if (!width) width = 700;
+        
+            jQuery(this).fancybox({
+                'width': width,
+                'autoDimensions': false,
+                'type': 'iframe',
+                afterClose:function(){
+                    window.location.reload();
+                }
+            });
+            
         });
     });
 

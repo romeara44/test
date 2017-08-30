@@ -647,6 +647,22 @@ use Assessment\Model\Assessment;
                 }
             });
         });
+
+        jQuery('.fancybox').each(function() {
+    
+            var width = jQuery(this).attr("width");
+            if (!width) width = 700;
+        
+            jQuery(this).fancybox({
+                'width': width,
+                'autoDimensions': false,
+                'type': 'iframe',
+                afterClose:function(){
+                    window.location.reload();
+                }
+            });
+            
+        });
     });
 
 </script>
