@@ -247,6 +247,11 @@ class RemediationplanactionTable implements ServiceLocatorAwareInterface
         return $id;
     }
 
+    public function saveRemediationplanactionfield($data, $rpa_id)
+    {
+        return $this->tableGateway->update($data, array('rpa_id' => $rpa_id));
+    }
+
     public function deleteRemediationplanaction($id)
     {
         $data['rpa_id'] = $id;

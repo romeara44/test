@@ -1,0 +1,1 @@
+ALTER TABLE `notes_files` ADD `nf_active` TINYINT NULL DEFAULT '1' AFTER `nf_note_id`;

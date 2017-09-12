@@ -160,6 +160,49 @@ use Assessment\Model\Assessment;
         </tr>
     </thead>
     <tbody>
+    <tr id="edit-row" style="display:none;">
+    <td>
+    <?php
+    $fn = $formTask->get('rpa_target_date');
+    echo $this->formText($fn->setAttributes(array('readonly' => 'readonly', 'class' => 'datepicker')));
+    ?>
+    </td>
+    <td>
+    <?php
+    $fn = $formTask->get('rpa_risk_level');
+    echo $this->formSelect($fn);
+    ?>
+    </td>
+    <td>
+    <?php
+    $fn = $formTask->get('rpa_policy');
+    echo $this->formInput($fn);
+    ?>
+    </td>
+    <td>
+    <select name="rpa_status">
+    <option value="0"><?= \Assessment\Model\Remediationplanaction::$statusesNames[\Assessment\Model\Remediationplanaction::STATUS_TODO] ?></option>
+    <option value="10"><?= \Assessment\Model\Remediationplanaction::$statusesNames[\Assessment\Model\Remediationplanaction::STATUS_PENDING_APPROVAL] ?></option>
+    <option value="30"><?= \Assessment\Model\Remediationplanaction::$statusesNames[\Assessment\Model\Remediationplanaction::STATUS_PENDING_IMPLEMENTATION] ?></option>
+    <option value="20"><?= \Assessment\Model\Remediationplanaction::$statusesNames[\Assessment\Model\Remediationplanaction::STATUS_COMPLETED] ?></option>
+    </select>
+    </td>
+    <td>
+    <?php
+    $fn = $formTask->get('rpa_contact_u_id');
+    echo $this->formSelect($fn);
+    ?>
+    </td>
+    <td>
+    <?php
+    $fn = $formTask->get('rpa_approver_u_id');
+    echo $this->formSelect($fn);
+    ?>
+    </td>
+    <td>
+    <input name="rpa_latest_action_date" type="text" readonly="readonly" class="datepicker" value="">
+    </td>
+    </tr>
     <?php $adrId = 0; $adrChange = false; ?>
     <?php foreach ($this->actions as $rpa): ?>
         <?php if ($adrId != $rpa->rpa_adr_id):
@@ -186,7 +229,7 @@ use Assessment\Model\Assessment;
         <?php $notesTaskAttText = $this->noteTable->getNotes($rpa->rpa_id, \Note\Model\Note::NOTE_RPA, 0, 'text'); ?>
         <?php $notesTaskAssessmentsText = $this->noteTable->getNotesForRemedTask($rpa->rpa_id, $adrId, 'text'); ?>
 
-        <tr>
+        <tr<?php if ($this->writable): ?> class="editable" data-id="<?= $rpa->rpa_id ?>" <?php endif; ?>>
             <td><?php echo $rpa->_rpa_target_date_formatted ?></td>
             <td class="tdSmall"><?php echo \Assessment\Model\Remediationplanaction::$levelsNames[$rpa->rpa_risk_level] ?></td>
             <td class="tdSmall"><?php echo $rpa->rpa_policy ?></td>
@@ -194,29 +237,33 @@ use Assessment\Model\Assessment;
             <td><?php echo $rpa->_contact_name ?></td>
             <td><?php echo $rpa->_approver_name ?></td>
             <td><?php echo $rpa->rpa_latest_action_date ? $rpa->_rpa_latest_action_date_formatted : ''; ?></td>
-            <td class="aright nowrap">
-                <a href="/remediationplan/edittask/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>/type/summary" id="edittask<?php echo $rpa->rpa_id ?>" class="fancybox" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
-                <?php /* <a href="/remediationplan/planemail/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>" class="fancybox" title="Email Assignee"><i class="fa fa-envelope"></i></a> &nbsp; */ ?>
+            <td class="aright nowrap">                
                 <?php if ($this->writable): ?>
                     <?php $deleteUrl = '/remediationplan/deletetask/' . $rpa->rpa_id . '/rpId/' . $rpObj->rp_id . '/type/summary'; ?>
                     <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete" title="Delete"><i class="fa fa-trash-o"></i></a>
                 <?php endif; ?>
-                <?php if ($notesTaskAtt->count() || ($notesTaskAssessments && $notesTaskAssessments->count())): ?>
-                    <a style="margin-left: 10px;" href="" class="attachments" rel="<?php echo $rpa->rpa_id ?>" title="View Attachments"><i class="fa fa-paperclip"></i></a>
-                <?php endif; ?>
-                <?php if ($notesTaskAttText->count() || ($notesTaskAssessments && $notesTaskAssessmentsText->count())): ?>
-                    <a style="margin-left: 10px;" href="" class="notes" rel="<?php echo $rpa->rpa_id ?>" title="View Notes"><i class="fa fa-file-text-o fa-1"></i></a>
-                <?php endif; ?>
+                <a style="margin-left: 10px;" href="" class="attachments" rel="<?php echo $rpa->rpa_id ?>" title="View Attachments"><i class="fa fa-paperclip"></i></a>
+                <a style="margin-left: 10px;" href="" class="notes" rel="<?php echo $rpa->rpa_id ?>" title="View Notes"><i class="fa fa-file-text-o fa-1"></i></a>
             </td>
         </tr>
 
         <?php //if (!$this->writable): ?>
 
             <tr class="expandable" id="notes<?php echo $rpa->rpa_id ?>">
-                <td>&nbsp;</td>
+                <td colspan="4">
+                    <form action="/remediationplan/savetasknote/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>" method="POST">
+                    <p style="border: 0;">
+                        <strong style="line-height: 30px;">Approver Notes</strong><br>
+                        <textarea name="note_text" style="width: 570px;"></textarea>
+                    </p>
+                    <p>
+                        <input type="submit" value="Save" class="form-button" />
+                    </p>
+                    </form>
+                </td>
                     <?php $colspan = 2; ?>
                     <?php foreach (array('Task notes' => $notesTaskAttText, 'Questions notes' => $notesTaskAssessmentsText) as $keyAtt => $notesTask): ?>
-                        <td colspan="<?php echo $colspan ?>">
+                        <td colspan="<?php echo $colspan ?>">                            
                             <?php if (is_object($notesTask) && ($notesTask->count())): ?>
                                 <div>
                                     <div><strong><?php echo $keyAtt ?>:</strong></div>
@@ -238,12 +285,26 @@ use Assessment\Model\Assessment;
                                 </div>
                             <?php endif; ?>
                         </td>
-                        <?php $colspan = 7; ?>
+                        <?php $colspan = 2; ?>
                     <?php endforeach; ?>
             </tr>
             
             <tr class="expandable" id="attachments<?php echo $rpa->rpa_id ?>">
-                <td>&nbsp;</td>
+                <td colspan="4">
+                    <form action="/remediationplan/savefiles/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>" method="POST" enctype="multipart/form-data">
+                    <p>
+                        <label>Attachments</label>
+                        <a href="javascript:" class="button browseFileTask"><i class="fa fa-plus-circle"></i> Browse Files...</a>
+                    </p>
+
+                    <div class="cboth"></div>
+                    <div class="filesToUploadBoxTask">
+                    </div>
+                    <p>
+                        <input type="submit" value="Save" class="form-button" />
+                    </p>
+                    </form>
+                </td>
                     <?php $colspan = 2; ?>
                     <?php foreach (array('Task attachments' => $notesTaskAtt, 'Questions attachments' => $notesTaskAssessments) as $keyAtt => $notesTask): ?>
                         <td colspan="<?php echo $colspan ?>">
@@ -283,7 +344,7 @@ use Assessment\Model\Assessment;
                                 </div>
                             <?php endif; ?>
                         </td>
-                        <?php $colspan = 7; ?>
+                        <?php $colspan = 2; ?>
                     <?php endforeach; ?>
             </tr>
         <?php //endif; ?>
@@ -499,16 +560,15 @@ use Assessment\Model\Assessment;
             $('#file' + browseFilesCounter).click();
             browseFilesCounter++;
         });
-
-        $('.browseFileTask').click(function() {
-            var noteId = $(this).attr('rel');
-            $('#filesToUploadBox' + noteId).append('<input type="file" name="notesFiles[]" id="file' + noteId + browseFilesCounter + '" /><div class="cboth"></div>');
-
-            $('#file' + noteId + browseFilesCounter).click();
-            browseFilesCounter++;
-        });
         
         openEditTask();
+
+        $('.browseFileTask').click(function() {
+            $(this).closest('td').find('.filesToUploadBoxTask').append('<input type="file" name="notesFiles[]" id="file' + browseFilesCounter + '" />');
+
+            $('#file' + browseFilesCounter).click();
+            browseFilesCounter++;
+        });
     });
     
     function openEditTask()
@@ -677,6 +737,58 @@ use Assessment\Model\Assessment;
             });
             
         });
+
+        $('tr.editable td').click(function() {
+            var td = $(this), edit_row = $('#edit-row');
+            if (td.hasClass('edit-mode') || td.index() >= edit_row.children().length) {
+                return;
+            }
+            td.addClass('edit-mode');
+            var old_val = td.html();
+            td.html('<span class="old-val">' + old_val + '</span>' + edit_row.children().eq(td.index()).children().clone().wrap('<div></div>').wrap('<form></form>').parent().parent().html() + '<a href="#" class="edit-save">Save</a> <a href="#" class="edit-cancel">Cancel</a>');
+            var elem = td.find('form').children();
+            if (elem.is('input')) {
+                elem.val(old_val);
+            }
+            if (elem.is('select')) {
+                elem.find('option').filter(function() {
+                    return $(this).text() == old_val; 
+                }).prop('selected', true);
+            }
+            if (elem.hasClass('datepicker')) {
+                elem.datepicker({dateFormat: 'mm/dd/yy'});
+            }
+        });
+
+        $('tr.editable').on('click', '.edit-cancel', function(e) {
+            e.preventDefault();
+            var td = $(this).closest('td');
+            td.html(td.children('span.old-val').html()).removeClass('edit-mode');
+        });
+
+        $('tr.editable').on('click', '.edit-save', function(e) {
+            e.preventDefault();
+            var td = $(this).closest('td');
+            var url = '/remediationplan/savetaskfield/' + td.closest('tr').data('id');
+            $.ajax({
+                type:"POST",
+                url:url,
+                data:td.find('form').serialize(),
+                success: function(data){
+                    if (data == '1') {
+                        var elem = td.find('form').children();
+                        if (elem.is('input')) {
+                            td.html(elem.val()).removeClass('edit-mode');
+                        }
+                        if (elem.is('select')) {
+                            td.html(elem.find('option:selected').text()).removeClass('edit-mode');
+                        }
+                    } else {
+                        alert('Error');
+                    }
+                }
+            });
+        });
     });
 
 </script>
@@ -721,3 +833,9 @@ use Assessment\Model\Assessment;
         });
     });
 </script>
+
+<style type="text/css">
+    tr.editable td span.old-val {
+        display:none;
+    }
+</style>

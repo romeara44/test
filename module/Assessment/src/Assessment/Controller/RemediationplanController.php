@@ -578,9 +578,13 @@ class RemediationplanController extends AbstractActionController
                 }
             }
         }
+
+        $formTask = new TaskForm($this->getServiceLocator(), $rpObj);
+
         $view = new ViewModel(array(
             'id' => $id,
             'formNote' => $formNote,
+            'formTask' => $formTask,
             'notes' => $notes,
             'rpObj' => $rpObj,
             'actions' => $actions,
@@ -609,22 +613,18 @@ class RemediationplanController extends AbstractActionController
 
         if ($request->isPost()) {
             $post = $request->getPost();
-
-            //$id = $this->getBreachremediationplanTable()->clonePlan($id);
-
-            // save files
             $note = new Note();
             $noteData['note_text'] = '';
             $noteData['note_item_type'] = \Note\Model\Note::NOTE_RPA;
             $noteData['note_item_id'] = $id;
             $note->exchangeArray($noteData);
             $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-            $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
+            $this->getNoteTable()->saveNote($note, $request->getFiles());
         }
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Save files for remediationplan "' . $rpId . '"');
 
-        return $this->redirect()->toRoute('remediationplan', array('controller' => 'remediationplan', 'action' => 'edit', 'id' => $rpId));
+        return $this->redirect()->toRoute('remediationplan', array('controller' => 'remediationplan', 'action' => 'summary', 'id' => $rpId));
     }
 
     public function _generateCsv($notes, $rpObj, $actions)
@@ -1170,6 +1170,44 @@ class RemediationplanController extends AbstractActionController
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Save task for remediationplan action "' . $rpa->rpa_id . '" for remediationplan "' . $rpa->rpa_rp_id . '"');
 
         return 1;
+    }
+
+    public function savetaskfieldAction()
+    {
+        $rpa_id = $this->params('id');
+        $request = $this->getRequest();
+        $post = $request->getPost();
+        $data = $post->getArrayCopy();
+
+        if (!empty($data['rpa_target_date'])) {
+            $data['rpa_target_date'] = \DateTime::createFromFormat('m/d/Y', $data['rpa_target_date'])->format('Y-m-d');
+        }
+        if (!empty($data['rpa_latest_action_date'])) {
+            $data['rpa_latest_action_date'] = \DateTime::createFromFormat('m/d/Y', $data['rpa_latest_action_date'])->format('Y-m-d');
+        }
+
+        echo $this->getRemediationplanactionTable()->saveRemediationplanactionfield($data, $rpa_id);
+        exit;
+    }
+
+    public function savetasknoteAction()
+    {
+        $rp_id = $this->params('rpId');
+        $rpa_id = $this->params('id');
+        $request = $this->getRequest();
+        $post = $request->getPost();
+
+        if($post['note_text']) {
+            $note = new Note();
+            $noteData['note_text'] = $post['note_text'];
+            $noteData['note_item_type'] = \Note\Model\Note::NOTE_RPA;
+            $noteData['note_item_id'] = $rpa_id;
+            $note->exchangeArray($noteData);
+            $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
+            $this->getNoteTable()->saveNote($note);
+        }
+
+        return $this->redirect()->toRoute('remediationplan', array('controller' => 'remediationplan', 'action' => 'summary', 'id' => $rp_id));
     }
 
     public function sendemailtestAction()
