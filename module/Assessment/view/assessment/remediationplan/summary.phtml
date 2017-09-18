@@ -555,7 +555,7 @@ use Assessment\Model\Assessment;
     var browseFilesCounter = 0;
     jQuery(document).ready(function() {
         $('#browseFile').click(function() {
-            $('#filesToUploadBox').append('<input type="file" name="notesFiles[]" id="file' + browseFilesCounter + '" />');
+            $('#filesToUploadBox').append('<input type="file" name="notesFiles[]" id="file' + browseFilesCounter + '" /><br />');
 
             $('#file' + browseFilesCounter).click();
             browseFilesCounter++;
@@ -743,6 +743,7 @@ use Assessment\Model\Assessment;
             if (td.hasClass('edit-mode') || td.index() >= edit_row.children().length) {
                 return;
             }
+            $('tr.editable .edit-cancel').trigger('click');
             td.addClass('edit-mode');
             var old_val = td.html();
             td.html('<span class="old-val">' + old_val + '</span>' + edit_row.children().eq(td.index()).children().clone().wrap('<div></div>').wrap('<form></form>').parent().parent().html() + '<a href="#" class="edit-save">Save</a> <a href="#" class="edit-cancel">Cancel</a>');
