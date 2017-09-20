@@ -619,12 +619,38 @@ class RemediationplanController extends AbstractActionController
             $noteData['note_item_id'] = $id;
             $note->exchangeArray($noteData);
             $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-            $this->getNoteTable()->saveNote($note, $request->getFiles());
+            $this->getNoteTable()->saveNote($note, $request->getFiles(), false, 'files');
+            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Save files for remediationplan "' . $rpId . '"');
         }
 
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Save files for remediationplan "' . $rpId . '"');
+        $identity = $this->getIdentity();
+        $rpa = $this->getRemediationplanactionTable()->getRemediationplanaction($id);
+        if($rpa->rpa_adr_id === null){
+            $adrId = 0;
+        } else {
+            $adrId = $rpa->rpa_adr_id;
+        }
 
-        return $this->redirect()->toRoute('remediationplan', array('controller' => 'remediationplan', 'action' => 'summary', 'id' => $rpId));
+        $notesTaskAtt = $this->noteTable->getNotes($id, \Note\Model\Note::NOTE_RPA, 0, 'file');
+        $notesTaskAssessments = $this->noteTable->getNotesForRemedTask($rpa->rpa_id, $adrId, 'file');
+
+        $model = new ViewModel(array(
+            'notesTaskAtt' => $notesTaskAtt,
+            'notesTaskAssessments' => $notesTaskAssessments,
+            'isPdf' => false,
+            'isAdmin' => $identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN ? true : false,
+        ));
+        $model->setTemplate('remediationplan/taskAttachments');
+
+        $renderer = $this->getServiceLocator()->get('Zend\View\Renderer\RendererInterface');
+        $htmlOutput = $renderer->render($model);
+
+        $jsonModel = new JsonModel();
+        $jsonModel->setVariables(array(
+        'html' => $htmlOutput
+        ));
+
+        return $jsonModel;
     }
 
     public function _generateCsv($notes, $rpObj, $actions)

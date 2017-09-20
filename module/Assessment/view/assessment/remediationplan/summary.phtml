@@ -290,62 +290,14 @@ use Assessment\Model\Assessment;
             </tr>
             
             <tr class="expandable" id="attachments<?php echo $rpa->rpa_id ?>">
-                <td colspan="4">
-                    <form action="/remediationplan/savefiles/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>" method="POST" enctype="multipart/form-data">
-                    <p>
-                        <label>Attachments</label>
-                        <a href="javascript:" class="button browseFileTask"><i class="fa fa-plus-circle"></i> Browse Files...</a>
-                    </p>
-
-                    <div class="cboth"></div>
-                    <div class="filesToUploadBoxTask">
-                    </div>
-                    <p>
-                        <input type="submit" value="Save" class="form-button" />
-                    </p>
-                    </form>
+                <td colspan="4">                    
                 </td>
-                    <?php $colspan = 2; ?>
-                    <?php foreach (array('Task attachments' => $notesTaskAtt, 'Questions attachments' => $notesTaskAssessments) as $keyAtt => $notesTask): ?>
-                        <td colspan="<?php echo $colspan ?>">
-                            <?php if (is_object($notesTask) && ($notesTask->count())): ?>
-                                <div>
-                                    <div><strong><?php echo $keyAtt ?>:</strong></div>
-                                    <div>
-                                        <?php foreach ($notesTask as $note): ?>
-                                        <div class="note">
-                                            <?php if ($note->_files != ''): ?>
-                                                <?php
-                                                $_files = explode(',', $note->_files);
-                                                ?>
-                                                <?php foreach ($_files as $_file): ?>
-                                                    <?php
-                                                    $_file = explode('::', $_file);
-                                                    $_fileName = $_file[0];
-                                                    $_fileId = $_file[1];
-                                                    $_active = $_file[2];
-                                                    ?>
-                                                    <?php if (!$this->isPdf): ?>
-                                                        <?php if ($_active || $this->isAdmin): ?>
-                                                            <span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="draggable" target="_blank" data-downloadurl="application/octet-stream:<?php echo $_fileName ?>:<?= empty($_SERVER['HTTPS']) ? 'http://' : 'https://' ?><?= $_SERVER['HTTP_HOST'] ?>/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>"><?php echo $_fileName ?></a>
-                                                            <?php if ($_active) : ?>
-                                                            <span>&nbsp;</span><a title="Delete" href="#del-att-box-modal" class="confirmation-modal i-delete" onclick="$('#delAttYes').attr('href', '/files/archive/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>');"><i class="fa fa-trash-o"></i></a>
-                                                            <?php elseif ($this->isAdmin) : ?>
-                                                            <span>&nbsp;</span><a href="/files/unarchive/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="ajax-link">Unarchive</a>
-                                                            <?php endif; ?>
-                                                            <br/>
-                                                        <?php endif; ?>
-                                                    <?php endif; ?>
-                                                <?php endforeach; ?>
-                                            <?php endif; ?>
-                                        </div>
-                                        <?php endforeach; ?>
-                                    </div>
-                                </div>
-                            <?php endif; ?>
-                        </td>
-                        <?php $colspan = 2; ?>
-                    <?php endforeach; ?>
+                <?php echo $this->partial('remediationplan/taskAttachments', array(
+                    'notesTaskAtt' => $notesTaskAtt,
+                    'notesTaskAssessments' => $notesTaskAssessments,
+                    'isPdf' => $this->isPdf,
+                    'isAdmin' => $this->isAdmin,
+                )); ?>                    
             </tr>
         <?php //endif; ?>
     <?php endforeach; ?>
@@ -562,13 +514,6 @@ use Assessment\Model\Assessment;
         });
         
         openEditTask();
-
-        $('.browseFileTask').click(function() {
-            $(this).closest('td').find('.filesToUploadBoxTask').append('<input type="file" name="notesFiles[]" id="file' + browseFilesCounter + '" />');
-
-            $('#file' + browseFilesCounter).click();
-            browseFilesCounter++;
-        });
     });
     
     function openEditTask()
@@ -626,13 +571,58 @@ use Assessment\Model\Assessment;
                 if(jQuery('#notes' + idA).is(':visible')) {
                     jQuery('#notes' + idA).slideUp();
                 } else {
-                    jQuery('#attachments' + idA).slideUp(function(){jQuery('#notes' + idA).delay(600).slideDown();});
+                    jQuery('#attachments' + idA).slideUp(function(){
+                        $('#attachments' + idA + ' td:first .fileupload').fileupload('destroy');
+                        jQuery('#attachments' + idA + ' td:first').html('');
+                        jQuery('#notes' + idA).delay(600).slideDown();
+                    });
                 }
             } else {
-                if(jQuery('#attachments' + idA).is(':visible')) {
-                    jQuery('#attachments' + idA).slideUp();
+                if(jQuery('#attachments' + idA).is(':visible')) {                    
+                    jQuery('#attachments' + idA).slideUp(function(){
+                        $('#attachments' + idA + ' td:first .fileupload').fileupload('destroy');
+                        jQuery('#attachments' + idA + ' td:first').html('');
+                    });
                 } else {
-                    jQuery('#notes' + idA).slideUp(function(){jQuery('#attachments' + idA).delay(600).slideDown();});
+                    jQuery('#notes' + idA).slideUp(function(){
+                        jQuery('#attachments' + idA + ' td:first').html('<input class="fileupload" type="file" name="files[]" multiple data-url="/remediationplan/savefiles/' + idA + '/rpId/<?php echo $rpObj->rp_id ?>">');
+                        jQuery('#attachments' + idA + ' td:first .fileupload').fileupload({
+                            dropZone: $(this),
+                            dataType: 'json',
+                            done: function (e, data) {
+                                var td = $(this).closest('td');                
+                                td.siblings('td').remove();
+                                td.after(data.result.html);    
+                                td.siblings('td').find('a.draggable').each(function( index, value ) {
+                                  value.addEventListener('dragstart',function(evt){
+                                    evt.dataTransfer.setData('DownloadURL',$(value).data('downloadurl'));
+                                  },false);
+                                });  
+                                td.siblings('td').find('.confirmation-modal').each(function() {
+                                    $(this).fancybox({
+                                        'width': '500',
+                                        'autoDimensions': false,
+                                        'hideOnContentClick': false,
+                                        'closeBtn': false,
+                                        'helpers' : {
+                                            'overlay' : {
+                                                'closeClick': false
+                                            }
+                                        },
+                                        'keys' : {
+                                            close  : null
+                                        },
+                                        'beforeShow': function () {
+                                            $.fancybox.wrap.bind("contextmenu", function (e) {
+                                                return false;
+                                            });
+                                        }
+                                    });
+                                });       
+                            }
+                        });
+                        jQuery('#attachments' + idA).delay(600).slideDown();
+                    });
                 }
             }
             
