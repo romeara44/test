@@ -1,5 +1,5 @@
 <?php foreach (array('Task attachments' => $this->notesTaskAtt, 'Questions attachments' => $this->notesTaskAssessments) as $keyAtt => $notesTask): ?>
-    <td colspan="2">
+    <td colspan="4">
         <?php if (is_object($notesTask) && ($notesTask->count())): ?>
             <div>
                 <div><strong><?php echo $keyAtt ?>:</strong></div>
