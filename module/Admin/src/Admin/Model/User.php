@@ -173,6 +173,7 @@ class User
                             'encoding' => 'UTF-8',
                             'min'      => 1,
                             'max'      => 100,
+                            'allow' => \Zend\Validator\Hostname::ALLOW_ALL
                         ),
                     ),
                     //$ee
@@ -274,6 +275,7 @@ class User
                                 'encoding' => 'UTF-8',
                                 'min'      => 1,
                                 'max'      => 100,
+                                'allow' => \Zend\Validator\Hostname::ALLOW_ALL
                             ),
                         ),
                         $ee
@@ -376,6 +378,7 @@ class User
                                 'encoding' => 'UTF-8',
                                 'min'      => 1,
                                 'max'      => 100,
+                                'allow' => \Zend\Validator\Hostname::ALLOW_ALL
                             ),
                         ),
                         $ee
@@ -469,6 +472,7 @@ class User
                             'encoding' => 'UTF-8',
                             'min'      => 1,
                             'max'      => 100,
+                            'allow' => \Zend\Validator\Hostname::ALLOW_ALL
                         ),
                     )
                 ),
@@ -488,6 +492,7 @@ class User
                             'encoding' => 'UTF-8',
                             'min'      => 1,
                             'max'      => 100,
+                            'allow' => \Zend\Validator\Hostname::ALLOW_ALL
                         ),
                     ),
                     array(
