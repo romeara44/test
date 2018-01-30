@@ -47,6 +47,10 @@ $form->setAttribute('method', 'post');
                     <label style="padding:0" for="a_c_id" generated="true" class="error"><?php echo $companyRolesMsg ?></label>
                 <?php endif; ?>
             </p>
+        <?php else : ?>
+            <?php $fn = $form->get('bl_c_id');
+                echo $this->formHidden($fn);
+                ?>
         <?php endif; ?>
 
         <p>
