@@ -374,6 +374,7 @@ class BreachlogTable implements ServiceLocatorAwareInterface
             } else if ($identity['u_role_id'] == User::ROLE_CLIENT) {
                 $data['bl_consultant_u_id'] = $identity['u_senior_consultant_u_id'];
                 $data['bl_c_id']            = $identity['u_company_id'];
+                $bl->bl_c_id = $identity['u_company_id'];
             }
 
             $data['bl_create_u_id'] = $identity['u_id'];

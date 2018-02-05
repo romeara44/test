@@ -51,6 +51,11 @@ $form->setAttribute('method', 'post');
             <?php $fn = $form->get('bl_c_id');
                 echo $this->formHidden($fn);
                 ?>
+            <p style="padding: 0;border-top: 0;">
+                <?php if($companyRolesMsg) :?>
+                    <label style="padding:0" for="a_c_id" generated="true" class="error">Please, fill all roles for your company</label>
+                <?php endif; ?>
+            </p>
         <?php endif; ?>
 
         <p>
