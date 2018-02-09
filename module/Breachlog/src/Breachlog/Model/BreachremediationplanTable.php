@@ -111,6 +111,7 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
 
             $select->join(array('c' => 'companies'), 'brp_c_id = c_id', array('_client_name' => 'c_name'), 'left');
             $select->join(array('u' => 'users'), 'brp_approver_u_id = u.u_id', array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)')), 'left');
+            $select->join(array('bl' => 'breach_logs'), 'brp_bl_id = bl_id', array('_bl_name' => DbCrypt::decryptField('bl_name')), 'left');
 
             $select->where('c_active = 1');
             

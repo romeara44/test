@@ -36,6 +36,7 @@ class Breachremediationplan
 
     public $brp_create_date;
     public $_client_name;
+    public $_bl_name;
     public $_approver_name;
     public $_accepter_name;
     public $_consultant_name;
@@ -73,6 +74,7 @@ class Breachremediationplan
         $this->brp_create_date     = (isset($data['brp_create_date'])) ? $data['brp_create_date'] : null;
         $this->brpa_latest_action_date     = (isset($data['brpa_latest_action_date'])) ? $data['brpa_latest_action_date'] : null;
         $this->_client_name     = (isset($data['_client_name'])) ? $data['_client_name'] : null;
+        $this->_bl_name     = (isset($data['_bl_name'])) ? $data['_bl_name'] : null;
         $this->_approver_name     = (isset($data['_approver_name'])) ? $data['_approver_name'] : null;
         $this->_accepter_name     = (isset($data['_accepter_name'])) ? $data['_accepter_name'] : null;
         $this->_consultant_name     = (isset($data['_consultant_name'])) ? $data['_consultant_name'] : null;

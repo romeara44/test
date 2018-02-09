@@ -135,6 +135,7 @@ class BreachremediationplanController extends AbstractActionController
             'status' => 'brp_status',
             'date' => 'brp_incident_date',
             'cName' => 'c_name',
+            'bl_name' => '_bl_name',
         );
 
         $sortCol = isset($mappingSortCol[$orderBy]) ? $mappingSortCol[$orderBy] : 'brp_id';

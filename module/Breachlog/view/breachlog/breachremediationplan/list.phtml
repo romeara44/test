@@ -23,6 +23,13 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
                 </a>
             </th>
 
+            <?php $classSort = ($order_by == 'bl_name') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('breachremediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'bl_name', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Name <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
             <?php if (!$isClientRole): ?>
                 <?php $classSort = ($order_by == 'cName') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
                 <th>
@@ -89,6 +96,7 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
             ?>
             <tr>
                 <td class="<?php echo $classBold ?>"><?php echo $brp->brp_id ?></td>
+                <td class="<?php echo $classBold ?>"><?php echo $brp->_bl_name  ?></td>
                 <?php if (!$isClientRole): ?>
                     <td class="<?php echo $classBold ?>" style="padding-left: <?php echo $paddingVersion ?>px"><?php if ($isVersion): ?><i class="fa fa-code-fork"></i> &nbsp; <?php endif ?><a href="/breachremediationplan/edit/<?php echo $brp->brp_id ?>"><?php echo stripslashes($brp->_client_name) ?></a></td>
                 <?php endif; ?>
