@@ -365,7 +365,7 @@ class BreachremediationplanController extends AbstractActionController
     {
         ob_start();
         $csvList[] = 'sep=,';
-        $csvList[] = 'Breach Remediation Plan for ' . $brpObj->_client_name;
+        $csvList[] = $brpObj->_bl_name;
         $csvList[] = '';
         $csvList[] = array(
                         'STATUS: ' . \Breachlog\Model\Breachremediationplan::$statusesNames[$brpObj->brp_status],

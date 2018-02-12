@@ -1,7 +1,7 @@
 
 
 <div class="page-title">
-    <h1 class="fleft">Breach Remediation Plan for <?php echo (!$this->isPdf) ? '<br/>' : '' ?><?php echo $this->brpObj->_client_name ?></h1>
+    <h1 class="fleft"><?php echo $this->brpObj->_bl_name ?></h1>
     <?php if (!$this->isPdf): ?>
         <a href="/breachremediationplan/edit/<?php echo $brpObj->brp_id ?>/type/pdf" class="button" title="Download as PDF"><i class="fa fa-download"></i> PDF</a>
         <a href="/breachremediationplan/edit/<?php echo $brpObj->brp_id ?>/type/csv" class="button" title="Download as CSV"><i class="fa fa-download"></i> CSV</a>
