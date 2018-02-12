@@ -14,7 +14,9 @@
 return array(
     'db' => array(
         'driver'         => 'Pdo',
-        'dsn'            => 'mysql:dbname=hipaacar_app;host=localhost',
+        'dsn'            => 'mysql:dbname=rockyhil_hipaa;host=localhost',
+        'user'           => 'root',
+        'password'       => 'Orriginalp1zza',
         'driver_options' => array(
             PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
         ),
