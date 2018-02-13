@@ -14,7 +14,9 @@
 return array(
     'db' => array(
         'driver'         => 'Pdo',
-        'dsn'            => 'mysql:dbname=hipaacar_app;host=localhost',
+        'dsn'            => 'mysql:dbname=rockyhil_hipaa;host=localhost',
+        'user'           => 'root',
+        'password'       => 'Orriginalp1zza',
         'driver_options' => array(
             PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
         ),
@@ -33,8 +35,8 @@ return array(
     'application_vars' => array(
         'register_email' => 'Registration@Carosh.com',
         'module_access_code_expiration' => 60 * 20,
-        'secure_db_key_file' => ROOT_PATH . '/../c147572b91c6719b26c5.dbkey',
-        'secure_file_key_file' => ROOT_PATH . '/../ccb3177cdb1f576a6d31.filekey',
+        'secure_db_key_file' => ROOT_PATH . '/c147572b91c6719b26c5.dbkey',
+        'secure_file_key_file' => ROOT_PATH . '/ccb3177cdb1f576a6d31.filekey',
         'assessment_interview_autosave_interval' => 1,
     )
 );
