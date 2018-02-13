@@ -177,6 +177,7 @@ class BreachlogController extends AbstractActionController
         return $view;
     }
 
+    // TODO (chris) Is this restricted correctly?
     public function editAction()
     {
         $request = $this->getRequest();
@@ -288,6 +289,7 @@ class BreachlogController extends AbstractActionController
                     $this->getBreachlogquestionTable()->setServiceLocator($this->getServiceLocator());
                     $brpId = $this->getBreachlogquestionTable()->setReportable($blId);
                     if ($brpId) {
+                        // TODO Reportable breach occurs here, we should mark the breach as uneditable (BT-5 bugfix)
                         return $this->redirect()->toRoute('breachremediationplan', array('controller' => 'breachremediationplan', 'action' => 'edit', 'id' => $brpId));
                     } else {
                         $bl->bl_id = $blId;
@@ -387,6 +389,7 @@ class BreachlogController extends AbstractActionController
         );
     }
 
+    // TODO is this restrictive enough?
     public function deleteAction()
     {
         $id = $this->params('id');
