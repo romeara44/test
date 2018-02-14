@@ -7,4 +7,5 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Zend\\' => array($vendorDir . '/zendframework/zendframework/library'),
+    'Prophecy\\' => array($vendorDir . '/phpspec/prophecy/src'),
 );

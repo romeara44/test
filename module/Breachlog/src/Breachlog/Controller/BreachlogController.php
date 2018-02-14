@@ -32,20 +32,29 @@ class BreachlogController extends AbstractActionController
 
     public function onDispatch(\Zend\Mvc\MvcEvent $e)
     {
+        // (Chris) handle loading of proper html/css/js?
         $this->layout()->searchRoleFilter = 'breachlog';
         $container = new Container('activity');
         $container->activity = time();
         $this->layout()->flashMessagesSuccess = $this->flashMessenger()->getSuccessMessages();
         $this->layout()->flashMessagesErrors = $this->flashMessenger()->getErrorMessages();
+
+        // (Chris) Not sure, does this mean user has to be authenticated?
         if (!$this->hasIdentity()) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
         $identity = $this->getIdentity();
+
+        // (Chris) Redirect to index if User doesn't have breach access (`u_has_breach`) in User table
         if (!$this->getUserTable()->checkModulesAccess('breach')) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
+
+        // (Chris) If you aren't of the correct company role (admin, or high level consultant or whatever), you get redirected
         if (!in_array($identity['u_role_id'], array(1, 2, 3, 5))) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+
+        // (Chris) Redirect to accept terms if it's your first login
         } else if ($identity['u_first_login'] == 1) {
             return $this->redirect()->toRoute('user', array('controller' => 'user', 'action' => 'acceptprivacyterms'));
         }
@@ -177,6 +186,7 @@ class BreachlogController extends AbstractActionController
         return $view;
     }
 
+    // TODO (chris) Is this restricted correctly?
     public function editAction()
     {
         $request = $this->getRequest();
@@ -261,6 +271,8 @@ class BreachlogController extends AbstractActionController
                 $companyRolesMsg = 'Please, fill all roles for this company';
             }
 
+            // TODO rework logic, breach remediation shouldn't be closely coupled to 'reportable' logic
+
             if ($form->isValid() && $checkFillCompanyRoles && !$questionsErrors) {
                 $post['bl_consultant_u_id'] = $identity['u_id'];
                 if(isset($post['questions'][11]) && $post['questions'][11] == 2) $post['bl_date_of_occurrence'] = '';
@@ -288,6 +300,7 @@ class BreachlogController extends AbstractActionController
                     $this->getBreachlogquestionTable()->setServiceLocator($this->getServiceLocator());
                     $brpId = $this->getBreachlogquestionTable()->setReportable($blId);
                     if ($brpId) {
+                        // TODO Reportable breach occurs here, we should mark the breach as uneditable (BT-5 bugfix)
                         return $this->redirect()->toRoute('breachremediationplan', array('controller' => 'breachremediationplan', 'action' => 'edit', 'id' => $brpId));
                     } else {
                         $bl->bl_id = $blId;
@@ -387,6 +400,7 @@ class BreachlogController extends AbstractActionController
         );
     }
 
+    // TODO is this restrictive enough?
     public function deleteAction()
     {
         $id = $this->params('id');
