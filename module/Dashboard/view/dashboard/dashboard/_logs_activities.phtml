@@ -35,13 +35,13 @@
                 <?php endif; ?>
             <?php elseif ($log->lo_item_type == \Application\Model\LogsTable::ITEM_TYPE_BRP): ?>
                 <?php if ($log->lo_type == \Application\Model\LogsTable::TYPE_ADD): ?>
-                    Breach Remediation Plan for <?php echo $log->_brpc_name ?> has been added.<br /><small><?php echo $this->formatDateA($log->lo_create_date, true) ?></small>
+                    Incident Remediation Plan for <?php echo $log->_brpc_name ?> has been added.<br /><small><?php echo $this->formatDateA($log->lo_create_date, true) ?></small>
                 <?php elseif ($log->lo_type == \Application\Model\LogsTable::TYPE_EDIT): ?>
-                    Breach Remediation Plan for <?php echo $log->_brpc_name ?> has been edited.<br /><small><?php echo $this->formatDateA($log->lo_create_date, true) ?></small>
+                    Incident Remediation Plan for <?php echo $log->_brpc_name ?> has been edited.<br /><small><?php echo $this->formatDateA($log->lo_create_date, true) ?></small>
                 <?php elseif ($log->lo_type == \Application\Model\LogsTable::TYPE_DELETE): ?>
-                    Breach Remediation Plan for <?php echo $log->_brpc_name ?> has been deleted.<br /><small><?php echo $this->formatDateA($log->lo_create_date, true) ?></small>
+                    Incident Remediation Plan for <?php echo $log->_brpc_name ?> has been deleted.<br /><small><?php echo $this->formatDateA($log->lo_create_date, true) ?></small>
                 <?php elseif ($log->lo_type == \Application\Model\LogsTable::TYPE_SIGNEDOFF): ?>
-                    Breach Remediation Plan for <?php echo $log->_brpc_name ?> has been signed-off.<br /><small><?php echo $this->formatDateA($log->lo_create_date, true) ?></small>
+                    Incident Remediation Plan for <?php echo $log->_brpc_name ?> has been signed-off.<br /><small><?php echo $this->formatDateA($log->lo_create_date, true) ?></small>
                 <?php endif; ?>
             <?php elseif ($log->lo_item_type == \Application\Model\LogsTable::ITEM_TYPE_ASSESSMENT): ?>
                 <?php if ($log->lo_type == \Application\Model\LogsTable::TYPE_ADD): ?>

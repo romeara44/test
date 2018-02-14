@@ -10,7 +10,7 @@
             <?php elseif ($log->lo_item_type == \Application\Model\LogsTable::ITEM_TYPE_BREACHLOG): ?>
                 <a href="/breachlog/edit/<?php echo $log->_bl_id; ?>">Breach Incident Log for <?php echo $log->_blc_name ?></a>
             <?php elseif ($log->lo_item_type == \Application\Model\LogsTable::ITEM_TYPE_BRP): ?>
-                <a href="/breachremediationplan/edit/<?php echo $log->_brp_id; ?>">Breach Remediation Plan for <?php echo $log->_brpc_name ?></a>
+                <a href="/breachremediationplan/edit/<?php echo $log->_brp_id; ?>">Incident Remediation Plan for <?php echo $log->_brpc_name ?></a>
             <?php elseif ($log->lo_item_type == \Application\Model\LogsTable::ITEM_TYPE_ASSESSMENT): ?>
                 <a href="/assessment/edit/<?php echo $log->_a_id; ?>">Assessment for <?php echo $log->_ac_name ?></a>
             <?php elseif ($log->lo_item_type == \Application\Model\LogsTable::ITEM_TYPE_RP): ?>

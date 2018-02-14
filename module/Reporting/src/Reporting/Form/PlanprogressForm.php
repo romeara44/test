@@ -41,7 +41,7 @@ class PlanprogressForm extends Form
                                          'security' => 'Security Risk Assessments',
                                          'privacy'  => 'Privacy Risk Assessments',
                                          'imported' => 'Imported Remediation Plans',
-                                         'breach'   => 'Breach Remediation Plans',
+                                         'breach'   => 'Incident Remediation Plans',
                                         )
             ),
         ));
