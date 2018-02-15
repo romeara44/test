@@ -494,7 +494,7 @@ class BreachremediationplanController extends AbstractActionController
         $id = $this->params('id');
 
         $this->getBreachremediationplanTable()->deleteBreachremediationplan($id);
-        $this->flashMessenger()->addSuccessMessage('Breach remediation plan has been deleted');
+        $this->flashMessenger()->addSuccessMessage('Incident Remediation Plan has been deleted');
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete breachlog plan "' . $id . '"');
 
@@ -506,7 +506,7 @@ class BreachremediationplanController extends AbstractActionController
         $id = $this->params('id');
 
         $this->getBreachremediationplanTable()->unarchiveBreachremediationplan($id);
-        $this->flashMessenger()->addSuccessMessage('Breach remediation plan has been unarchived');
+        $this->flashMessenger()->addSuccessMessage('Incident Remediation Plan has been unarchived');
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Unarchive breachlog plan "' . $id . '"');
 
@@ -524,7 +524,7 @@ class BreachremediationplanController extends AbstractActionController
         $id = $this->params('id');
 
         $this->getBreachremediationplanTable()->reopenBreachremediationplan($id);
-        $this->flashMessenger()->addSuccessMessage('Breach Remediation plan has been opened');
+        $this->flashMessenger()->addSuccessMessage('Incident Remediation Plan has been opened');
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Reopen breachlog plan "' . $id . '"');
 
@@ -671,7 +671,7 @@ class BreachremediationplanController extends AbstractActionController
 
         $viewModel->setTerminal(true);
 
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Send email breach remediation plan action "' . $id . '" for breach remediation plan "' . $brpObj->brp_id . '"');
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Send email Incident Remediation Plan action "' . $id . '" for Incident Remediation Plan "' . $brpObj->brp_id . '"');
 
         return $viewModel;
     }
@@ -708,7 +708,7 @@ class BreachremediationplanController extends AbstractActionController
 
         $viewModel->setTerminal(true);
 
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Send email remediation plan action "' . $id . '" for breach remediation plan "' . $brpObj->brp_id . '"');
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Send email remediation plan action "' . $id . '" for Incident Remediation Plan "' . $brpObj->brp_id . '"');
 
 
         return $viewModel;
@@ -746,7 +746,7 @@ class BreachremediationplanController extends AbstractActionController
 
         $viewModel->setTerminal(true);
 
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Send approver email for breach remediation plan action "' . $id . '" for breach remediation plan "' . $brpObj->brp_id . '"');
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Send approver email for Incident Remediation Plan action "' . $id . '" for Incident Remediation Plan "' . $brpObj->brp_id . '"');
 
         return $viewModel;
     }

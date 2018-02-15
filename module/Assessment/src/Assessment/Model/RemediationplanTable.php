@@ -339,7 +339,7 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
         $result = '';
 
         if($item->_type == 'breach') {
-            $result = 'Breach Remediation Plan';
+            $result = 'Incident Remediation Plan';
         } else {
             if(!$item->_assesment) {
                 $result = 'Imported Remediation Plans';
