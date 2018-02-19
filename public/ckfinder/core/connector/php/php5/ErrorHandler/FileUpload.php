@@ -33,7 +33,7 @@ require_once CKFINDER_CONNECTOR_LIB_DIR . "/ErrorHandler/Base.php";
  */
 class CKFinder_Connector_ErrorHandler_FileUpload extends CKFinder_Connector_ErrorHandler_Base {
     /**
-     * Throw file upload error, return true if error has been thrown, false if error has been catched
+     * Throw file upload error, return true if error has been thrown, false if error has been red
      *
      * @param int $number
      * @param string $text
