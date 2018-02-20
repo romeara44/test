@@ -172,7 +172,7 @@ class MenuTop extends AbstractHelper
                 'url' => '/reporting/auditbreach',
                 'disabled' => true,
                 'items' => array(
-                    array('title' => 'Audit/Breach',
+                    array('title' => 'Audit/Incident',
                           'url' => '/reporting/auditbreach',
                           'disabled' => true
                         ),
@@ -272,7 +272,7 @@ class MenuTop extends AbstractHelper
                 'title' => 'Reporting',
                 'url' => '/reporting/auditbreach',
                 'items' => array(
-                    array('title' => 'Audit/Breach',
+                    array('title' => 'Audit/Incident',
                             'url' => '/reporting/auditbreach'
                         ),
                     array('title' => 'Plans Progress',
@@ -374,7 +374,7 @@ class MenuTop extends AbstractHelper
                 'title' => 'Reporting',
                 'url' => '/reporting/auditbreach',
                 'items' => array(
-                    array('title' => 'Audit/Breach',
+                    array('title' => 'Audit/Incident',
                             'url' => '/reporting/auditbreach'
                         ),
                     array('title' => 'Plans Progress',
@@ -491,7 +491,7 @@ class MenuTop extends AbstractHelper
                             'title' => 'Reporting',
                             'url' => '/reporting/auditbreach',
                             'items' => array(
-                                array('title' => 'Audit/Breach',
+                                array('title' => 'Audit/Incident',
                                         'url' => '/reporting/auditbreach'
                                     ),
                                 array('title' => 'Plans Progress',
@@ -615,7 +615,7 @@ class MenuTop extends AbstractHelper
                                                             'title' => 'Reporting',
                                                             'url' => '/reporting/auditbreach',
                                                             'items' => array(
-                                                                array('title' => 'Audit/Breach',
+                                                                array('title' => 'Audit/Incident',
                                                                         'url' => '/reporting/auditbreach'
                                                                     ),
                                                                 array('title' => 'Plans Progress',
@@ -727,7 +727,7 @@ class MenuTop extends AbstractHelper
                             'title' => 'Reporting',
                             'url' => '/reporting/auditbreach',
                             'items' => array(
-                                array('title' => 'Audit/Breach',
+                                array('title' => 'Audit/Incident',
                                         'url' => '/reporting/auditbreach',
                                         'disabled' => true
                                     ),
