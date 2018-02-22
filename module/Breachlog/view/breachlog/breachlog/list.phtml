@@ -61,14 +61,16 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
         <?php foreach ($this->paginator as $bl): ?>
             <tr>
                 <td><?php echo $bl->bl_id ?></td>
-                <td><a href="/breachlog/edit/<?php echo $bl->bl_id ?>"><?php echo $bl->bl_name ?></a></td>
+                <td><a href="/breachlog/edit/<?php echo Cbl_id ?>"><?php echo $bl->bl_name ?></a></td>
                 <?php if (!$isClientRole): ?>
                     <td><?php echo stripslashes($bl->_client_name) ?></td>
                 <?php endif; ?>
                 <td><?php echo $bl->bl_reportable ? 'Yes' : 'No' ?></td>
                 <td><?php echo ($bl->bl_date_of_occurrence != '0000-00-00 00:00:00') ? $this->formatDateA($bl->bl_date_of_occurrence) : '' ?></td>
                 <td style="white-space: nowrap;" class="aright">
-                    <a href="/breachlog/edit/<?php echo $bl->bl_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+										<?php if ($bl->bl_accepter_u_id === 0 || $bl->bl_accepter_u_id === NULL): ?>
+											<a href="/breachlog/edit/<?php echo $bl->bl_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+										<?php endif; ?>										
                     <?php if ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
                         <?php if ($bl->bl_active): ?>
                             <?php $deleteUrl = '/breachlog/delete/' . $bl->bl_id; ?>
