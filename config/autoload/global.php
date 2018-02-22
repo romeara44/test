@@ -38,4 +38,3 @@ return array(
         'assessment_interview_autosave_interval' => 1,
     )
 );
-

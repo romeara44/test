@@ -189,11 +189,12 @@ class AuthController extends AbstractActionController
         $captchaContainer = new Container('captcha');
 
         $showCaptcha = $captchaContainer->offsetExists('show');
+        $showCaptcha = false;
 
         $config = $this->getServiceLocator()->get('config');
         
-        $google_recaptcha_secret = $config['application_vars']['google_recaptcha_secret'];
-        $google_recaptcha_key = $config['application_vars']['google_recaptcha_key'];
+//        $google_recaptcha_secret = $config['application_vars']['google_recaptcha_secret'];
+//        $google_recaptcha_key = $config['application_vars']['google_recaptcha_key'];
 
         $request = $this->getRequest();
 
@@ -364,6 +365,7 @@ class AuthController extends AbstractActionController
         }
 
         $showCaptcha = $captchaContainer->offsetExists('show');
+        $showCaptcha = false;
 
         /*if($showCaptcha) {
             $form->addCaptcha();
@@ -375,7 +377,7 @@ class AuthController extends AbstractActionController
             'form' => $form,
             'showCaptcha' => $showCaptcha,
             'showCompany' => $showCompany,
-            'google_recaptcha_key' => $google_recaptcha_key,
+//            'google_recaptcha_key' => $google_recaptcha_key,
         ));
 
         $this->layout( 'layout/layout_login' );

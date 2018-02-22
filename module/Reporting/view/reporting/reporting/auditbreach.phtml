@@ -1,5 +1,5 @@
 <div class="page-title">
-    <h1 class="fleft">Audit/Breach</h1>
+    <h1 class="fleft">Audit/Incident</h1>
     <div class="cboth"></div>
 </div>
 <div>
@@ -14,7 +14,7 @@
 <?php if($search): ?>
     <?php if($breachAccess): ?>
         <div class="auditbreach_wrap">
-            <p><h4 class="fleft">Breach Remediation Plans</h4></p>
+            <p><h4 class="fleft">Incident Remediation Plans</h4></p>
             <div class="auditbreach_table_wrap">
                 <?php echo $this->partial('reporting/reporting/auditbreach_brp.phtml', array('bRPPaginator' => $this->bRPPaginator, 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'search' => $search)) ?>
             </div>

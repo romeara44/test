@@ -43,7 +43,7 @@ class DashboardController extends AbstractActionController
         }
 
         $identity = $this->getIdentity();
-        
+
         if ($identity['u_first_login'] == 1) {
             return $this->redirect()->toRoute('user', array('controller' => 'user', 'action' => 'acceptprivacyterms'));
         }
@@ -223,19 +223,22 @@ class DashboardController extends AbstractActionController
     public function adminAction()
     {
         $identity = $this->getIdentity();
+
+        // (chris) redirect to index if user is not an admin..
         if (!in_array($identity['u_role_id'], array(1))) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
+
+        // (chris) what does this do???
         $container = new Container('activity');
         $container->activity = time();
         $container = new Container('files');
-
         if ($container->item != '') {
             $container->item = '';
             $this->redirect()->toUrl($container->item);
         }
 
-
+        // (chris) Looks like these are populating the dashboard charts...
         $c1 = (int) $this->params('c1');
         $c2 = (int) $this->params('c2');
         $c3 = (int) $this->params('c3');
@@ -360,6 +363,7 @@ class DashboardController extends AbstractActionController
 
 }
 
+// (chris) zendesk? this is very weird, not sure why this is defined this way.
 define("ZDAPIKEY", "e2asX5c1tjmJo8CPb4mwD4oAbe3KFaIwai9s9YC8");
 define("ZDUSER", "tb82@interia.pl");
 define("ZDURL", "https://tb82.zendesk.com/api/v2");

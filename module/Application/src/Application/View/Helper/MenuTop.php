@@ -114,11 +114,11 @@ class MenuTop extends AbstractHelper
                 'url' => '/breachlog/list',
                 'disabled' => true,
                 'items' => array(
-                    array('title' => 'Breach Logs',
+                    array('title' => 'Incident Logs',
                           'url' => '/breachlog/list',
                           'disabled' => true
                         ),
-                    array('title' => 'Breach Remediation Plans',
+                    array('title' => 'Incident Remediation Plans',
                           'url' => '/breachremediationplan/list',
                           'disabled' => true
                         )
@@ -172,7 +172,7 @@ class MenuTop extends AbstractHelper
                 'url' => '/reporting/auditbreach',
                 'disabled' => true,
                 'items' => array(
-                    array('title' => 'Audit/Breach',
+                    array('title' => 'Audit/Incident',
                           'url' => '/reporting/auditbreach',
                           'disabled' => true
                         ),
@@ -215,11 +215,11 @@ class MenuTop extends AbstractHelper
                 'url' => '/breachlog/list',
                 'class' => 'with-access',
                 'items' => array(
-                    array('title' => 'Breach Logs',
+                    array('title' => 'Incident Logs',
                           'url' => '/breachlog/list',
                          'class' => 'with-access'
                         ),
-                    array('title' => 'Breach Remediation Plans',
+                    array('title' => 'Incident Remediation Plans',
                          'url' => '/breachremediationplan/list',
                          'class' => 'with-access'
                         )
@@ -272,7 +272,7 @@ class MenuTop extends AbstractHelper
                 'title' => 'Reporting',
                 'url' => '/reporting/auditbreach',
                 'items' => array(
-                    array('title' => 'Audit/Breach',
+                    array('title' => 'Audit/Incident',
                             'url' => '/reporting/auditbreach'
                         ),
                     array('title' => 'Plans Progress',
@@ -317,11 +317,11 @@ class MenuTop extends AbstractHelper
                 'url' => '/breachlog/list',
                 'class' => 'with-access',
                 'items' => array(
-                    array('title' => 'Breach Logs',
+                    array('title' => 'Incident Logs',
                           'url' => '/breachlog/list',
                           'class' => 'with-access'
                         ),
-                    array('title' => 'Breach Remediation Plans',
+                    array('title' => 'Incident Remediation Plans',
                          'url' => '/breachremediationplan/list',
                          'class' => 'with-access'
                         )
@@ -374,7 +374,7 @@ class MenuTop extends AbstractHelper
                 'title' => 'Reporting',
                 'url' => '/reporting/auditbreach',
                 'items' => array(
-                    array('title' => 'Audit/Breach',
+                    array('title' => 'Audit/Incident',
                             'url' => '/reporting/auditbreach'
                         ),
                     array('title' => 'Plans Progress',
@@ -430,11 +430,11 @@ class MenuTop extends AbstractHelper
                                 'url' => '/breachlog/list',
                                 'class' => 'with-access',
                                 'items' => array(
-                                    array('title' => 'Breach Logs',
+                                    array('title' => 'Incident Logs',
                                           'url' => '/breachlog/list',
                                           'class' => 'with-access'
                                         ),
-                                    array('title' => 'Breach Remediation Plans',
+                                    array('title' => 'Incident Remediation Plans',
                                           'url' => '/breachremediationplan/list',
                                           'class' => 'with-access'
                                         )
@@ -491,7 +491,7 @@ class MenuTop extends AbstractHelper
                             'title' => 'Reporting',
                             'url' => '/reporting/auditbreach',
                             'items' => array(
-                                array('title' => 'Audit/Breach',
+                                array('title' => 'Audit/Incident',
                                         'url' => '/reporting/auditbreach'
                                     ),
                                 array('title' => 'Plans Progress',
@@ -578,11 +578,11 @@ class MenuTop extends AbstractHelper
                                     'url' => '/breachlog/list',
                                     'class' => 'with-access',
                                     'items' => array(
-                                        array('title' => 'Breach Logs',
+                                        array('title' => 'Incident Logs',
                                               'url' => '/breachlog/list',
                                               'class' => 'with-access'
                                             ),
-                                        array('title' => 'Breach Remediation Plans',
+                                        array('title' => 'Incident Remediation Plans',
                                               'url' => '/breachremediationplan/list',
                                               'class' => 'with-access'
                                             )
@@ -615,7 +615,7 @@ class MenuTop extends AbstractHelper
                                                             'title' => 'Reporting',
                                                             'url' => '/reporting/auditbreach',
                                                             'items' => array(
-                                                                array('title' => 'Audit/Breach',
+                                                                array('title' => 'Audit/Incident',
                                                                         'url' => '/reporting/auditbreach'
                                                                     ),
                                                                 array('title' => 'Plans Progress',
@@ -686,11 +686,11 @@ class MenuTop extends AbstractHelper
                 'url' => '/breachlog/list',
                 'disabled' => true,
                 'items' => array(
-                    array('title' => 'Breach Logs',
+                    array('title' => 'Incident Logs',
                           'url' => '/breachlog/list',
                           'disabled' => true
                         ),
-                    array('title' => 'Breach Remediation Plans',
+                    array('title' => 'Incident Remediation Plans',
                           'url' => '/breachremediationplan/list',
                           'disabled' => true
                         )
@@ -727,7 +727,7 @@ class MenuTop extends AbstractHelper
                             'title' => 'Reporting',
                             'url' => '/reporting/auditbreach',
                             'items' => array(
-                                array('title' => 'Audit/Breach',
+                                array('title' => 'Audit/Incident',
                                         'url' => '/reporting/auditbreach',
                                         'disabled' => true
                                     ),
