@@ -63,18 +63,31 @@ class BreachlogquestionTable implements ServiceLocatorAwareInterface
     public function setReportable($blId = 0)
     {
         $questions = $this->getBreachlogquestionsWithAnswers($blId);
-
-       // echo '<pre>';
-
         $questionsAnwers = array();
-
         foreach ($questions as $question) {
             $questionsAnwers[$question->blq_id] = $question->_bla_value;
         }
 
-        if (($questionsAnwers[1] == 2) && ($questionsAnwers[2] == 2) && (empty($questionsAnwers[3]) || $questionsAnwers[3] == 2) 
-            && ($questionsAnwers[4] == 2) && ($questionsAnwers[5] == 1) && ($questionsAnwers[6] == 1) && ($questionsAnwers[7] == 2) 
-            && ($questionsAnwers[8] == 1) && ($questionsAnwers[11] == 1)) {
+        // Determine if either
+        // a.) Incident includes identifiable data
+        // b.) Incident does not include identifiable data, but de-identified data
+        //     can be re-identified
+        $isDataIdentifiable =
+               ($questionsAnwers[2] == 2 && empty($questionsAnwers[3]))
+            || ($questionsAnwers[2] == 1 && $questionsAnwers[3] == 2);
+
+        // Determines if security incident is a breach (i.e., reportable)
+        $isIncidentReportable =
+               ($questionsAnwers[1] == 2)
+            && ($isDataIdentifiable)
+            && ($questionsAnwers[4] == 2)
+            && ($questionsAnwers[5] == 1)
+            && ($questionsAnwers[6] == 1)
+            && ($questionsAnwers[7] == 2)
+            && ($questionsAnwers[8] == 1)
+            && ($questionsAnwers[11] == 1);
+
+        if ($isIncidentReportable) {
 
             $blDb = $this->getServiceLocator()->get('Breachlog\Model\BreachlogTable');
 

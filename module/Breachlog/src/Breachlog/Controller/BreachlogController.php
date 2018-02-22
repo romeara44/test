@@ -228,13 +228,16 @@ class BreachlogController extends AbstractActionController
                 }
             }
         }
-        
+
         $questionsErrors = false;
         $answers = array();
         $questionsFormAnswers = array();
         $identity = $this->getIdentity();
         $request = $this->getRequest();
+
+        // At this point we load the blank form....
         if ($request->isPost()) {
+
             $bl = new Breachlog();
             $post = $request->getPost();
 
@@ -272,7 +275,6 @@ class BreachlogController extends AbstractActionController
                 $companyRolesMsg = 'Please, fill all roles for this company';
             }
 
-            // TODO rework logic, breach remediation shouldn't be closely coupled to 'reportable' logic
 
             if ($form->isValid() && $checkFillCompanyRoles && !$questionsErrors) {
                 $post['bl_consultant_u_id'] = $identity['u_id'];
@@ -315,7 +317,7 @@ class BreachlogController extends AbstractActionController
                         $this->getBreachlogTable()->saveBreachlog($bl);
                     }
                 }
-                
+
                 // save text note
                 if($post['note_text'])
                 {
