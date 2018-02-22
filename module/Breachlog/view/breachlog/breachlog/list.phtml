@@ -61,7 +61,7 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
         <?php foreach ($this->paginator as $bl): ?>
             <tr>
                 <td><?php echo $bl->bl_id ?></td>
-                <td><a href="/breachlog/edit/<?php echo Cbl_id ?>"><?php echo $bl->bl_name ?></a></td>
+                <td><a href="/breachlog/edit/<?php echo $bl->bl_id ?>"><?php echo $bl->bl_name ?></a></td>
                 <?php if (!$isClientRole): ?>
                     <td><?php echo stripslashes($bl->_client_name) ?></td>
                 <?php endif; ?>
