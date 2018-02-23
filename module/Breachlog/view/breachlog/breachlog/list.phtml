@@ -68,7 +68,7 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
                 <td><?php echo $bl->bl_reportable ? 'Yes' : 'No' ?></td>
                 <td><?php echo ($bl->bl_date_of_occurrence != '0000-00-00 00:00:00') ? $this->formatDateA($bl->bl_date_of_occurrence) : '' ?></td>
                 <td style="white-space: nowrap;" class="aright">
-                    <a href="/breachlog/edit/<?php echo $bl->bl_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+                    <a href="/breachlog/edit/<?php echo $bl->bl_id . '&type=view' ?>" title="View Only"><i class="far fa-list-alt"></i></a> &nbsp;
                     <?php if ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
                         <?php if ($bl->bl_active): ?>
                             <?php $deleteUrl = '/breachlog/delete/' . $bl->bl_id; ?>
