@@ -133,6 +133,7 @@ class BreachlogquestionTable implements ServiceLocatorAwareInterface
                 $brpaData['brpa_action_plan']  = '';
                 $brpaData['brpa_status']       = 0;
 
+                // TODO double check this, it's how reporting dates are determined (BT-5)
                 if (in_array($taskKey, array(9, 10, 11, 12))) {
                     if (in_array($taskKey, array(11, 12))) {
                         $brpaData['brpa_target_date'] = '';
