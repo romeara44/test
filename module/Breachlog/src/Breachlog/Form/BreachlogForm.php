@@ -38,7 +38,7 @@ class BreachlogForm extends Form
                 'type'  => 'text',
             ),
             'options' => array(
-                'label' => 'Breach Name',
+                'label' => 'Incident Name',
             )
         ));
         
@@ -88,7 +88,7 @@ class BreachlogForm extends Form
                 'type'  => 'text',
             ),
             'options' => array(
-                'label' => 'Size of Breach',
+                'label' => 'Size of Incident',
             )
         ));
 
@@ -98,7 +98,7 @@ class BreachlogForm extends Form
                 'type'  => 'text',
             ),
             'options' => array(
-                'label' => 'Description of the Breach Event',
+                'label' => 'Description of the Incident Event',
             )
         ));
 
