@@ -331,7 +331,7 @@ $form->setAttribute('method', 'post');
         <div class="cboth"></div>
         
         <div class="form-buttons">
-					<?php if(isset($this->etype) && $this->etype === 'view'): ?>
+					<?php if(isset($this->etype) && $this->etype !== 'view'): ?>
             <input type="submit" value="Save" class="form-button" />
             <div class="fleft">or</div>
 					<?php endif; ?>
