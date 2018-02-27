@@ -192,6 +192,7 @@ class BreachlogController extends AbstractActionController
         $request = $this->getRequest();
 
         $id = (int) $this->params('id');
+				$etype = (strpos($request, 'type=view') === false) ? '' : 'view';
         $noteform = $request->isPost() && (int) $request->getPost('noteform');
 
         if (!$this->hasIdentity()) {
@@ -391,6 +392,7 @@ class BreachlogController extends AbstractActionController
             'notes' => $notes,
             'formNote' => $formNote,
             'blId' => $id,
+            'etype' => $etype,
             'blObj' => $blObj,
             'companyUsers' => $companyUsers,
             'questions' => $questions,
