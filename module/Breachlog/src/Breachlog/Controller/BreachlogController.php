@@ -299,19 +299,20 @@ class BreachlogController extends AbstractActionController
                         $blaId = $this->getBreachloganswerTable()->saveBreachloganswers($bla);
                     }
                     $this->getBreachlogquestionTable()->setServiceLocator($this->getServiceLocator());
+
+                    // This is where we determine if the security incident is a reportable breach
                     $brpId = $this->getBreachlogquestionTable()->setReportable($blId);
+
                     if ($brpId) {
-                        // TODO Reportable breach occurs here, we should mark the breach as uneditable (BT-5 bugfix)
+                        // As per lhecker in BT-6, any reportable breach requires a remediation plan
+                        $this->flashMessenger()->addSuccessMessage('This security incident constitutes a reportable breach. Please create a remediation plan.');
                         return $this->redirect()->toRoute('breachremediationplan', array('controller' => 'breachremediationplan', 'action' => 'edit', 'id' => $brpId));
                     } else {
+                        // As per lhecker in BT-6, a remediation plan should not be created if incident is not a breach
+                        $this->flashMessenger()->addSuccessMessage('This security incident does not constitute a reportable breach. No additional reporting is necessary.');
                         $bl->bl_id = $blId;
                         $bl->bl_date_of_occurrence = '';
                         $this->getBreachlogTable()->saveBreachlog($bl);
-                        if(isset($post['questions'][11]) && $post['questions'][11] == 2) {
-                            $this->flashMessenger()->addSuccessMessage('A breach has occurred, but is not reportable, under the Safe Harbor Exemption for encrypted data');
-                        } else {
-                            $this->flashMessenger()->addSuccessMessage('A reportable breach has not occurred, no additional reporting is necessary');
-                        }
                     }
                 }
                 

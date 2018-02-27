@@ -71,6 +71,7 @@ class BreachlogquestionTable implements ServiceLocatorAwareInterface
         foreach ($questions as $question) {
             $questionsAnwers[$question->blq_id] = $question->_bla_value;
         }
+
         if (($questionsAnwers[1] == 2) && ($questionsAnwers[2] == 2) && (empty($questionsAnwers[3]) || $questionsAnwers[3] == 2) 
             && ($questionsAnwers[4] == 2) && ($questionsAnwers[5] == 1) && ($questionsAnwers[6] == 1) && ($questionsAnwers[7] == 2) 
             && ($questionsAnwers[8] == 1) && ($questionsAnwers[11] == 1)) {
@@ -120,12 +121,13 @@ class BreachlogquestionTable implements ServiceLocatorAwareInterface
 
             foreach (Breachremediationplanaction::$tasks as $taskKey => $task) {
 
+                // A media release is not necessary when 500 or fewer
+                // individuals are compromised.
                 if (($taskKey == 9) && ($blSize <= 500)) {
                     continue;
                 }
 
                 $brpa = new Breachremediationplanaction();
-
                 $brpaData['brpa_brp_id']       = $brpId;
                 $brpaData['brpa_contact_u_id'] = $bl->bl_consultant_u_id;
                 $brpaData['brpa_approver_u_id'] = $approval_authority_role->cr_u_id;
@@ -133,24 +135,30 @@ class BreachlogquestionTable implements ServiceLocatorAwareInterface
                 $brpaData['brpa_action_plan']  = '';
                 $brpaData['brpa_status']       = 0;
 
-                if (in_array($taskKey, array(9, 10, 11, 12))) {
-                    if (in_array($taskKey, array(11, 12))) {
-                        $brpaData['brpa_target_date'] = '';
-                    } elseif (in_array($taskKey, array(9))) {
-                        $brpaData['brpa_target_date'] = date('Y-m-d H:i:s', time() + 60 * 60 * 24 * 60);
-                    } else {
-                        if ($blSize > 500) {
-                            $brpaData['brpa_target_date'] = date('Y-m-d H:i:s', time() + 60 * 60 * 24 * 60);
-                        } else {
-                            $brpaData['brpa_target_date'] = date('Y-m-d H:i:s', time() + 60 * 60 * 24 * 60);
-                        }
-                    }
-                } else {
-                    $brpaData['brpa_target_date'] = date('Y-m-d H:i:s', time() + 60 * 60 * 24 * 60);
+                // **NOTE** This is logically equivalent to the previous code, but less confusing
+                // This piece of code determines resolution dates for various remediation plan
+                // actions, including required HHS reporting.
+
+                // Set default date for most tasks, 60 days from now
+                $brpaData['brpa_target_date'] = date('Y-m-d H:i:s', time() + 60 * 60 * 24 * 60);
+
+                // This task specifically relates to HHS reporting.
+                // If 500 or less individuals are affected, reporting
+                //is required within 60 days of end of calendar year.
+                if ($taskKey == 10 && $blSize <= 500) {
+                    // If 500 or less individuals are affected, reporting is required within 60 days
+                    // of end of calendar year.
+                    $date = date('Y-12-31', time());
+                    $date = date('Y-m-d H:i:s', strtotime('+59 days', strtotime($date)));
+                    $brpaData['brpa_target_date'] = $date;
+                }
+
+                // Since these tasks require feedback from HHS, they have an indeterminate date
+                if (in_array($taskKey, array(11, 12))) {
+                    $brpaData['brpa_target_date'] = '';
                 }
 
                 $brpa->exchangeArray($brpaData);
-
                 $this->getServiceLocator()->get('Breachlog\Model\BreachremediationplanactionTable')->setServiceLocator($this->getServiceLocator());
                 $brpaId = $this->getServiceLocator()->get('Breachlog\Model\BreachremediationplanactionTable')->saveBreachremediationplanaction($brpa);
             }
