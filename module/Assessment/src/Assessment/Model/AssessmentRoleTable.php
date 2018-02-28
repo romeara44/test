@@ -31,6 +31,7 @@ class AssessmentRoleTable implements ServiceLocatorAwareInterface
         return $this->serviceLocator;
     }
 
+    // TODO Update this to check for role_alias
     public function getRoleNameById($id)
     {
         $id  = (int) $id;
