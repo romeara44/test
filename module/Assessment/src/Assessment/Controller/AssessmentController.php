@@ -206,7 +206,7 @@ class AssessmentController extends AbstractActionController
         $aObj = $this->getAssessmentTable()->getAssessment($id);
         $addresses = $this->getAddressTable()->getAddresses($id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
         $assessmentsRoles = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type, true);
-//var_dump($aObj);die();
+
         $viewParams['aObj'] = $aObj;
         $viewParams['addresses'] = $addresses;
         $viewParams['assessmentsRoles'] = $assessmentsRoles;
@@ -475,6 +475,7 @@ class AssessmentController extends AbstractActionController
 
                 }
             } elseif ($step == 2) {
+
                 $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update assessment "' . $id . '" step 2');
                 $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_UPLOADED_ROLES, \Application\Model\LogsTable::ITEM_TYPE_ASSESSMENT, $id);
 
@@ -615,6 +616,8 @@ class AssessmentController extends AbstractActionController
             }
 
         } else {
+            // Here's the edit screen
+
             if ((int) $id) {
                 $form->bind($aObj);
                 $addresses = $this->getAddressTable()->getAddresses($id, \Client\Model\AddressItem::ASSESSMENT_TYPE);

@@ -68,6 +68,7 @@ class CompanyRolesTable implements ServiceLocatorAwareInterface
         return $roles;
     }
 
+    // TODO This should be more lax to as per HS-17
     public function checkFillCompanyRoles($cId = null)
     {
         $authService = new \Zend\Authentication\AuthenticationService();

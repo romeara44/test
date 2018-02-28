@@ -62,6 +62,9 @@ class AssessmentRoleTable implements ServiceLocatorAwareInterface
         } else {
             //$select->where('ar_id <> 7');
         }
+
+        // TODO make this company specific....
+        $select->join("assessment_role_alias", "assessments_roles.ar_id = assessment_role_alias.ara_id", "*", "left");
         $select->order('ar_order ASC');
 
         $resultSet = $this->tableGateway->selectWith($select);

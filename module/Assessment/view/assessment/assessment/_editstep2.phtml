@@ -77,7 +77,15 @@ $form->setAttribute('method', 'post');
                 ?>
                 <div class="col3 <?php echo $last ?>"><br />
                     <p>
-                        <strong style="line-height: 32px;"><?php echo $ar['ar_name'] ?></strong><br />
+                        <!-- Add edit button here -->
+                        <strong style="line-height: 32px;">
+                            <?php
+                                if (!is_null($ar['role_alias'])):
+                                    echo $ar['role_alias'];
+                                else:
+                                    echo $ar['ar_name'];
+                                endif;
+                            ?></strong><br />
                         <select name="arlc[<?php echo $this->location ?>][<?php echo $ar['ar_id'] ?>]" id="" class="contactSelect w225">
                             <option value="">Select Contact</option>
                             <option value="">---</option>
