@@ -204,8 +204,9 @@ class AssessmentController extends AbstractActionController
         if (!$id) return;
 
         $aObj = $this->getAssessmentTable()->getAssessment($id);
+        $companyId = (int) $aObj->a_c_id;
         $addresses = $this->getAddressTable()->getAddresses($id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
-        $assessmentsRoles = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type, true);
+        $assessmentsRoles = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type, true, $companyId);
 
         $viewParams['aObj'] = $aObj;
         $viewParams['addresses'] = $addresses;
