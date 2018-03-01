@@ -2,14 +2,8 @@
 namespace Assessment\Model;
 
 use Zend\Db\TableGateway\TableGateway;
-use Zend\Mail;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
-
-use Zend\Db\ResultSet\ResultSet;
-use Zend\Db\Sql\Select;
-use Zend\Paginator\Adapter\DbSelect;
-use Zend\Paginator\Paginator;
 
 class AssessmentRoleTable implements ServiceLocatorAwareInterface
 {
@@ -50,7 +44,7 @@ class AssessmentRoleTable implements ServiceLocatorAwareInterface
         return $row->ar_name;
     }
 
-    public function getAssessmentsRoles($aType = 1, $interview = false)
+    public function getAssessmentsRoles($aType = 1, $interview = false, $companyId = false)
     {
         $select = $this->tableGateway->getSql()->select();
         $select->where('ar_active = 1');
@@ -63,11 +57,31 @@ class AssessmentRoleTable implements ServiceLocatorAwareInterface
             //$select->where('ar_id <> 7');
         }
 
-        // TODO make this company specific....
-        $select->join("assessment_role_alias", "assessments_roles.ar_id = assessment_role_alias.ara_id", "*", "left");
-        $select->order('ar_order ASC');
+        if ($companyId) {
+            $t = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleAlias')->getAssessmentRoleAliases($companyId);
+            $ts = array();
 
+            foreach ($t as $index => $value) {
+                $ts[$value['ar_id']] = 'test' . $value['ar_id'];
+            }
+
+        }
+
+        $select->order('ar_order ASC');
         $resultSet = $this->tableGateway->selectWith($select);
+
+        if ($companyId) {
+            $resultSet->buffer();
+            foreach ($resultSet as $i => $v) {
+                if (array_key_exists($v->ar_id, $ts)) {
+                    $results[] = array('ar_name' => $ts[$v->ar_id], 'ar_id' => $v->ar_id);
+                } else {
+                    $results[] = array('ar_name' => $v->ar_name, 'ar_id' => $v->ar_id);
+                }
+            }
+
+            $resultSet->initialize($results);
+        }
 
         return $resultSet;
     }
