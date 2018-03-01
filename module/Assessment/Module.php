@@ -55,12 +55,31 @@ class Module
                         $table = new \Assessment\Model\AssessmentRoleTable($tableGateway);
                         return $table;
                 },
+                'Assessment\Model\AssessmentRoleAlias' =>  function($sm) {
+                    $tableGateway = $sm->get('AssessmentRoleAliasGateway');
+                    $table = new \Assessment\Model\AssessmentRoleAlias($tableGateway);
+                    return $table;
+                },
+                'Assessment\Model\CompanyAssessmentRoleAlias' =>  function($sm) {
+                    $tableGateway = $sm->get('CompanyAssessmentRoleAliasGateway');
+                    $table = new \Assessment\Model\CompanyAssessmentRoleAlias($tableGateway);
+                    return $table;
+                },
                 'AssessmentRoleTableGateway' => function ($sm) {
                         $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                         $resultSetPrototype = new ResultSet();
                         return new TableGateway('assessments_roles', $dbAdapter, null, $resultSetPrototype);
                 },
-
+                'AssessmentRoleAliasGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    return new TableGateway('assessment_role_alias', $dbAdapter, null, $resultSetPrototype);
+                },
+                'CompanyAssessmentRoleAliasGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    return new TableGateway('company_assessment_role_alias', $dbAdapter, null, $resultSetPrototype);
+                },
                 'Assessment\Model\AssessmentInventoryTable' =>  function($sm) {
                         $tableGateway = $sm->get('AssessmentInventoryTableGateway');
                         $table = new \Assessment\Model\AssessmentInventoryTable($tableGateway);
