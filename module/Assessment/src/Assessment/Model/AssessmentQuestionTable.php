@@ -116,6 +116,21 @@ class AssessmentQuestionTable implements ServiceLocatorAwareInterface
             }
         }
 
+//        var_dump($qCats[4]);
+        $roleAlias = 'AQT testing';
+        foreach ($qCats as $index => $qCat) {
+
+            $qCats[$index]['cat']['aqc_description'] = str_replace('@role_alias', $roleAlias, $qCat['cat']['aqc_description']);
+            $qCats[$index]['cat']['aqc_description'] = str_replace('@role_alias', $roleAlias, $qCat['cat']['aqc_description']);
+            foreach ($qCat['elements'] as $i => $element) {
+//                var_dump($element);
+//                die();
+//                $qCats[$index]['elements'][$i]['aqc_title'] = str_replace('@role_alias', $roleAlias, $element['aqc_title']);
+            }
+        }
+
+//        var_dump($qCats);
+//        die();
 
         return $qCats;
     }

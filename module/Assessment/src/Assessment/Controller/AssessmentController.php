@@ -224,6 +224,10 @@ class AssessmentController extends AbstractActionController
 
     public function exportAction()
     {
+
+        var_dump('export-action');
+        die();
+
         $id = (int) $this->params('id');
         $location = (int) $this->params('location');
 
@@ -617,8 +621,8 @@ class AssessmentController extends AbstractActionController
             }
 
         } else {
-            // Here's the edit screen
 
+            // Here's the edit screen
             if ((int) $id) {
                 $form->bind($aObj);
                 $addresses = $this->getAddressTable()->getAddresses($id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
