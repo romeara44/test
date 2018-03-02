@@ -224,10 +224,6 @@ class AssessmentController extends AbstractActionController
 
     public function exportAction()
     {
-
-        var_dump('export-action');
-        die();
-
         $id = (int) $this->params('id');
         $location = (int) $this->params('location');
 
@@ -414,7 +410,6 @@ class AssessmentController extends AbstractActionController
         $addresses = array();
         $identity = $this->getIdentity();
         $request = $this->getRequest();
-
         $isPrivacy = false;
         $valid = false;
         if ($request->isPost()) {
@@ -692,9 +687,8 @@ class AssessmentController extends AbstractActionController
             $viewParams['assessmentRole'] = $assessmentRole;
             $viewParams['locationName'] = $this->getAddressTable()->getLocationNameById($location);
             $viewParams['assessmentRoleName'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getRoleNameById($assessmentRole);
-
             $viewParams['questions'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionTable')->getQuestions($aObj->a_type, $assessmentRole, $aObj->a_id, $location, $aObj);
-           // var_dump($viewParams['questions']);die();
+
             if ($location) {
                 $viewParams['answers'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionAnswerTable')->getAqas($id, $location, $assessmentRole);
             } else {

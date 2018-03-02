@@ -29,27 +29,21 @@ class AssessmentRoleTable implements ServiceLocatorAwareInterface
     public function getRoleNameById($id, $companyId = false)
     {
         $id  = (int) $id;
-
         $select = $this->tableGateway->getSql()->select();
         $select->where('ar_id = ' . $id);
         $select->where('ar_active = 1');
-
         $resultSet = $this->tableGateway->selectWith($select);
-
         $row = $resultSet->current();
+
         if (!$row) {
             return '';
         }
-
+        $result = $row->ar_name;
         if ($companyId) {
-            $t = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleAlias')->getAssessmentRoleAlias($companyId, $id);
-            // TODO overwrite ar_name here
-            var_dump($t);
-            var_dump('failed');
-            die();
+            $alias = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleAlias')->getAssessmentRoleAlias($companyId, $id);
+            $result = $alias;
         }
-
-        return $row->ar_name;
+        return $result;
     }
 
     public function getAssessmentsRoles($aType = 1, $interview = false, $companyId = false)

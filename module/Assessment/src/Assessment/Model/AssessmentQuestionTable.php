@@ -51,9 +51,6 @@ class AssessmentQuestionTable implements ServiceLocatorAwareInterface
 
     public function getQuestions($type = \Assessment\Model\Assessment::TYPE_SECURITY_RISK, $aRole = 1, $aId = 0, $location = 0, $aObj = null)
     {
-//        var_dump($aRole);
-//        die();
-
         $addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($aId, \Client\Model\AddressItem::ASSESSMENT_TYPE);
 
         $counterAdr = 0;
@@ -69,12 +66,15 @@ class AssessmentQuestionTable implements ServiceLocatorAwareInterface
 
         if ($aObj) {
             $company = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getCompany($aObj->a_c_id);
+            $arId = (int) $aRole;
+            $companyId = (int) $company->c_id;
+            $alias = $t = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getRoleNameById($arId, $companyId);
             if ($company->c_rel_type == \Client\Model\Company::RELATION_TYPE_CHILD && $company->c_type == \Client\Model\Company::CHILD_TYPE_LOCATION_ONLY) {
                 $additionalAddress = true;
             }
+
         }
 
-        //die;
         $select = $this->tableGateway->getSql()->select();
         $select->where('aq_type = ' . $type);
         $select->where('aq_active = 1');
@@ -94,8 +94,6 @@ class AssessmentQuestionTable implements ServiceLocatorAwareInterface
         $resultSet = $this->tableGateway->selectWith($select);
         $resultSet2 = $this->tableGateway->selectWith($select);
 
-        $alias = // TODO get alias by c_id and ar_id
-
         $qCats = array();
         foreach ($resultSet->buffer() as $rs) {
             if (!(int) $rs->aq_parent_aq_id) {
@@ -109,9 +107,14 @@ class AssessmentQuestionTable implements ServiceLocatorAwareInterface
                 $catDesc['aqc_parent_id'] = $rs->aqc_parent_id;
                 $catDesc['aqc_name'] = $rs->aqc_name;
                 $catDesc['aqc_citation'] = $rs->aqc_citation;
-                $catDesc['aqc_specification'] = $rs->aqc_specification;
-                $catDesc['aqc_description'] = $rs->aqc_description;
-                $catDesc['aqc_policy'] = $rs->aqc_policy;
+
+                if ($aObj) {
+                    $catDesc['aqc_specification'] = str_replace('@role_alias', $alias, $rs->aqc_specification);
+                    $catDesc['aqc_description'] = str_replace('@role_alias', $alias, $rs->aqc_description);
+                    $catDesc['aqc_policy'] = str_replace('@role_alias', $alias, $rs->aqc_policy);
+                }
+
+
 
                 if (!isset($qCats[$rs->aq_aqc_id]['cat'])) {
                     $catDesc['aqc_citation'] = str_replace('Â', '', $catDesc['aqc_citation']);
@@ -124,23 +127,18 @@ class AssessmentQuestionTable implements ServiceLocatorAwareInterface
         // Use company information to interpolate assessment-role-aliases
         if ($aObj) {
 
-
-            $roleAlias = 'AQT testing';
+            // TODO review this...
             foreach ($qCats as $index => $qCat) {
-
-                $qCats[$index]['cat']['aqc_description'] = str_replace('@role_alias', $roleAlias, $qCat['cat']['aqc_description']);
-                $qCats[$index]['cat']['aqc_description'] = str_replace('@role_alias', $roleAlias, $qCat['cat']['aqc_description']);
-                foreach ($qCat['elements'] as $i => $element) {
-//                var_dump($element);
+//                var_dump($qCats[$index]['elements']);
 //                die();
-//                $qCats[$index]['elements'][$i]['aqc_title'] = str_replace('@role_alias', $roleAlias, $element['aqc_title']);
-                }
+//                $qCats[$index]['cat']['aqc_description'] = str_replace('@role_alias', $alias, $qCat['cat']['aqc_description']);
+//                $qCats[$index]['cat']['aqc_description'] = str_replace('@role_alias', $alias, $qCat['cat']['aqc_description']);
+//                $qCats[$index]['elements'][0]['aq_title'] = str_replace('@role_alias', $alias, $qCat['elements'][0]['aq_title']);
+//                $qCats[$index]['elements'][0]['aq_specification'] = str_replace('@role_alias', $alias, $qCat['elements'][0]['aq_specification']);
             }
-
         }
 
-//        var_dump($qCats);
-//        die();
+
 
         return $qCats;
     }
