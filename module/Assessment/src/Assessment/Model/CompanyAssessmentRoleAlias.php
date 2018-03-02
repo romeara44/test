@@ -25,6 +25,12 @@ class CompanyAssessmentRoleAlias implements ServiceLocatorAwareInterface
         return $this->serviceLocator;
     }
 
+    public function getCompanyAssessmentRoleAlias($companyId, $arId)
+    {
+        // TODO implement this
+
+    }
+
     public function getCompanyAssessmentRoleAliases($companyId)
     {
         $select = $this->tableGateway->getSql()->select();

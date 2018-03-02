@@ -26,7 +26,7 @@ class AssessmentRoleTable implements ServiceLocatorAwareInterface
     }
 
     // TODO Update this to check for role_alias
-    public function getRoleNameById($id)
+    public function getRoleNameById($id, $companyId = false)
     {
         $id  = (int) $id;
 
@@ -39,6 +39,14 @@ class AssessmentRoleTable implements ServiceLocatorAwareInterface
         $row = $resultSet->current();
         if (!$row) {
             return '';
+        }
+
+        if ($companyId) {
+            $t = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleAlias')->getAssessmentRoleAlias($companyId, $id);
+            // TODO overwrite ar_name here
+            var_dump($t);
+            var_dump('failed');
+            die();
         }
 
         return $row->ar_name;

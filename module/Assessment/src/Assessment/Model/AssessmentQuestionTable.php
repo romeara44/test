@@ -51,6 +51,9 @@ class AssessmentQuestionTable implements ServiceLocatorAwareInterface
 
     public function getQuestions($type = \Assessment\Model\Assessment::TYPE_SECURITY_RISK, $aRole = 1, $aId = 0, $location = 0, $aObj = null)
     {
+//        var_dump($aRole);
+//        die();
+
         $addresses = $this->getServiceLocator()->get('Client\Model\AddressTable')->getAddresses($aId, \Client\Model\AddressItem::ASSESSMENT_TYPE);
 
         $counterAdr = 0;
@@ -91,6 +94,8 @@ class AssessmentQuestionTable implements ServiceLocatorAwareInterface
         $resultSet = $this->tableGateway->selectWith($select);
         $resultSet2 = $this->tableGateway->selectWith($select);
 
+        $alias = // TODO get alias by c_id and ar_id
+
         $qCats = array();
         foreach ($resultSet->buffer() as $rs) {
             if (!(int) $rs->aq_parent_aq_id) {
@@ -116,17 +121,22 @@ class AssessmentQuestionTable implements ServiceLocatorAwareInterface
             }
         }
 
-//        var_dump($qCats[4]);
-        $roleAlias = 'AQT testing';
-        foreach ($qCats as $index => $qCat) {
+        // Use company information to interpolate assessment-role-aliases
+        if ($aObj) {
 
-            $qCats[$index]['cat']['aqc_description'] = str_replace('@role_alias', $roleAlias, $qCat['cat']['aqc_description']);
-            $qCats[$index]['cat']['aqc_description'] = str_replace('@role_alias', $roleAlias, $qCat['cat']['aqc_description']);
-            foreach ($qCat['elements'] as $i => $element) {
+
+            $roleAlias = 'AQT testing';
+            foreach ($qCats as $index => $qCat) {
+
+                $qCats[$index]['cat']['aqc_description'] = str_replace('@role_alias', $roleAlias, $qCat['cat']['aqc_description']);
+                $qCats[$index]['cat']['aqc_description'] = str_replace('@role_alias', $roleAlias, $qCat['cat']['aqc_description']);
+                foreach ($qCat['elements'] as $i => $element) {
 //                var_dump($element);
 //                die();
 //                $qCats[$index]['elements'][$i]['aqc_title'] = str_replace('@role_alias', $roleAlias, $element['aqc_title']);
+                }
             }
+
         }
 
 //        var_dump($qCats);

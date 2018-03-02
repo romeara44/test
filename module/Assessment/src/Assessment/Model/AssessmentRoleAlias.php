@@ -25,6 +25,13 @@ class AssessmentRoleAlias implements ServiceLocatorAwareInterface
         return $this->serviceLocator;
     }
 
+    public function getAssessmentRoleAlias($companyId, $arId)
+    {
+        // TODO implement Alias search
+
+        return null;
+    }
+
     public function getAssessmentRoleAliases($companyId)
     {
         return $this->getServiceLocator()
