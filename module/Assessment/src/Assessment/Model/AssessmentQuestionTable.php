@@ -126,15 +126,11 @@ class AssessmentQuestionTable implements ServiceLocatorAwareInterface
 
         // Use company information to interpolate assessment-role-aliases
         if ($aObj) {
-
             // TODO review this...
             foreach ($qCats as $index => $qCat) {
-//                var_dump($qCats[$index]['elements']);
-//                die();
-//                $qCats[$index]['cat']['aqc_description'] = str_replace('@role_alias', $alias, $qCat['cat']['aqc_description']);
-//                $qCats[$index]['cat']['aqc_description'] = str_replace('@role_alias', $alias, $qCat['cat']['aqc_description']);
-//                $qCats[$index]['elements'][0]['aq_title'] = str_replace('@role_alias', $alias, $qCat['elements'][0]['aq_title']);
-//                $qCats[$index]['elements'][0]['aq_specification'] = str_replace('@role_alias', $alias, $qCat['elements'][0]['aq_specification']);
+                $qCats[$index]['cat']['aqc_description'] = str_replace('@role_alias', $alias, $qCat['cat']['aqc_description']);
+                $qCats[$index]['cat']['aqc_description'] = str_replace('@role_alias', $alias, $qCat['cat']['aqc_description']);
+                $qCats[$index]['elements'][0]['aq_title'] = str_replace('@role_alias', $alias, $qCat['elements'][0]['aq_title']);
             }
         }
 
