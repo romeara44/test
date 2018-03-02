@@ -114,8 +114,6 @@ class AssessmentQuestionTable implements ServiceLocatorAwareInterface
                     $catDesc['aqc_policy'] = str_replace('@role_alias', $alias, $rs->aqc_policy);
                 }
 
-
-
                 if (!isset($qCats[$rs->aq_aqc_id]['cat'])) {
                     $catDesc['aqc_citation'] = str_replace('Â', '', $catDesc['aqc_citation']);
                     $qCats[$rs->aq_aqc_id]['cat'] = $catDesc;
