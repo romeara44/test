@@ -278,7 +278,7 @@ class CompanyController extends AbstractActionController
             'contacts' => $contacts,
             'notes' => $notes,
             'companyObj' => $companyObj,
-            'assessmentsRoles' => $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles(),
+            'assessmentsRoles' => $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles(1, false, $id),
             'primaryContactId'=> $primaryContactId,
             'trainingManagerIds'=> $trainingManagerIds,
             'roleId' => $identity['u_role_id'],
