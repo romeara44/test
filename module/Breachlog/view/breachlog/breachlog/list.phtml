@@ -77,7 +77,7 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
                     <?php if ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
                         <?php if ($bl->bl_active): ?>
                             <?php $deleteUrl = '/breachlog/delete/' . $bl->bl_id; ?>
-                            <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o">
+                            <a href="#confirmation-box-modal" onclick="$('#deleteYes').kattr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o">
                         <?php else: ?>
                             <a href="/breachlog/unarchive/<?php echo $bl->bl_id  ?>" class="">Unarchive</a>
                         <?php endif; ?>
