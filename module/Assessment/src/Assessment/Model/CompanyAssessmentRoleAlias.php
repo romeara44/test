@@ -49,8 +49,7 @@ class CompanyAssessmentRoleAlias implements ServiceLocatorAwareInterface
 
     public function saveCompanyAssessmentRoleAlias($data)
     {
-        // TODO clarify variables here...
-        $araId = 0;
+        $caraId = 0;
 
         $select = $this->tableGateway->getSql()->select();
         $select->where("c_id = {$data['companyId']}");
@@ -58,32 +57,26 @@ class CompanyAssessmentRoleAlias implements ServiceLocatorAwareInterface
         $resultSet = $this->tableGateway->selectWith($select);
 
         foreach ($resultSet as $result) {
-            $araId = $result->ara_id;
+            $caraId = $result->ara_id;
         }
 
         $alias = $data['alias'];
-        if ($araId == 0) {
-            $aliasId = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleAlias')->getAliasIdByAliasString($alias);
-            if ($aliasId == 0) {
-                $aliasId = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleAlias')->saveAssessmentRoleAlias($alias);
-            }
+        $aliasId = (int) $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleAlias')->getAliasIdByAliasString($alias);
 
-            if ($aliasId != 0) {
-                $caraData['c_id'] = $data['companyId'];
-                $caraData['ar_id'] = $data['roleId'];
-                $caraData['ara_id'] = $aliasId;
-                $this->tableGateway->insert($caraData);
-            }
-
-        } else {
-            $insertId = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleAlias')->saveAssessmentRoleAlias($alias);
-            $caraData['c_id'] = $data['companyId'];
-            $caraData['ar_id'] = $data['roleId'];
-            $caraData['ara_id'] = $insertId;
-            $this->tableGateway->update($caraData, array("c_id = {$data['companyId']}", "ar_id = {$data['roleId']}"));
+        if ($aliasId == 0) {
+            $aliasId = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleAlias')->saveAssessmentRoleAlias($alias);
         }
 
-//        return $id;
-    }
+        $caraData['c_id'] = $data['companyId'];
+        $caraData['ar_id'] = $data['roleId'];
+        $caraData['ara_id'] = $aliasId;
 
+        if ($aliasId != 0) {
+            if ($caraId == 0) {
+                $this->tableGateway->insert($caraData);
+            } else {
+                $this->tableGateway->update($caraData, array("c_id = {$data['companyId']}", "ar_id = {$data['roleId']}"));
+            }
+        }
+    }
 }

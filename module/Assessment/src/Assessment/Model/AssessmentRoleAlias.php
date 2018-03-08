@@ -55,7 +55,11 @@ class AssessmentRoleAlias implements ServiceLocatorAwareInterface
     {
         $alias = 0;
         $select = $this->tableGateway->getSql()->select();
-        $select->where("role_alias = {$aliasString}");
+        $select->where("role_alias = '{$aliasString}'");
+        $resultSet = $this->tableGateway->selectWith($select)->buffer();
+        foreach ($resultSet as $result) {
+            $alias = ($result->ara_id);
+        }
         return $alias;
     }
 
