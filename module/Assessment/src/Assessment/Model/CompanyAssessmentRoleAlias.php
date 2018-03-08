@@ -46,9 +46,10 @@ class CompanyAssessmentRoleAlias implements ServiceLocatorAwareInterface
         return $resultSet;
     }
 
+
     public function saveCompanyAssessmentRoleAlias($data)
     {
-        // TODO this fails poorly
+        // TODO clarify variables here...
         $araId = 0;
 
         $select = $this->tableGateway->getSql()->select();
@@ -61,15 +62,12 @@ class CompanyAssessmentRoleAlias implements ServiceLocatorAwareInterface
         }
 
         $alias = $data['alias'];
-
-
         if ($araId == 0) {
             $aliasId = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleAlias')->getAliasIdByAliasString($alias);
             if ($aliasId == 0) {
                 $aliasId = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleAlias')->saveAssessmentRoleAlias($alias);
             }
 
-            // TODO This is kinda confusing, rework it for clarity
             if ($aliasId != 0) {
                 $caraData['c_id'] = $data['companyId'];
                 $caraData['ar_id'] = $data['roleId'];
@@ -78,16 +76,10 @@ class CompanyAssessmentRoleAlias implements ServiceLocatorAwareInterface
             }
 
         } else {
-            // TODO INSERT NEW MAPPING HERE
-            // Insert/Fetch alias ID
-            $aliasId = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleAlias')->getAliasIdByAliasString($alias);
-            if ($aliasId == 0) {
-                $insertId = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleAlias')->saveAssessmentRoleAlias($alias);
-            }
-
+            $insertId = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleAlias')->saveAssessmentRoleAlias($alias);
             $caraData['c_id'] = $data['companyId'];
             $caraData['ar_id'] = $data['roleId'];
-            $caraData['ara_id'] = $aliasId;
+            $caraData['ara_id'] = $insertId;
             $this->tableGateway->update($caraData, array("c_id = {$data['companyId']}", "ar_id = {$data['roleId']}"));
         }
 

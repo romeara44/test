@@ -25,6 +25,7 @@ class AssessmentRoleAlias implements ServiceLocatorAwareInterface
         return $this->serviceLocator;
     }
 
+    // TODO there should not be duplicates in `ara` table, but there are
     public function saveAssessmentRoleAlias($alias)
     {
         $id = 0;
