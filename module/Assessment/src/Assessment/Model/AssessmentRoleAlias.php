@@ -25,6 +25,18 @@ class AssessmentRoleAlias implements ServiceLocatorAwareInterface
         return $this->serviceLocator;
     }
 
+    public function saveAssessmentRoleAlias($alias)
+    {
+        $id = 0;
+        if ($alias != '')
+        {
+            $data = array('role_alias' => $alias);
+            $this->tableGateway->insert($data);
+            $id = $this->tableGateway->lastInsertValue;
+        }
+        return $id;
+    }
+
     public function getAssessmentRoleAlias($companyId, $arId)
     {
         $alias = 0;
@@ -38,10 +50,19 @@ class AssessmentRoleAlias implements ServiceLocatorAwareInterface
         return $alias;
     }
 
+    public function getAliasIdByAliasString($aliasString)
+    {
+        $alias = 0;
+        $select = $this->tableGateway->getSql()->select();
+        $select->where("role_alias = {$aliasString}");
+        return $alias;
+    }
+
     public function getAssessmentRoleAliases($companyId)
     {
         return $this->getServiceLocator()
                 ->get('Assessment\Model\CompanyAssessmentRoleAlias')
                 ->getCompanyAssessmentRoleAliases($companyId);
     }
+
 }

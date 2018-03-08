@@ -77,10 +77,18 @@ $form->setAttribute('method', 'post');
                 ?>
                 <div class="col3 <?php echo $last ?>"><br />
                     <p>
-                        <!-- Add edit button here -->
                         <strong style="line-height: 32px;">
                             <?php echo $ar['ar_name'];?></strong><br />
+                    <p>
+                        Specify role name (optional)
+                        <input type="text" name="aliasform[<?php echo $ar['ar_id'] ?>]"/>
+
+                    </p>
+                    <p>
+                        Assign role
+                    </p>
                         <select name="arlc[<?php echo $this->location ?>][<?php echo $ar['ar_id'] ?>]" id="" class="contactSelect w225">
+
                             <option value="">Select Contact</option>
                             <option value="">---</option>
                             <?php $selected = ''; ?>
@@ -98,6 +106,7 @@ $form->setAttribute('method', 'post');
                             <option value="addNewContactSelect">&rarr; Add New Contact</option>
                         </select>
                     </p>
+
                     <a id="addNewContactLink" style="display: none" href="/assessment/addnewcontact/<?php echo $this->aId ?>/step/2/location/<?php echo $this->location ?>/companyId/<?php echo $this->aObj->a_c_id; ?>" class="fancybox" title="Edit"><i class="fa fa-pencil"></i></a>
                 </div>
 

@@ -123,6 +123,7 @@ class CompanyController extends AbstractActionController
         $rolesform = $request->isPost() && (int) $request->getPost('rolesform');
         $roleFilter = $this->params()->fromRoute('roleFilter') ? (int) $this->params()->fromRoute('roleFilter') : 0;
 
+
         $this->getLogTable()->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_COMPANY, $id);
 
         if (!$this->hasIdentity()) {
@@ -176,7 +177,7 @@ class CompanyController extends AbstractActionController
         $identity = $this->getIdentity();        
 
         if ($request->isPost()) {
-            if ($renewalform) {                
+            if ($renewalform) {
                 $this->getCompanyTable()->saveRenewalData($id, $request->getPost());
                 return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
             } elseif ($noteform) {
@@ -192,8 +193,8 @@ class CompanyController extends AbstractActionController
                     $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
 
                     $this->flashMessenger()->addSuccessMessage('Note saved');
-
                     return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
+
                 } else {
                     if ($id) {
                         $form->bind($companyObj);
@@ -215,6 +216,16 @@ class CompanyController extends AbstractActionController
                         $this->getServiceLocator()->get('Client\Model\CompanyRolesTable')->saveCompanyRole($cr);
                     }
                 }
+
+                if (isset($post['aliasform'])) {
+                    foreach ($post['aliasform'] as $roleId => $alias) {
+                        $data['alias'] = $alias;
+                        $data['roleId'] = $roleId;
+                        $data['companyId'] = $id;
+                        $this->getServiceLocator()->get('Assessment\Model\CompanyAssessmentRoleAlias')->saveCompanyAssessmentRoleAlias($data);
+                    }
+                }
+
                 return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
             } else {
                 $post = $request->getPost();

@@ -371,9 +371,20 @@ $form->setAttribute('method', 'post');
             <form action="/company/edit/<?php echo $this->cId ?>" name="rolesform" id="" method="POST">
                 <?php $counterRoles = 1; ?>
                 <?php foreach ($this->assessmentsRoles as $ar): ?>
+
                 <div class="col4  <?php echo ($counterRoles && $counterRoles % 2 == 0 ? 'last' : 'company-role-first') ?>"><br />
+
                     <p>
                         <strong style="line-height: 32px;"><?php echo $ar['ar_name'] ?></strong><br />
+
+                    <p>
+                        Specify role name (optional)
+                        <input type="text" name="aliasform[<?php echo $ar['ar_id'] ?>]"/>
+
+                    </p>
+                    <p>
+                        Assign role
+                    </p>
                         <select name="rolesform[<?php echo $ar['ar_id'] ?>]" id="" class="contactSelect w225">
                             <option value="">Select Contact</option>
                             <option value="">---</option>

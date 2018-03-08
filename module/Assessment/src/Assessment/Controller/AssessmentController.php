@@ -379,8 +379,6 @@ class AssessmentController extends AbstractActionController
 
     public function editAction()
     {
-        $request = $this->getRequest();
-
         $id = (int) $this->params('id');
         $step = (int) $this->params('step');
         $step = $step == 0 ? 1 : $step;
@@ -414,6 +412,10 @@ class AssessmentController extends AbstractActionController
         $request = $this->getRequest();
         $isPrivacy = false;
         $valid = false;
+
+        $a = new Assessment();
+        $form = new AssessmentForm($this->getServiceLocator());
+
         if ($request->isPost()) {
             $post = $request->getPost();
 
@@ -483,7 +485,6 @@ class AssessmentController extends AbstractActionController
                 $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update assessment "' . $id . '" step 2');
                 $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_UPLOADED_ROLES, \Application\Model\LogsTable::ITEM_TYPE_ASSESSMENT, $id);
 
-
                 $valid = true;
                 $post = $request->getPost();
 
@@ -502,6 +503,16 @@ class AssessmentController extends AbstractActionController
                         }
                     }
                 }
+
+                if (isset($post['aliasform'])) {
+                    foreach ($post['aliasform'] as $roleId => $alias) {
+                        $data['alias'] = $alias;
+                        $data['roleId'] = $roleId;
+                        $data['companyId'] = $aObj->a_c_id;
+                        $this->getServiceLocator()->get('Assessment\Model\CompanyAssessmentRoleAlias')->saveCompanyAssessmentRoleAlias($data);
+                    }
+                }
+
                 if ($this->getAssessmentTable()->checkLocationFinished($id, $location)) {
                     $this->getAssessmentTable()->_createRemediationPlan($id, $location);
                     if ($this->getAssessmentTable()->checkAllLocationsFinished($id)) {
@@ -624,6 +635,7 @@ class AssessmentController extends AbstractActionController
 
             // Here's the edit screen
             if ((int) $id) {
+
                 $form->bind($aObj);
                 $addresses = $this->getAddressTable()->getAddresses($id, \Client\Model\AddressItem::ASSESSMENT_TYPE);
 
@@ -669,8 +681,7 @@ class AssessmentController extends AbstractActionController
             $viewParams['companyAddresses'] = $companyAddresses;
         }
 
-        $cId = $aObj->a_c_id;
-
+        $cId = (int) $aObj->a_c_id;
         if ($step == 1) {
             $viewParams['locationName'] = $this->getAddressTable()->getLocationNameById($location);
             $viewParams['locationFinished'] = $id ? $this->getAssessmentTable()->checkLocationFinished($id, $location) : 0;
@@ -685,6 +696,8 @@ class AssessmentController extends AbstractActionController
                 $adrId = $address->adr_id;
                 break;
             }
+
+
             $viewParams['rolesAdr1'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->getArlcByLocation($id, $adrId);
         } elseif ($step == 3) {
             $viewParams['locationFinished'] = $this->getAssessmentTable()->checkLocationFinished($id, $location);
