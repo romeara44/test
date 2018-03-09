@@ -686,13 +686,12 @@ class AssessmentController extends AbstractActionController
             $viewParams['companyAddresses'] = $companyAddresses;
         }
 
-        $cId = (int) $aObj->a_c_id;
         if ($step == 1) {
             $viewParams['locationName'] = $this->getAddressTable()->getLocationNameById($location);
             $viewParams['locationFinished'] = $id ? $this->getAssessmentTable()->checkLocationFinished($id, $location) : 0;
         } elseif ($step == 2) {
             $viewParams['locationFinished'] = $this->getAssessmentTable()->checkLocationFinished($id, $location);
-            $viewParams['assessmentsRoles'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type, false, $cId);
+            $viewParams['assessmentsRoles'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type, false, $aObj->a_c_id);
             $viewParams['arlcContacts'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->getArlcByLocation($id, $location);
             $viewParams['companyRoles'] = $this->getServiceLocator()->get('Client\Model\CompanyRolesTable')->getExistsCompanyRoles($aObj->a_c_id);
             $viewParams['contacts'] = $contacts;
@@ -705,11 +704,13 @@ class AssessmentController extends AbstractActionController
 
             $viewParams['rolesAdr1'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->getArlcByLocation($id, $adrId);
         } elseif ($step == 3) {
+
+            $companyId = $aObj->a_c_id;
             $viewParams['locationFinished'] = $this->getAssessmentTable()->checkLocationFinished($id, $location);
-            $viewParams['assessmentsRoles'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type, true, $cId);
+            $viewParams['assessmentsRoles'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type, true, $companyId);
             $viewParams['assessmentRole'] = $assessmentRole;
             $viewParams['locationName'] = $this->getAddressTable()->getLocationNameById($location);
-            $viewParams['assessmentRoleName'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getRoleNameById($assessmentRole);
+            $viewParams['assessmentRoleName'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getRoleNameById($assessmentRole, $companyId);
             $viewParams['questions'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionTable')->getQuestions($aObj->a_type, $assessmentRole, $aObj->a_id, $location, $aObj);
 
             if ($location) {
