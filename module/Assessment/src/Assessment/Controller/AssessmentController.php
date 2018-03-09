@@ -488,6 +488,11 @@ class AssessmentController extends AbstractActionController
                 $valid = true;
                 $post = $request->getPost();
 
+                if (isset($post['revert-alias'])) {
+                    $this->getServiceLocator()->get('Assessment\Model\CompanyAssessmentRoleAlias')->deleteCompanyAssessmentRoleAlias($aObj->a_c_id, $post['revert-alias']);
+                    return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'list'));
+                }
+
                 if (isset($post['arlc'])) {
                     foreach ($post['arlc'] as $locationId => $valueArlc) {
                         foreach ($valueArlc as $arId => $uId) {

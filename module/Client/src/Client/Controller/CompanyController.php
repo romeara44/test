@@ -177,7 +177,12 @@ class CompanyController extends AbstractActionController
         $identity = $this->getIdentity();        
 
         if ($request->isPost()) {
-            if ($renewalform) {
+            $post = $request->getPost();
+            if (isset($post['revert-alias'])) {
+                $this->getServiceLocator()->get('Assessment\Model\CompanyAssessmentRoleAlias')->deleteCompanyAssessmentRoleAlias($id, $post['revert-alias']);
+                return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
+
+            } elseif ($renewalform){
                 $this->getCompanyTable()->saveRenewalData($id, $request->getPost());
                 return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
             } elseif ($noteform) {

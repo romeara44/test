@@ -82,7 +82,7 @@ $form->setAttribute('method', 'post');
                     <p>
                         Specify role name (optional)
                         <input type="text" name="aliasform[<?php echo $ar['ar_id'] ?>]"/>
-
+                        <button type="submit" name="revert-alias" class="form-button" value="<?php echo $ar['ar_id'] ?>">Revert</button>
                     </p>
                     <p>
                         Assign role
@@ -106,6 +106,10 @@ $form->setAttribute('method', 'post');
                             <option value="addNewContactSelect">&rarr; Add New Contact</option>
                         </select>
                     </p>
+
+
+
+
 
                     <a id="addNewContactLink" style="display: none" href="/assessment/addnewcontact/<?php echo $this->aId ?>/step/2/location/<?php echo $this->location ?>/companyId/<?php echo $this->aObj->a_c_id; ?>" class="fancybox" title="Edit"><i class="fa fa-pencil"></i></a>
                 </div>
@@ -157,6 +161,4 @@ $form->setAttribute('method', 'post');
             $('#addNewContactLink').click();
         }
     });
-
-
 </script>

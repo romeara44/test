@@ -46,6 +46,15 @@ class CompanyAssessmentRoleAlias implements ServiceLocatorAwareInterface
         return $resultSet;
     }
 
+    public function deleteCompanyAssessmentRoleAlias($companyId, $arId)
+    {
+        $companyId = (int) $companyId;
+        $arId = (int) $arId;
+        $delete = $this->tableGateway->getSql()->delete();
+        $delete->where(array("c_id = {$companyId}", "ar_id = {$arId}"));
+        $resultSet = $this->tableGateway->deleteWith($delete);
+        return $resultSet;
+    }
 
     public function saveCompanyAssessmentRoleAlias($data)
     {
