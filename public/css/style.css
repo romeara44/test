@@ -150,25 +150,6 @@ body {
     width: 200px;
 }
 
-#global-alert {
-	position:fixed;
-	top:0;
-	width:100%;
-	z-index:100;
-	float: right;
-	height: 85px;
-	/*padding: 25px 25px 0 25px;*/
-	color: #b6c1cb;
-	font-size: 14px;
-	font-weight: 300;
-	line-height: 21px;
-	text-align: left;
-}
-
-#global-alert h5 {
-	color: #ff0000;
-}
-
 /* Top Links & Search */
 
 #top-links {
@@ -994,7 +975,6 @@ form p {
 	margin: 0;
 	padding: 10px 0 0 0;
 	border-top: 1px solid #e1ebf0;
-	/*border-top: 1px solid #ff0000;*/
 }
 
 label {
@@ -1003,7 +983,6 @@ label {
 	margin: 0;
 	padding: 6px 0 0 1px;
 	color: #3c5f7d;
-	/*color: #ff0000;*/
 	line-height: 22px;
 }
 label.checkbox { width: auto; padding: 0; line-height: 14px; }
