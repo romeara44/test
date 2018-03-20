@@ -1,6 +1,7 @@
 UPDATE assessments_questions
-SET aq_update_date = NULL
-WHERE aq_update_date != NULL;
+SET aq_update_date = NULL;
+
+ALTER TABLE assessments_questions MODIFY COLUMN aq_update_date NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP(0);
 
 UPDATE `assessments_questions` 
 	SET aq_title = 'Does the county know the specifications by which it has to determine how it will comply with the standard ?' 
