@@ -1,0 +1,43 @@
+<?php
+
+// within a view script
+$form = new \Assessment\Form\AliasForm();
+var_dump($form);
+die();
+//$form->prepare();
+//
+//// Assuming the "contact/process" route exists...
+//$form->setAttribute('action', '/alias/edit' . '1/54');
+//
+//// Set the method attribute for the form
+//$form->setAttribute('method', 'post');
+
+//var_dump($this);
+//die();
+
+?>
+
+<h1>
+Company Assessment Role Alias Detail
+</h1>
+<p>
+    <strong>Default Role Name:</strong> <?php echo $this->defaultAlias;?>
+<p>
+    <strong>Current Role Alias:</strong> <?php echo $this->alias;?>
+</p>
+<p>
+Specify new role alias (optional)
+</p>
+
+<form action="/alias/edit/<?php echo $this->id ?>/<?php echo $this->cId?>" method="post" name="alias" id="alias">
+<!--    "/alias/edit/--><?php //echo $this->id ?><!--/--><?php //echo $this->cId?><!--"-->
+
+<!--<form action="/alias/edit/--><?php //echo $this->id . "/" . $this->cId; ?><!--/" method="post" name="alias">-->
+
+<input type="text" name="aliasform"/><br><br><br>
+<!--<button type="submit" name="revert" class="button" value="test">Revert</button>-->
+
+<div class="form-buttons">
+    <a href="/assessment/list" class="cancel">Save</a> or
+    <a href="/assessment/list" class="cancel">Cancel</a>
+</div>

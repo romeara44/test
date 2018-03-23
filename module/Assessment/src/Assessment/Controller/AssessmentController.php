@@ -226,6 +226,11 @@ class AssessmentController extends AbstractActionController
 
     }
 
+    public function editAliasAction()
+    {
+
+    }
+
     public function exportAction()
     {
         $id = (int) $this->params('id');
@@ -379,6 +384,11 @@ class AssessmentController extends AbstractActionController
 
     public function editAction()
     {
+
+//        // This works now
+//        return $this->redirect()->toRoute('alias', array('controller' => 'alias', 'action' => 'edit', 'id' => '1'));
+//        // TODO put this in the right place
+
         $id = (int) $this->params('id');
         $step = (int) $this->params('step');
         $step = $step == 0 ? 1 : $step;
@@ -481,6 +491,8 @@ class AssessmentController extends AbstractActionController
                 }
             } elseif ($step == 2) {
 
+//                var_dump('test');
+//                die();
 
                 $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update assessment "' . $id . '" step 2');
                 $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_UPLOADED_ROLES, \Application\Model\LogsTable::ITEM_TYPE_ASSESSMENT, $id);
@@ -489,8 +501,11 @@ class AssessmentController extends AbstractActionController
                 $post = $request->getPost();
 
                 if (isset($post['revert-alias'])) {
-                    $this->getServiceLocator()->get('Assessment\Model\CompanyAssessmentRoleAlias')->deleteCompanyAssessmentRoleAlias($aObj->a_c_id, $post['revert-alias']);
-                    return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'list'));
+//                    $this->getServiceLocator()->get('Assessment\Model\CompanyAssessmentRoleAlias')->deleteCompanyAssessmentRoleAlias($aObj->a_c_id, $post['revert-alias']);
+//                    return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'list'));
+                    // This works now
+                    return $this->redirect()->toRoute('alias', array('controller' => 'alias', 'action' => 'edit', 'id' => '1'));
+                    // TODO put this in the right place
                 }
 
                 if (isset($post['arlc'])) {
@@ -704,7 +719,6 @@ class AssessmentController extends AbstractActionController
 
             $viewParams['rolesAdr1'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->getArlcByLocation($id, $adrId);
         } elseif ($step == 3) {
-
             $companyId = $aObj->a_c_id;
             $viewParams['locationFinished'] = $this->getAssessmentTable()->checkLocationFinished($id, $location);
             $viewParams['assessmentsRoles'] = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type, true, $companyId);
