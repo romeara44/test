@@ -43,9 +43,6 @@ class AliasController extends AbstractActionController
 
     public function onDispatch(\Zend\Mvc\MvcEvent $e)
     {
-//        var_dump('ytsert');
-//        die();
-
         $this->layout()->searchRoleFilter = 'alias';
         $container = new Container('activity');
         $container->activity = time();
@@ -60,62 +57,77 @@ class AliasController extends AbstractActionController
         } else if ($identity['u_first_login'] == 1) {
             return $this->redirect()->toRoute('user', array('controller' => 'user', 'action' => 'acceptprivacyterms'));
         }
-
-
-//        var_dump($this);
-//        die();
         return parent::onDispatch($e);
     }
 
     public function editAction()
     {
         $request = $this->getRequest();
-//        $request->setMethod('post');
 
         if ($request->isPost()) {
             $post = $request->getPost();
-            var_dump($post);
-            die();
+
+            if (isset($post['delete'])) {
+                $this->getServiceLocator()
+                    ->get('Assessment\Model\CompanyAssessmentRoleAlias')
+                    ->deleteCompanyAssessmentRoleAlias($post['companyId'], $post['id']);
+                $this->flashMessenger()->addSuccessMessage('Alias removed!');
+            }
+
+            $isValid =
+                isset($post['alias']) &&
+                isset($post['id']) &&
+                isset($post['companyId']) &&
+                ($post['alias'] !== "");
+
+            if ($isValid) {
+                $data['alias'] = $post['alias'];
+                $data['roleId'] = $post['id'];
+                $data['companyId'] = $post['companyId'];
+
+                $this->getServiceLocator()
+                    ->get('Assessment\Model\CompanyAssessmentRoleAlias')
+                    ->saveCompanyAssessmentRoleAlias($data);
+                $this->flashMessenger()->addSuccessMessage('Alias updated!');
+            }
+
+            if (!isset($post['delete']) && !$isValid) {
+                $this->flashMessenger()->addErrorMessage('Invalid input. Alias remains unchanged');
+            }
+
+            // TODO is this correct redirect location? Will need more data passed through if we want to
+            // redirect to the assessment-edit-roles page (probably best scenario)
+            return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'list'));
         } else {
-//            var_dump('test');
-//            die();
+
+            $viewParams['id'] = $this->params('id');
+            $viewParams['cId'] = $this->params('companyId');
+            $viewParams['defaultAlias'] = $this->getServiceLocator()
+                ->get('Assessment\Model\AssessmentRoleTable')
+                ->getRoleNameById($viewParams['id']);
+            $hasAlias = $this->getServiceLocator()
+                ->get('Assessment\Model\AssessmentRoleTable')
+                ->getRoleNameById($viewParams['id'], $viewParams['cId']);
+            $viewParams['alias'] = 'No alias is set for this role.';
+
+            if ($hasAlias !== 0) {
+                $viewParams['alias'] = $hasAlias;
+            }
+
+            $viewModel = new ViewModel($viewParams);
+            return $viewModel;
         }
-//        $post = $request->getPost();
-//        var_dump($post);
-//            die();
-//        } else {
-//            var_dump($request->isPost());
-//            $request->setMethod('post');
-//            var_dump($request->isPost());
-//            var_dump('not a post');
-//            die();
-//        }
-
-
-        $viewParams['id'] = $this->params('id');
-        $viewParams['cId'] = $this->params('companyId');
-        $viewParams['defaultAlias'] = $this->getServiceLocator()
-            ->get('Assessment\Model\AssessmentRoleTable')
-            ->getRoleNameById($viewParams['id']);
-
-        $hasAlias = $this->getServiceLocator()
-            ->get('Assessment\Model\AssessmentRoleTable')
-            ->getRoleNameById($viewParams['id'], $viewParams['cId']);
-
-        $viewParams['alias'] = 'No alias is set for this role.';
-        if ($hasAlias != 0) {
-            $viewParams['alias'] = $hasAlias;
-        }
-
-        $viewModel = new ViewModel($viewParams);
-//        var_dump($viewModel);
-        return $viewModel;
     }
 
-    public function listAction()
+    public function revertAliasAction()
     {
-//        return 'test';
+        $request = $this->getRequest();
+        $post = $request->getPost();
+        $this->getServiceLocator()
+            ->get('Assessment\Model\CompanyAssessmentRoleAlias')
+            ->deleteCompanyAssessmentRoleAlias($post['companyId'], $post['arId']);
     }
+
 
     public function getIdentity()
     {

@@ -524,21 +524,13 @@ class AssessmentController extends AbstractActionController
                     }
                 }
 
-                if (isset($post['aliasform'])) {
-                    foreach ($post['aliasform'] as $roleId => $alias) {
-                        $data['alias'] = $alias;
-                        $data['roleId'] = $roleId;
-                        $data['companyId'] = $aObj->a_c_id;
-                        $this->getServiceLocator()->get('Assessment\Model\CompanyAssessmentRoleAlias')->saveCompanyAssessmentRoleAlias($data);
-                    }
-                }
-
                 if ($this->getAssessmentTable()->checkLocationFinished($id, $location)) {
                     $this->getAssessmentTable()->_createRemediationPlan($id, $location);
                     if ($this->getAssessmentTable()->checkAllLocationsFinished($id)) {
                         return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'list'));
                     }
                 }
+                
             } elseif ($step == 3) {
                 $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update assessment "' . $id . '" step 5');
                 //$id = $this->getAssessmentTable()->cloneAssessment($id);
