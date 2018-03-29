@@ -384,18 +384,12 @@ class AssessmentController extends AbstractActionController
 
     public function editAction()
     {
-
-//        // This works now
-//        return $this->redirect()->toRoute('alias', array('controller' => 'alias', 'action' => 'edit', 'id' => '1'));
-//        // TODO put this in the right place
-
         $id = (int) $this->params('id');
         $step = (int) $this->params('step');
         $step = $step == 0 ? 1 : $step;
         $location = (int) $this->params('location');
         $assessmentRole = 0;
         $companyRolesMsg = '';
-
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_ASSESSMENT, $id);
 
         if ($step == 3 && $this->params('locationRole')) {

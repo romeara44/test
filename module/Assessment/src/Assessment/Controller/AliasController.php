@@ -73,7 +73,7 @@ class AliasController extends AbstractActionController
         }
 
         if ($request->isPost()) {
-            
+
             $post = $request->getPost();
 
             if (isset($post['delete'])) {
