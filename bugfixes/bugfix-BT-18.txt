@@ -1,0 +1,2 @@
+ALTER TABLE breach_logs MODIFY bl_update_date tinyblob DEFAULT NULL;
+ALTER TABLE breach_logs MODIFY bl_create_date tinyblob DEFAULT NULL;
