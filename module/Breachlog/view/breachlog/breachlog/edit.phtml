@@ -222,7 +222,7 @@ $form->setAttribute('method', 'post');
                 endif;
                 ?>
                 <?php
-                    $qLabel = $question->blq_order == 10 ? 'In 60 days' : 'Yes';
+                    $qLabel = $question->blq_order == 10 ? 'Within 60 days' : 'Yes';
                     $disabled = $this->blId ? ' DISABLED ' : '';
                 ?>
                 <input <?php echo $checked ?> <?php echo $disabled ?> type="radio" name="questions[<?php echo $question->blq_id ?>]" id="q<?php echo $question->blq_id ?>2" value="2" class="radio" style="margin-top: 10px; margin-bottom: 20px;" /> <label for="q<?php echo $question->blq_id ?>2" class="checkbox fleft" style="margin-top: 10px; margin-bottom: 20px;"><?php echo $qLabel ?> &nbsp; &nbsp; &nbsp; </label>
@@ -236,7 +236,7 @@ $form->setAttribute('method', 'post');
                 ?>
 
                 <?php
-                    $qLabel = $question->blq_order == 10 ? '60 days after end of year' : 'No';
+                    $qLabel = $question->blq_order == 10 ? 'Feb. 28th of next year (within 60 days of the end of the calendar year)' : 'No';
                 ?>
                 <input <?php echo $checked ?> <?php echo $disabled ?> type="radio" name="questions[<?php echo $question->blq_id ?>]" id="q<?php echo $question->blq_id ?>1" value="1" class="radio" style="margin-top: 10px; margin-bottom: 20px;" /> <label for="q<?php echo $question->blq_id ?>1" class="checkbox fleft" style="margin-top: 10px; margin-bottom: 20px;"><?php echo $qLabel ?> &nbsp; &nbsp; &nbsp; </label>
             </p>
