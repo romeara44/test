@@ -10,12 +10,9 @@ Company Assessment Role Alias Detail
 Specify new role alias (optional)
 </p>
 
-
-
-
     <div class="form-buttons">
 
-        <form method="post" action="/alias/edit/<?php echo $this->id ?>/<?php echo $this->cId?>" class="inline">
+        <form method="post" action="/alias/edit/<?php echo $this->id ?>/<?php echo $this->cId?>/<?php echo $this->redirect?>" class="inline">
             <input type="hidden" name="id" value="<?php echo $this->id; ?>">
             <input type="text" name="alias"><br><br><br>
             <button type="submit" name="companyId" value="<?php echo $this->cId; ?>" class="form-button">
@@ -24,7 +21,7 @@ Specify new role alias (optional)
         </form>
         <br><br>
 
-        <form method="post" action="/alias/edit/<?php echo $this->id ?>/<?php echo $this->cId?>" class="inline">
+        <form method="post" action="/alias/edit/<?php echo $this->id ?>/<?php echo $this->cId?>/<?php echo $this->redirect?>" class="inline">
             <input type="hidden" name="delete" value="<?php echo $this->id; ?>">
             <input type="hidden" name="id" value="<?php echo $this->id; ?>">
             <button type="submit" name="companyId" value="<?php echo $this->cId; ?>" class="form-button">

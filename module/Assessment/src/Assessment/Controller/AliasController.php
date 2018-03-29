@@ -63,8 +63,17 @@ class AliasController extends AbstractActionController
     public function editAction()
     {
         $request = $this->getRequest();
+        $redirect = $this->params('redirect');
+
+
+        if ($redirect == 'company') {
+            $route = 'client';
+        } else {
+            $route = 'assessment';
+        }
 
         if ($request->isPost()) {
+            
             $post = $request->getPost();
 
             if (isset($post['delete'])) {
@@ -95,13 +104,12 @@ class AliasController extends AbstractActionController
                 $this->flashMessenger()->addErrorMessage('Invalid input. Alias remains unchanged');
             }
 
-            // TODO is this correct redirect location? Will need more data passed through if we want to
-            // redirect to the assessment-edit-roles page (probably best scenario)
-            return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'list'));
+            return $this->redirect()->toRoute($route, array('controller' => $redirect, 'action' => 'list'));
         } else {
 
             $viewParams['id'] = $this->params('id');
             $viewParams['cId'] = $this->params('companyId');
+            $viewParams['redirect'] = $this->params('redirect');
             $viewParams['defaultAlias'] = $this->getServiceLocator()
                 ->get('Assessment\Model\AssessmentRoleTable')
                 ->getRoleNameById($viewParams['id']);

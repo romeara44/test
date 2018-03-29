@@ -375,13 +375,7 @@ $form->setAttribute('method', 'post');
                 <div class="col4  <?php echo ($counterRoles && $counterRoles % 2 == 0 ? 'last' : 'company-role-first') ?>"><br />
 
                     <p>
-                        <strong style="line-height: 32px;"><?php echo $ar['ar_name'] ?></strong><br />
-
-                    <p>
-                        Specify role name (optional)
-                        <input type="text" name="aliasform[<?php echo $ar['ar_id'] ?>]"/>
-                        <button type="submit" name="revert-alias" class="form-button" value="<?php echo $ar['ar_id'] ?>">Revert</button>
-                    </p>
+                        <strong style="line-height: 32px;"><?php echo "<a href='/alias/edit/{$ar['ar_id']}/{$this->cId}/company'>" . $ar['ar_name'] . "</a>"; ?></strong><br />
                     <p>
                         Assign role
                     </p>

@@ -80,14 +80,7 @@ $form->setAttribute('method', 'post');
                 <div class="col3 <?php echo $last ?>"><br />
                     <p>
                         <strong style="line-height: 32px;">
-                            <?php echo "<a href='/alias/edit/{$ar['ar_id']}/{$aObj->a_c_id}'>" . $ar['ar_name'] . "</a>";?></strong><br />
-<!--                        <button type="submit" name="revert-alias" class="form-button" value="--><?php //echo $ar['ar_id'] ?><!--"><i class="fa fa-edit"></i></button>-->
-<!--                        <button type="submit" name="revert-alias" class="form-button" value="--><?php //echo $ar['ar_id'] ?><!--"><i class="fa fa-close"></i></button>-->
-                    <p>
-<!--                        Specify role name (optional)-->
-<!--                        <input type="text" name="aliasform[--><?php //echo $ar['ar_id'] ?><!--]"/>-->
-<!--                        <button type="submit" name="revert-alias" class="form-button" value="--><?php //echo $ar['ar_id'] ?><!--">Revert</button>-->
-                    </p>
+                            <?php echo "<a href='/alias/edit/{$ar['ar_id']}/{$aObj->a_c_id}/assessment'>" . $ar['ar_name'] . "</a>";?></strong><br />
                     <p>
                         Assign role
                     </p>
@@ -110,10 +103,6 @@ $form->setAttribute('method', 'post');
                             <option value="addNewContactSelect">&rarr; Add New Contact</option>
                         </select>
                     </p>
-
-
-
-
 
                     <a id="addNewContactLink" style="display: none" href="/assessment/addnewcontact/<?php echo $this->aId ?>/step/2/location/<?php echo $this->location ?>/companyId/<?php echo $this->aObj->a_c_id; ?>" class="fancybox" title="Edit"><i class="fa fa-pencil"></i></a>
                 </div>

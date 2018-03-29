@@ -491,22 +491,11 @@ class AssessmentController extends AbstractActionController
                 }
             } elseif ($step == 2) {
 
-//                var_dump('test');
-//                die();
-
                 $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update assessment "' . $id . '" step 2');
                 $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_UPLOADED_ROLES, \Application\Model\LogsTable::ITEM_TYPE_ASSESSMENT, $id);
 
                 $valid = true;
                 $post = $request->getPost();
-
-                if (isset($post['revert-alias'])) {
-//                    $this->getServiceLocator()->get('Assessment\Model\CompanyAssessmentRoleAlias')->deleteCompanyAssessmentRoleAlias($aObj->a_c_id, $post['revert-alias']);
-//                    return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'list'));
-                    // This works now
-                    return $this->redirect()->toRoute('alias', array('controller' => 'alias', 'action' => 'edit', 'id' => '1'));
-                    // TODO put this in the right place
-                }
 
                 if (isset($post['arlc'])) {
                     foreach ($post['arlc'] as $locationId => $valueArlc) {
@@ -530,7 +519,7 @@ class AssessmentController extends AbstractActionController
                         return $this->redirect()->toRoute('assessment', array('controller' => 'assessment', 'action' => 'list'));
                     }
                 }
-                
+
             } elseif ($step == 3) {
                 $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update assessment "' . $id . '" step 5');
                 //$id = $this->getAssessmentTable()->cloneAssessment($id);

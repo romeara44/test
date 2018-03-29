@@ -42,7 +42,7 @@ return array(
             'alias' => array(
                 'type'    => 'segment',
                 'options' => array(
-                    'route'    => '/alias[/:action][/:id][/:companyId]',
+                    'route'    => '/alias[/:action][/:id][/:companyId][/:redirect]',
                     'constraints' => array(
                         'action' => '(?!\bpage\b)(?!\border_by\b)[a-zA-Z][a-zA-Z0-9_-]*',
                         'id'     => '[0-9]+',
