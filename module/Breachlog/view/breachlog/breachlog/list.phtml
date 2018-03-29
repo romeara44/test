@@ -72,8 +72,8 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
 											<a href="/breachlog/edit/<?php echo $bl->bl_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
 										<?php endif; ?>										
 										<!--even though this is /breachlog/edit send a url var type=view. 
-										//this will make it read only for anybody to view.-->
-                    <a href="/breachlog/edit/<?php echo $bl->bl_id . '?type=view' ?>" title="View Only"><i class="far fa-list-alt"></i></a> &nbsp;
+											this will make it read only for anybody to view.-->
+                    <a href="/breachlog/edit/<?php echo $bl->bl_id . '?type=view' ?>" title="View Only"><i class="fa fa-book"></i></a> &nbsp;
                     <?php if ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
                         <?php if ($bl->bl_active): ?>
                             <?php $deleteUrl = '/breachlog/delete/' . $bl->bl_id; ?>
