@@ -70,17 +70,22 @@ $form->setAttribute('method', 'post');
 
             <?php $maxInRows = 3; $counterRoles = 0; $last = ''; ?>
             <?php foreach ($this->assessmentsRoles as $ar): ?>
-                <?php
-                if (($counterRoles % $maxInRows) == 0):
-                    $last = 'last';
-                else:
-                    $last = '';
-                endif;
-                ?>
-                <div class="col3 <?php echo $last ?>"><br />
+                <div class="col3"><br />
                     <p>
-                        <strong style="line-height: 32px;">
-                            <?php echo "<a href='/alias/edit/{$ar['ar_id']}/{$aObj->a_c_id}/assessment'>" . $ar['ar_name'] . "</a>";?></strong><br />
+                        <style>
+                            .test-block {
+                                display: inline-block;
+                                margin-left: 2%;
+                            }
+                        </style>
+                        <div class="test-block">
+                            <strong style="line-height: 32px;">
+                                <?php echo $ar['ar_name'];?>
+                            </strong>
+                        </div>
+                        <div  class="test-block">
+                            <?php echo "<a href='/alias/edit/{$ar['ar_id']}/{$aObj->a_c_id}/assessment'><i class='fa fa-pencil'></i></a>";?>
+                        </div>
                     <p>
                         Assign role
                     </p>
