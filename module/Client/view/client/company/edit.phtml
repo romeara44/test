@@ -375,7 +375,20 @@ $form->setAttribute('method', 'post');
                 <div class="col4  <?php echo ($counterRoles && $counterRoles % 2 == 0 ? 'last' : 'company-role-first') ?>"><br />
 
                     <p>
-                        <strong style="line-height: 32px;"><?php echo "<a href='/alias/edit/{$ar['ar_id']}/{$this->cId}/company'>" . $ar['ar_name'] . "</a>"; ?></strong><br />
+                        <style>
+                            .test-block {
+                                display: inline-block;
+                                margin-left: 2%;
+                            }
+                        </style>
+                            <div class="test-block">
+                                <strong style="line-height: 32px;">
+                                    <?php echo $ar['ar_name'];?>
+                                </strong>
+                            </div>
+                            <div  class="test-block">
+                                <?php echo "<a href='/alias/edit/{$ar['ar_id']}/{$this->cId}/company'><i class='fa fa-pencil'></i></a>";?>
+                            </div>
                     <p>
                         Assign role
                     </p>
