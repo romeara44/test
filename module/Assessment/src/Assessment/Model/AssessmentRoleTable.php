@@ -25,6 +25,16 @@ class AssessmentRoleTable implements ServiceLocatorAwareInterface
         return $this->serviceLocator;
     }
 
+    public function getDefaultAssessmentRole($id) {
+        $id  = (int) $id;
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('ar_id = ' . $id);
+        $select->where('ar_active = 1');
+        $resultSet = $this->tableGateway->selectWith($select);
+        $row = $resultSet->current();
+        return $row->ar_name;
+    }
+
     public function getRoleNameById($id, $companyId = false)
     {
         $id  = (int) $id;
@@ -37,11 +47,14 @@ class AssessmentRoleTable implements ServiceLocatorAwareInterface
         if (!$row) {
             return '';
         }
+
         $result = $row->ar_name;
+
         if ($companyId) {
             $alias = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleAlias')->getAssessmentRoleAlias($companyId, $id);
             $result = $alias;
         }
+
         return $result;
     }
 

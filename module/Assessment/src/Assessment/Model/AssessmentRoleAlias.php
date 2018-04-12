@@ -25,7 +25,6 @@ class AssessmentRoleAlias implements ServiceLocatorAwareInterface
         return $this->serviceLocator;
     }
 
-    // TODO there should not be duplicates in `ara` table, but there are
     public function saveAssessmentRoleAlias($alias)
     {
         $id = 0;
@@ -41,13 +40,25 @@ class AssessmentRoleAlias implements ServiceLocatorAwareInterface
     public function getAssessmentRoleAlias($companyId, $arId)
     {
         $alias = 0;
-        $ara_id = $this->getServiceLocator()->get('Assessment\Model\CompanyAssessmentRoleAlias')->getCompanyAssessmentRoleAliasId($companyId, $arId);
+        $ara_id = $this->getServiceLocator()
+            ->get('Assessment\Model\CompanyAssessmentRoleAlias')
+            ->getCompanyAssessmentRoleAliasId($companyId, $arId);
+
         $select = $this->tableGateway->getSql()->select();
         $select->where("ara_id = {$ara_id}");
         $resultSet = $this->tableGateway->selectWith($select)->buffer();
+
         foreach ($resultSet as $result) {
             $alias = ($result->role_alias);
         }
+
+        // Return default role name if alias is not found
+        if ($alias === 0) {
+            $alias = $this->getServiceLocator()
+                ->get('Assessment\Model\AssessmentRoleTable')
+                ->getDefaultAssessmentRole($arId);
+        }
+
         return $alias;
     }
 
