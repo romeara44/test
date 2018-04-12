@@ -146,6 +146,21 @@
             </div>
         </div>
 
+        <div id="test-modal">
+            <h3>Are you sure you want to partay?</h3>
+            <div class="form-buttons">
+                <form method="post" action="/alias/edit/<?php echo $this->id ?>/<?php echo $this->cId?>/<?php echo $this->redirect?>" class="inline">
+                    <input type="hidden" name="id" value="<?php echo $this->id; ?>">
+                    <input type="text" name="alias"><br><br><br>
+                    <button type="submit" name="companyId" value="<?php echo $this->cId; ?>" class="form-button">
+                        Save
+                    </button>
+                </form>
+                <a id="test-yes" class="form-button">Yes</a>
+                <a href="javascript:void(0);" onclick="jQuery.fancybox.close();" class="form-button">No</a>
+            </div>
+        </div>
+
         <div class="modules-access-box">
             <h3>For access to this module you need enter code</h3>
             <div>

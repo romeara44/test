@@ -84,7 +84,9 @@ $form->setAttribute('method', 'post');
                             </strong>
                         </div>
                         <div  class="test-block">
-                            <?php echo "<a href='/alias/edit/{$ar['ar_id']}/{$aObj->a_c_id}/assessment'><i class='fa fa-pencil'></i></a>";?>
+<!--                            --><?php //echo "<a href='/alias/edit/{$ar['ar_id']}/{$aObj->a_c_id}/assessment'><i class='fa fa-pencil'></i></a>";?>
+<!--                            test-modal points to div in layout.phtml-->
+                            <a href="#test-modal" onclick="$('#test-yes').attr('href', '<?php echo 'post to att'; ?>')" class="confirmation-modal"><i class="fa fa-pencil"></i></a>
                         </div>
                     <p>
                         Assign role
