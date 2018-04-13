@@ -147,19 +147,19 @@
         </div>
 
         <div id="role-rename-modal" style="display: none;">
-            <h3>Update Role Name</h3>
+            <h3>Update Role Name (Optional)</h3>
             <div class="form-buttons">
 
                 <form id="alias-form" method="post" action="" class="inline">
-                    <input type="text" name="alias" id="alias"><br><br><br>
+                    <input type="text" name="alias" id="alias">
                 </form>
 
                 <a id="rename-role" class="form-button" onclick="renameRole()">Update</a>
 <!--                TODO make this delete alias-->
-                <a href="javascript:void(0);" onclick="jQuery.fancybox.close();" class="form-button">Revert to Default</a>
+                <a href="javascript:void(0);" onclick="renameRole(true);" class="form-button">Revert to Default</a>
                 <a href="javascript:void(0);" onclick="jQuery.fancybox.close();" class="form-button">Cancel</a>
                 <script>
-                    function renameRole() {
+                    function renameRole(revert) {
                         // Get required values from the DOM
                         var ar_id = document.getElementById("alias-form-role-id").innerText;
                         var company_id = document.getElementById("alias-form-company-id").innerText;
@@ -171,6 +171,15 @@
                         input.name = 'redirect'; // 'the key/name of the attribute/field that is sent to the server
                         input.value = redirect;
                         document.getElementById('alias-form').appendChild(input);
+
+                        // Add 'delete' element to POST for alias-form
+                        if (revert) {
+                            revert = document.createElement('input');
+                            revert.type = 'hidden';
+                            revert.name = 'delete'; // 'the key/name of the attribute/field that is sent to the server
+                            revert.value = 'delete';
+                            document.getElementById('alias-form').appendChild(revert);
+                        }
 
                         // Build POST action url and submit form
                         var form_action = "/alias/edit/" + ar_id + "/" + company_id;
