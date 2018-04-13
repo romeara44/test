@@ -74,7 +74,7 @@ class AliasController extends AbstractActionController
                 $this->getServiceLocator()
                     ->get('Assessment\Model\CompanyAssessmentRoleAlias')
                     ->deleteCompanyAssessmentRoleAlias($companyId, $id);
-                $this->flashMessenger()->addSuccessMessage('Alias removed!');
+//                $this->flashMessenger()->addSuccessMessage('Alias removed!');
             }
 
             $isValid =
@@ -91,11 +91,11 @@ class AliasController extends AbstractActionController
                 $this->getServiceLocator()
                     ->get('Assessment\Model\CompanyAssessmentRoleAlias')
                     ->saveCompanyAssessmentRoleAlias($data);
-                $this->flashMessenger()->addSuccessMessage('Alias updated!');
+//                $this->flashMessenger()->addSuccessMessage('Alias updated!');
             }
 
             if (!isset($post['delete']) && !$isValid) {
-                $this->flashMessenger()->addErrorMessage('Invalid input. Alias remains unchanged');
+//                $this->flashMessenger()->addErrorMessage('Invalid input. Alias remains unchanged');
             }
 
             $alias = $this->getServiceLocator()
