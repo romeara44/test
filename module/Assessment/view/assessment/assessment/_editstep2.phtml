@@ -84,9 +84,20 @@ $form->setAttribute('method', 'post');
                             </strong>
                         </div>
                         <div  class="test-block">
-<!--                            --><?php //echo "<a href='/alias/edit/{$ar['ar_id']}/{$aObj->a_c_id}/assessment'><i class='fa fa-pencil'></i></a>";?>
-<!--                            test-modal points to div in layout.phtml-->
-                            <a href="#test-modal" onclick="$('#test-yes').attr('href', '<?php echo 'post to att'; ?>')" class="confirmation-modal"><i class="fa fa-pencil"></i></a>
+
+                            <?php echo "<div id='alias-form-role-id' style='display: none;'></div>"; ?>
+                            <?php echo "<div id='alias-form-company-id' style='display: none;'></div>"; ?>
+                            <?php echo "<div id='alias-form-redirect' style='display: none;'>http://{$_SERVER['SERVER_NAME']}{$_SERVER['REQUEST_URI']}</div>"; ?>
+
+                            <a href="#role-rename-modal" class="confirmation-modal" onclick="setDomElements(<?php echo $ar['ar_id']; ?>, <?php echo $aObj->a_c_id;?>)"><i class="fa fa-pencil"></i></a>
+                            <script>
+                                function setDomElements(arId, companyId) {
+                                    document.getElementById("alias-form-role-id").innerText = arId;
+                                    document.getElementById("alias-form-company-id").innerText = companyId;
+                                }
+
+                            </script>
+
                         </div>
                     <p>
                         Assign role
@@ -139,6 +150,7 @@ $form->setAttribute('method', 'post');
 <div class="cboth"><br /></div>
 
 
+
 <script type="text/javascript">
     jQuery(document).ready(function() {
         $('#saveAndContinue').click(function() {
@@ -162,3 +174,4 @@ $form->setAttribute('method', 'post');
         }
     });
 </script>
+

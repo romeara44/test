@@ -63,18 +63,12 @@ class AliasController extends AbstractActionController
     public function editAction()
     {
         $request = $this->getRequest();
-        $redirect = $this->params('redirect');
-
-
-        if ($redirect == 'company') {
-            $route = 'client';
-        } else {
-            $route = 'assessment';
-        }
 
         if ($request->isPost()) {
 
             $post = $request->getPost();
+            $id = $this->params('id');
+            $companyId = $this->params('companyId');
 
             if (isset($post['delete'])) {
                 $this->getServiceLocator()
@@ -85,14 +79,16 @@ class AliasController extends AbstractActionController
 
             $isValid =
                 isset($post['alias']) &&
-                isset($post['id']) &&
-                isset($post['companyId']) &&
+                isset($id) &&
+                isset($companyId) &&
                 ($post['alias'] !== "");
+
 
             if ($isValid) {
                 $data['alias'] = $post['alias'];
-                $data['roleId'] = $post['id'];
-                $data['companyId'] = $post['companyId'];
+                $data['roleId'] = $id;
+                $data['companyId'] = $companyId;
+
 
                 $this->getServiceLocator()
                     ->get('Assessment\Model\CompanyAssessmentRoleAlias')
@@ -103,28 +99,10 @@ class AliasController extends AbstractActionController
             if (!isset($post['delete']) && !$isValid) {
                 $this->flashMessenger()->addErrorMessage('Invalid input. Alias remains unchanged');
             }
-
-            return $this->redirect()->toRoute($route, array('controller' => $redirect, 'action' => 'list'));
-        } else {
-
-            $viewParams['id'] = $this->params('id');
-            $viewParams['cId'] = $this->params('companyId');
-            $viewParams['redirect'] = $this->params('redirect');
-            $viewParams['defaultAlias'] = $this->getServiceLocator()
-                ->get('Assessment\Model\AssessmentRoleTable')
-                ->getRoleNameById($viewParams['id']);
-            $hasAlias = $this->getServiceLocator()
-                ->get('Assessment\Model\AssessmentRoleTable')
-                ->getRoleNameById($viewParams['id'], $viewParams['cId']);
-            $viewParams['alias'] = 'No alias is set for this role.';
-
-            if ($hasAlias !== 0) {
-                $viewParams['alias'] = $hasAlias;
-            }
-
-            $viewModel = new ViewModel($viewParams);
-            return $viewModel;
+            return $this->redirect()->toUrl($post['redirect']);
         }
+        // TODO make sure this fails well. What happens if you make a GET request to this url?
+        return 0;
     }
 
     public function revertAliasAction()

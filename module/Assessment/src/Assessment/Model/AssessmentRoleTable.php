@@ -74,6 +74,7 @@ class AssessmentRoleTable implements ServiceLocatorAwareInterface
         if ($companyId) {
             $companyId = (int) $companyId;
             $t = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleAlias')->getAssessmentRoleAliases($companyId);
+
             $ts = array();
             foreach ($t as $index => $value) {
                 $ts[$value['ar_id']] = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleAlias')->getAssessmentRoleAlias($companyId, $value['ar_id']);

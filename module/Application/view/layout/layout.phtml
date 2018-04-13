@@ -146,18 +146,38 @@
             </div>
         </div>
 
-        <div id="test-modal">
-            <h3>Are you sure you want to partay?</h3>
+        <div id="role-rename-modal">
+            <h3>Update Role Name</h3>
             <div class="form-buttons">
-                <form method="post" action="/alias/edit/<?php echo $this->id ?>/<?php echo $this->cId?>/<?php echo $this->redirect?>" class="inline">
-                    <input type="hidden" name="id" value="<?php echo $this->id; ?>">
-                    <input type="text" name="alias"><br><br><br>
-                    <button type="submit" name="companyId" value="<?php echo $this->cId; ?>" class="form-button">
-                        Save
-                    </button>
+
+                <form id="alias-form" method="post" action="" class="inline">
+                    <input type="text" name="alias" id="alias"><br><br><br>
                 </form>
-                <a id="test-yes" class="form-button">Yes</a>
-                <a href="javascript:void(0);" onclick="jQuery.fancybox.close();" class="form-button">No</a>
+
+                <a id="rename-role" class="form-button" onclick="renameRole()">Update</a>
+<!--                TODO make this delete alias-->
+                <a href="javascript:void(0);" onclick="jQuery.fancybox.close();" class="form-button">Revert to Default</a>
+                <a href="javascript:void(0);" onclick="jQuery.fancybox.close();" class="form-button">Cancel</a>
+                <script>
+                    function renameRole() {
+                        // Get required values from the DOM
+                        var ar_id = document.getElementById("alias-form-role-id").innerText;
+                        var company_id = document.getElementById("alias-form-company-id").innerText;
+                        var redirect = document.getElementById("alias-form-redirect").innerText;
+
+                        // Add 'redirect' element to alias-form
+                        var input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'redirect'; // 'the key/name of the attribute/field that is sent to the server
+                        input.value = redirect;
+                        document.getElementById('alias-form').appendChild(input);
+
+                        // Build POST action url and submit form
+                        var form_action = "/alias/edit/" + ar_id + "/" + company_id;
+                        document.getElementById('alias-form').action = form_action;
+                        document.getElementById("alias-form").submit();
+                    }
+                </script>
             </div>
         </div>
 
