@@ -80,14 +80,13 @@ $form->setAttribute('method', 'post');
                         </style>
                         <div class="form-modal-block">
                             <strong style="line-height: 32px;">
-                                <?php echo $ar['ar_name'];?>
+                                <div id="rolename <?php echo $ar['ar_id'];?>"><?php echo $ar['ar_name'];?></div>
                             </strong>
                         </div>
                         <div  class="form-modal-block">
 
                             <?php echo "<div id='alias-form-role-id' style='display: none;'></div>"; ?>
                             <?php echo "<div id='alias-form-company-id' style='display: none;'></div>"; ?>
-                            <?php echo "<div id='alias-form-redirect' style='display: none;'>http://{$_SERVER['SERVER_NAME']}{$_SERVER['REQUEST_URI']}</div>"; ?>
 
                             <a href="#role-rename-modal" class="confirmation-modal" onclick="setDomElements(<?php echo $ar['ar_id']; ?>, <?php echo $aObj->a_c_id;?>)"><i class="fa fa-pencil"></i></a>
                             <script>

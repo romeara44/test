@@ -155,36 +155,45 @@
                 </form>
 
                 <a id="rename-role" class="form-button" onclick="renameRole()">Update</a>
-<!--                TODO make this delete alias-->
                 <a href="javascript:void(0);" onclick="renameRole(true);" class="form-button">Revert to Default</a>
                 <a href="javascript:void(0);" onclick="jQuery.fancybox.close();" class="form-button">Cancel</a>
                 <script>
-                    function renameRole(revert) {
+
+                    function renameRole(revert_alias) {
                         // Get required values from the DOM
                         var ar_id = document.getElementById("alias-form-role-id").innerText;
                         var company_id = document.getElementById("alias-form-company-id").innerText;
-                        var redirect = document.getElementById("alias-form-redirect").innerText;
-
-                        // Add 'redirect' element to alias-form
-                        var input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = 'redirect'; // 'the key/name of the attribute/field that is sent to the server
-                        input.value = redirect;
-                        document.getElementById('alias-form').appendChild(input);
 
                         // Add 'delete' element to POST for alias-form
-                        if (revert) {
+                        if (revert_alias) {
                             revert = document.createElement('input');
                             revert.type = 'hidden';
                             revert.name = 'delete'; // 'the key/name of the attribute/field that is sent to the server
-                            revert.value = 'delete';
+                            revert.value = 'true';
                             document.getElementById('alias-form').appendChild(revert);
                         }
 
-                        // Build POST action url and submit form
-                        var form_action = "/alias/edit/" + ar_id + "/" + company_id;
-                        document.getElementById('alias-form').action = form_action;
-                        document.getElementById("alias-form").submit();
+                        $.ajax({
+                            url:"/alias/edit/" + ar_id + "/" + company_id,
+                            type:'post',
+                            data:$(document.getElementById('alias-form')).serialize(),
+                            success:function(response){
+                                var data = JSON.parse(response);
+                                var targetDiv = "rolename " + ar_id;
+                                // Reset rolename on current page (since there's no redirect)
+                                document.getElementById(targetDiv).innerText = data.alias;
+                            }
+                        });
+
+                        // Remove 'delete' element to prevent failure of future posts
+                        if (revert_alias) {
+                            document.getElementById('alias-form').removeChild(revert);
+                        }
+
+                        // Reset alias-form to defaults and close modal
+                        field_alias = document.getElementById("alias-form").elements.namedItem("alias");
+                        field_alias.value = field_alias.defaultValue;
+                        jQuery.fancybox.close();
                     }
                 </script>
             </div>

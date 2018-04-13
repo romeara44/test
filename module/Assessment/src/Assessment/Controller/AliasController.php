@@ -70,7 +70,7 @@ class AliasController extends AbstractActionController
             $id = $this->params('id');
             $companyId = $this->params('companyId');
 
-            if (isset($post['delete'])) {
+            if ((isset($post['delete'])) && ($post['delete'] == 'true')) {
                 $this->getServiceLocator()
                     ->get('Assessment\Model\CompanyAssessmentRoleAlias')
                     ->deleteCompanyAssessmentRoleAlias($companyId, $id);
@@ -98,9 +98,20 @@ class AliasController extends AbstractActionController
                 $this->flashMessenger()->addErrorMessage('Invalid input. Alias remains unchanged');
             }
 
-            return $this->redirect()->toUrl($post['redirect']);
+            $alias = $this->getServiceLocator()
+                ->get('Assessment\Model\AssessmentRoleAlias')
+                ->getAssessmentRoleAlias($companyId, $id);
+
+            $response = array(
+                "success" => 'true',
+                "alias"   => $alias,
+            );
+
+            $json = json_encode($response);
+            $this->response->setContent($json);
+            return $this->response;
         }
-        // TODO make sure this fails well. What happens if you make a GET request to this url?
+        // TODO what happens here if we GET this url?
         return 0;
     }
 
