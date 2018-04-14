@@ -391,7 +391,7 @@ $form->setAttribute('method', 'post');
                             <?php echo "<div id='alias-form-role-id' style='display: none;'></div>"; ?>
                             <?php echo "<div id='alias-form-company-id' style='display: none;'></div>"; ?>
 
-                            <a href="#role-rename-modal" class="confirmation-modal" onclick="setDomElements(<?php echo $ar['ar_id']; ?>, <?php echo $this->cId;?>)"><i class="fa fa-pencil"></i></a>
+                            <a href="#role-rename-modal" onclick="setDomElements(<?php echo $ar['ar_id']; ?>, <?php echo $this->cId;?>)"><i class="fa fa-pencil"></i></a>
                             <script>
                                 function setDomElements(arId, companyId) {
                                     document.getElementById("alias-form-role-id").innerText = arId;
