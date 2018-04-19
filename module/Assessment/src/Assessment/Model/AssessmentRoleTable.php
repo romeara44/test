@@ -35,6 +35,14 @@ class AssessmentRoleTable implements ServiceLocatorAwareInterface
         return $row->ar_name;
     }
 
+    public function getDefaultAssessmentRoles() {
+
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('ar_active = 1');
+        $resultSet = $this->tableGateway->selectWith($select);
+        return $resultSet;
+    }
+
     public function getRoleNameById($id, $companyId = false)
     {
         $id  = (int) $id;
@@ -58,6 +66,24 @@ class AssessmentRoleTable implements ServiceLocatorAwareInterface
         return $result;
     }
 
+    public function interpolateAliases($string, $aliasArray)
+    {
+        foreach ($aliasArray as $default => $alias) {
+            $string = str_ireplace($default, $alias, $string);
+        }
+        return $string;
+    }
+
+    public function getDefaultAliasMapper($companyId)
+    {
+        $defaults = $this->getDefaultAssessmentRoles();
+        $result = array();
+        foreach($defaults as $default) {
+            $result[$default->ar_name] = $this->getRoleNameById($default->ar_id, $companyId);
+        }
+        return $result;
+    }
+
     public function getAssessmentsRoles($aType = 1, $interview = false, $companyId = false)
     {
         $select = $this->tableGateway->getSql()->select();
@@ -73,11 +99,14 @@ class AssessmentRoleTable implements ServiceLocatorAwareInterface
 
         if ($companyId) {
             $companyId = (int) $companyId;
-            $t = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleAlias')->getAssessmentRoleAliases($companyId);
+            $t = $this->getDefaultAssessmentRoles();
 
+            // Overwrite default role-names if corresponding alias exists
             $ts = array();
             foreach ($t as $index => $value) {
-                $ts[$value['ar_id']] = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleAlias')->getAssessmentRoleAlias($companyId, $value['ar_id']);
+                $ts[$value->ar_id] = $this->getServiceLocator()
+                    ->get('Assessment\Model\AssessmentRoleAlias')
+                    ->getAssessmentRoleAlias($companyId, $value->ar_id);
             }
         }
 
