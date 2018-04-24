@@ -11,6 +11,8 @@ $form->setAttribute('action', '/assessment/edit');
 $form->setAttribute('method', 'post');
 
 // Render the opening tag
+
+
 ?>
 
 <style>
@@ -68,17 +70,39 @@ $form->setAttribute('method', 'post');
 
             <?php $maxInRows = 3; $counterRoles = 0; $last = ''; ?>
             <?php foreach ($this->assessmentsRoles as $ar): ?>
-                <?php
-                if (($counterRoles % $maxInRows) == 0):
-                    $last = 'last';
-                else:
-                    $last = '';
-                endif;
-                ?>
-                <div class="col3 <?php echo $last ?>"><br />
+                <div class="col3"><br />
                     <p>
-                        <strong style="line-height: 32px;"><?php echo $ar['ar_name'] ?></strong><br />
+                        <style>
+                            .form-modal-block {
+                                display: inline-block;
+                                margin-left: 2%;
+                            }
+                        </style>
+                        <div class="form-modal-block">
+                            <strong style="line-height: 32px;">
+                                <div id="rolename <?php echo $ar['ar_id'];?>"><?php echo $ar['ar_name'];?></div>
+                            </strong>
+                        </div>
+                        <div  class="form-modal-block">
+
+                            <?php echo "<div id='alias-form-role-id' style='display: none;'></div>"; ?>
+                            <?php echo "<div id='alias-form-company-id' style='display: none;'></div>"; ?>
+
+                            <a href="#role-rename-modal" class="confirmation-modal" onclick="setDomElements(<?php echo $ar['ar_id']; ?>, <?php echo $aObj->a_c_id;?>)"><i class="fa fa-pencil"></i></a>
+                            <script>
+                                function setDomElements(arId, companyId) {
+                                    document.getElementById("alias-form-role-id").innerText = arId;
+                                    document.getElementById("alias-form-company-id").innerText = companyId;
+                                }
+
+                            </script>
+
+                        </div>
+                    <p>
+                        Assign role
+                    </p>
                         <select name="arlc[<?php echo $this->location ?>][<?php echo $ar['ar_id'] ?>]" id="" class="contactSelect w225">
+
                             <option value="">Select Contact</option>
                             <option value="">---</option>
                             <?php $selected = ''; ?>
@@ -96,6 +120,7 @@ $form->setAttribute('method', 'post');
                             <option value="addNewContactSelect">&rarr; Add New Contact</option>
                         </select>
                     </p>
+
                     <a id="addNewContactLink" style="display: none" href="/assessment/addnewcontact/<?php echo $this->aId ?>/step/2/location/<?php echo $this->location ?>/companyId/<?php echo $this->aObj->a_c_id; ?>" class="fancybox" title="Edit"><i class="fa fa-pencil"></i></a>
                 </div>
 
@@ -124,6 +149,7 @@ $form->setAttribute('method', 'post');
 <div class="cboth"><br /></div>
 
 
+
 <script type="text/javascript">
     jQuery(document).ready(function() {
         $('#saveAndContinue').click(function() {
@@ -146,6 +172,5 @@ $form->setAttribute('method', 'post');
             $('#addNewContactLink').click();
         }
     });
-
-
 </script>
+

@@ -35,6 +35,7 @@ class RemediationplanController extends AbstractActionController
     protected $userTable;
     protected $noteTable;
     protected $mailtemplateTable;
+    protected $companyRolesTable;
 
     public function onDispatch(\Zend\Mvc\MvcEvent $e)
     {
@@ -281,9 +282,7 @@ class RemediationplanController extends AbstractActionController
         $rpObj->_client_name = stripslashes($rpObj->_client_name);
         $actions = $this->getRemediationplanactionTable()->getRemediationplanactions($id, $sortCol, $order);
         $actions->buffer();
-
         $noteTable = $this->getNoteTable();
-
         $identity = $this->getIdentity();
 
         $userTable = $this->getServiceLocator()->get('Admin\Model\UserTable');
@@ -294,6 +293,17 @@ class RemediationplanController extends AbstractActionController
             $userConsultants = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getByCompany($rpObj->rp_c_id);
 
             $company = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getCompany($rpObj->rp_c_id);
+            $roleTable = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable');
+            $aliasArray = $roleTable->getDefaultAliasMapper($rpObj->rp_c_id);
+
+            $actionsArray = array();
+            foreach ($actions as $index => $action) {
+                $actionsArray[$index] = $action;
+                $actionsArray[$index]->rpa_threat = $roleTable->interpolateAliases($action->rpa_threat, $aliasArray);
+                $actionsArray[$index]->rpa_action_plan = $roleTable->interpolateAliases($action->rpa_action_plan, $aliasArray);
+            }
+
+            $actions = $actionsArray;
 
             if($company) {
                 $userPrimary = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUser($company->c_primary_contact_u_id);

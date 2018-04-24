@@ -123,6 +123,7 @@ class CompanyController extends AbstractActionController
         $rolesform = $request->isPost() && (int) $request->getPost('rolesform');
         $roleFilter = $this->params()->fromRoute('roleFilter') ? (int) $this->params()->fromRoute('roleFilter') : 0;
 
+
         $this->getLogTable()->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_COMPANY, $id);
 
         if (!$this->hasIdentity()) {
@@ -176,7 +177,12 @@ class CompanyController extends AbstractActionController
         $identity = $this->getIdentity();        
 
         if ($request->isPost()) {
-            if ($renewalform) {                
+            $post = $request->getPost();
+            if (isset($post['revert-alias'])) {
+                $this->getServiceLocator()->get('Assessment\Model\CompanyAssessmentRoleAlias')->deleteCompanyAssessmentRoleAlias($id, $post['revert-alias']);
+                return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
+
+            } elseif ($renewalform){
                 $this->getCompanyTable()->saveRenewalData($id, $request->getPost());
                 return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
             } elseif ($noteform) {
@@ -192,8 +198,8 @@ class CompanyController extends AbstractActionController
                     $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
 
                     $this->flashMessenger()->addSuccessMessage('Note saved');
-
                     return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
+
                 } else {
                     if ($id) {
                         $form->bind($companyObj);
@@ -215,6 +221,16 @@ class CompanyController extends AbstractActionController
                         $this->getServiceLocator()->get('Client\Model\CompanyRolesTable')->saveCompanyRole($cr);
                     }
                 }
+
+                if (isset($post['aliasform'])) {
+                    foreach ($post['aliasform'] as $roleId => $alias) {
+                        $data['alias'] = $alias;
+                        $data['roleId'] = $roleId;
+                        $data['companyId'] = $id;
+                        $this->getServiceLocator()->get('Assessment\Model\CompanyAssessmentRoleAlias')->saveCompanyAssessmentRoleAlias($data);
+                    }
+                }
+
                 return $this->redirect()->toRoute('client', array('controller' => 'company', 'action' => 'list'));
             } else {
                 $post = $request->getPost();
@@ -278,7 +294,7 @@ class CompanyController extends AbstractActionController
             'contacts' => $contacts,
             'notes' => $notes,
             'companyObj' => $companyObj,
-            'assessmentsRoles' => $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles(),
+            'assessmentsRoles' => $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles(1, false, $id),
             'primaryContactId'=> $primaryContactId,
             'trainingManagerIds'=> $trainingManagerIds,
             'roleId' => $identity['u_role_id'],

@@ -371,9 +371,38 @@ $form->setAttribute('method', 'post');
             <form action="/company/edit/<?php echo $this->cId ?>" name="rolesform" id="" method="POST">
                 <?php $counterRoles = 1; ?>
                 <?php foreach ($this->assessmentsRoles as $ar): ?>
+
                 <div class="col4  <?php echo ($counterRoles && $counterRoles % 2 == 0 ? 'last' : 'company-role-first') ?>"><br />
+
                     <p>
-                        <strong style="line-height: 32px;"><?php echo $ar['ar_name'] ?></strong><br />
+                        <style>
+                            .form-modal-block {
+                                display: inline-block;
+                                margin-left: 2%;
+                            }
+                        </style>
+                        <div class="form-modal-block">
+                            <strong style="line-height: 32px;">
+                                <div id="rolename <?php echo $ar['ar_id'];?>"><?php echo $ar['ar_name'];?></div>
+                            </strong>
+                        </div>
+                        <div  class="form-modal-block">
+
+                            <?php echo "<div id='alias-form-role-id' style='display: none;'></div>"; ?>
+                            <?php echo "<div id='alias-form-company-id' style='display: none;'></div>"; ?>
+
+                            <a href="#role-rename-modal" class="confirmation-modal" onclick="setDomElements(<?php echo $ar['ar_id']; ?>, <?php echo $this->cId;?>)"><i class="fa fa-pencil"></i></a>
+                            <script>
+                                function setDomElements(arId, companyId) {
+                                    document.getElementById("alias-form-role-id").innerText = arId;
+                                    document.getElementById("alias-form-company-id").innerText = companyId;
+                                }
+                            </script>
+                        </div>
+
+                    <p>
+                        Assign role
+                    </p>
                         <select name="rolesform[<?php echo $ar['ar_id'] ?>]" id="" class="contactSelect w225">
                             <option value="">Select Contact</option>
                             <option value="">---</option>

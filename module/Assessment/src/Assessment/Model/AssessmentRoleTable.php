@@ -2,14 +2,8 @@
 namespace Assessment\Model;
 
 use Zend\Db\TableGateway\TableGateway;
-use Zend\Mail;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
-
-use Zend\Db\ResultSet\ResultSet;
-use Zend\Db\Sql\Select;
-use Zend\Paginator\Adapter\DbSelect;
-use Zend\Paginator\Paginator;
 
 class AssessmentRoleTable implements ServiceLocatorAwareInterface
 {
@@ -31,25 +25,66 @@ class AssessmentRoleTable implements ServiceLocatorAwareInterface
         return $this->serviceLocator;
     }
 
-    public function getRoleNameById($id)
-    {
+    public function getDefaultAssessmentRole($id) {
         $id  = (int) $id;
-
         $select = $this->tableGateway->getSql()->select();
         $select->where('ar_id = ' . $id);
         $select->where('ar_active = 1');
-
         $resultSet = $this->tableGateway->selectWith($select);
-
         $row = $resultSet->current();
+        return $row->ar_name;
+    }
+
+    public function getDefaultAssessmentRoles() {
+
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('ar_active = 1');
+        $resultSet = $this->tableGateway->selectWith($select);
+        return $resultSet;
+    }
+
+    public function getRoleNameById($id, $companyId = false)
+    {
+        $id  = (int) $id;
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('ar_id = ' . $id);
+        $select->where('ar_active = 1');
+        $resultSet = $this->tableGateway->selectWith($select);
+        $row = $resultSet->current();
+
         if (!$row) {
             return '';
         }
 
-        return $row->ar_name;
+        $result = $row->ar_name;
+
+        if ($companyId) {
+            $alias = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleAlias')->getAssessmentRoleAlias($companyId, $id);
+            $result = $alias;
+        }
+
+        return $result;
     }
 
-    public function getAssessmentsRoles($aType = 1, $interview = false)
+    public function interpolateAliases($string, $aliasArray)
+    {
+        foreach ($aliasArray as $default => $alias) {
+            $string = str_ireplace($default, $alias, $string);
+        }
+        return $string;
+    }
+
+    public function getDefaultAliasMapper($companyId)
+    {
+        $defaults = $this->getDefaultAssessmentRoles();
+        $result = array();
+        foreach($defaults as $default) {
+            $result[$default->ar_name] = $this->getRoleNameById($default->ar_id, $companyId);
+        }
+        return $result;
+    }
+
+    public function getAssessmentsRoles($aType = 1, $interview = false, $companyId = false)
     {
         $select = $this->tableGateway->getSql()->select();
         $select->where('ar_active = 1');
@@ -61,9 +96,35 @@ class AssessmentRoleTable implements ServiceLocatorAwareInterface
         } else {
             //$select->where('ar_id <> 7');
         }
-        $select->order('ar_order ASC');
 
+        if ($companyId) {
+            $companyId = (int) $companyId;
+            $t = $this->getDefaultAssessmentRoles();
+
+            // Overwrite default role-names if corresponding alias exists
+            $ts = array();
+            foreach ($t as $index => $value) {
+                $ts[$value->ar_id] = $this->getServiceLocator()
+                    ->get('Assessment\Model\AssessmentRoleAlias')
+                    ->getAssessmentRoleAlias($companyId, $value->ar_id);
+            }
+        }
+
+        $select->order('ar_order ASC');
         $resultSet = $this->tableGateway->selectWith($select);
+
+        if ($companyId) {
+            $resultSet->buffer();
+            foreach ($resultSet as $i => $v) {
+                if (array_key_exists($v->ar_id, $ts)) {
+                    $results[] = array('ar_name' => $ts[$v->ar_id], 'ar_id' => $v->ar_id);
+                } else {
+                    $results[] = array('ar_name' => $v->ar_name, 'ar_id' => $v->ar_id);
+                }
+            }
+
+            $resultSet->initialize($results);
+        }
 
         return $resultSet;
     }

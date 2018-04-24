@@ -150,7 +150,6 @@ body {
     width: 200px;
 }
 
-
 /* Top Links & Search */
 
 #top-links {
@@ -497,6 +496,7 @@ th .button { margin-bottom: 0; }
 	font-weight: 400;
 	line-height: 34px;
 	background: #258e8f url(../images/button-bg.png) left top repeat-x;
+	/*background: #258e8f url(../images/apple-touch-icon-ipad.png) left top repeat-x;*/
 	border: 0;
 	border-radius: 3px;
 	text-decoration: none;
@@ -990,7 +990,7 @@ label.checkbox { width: auto; padding: 0; line-height: 14px; }
 
 input {
 	float: left;
-	width: 300px;
+	width: 90%;
 	margin: 0 0 10px 0;
 	padding: 6px 8px;
 	color: #081c2f;
@@ -1501,7 +1501,6 @@ form.chart select {
     width: 250px;
     margin: 0 auto 12px auto;
 }
-
 
 /* Toolbox */
 

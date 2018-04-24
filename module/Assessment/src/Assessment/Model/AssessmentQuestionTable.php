@@ -1,4 +1,5 @@
 <?php
+
 namespace Assessment\Model;
 
 use Zend\Db\TableGateway\TableGateway;
@@ -33,7 +34,7 @@ class AssessmentQuestionTable implements ServiceLocatorAwareInterface
 
     public function getQuestion($id)
     {
-        $id  = (int) $id;
+        $id = (int)$id;
 
         $select = $this->tableGateway->getSql()->select();
         $select->where('aq_id = ' . $id);
@@ -66,16 +67,18 @@ class AssessmentQuestionTable implements ServiceLocatorAwareInterface
 
         if ($aObj) {
             $company = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getCompany($aObj->a_c_id);
+            $roleTable = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable');
+            $aliasArray = $roleTable->getDefaultAliasMapper($aObj->a_c_id);
+
             if ($company->c_rel_type == \Client\Model\Company::RELATION_TYPE_CHILD && $company->c_type == \Client\Model\Company::CHILD_TYPE_LOCATION_ONLY) {
                 $additionalAddress = true;
             }
+
         }
 
-        //die;
         $select = $this->tableGateway->getSql()->select();
         $select->where('aq_type = ' . $type);
         $select->where('aq_active = 1');
-
         $select->join(array('aqo' => 'assessments_questions_options'), 'aqo_aq_id = aq_id', array('*', '_options' => new \Zend\Db\Sql\Expression('GROUP_CONCAT(CONCAT(aqo_id, "::", aqo_title) ORDER BY aqo_order)')), 'left');
         $select->join(array('aqc' => 'assessments_questions_categories'), 'aq_aqc_id = aqc_id', array('*'), 'left');
 
@@ -83,8 +86,7 @@ class AssessmentQuestionTable implements ServiceLocatorAwareInterface
             $select->where('aqc_additional_location = 1');
         }
 
-        $select->where('aqc_ar_id = ' . (int) $aRole);
-
+        $select->where('aqc_ar_id = ' . (int)$aRole);
         $select->order('aq_order ASC');
         $select->group('aqo_aq_id');
 
@@ -93,20 +95,24 @@ class AssessmentQuestionTable implements ServiceLocatorAwareInterface
 
         $qCats = array();
         foreach ($resultSet->buffer() as $rs) {
-            if (!(int) $rs->aq_parent_aq_id) {
-                $obj = (array) $rs;
+            if (!(int)$rs->aq_parent_aq_id) {
+                $obj = (array)$rs;
                 foreach ($resultSet2->buffer() as $rs2) {
                     if (($rs2->aq_parent_aq_id == $rs->aq_id) && ($rs2->aq_aqc_id == $rs->aq_aqc_id)) {
-                        $obj['children'][] = (array) $rs2;
+                        $obj['children'][] = (array)$rs2;
                     }
                 }
 
                 $catDesc['aqc_parent_id'] = $rs->aqc_parent_id;
                 $catDesc['aqc_name'] = $rs->aqc_name;
                 $catDesc['aqc_citation'] = $rs->aqc_citation;
-                $catDesc['aqc_specification'] = $rs->aqc_specification;
-                $catDesc['aqc_description'] = $rs->aqc_description;
-                $catDesc['aqc_policy'] = $rs->aqc_policy;
+
+                if ($aObj) {
+                    $catDesc['aqc_specification'] = $roleTable->interpolateAliases($rs->aqc_specification, $aliasArray);
+                    $catDesc['aqc_description'] = $roleTable->interpolateAliases($rs->aqc_description, $aliasArray);
+                    $catDesc['aqc_policy'] = $roleTable->interpolateAliases($rs->aqc_policy, $aliasArray);
+                }
+
 
                 if (!isset($qCats[$rs->aq_aqc_id]['cat'])) {
                     $catDesc['aqc_citation'] = str_replace('Â', '', $catDesc['aqc_citation']);
@@ -116,18 +122,31 @@ class AssessmentQuestionTable implements ServiceLocatorAwareInterface
             }
         }
 
-
+        // Use company information to interpolate assessment-role-aliases
+        if ($aObj) {
+            foreach ($qCats as $index => $qCat) {
+                foreach ($qCats[$index]['elements'] as $i => $element) {
+                    if (array_key_exists('children', $element)) {
+                        foreach ($element['children'] as $ii => $child) {
+                            $qCats[$index]['elements'][$i]['aq_title'] = $roleTable->interpolateAliases($qCat['elements'][$i]['aq_title'], $aliasArray);
+                            $qCats[$index]['elements'][$i]['children'][$ii]['aq_title'] = $roleTable->interpolateAliases($child['aq_title'], $aliasArray);
+                            $qCats[$index]['elements'][$i]['children'][$ii]['aqc_description'] = $roleTable->interpolateAliases($child['aqc_description'], $aliasArray);
+                            $qCats[$index]['elements'][$i]['children'][$ii]['aqc_specification'] = $roleTable->interpolateAliases($child['aqc_specification'], $aliasArray);
+                        }
+                    }
+                }
+            }
+        }
         return $qCats;
     }
 
     public function getQuestionsIdsByCategory($catId = 0)
     {
-        $catId = (int) $catId;
+        $catId = (int)$catId;
+
         $select = $this->tableGateway->getSql()->select();
         $select->where('aq_active = 1');
-
         $select->where('aq_aqc_id = ' . $catId);
-
         $select->order('aq_order ASC');
         $select->group('aq_id');
 
@@ -144,14 +163,10 @@ class AssessmentQuestionTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
         $select->where('aq_type = 1');
         $select->where('aq_active = 1');
-
         $select->where('aq_id > 7');
-
         $select->order('aq_order ASC');
         $select->group('aq_id');
-
         $resultSet = $this->tableGateway->selectWith($select);
-
         return $resultSet;
     }
 }

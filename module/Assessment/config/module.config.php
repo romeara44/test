@@ -5,6 +5,7 @@ return array(
         'invokables' => array(
             'Assessment\Controller\Assessment' => 'Assessment\Controller\AssessmentController',
             'Assessment\Controller\Remediationplan' => 'Assessment\Controller\RemediationplanController',
+            'Assessment\Controller\Alias' => 'Assessment\Controller\AliasController',
         ),
     ),
 
@@ -38,6 +39,33 @@ return array(
                 ),
             ),
 
+            'alias' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/alias[/:action][/:id][/:companyId][/:redirect]',
+                    'constraints' => array(
+                        'action' => '(?!\bpage\b)(?!\border_by\b)[a-zA-Z][a-zA-Z0-9_-]*',
+                        'id'     => '[0-9]+',
+                        'page' => '[0-9]+',
+                        'order_by' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'order' => 'ASC|DESC',
+                        'roleFilter' => '[0-9]+',
+                        'step' => '[0-9]+',
+                        'location' => '[0-9]+',
+                        'adrId' => '[0-9]+',
+                        'ailiId' => '[0-9]+',
+                        'abalId' => '[0-9]+',
+                        'locationRole' => '[0-9_]+',
+                        'assessmentRole' => '[0-9_]+',
+                        'companyId' => '[0-9_]+',
+                    ),
+                    'defaults' => array(
+                        'controller' => 'Assessment\Controller\Alias',
+                        'action'     => 'index',
+                    ),
+                ),
+            ),
+
             'remediationplan' => array(
                 'type'    => 'segment',
                 'options' => array(
@@ -66,6 +94,7 @@ return array(
         'template_path_stack' => array(
             'assessment' => __DIR__ . '/../view',
             'remediationplan' => __DIR__ . '/../view',
+            'alias' => __DIR__ . '/../view',
         ),
         'template_map' => array(
             'remediationplan/pdfTemplate' => __DIR__ . '/../../../module/Assessment/view/assessment/remediationplan/pdfTemplate.phtml',

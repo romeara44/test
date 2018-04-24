@@ -35,9 +35,7 @@ class AssessmentQuestionCategoryTable implements ServiceLocatorAwareInterface
     {
         $select = $this->tableGateway->getSql()->select();
         $select->where('aqc_active = 1');
-
         $resultSet = $this->tableGateway->selectWith($select);
-
         return $resultSet;
     }
 
@@ -56,10 +54,9 @@ class AssessmentQuestionCategoryTable implements ServiceLocatorAwareInterface
         if ($additional_location) {
             $select->where('aqc_additional_location = 1');
         }
+
         $select->join(array('aq' => 'assessments_questions'), 'aq_aqc_id = aqc_id', array('*'));
-
         $select->group('aqc_id');
-
         $resultSet = $this->tableGateway->selectWith($select);
         return $resultSet;
     }
