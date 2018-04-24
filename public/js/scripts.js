@@ -33,7 +33,6 @@ jQuery(document).ready(function() {
 
         jQuery(this).fancybox({
             'width': '500',
-            'background': 'red',
             'autoDimensions': false,
             'hideOnContentClick': false,
             'closeBtn': false,
@@ -53,30 +52,6 @@ jQuery(document).ready(function() {
         });
 
     });
-
-    // jQuery('.test-modal').each(function() {
-    //
-    //     jQuery(this).fancybox({
-    //         'width': '500',
-    //         'autoDimensions': false,
-    //         'hideOnContentClick': false,
-    //         'closeBtn': false,
-    //         'helpers' : {
-    //             'overlay' : {
-    //                 'closeClick': false
-    //             }
-    //         },
-    //         'keys' : {
-    //             close  : null
-    //         },
-    //         'beforeShow': function () {
-    //             jQuery.fancybox.wrap.bind("contextmenu", function (e) {
-    //                 return false;
-    //             });
-    //         }
-    //     });
-    //
-    // });
 
 	$('ul#tabs-nav').each(function() {
 		var $active, $content, $links = $(this).find('a');
