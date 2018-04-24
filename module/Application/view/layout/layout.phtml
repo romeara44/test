@@ -159,62 +159,62 @@
                 <a href="javascript:void(0);" onclick="jQuery.fancybox.close();" class="form-button">Cancel</a>
 
                 <script>
-										var owner = null;
-										class roleObj{
-											constructor() {
-												var t = this;
-												owner = t;
-												t.document = document;
-												t.ar_id = t.document.getElementById("alias-form-role-id").innerText;
-												t.company_id = t.document.getElementById("alias-form-company-id").innerText;
-												t.url = "/alias/edit/" + t.ar_id + "/" + t.company_id;
-												t.revert = null;
-											}
-											
-											ajaxCall(callback){
-												var t = this;
-												$.ajax({
-													url:t.url,
-													type:'post',
-													data:$(t.document.getElementById('alias-form')).serialize(),
-													success:function(response){
-															var data = JSON.parse(response);
-															var targetDiv = "rolename " + t.ar_id;
-															// Reset rolename on current page (since there's no redirect)
-															owner.document.getElementById(targetDiv).innerText = data.alias;
-															callback();
-													}
-												});												
-											}
-											
-											renameRole(){
-												var t = this;
-												t.ajaxCall(t.finish);
-											}
-											
-											revertRole(){
-												var t = this;
-				
-												t.revert = t.document.createElement('input');
-												t.revert.type = 'hidden';
-												t.revert.name = 'delete'; // 'the key/name of the attribute/field that is sent to the server
-												t.revert.value = 'true';
-												t.document.getElementById('alias-form').appendChild(t.revert);
-												t.ajaxCall(function(){
-													var t = owner;
-													t.document.getElementById('alias-form').removeChild(t.revert);
-													t.finish();
-												});
-											}
-											
-											finish(){
-												var t = owner;
-                        // Reset alias-form to defaults and close modal
-                        var field_alias = t.document.getElementById("alias-form").elements.namedItem("alias");
-                        field_alias.value = field_alias.defaultValue;
-                        jQuery.fancybox.close();
-											}
-										}
+                    var owner = null;
+                    class roleObj{
+                        constructor() {
+                            var t = this;
+                            owner = t;
+                            t.document = document;
+                            t.ar_id = t.document.getElementById("alias-form-role-id").innerText;
+                            t.company_id = t.document.getElementById("alias-form-company-id").innerText;
+                            t.url = "/alias/edit/" + t.ar_id + "/" + t.company_id;
+                            t.revert = null;
+                        }
+
+                        ajaxCall(callback){
+                            var t = this;
+                            $.ajax({
+                                url:t.url,
+                                type:'post',
+                                data:$(t.document.getElementById('alias-form')).serialize(),
+                                success:function(response){
+                                        var data = JSON.parse(response);
+                                        var targetDiv = "rolename " + t.ar_id;
+                                        // Reset rolename on current page (since there's no redirect)
+                                        owner.document.getElementById(targetDiv).innerText = data.alias;
+                                        callback();
+                                }
+                            });
+                        }
+
+                        renameRole(){
+                            var t = this;
+                            t.ajaxCall(t.finish);
+                        }
+
+                        revertRole(){
+                            var t = this;
+
+                            t.revert = t.document.createElement('input');
+                            t.revert.type = 'hidden';
+                            t.revert.name = 'delete'; // 'the key/name of the attribute/field that is sent to the server
+                            t.revert.value = 'true';
+                            t.document.getElementById('alias-form').appendChild(t.revert);
+                            t.ajaxCall(function(){
+                                var t = owner;
+                                t.document.getElementById('alias-form').removeChild(t.revert);
+                                t.finish();
+                            });
+                        }
+
+                        finish(){
+                            var t = owner;
+                            // Reset alias-form to defaults and close modal
+                            var field_alias = t.document.getElementById("alias-form").elements.namedItem("alias");
+                            field_alias.value = field_alias.defaultValue;
+                            jQuery.fancybox.close();
+                        }
+                    }
 
                 </script>
             </div>

@@ -507,10 +507,6 @@ th .button { margin-bottom: 0; }
 
 .form-button .fa { margin-left: -2px; margin-right: 4px; }
 
-.btn {
-	background: red;
-}
-
 .label {
 	float: left;
 	display: block;
