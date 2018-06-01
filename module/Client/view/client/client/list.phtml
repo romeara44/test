@@ -5,6 +5,9 @@ $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
 $identity = $authService->getIdentity();
 ?>
 
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
+
 <div class="page-title">
     <h1 class="fleft">Clients</h1>
     <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 0, 'activeFilter' => $activeFilter)); ?>" class="label <?php echo $roleFilter == 0 ? ' selected ' : '' ?>">All</a>
@@ -26,36 +29,22 @@ $identity = $authService->getIdentity();
 
 <p></p>
 
-<table cellpadding="0" cellspacing="0">
+<table id="client-list" cellpadding="0" cellspacing="0">
     <thead>
         <tr>
             <?php $classSort = ($order_by == 'id') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
-            <th>
-                <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => 'id', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'activeFilter' => $activeFilter)); ?>">
-                    ID <i class="fa <?php echo $classSort ?>"></i>
-                </a>
-            </th>
-
+            <th>ID</th>
             <th>Type </th>
 
             <?php $classSort = ($order_by == 'name') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
-            <th>
-                <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => 'name', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'activeFilter' => $activeFilter)); ?>">
-                    Name <i class="fa <?php echo $classSort ?>"></i>
-                </a>
-            </th>
+            <th>Name</th>
 
             <?php $classSort = ($order_by == 'company') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
-            <th>
-                <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => 'company', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'activeFilter' => $activeFilter)); ?>">
-                    Company <i class="fa <?php echo $classSort ?>"></i>
-                </a>
-            </th>
-
-            <th>Phone </th>
-            <th>Created </th>
-            <th>Renewal Date </th>
-            <th>&nbsp;</th>
+            <th>Company</th>
+            <th>Phone</th>
+            <th>Created</th>
+            <th>Renewal Date</th>
+            <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
         </tr>
     </thead>
     <tbody>
@@ -100,13 +89,13 @@ $identity = $authService->getIdentity();
         <?php endforeach; ?>
     </tbody>
 </table>
-
-<?php echo $this->paginationControl(
-    $this->paginator,
-    'sliding',
-    array('partial/paginator.phtml', 'Client'),
-    array('route' => 'list', 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'roleFilter' => $roleFilter, 'activeFilter' => $activeFilter, 'role' => 1, 'controller' => 'client', 'action' => 'list')
-);
-?>
+<script>
+	$(document).ready( function () {
+		$('#client-list').DataTable();
+		$('.dataTables_filter input[type="search"]').
+			attr('placeholder','global search').
+			css({'width':'180px','display':'inline-block'});
+	});
+</script>
 
 <div class="cboth"><br /></div>
