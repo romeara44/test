@@ -118,8 +118,8 @@ class DisclosureRecordController extends AbstractActionController
         $sortCol   = isset($mappingSortCol[$orderBy]) ? $mappingSortCol[$orderBy] : 'dr_id';
         $paginator = $this->getDisclosureRecordTable()->getDisclosureRecords(true, $sortCol, $order, $this->getIdentity(), $search, $mappingTypeItem[$roleFilter]);
       
-        $paginator->setCurrentPageNumber($page);
-        $paginator->setItemCountPerPage(10);
+        $paginator->setCurrentPageNumber(1);
+        $paginator->setItemCountPerPage(0);
 
         $view = new ViewModel(array(
             'order_by'    => $orderBy,

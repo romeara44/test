@@ -129,8 +129,8 @@ class ClientController extends AbstractActionController
 
         $sortCol = isset($mappingSortCol[$orderBy]) ? $mappingSortCol[$orderBy] : 'c_id';
         $paginator = $this->getCompanyTable()->getCompanies(true, $sortCol, $order,  $mappingTypeItem[$roleFilter], $this->getIdentity(), $activeFilter);
-        $paginator->setCurrentPageNumber($page);
-        $paginator->setItemCountPerPage(10);
+        $paginator->setCurrentPageNumber(1);
+        $paginator->setItemCountPerPage(0);
 
         $view = new ViewModel(array(
             'order_by' => $orderBy,
