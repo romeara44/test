@@ -6,6 +6,10 @@ $identity = $authService->getIdentity();
 $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
 ?>
 
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
+
+
 <div class="page-title">
     <h1 class="fleft">Remediation Plans</h1>
 
@@ -17,44 +21,49 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
 
 <p></p>
 
-<table cellpadding="0" cellspacing="0">
+<table id="remediation-plan-list-table" cellpadding="0" cellspacing="0">
     <thead>
         <tr>
-            <?php $classSort = ($order_by == 'id') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+<!--            --><?php //$classSort = ($order_by == 'id') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
-                <a href="<?php echo $this->url('remediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'id', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
-                    ID <i class="fa <?php echo $classSort ?>"></i>
-                </a>
+<!--                <a href="--><?php //echo $this->url('remediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'id', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?><!--">-->
+                    ID
+<!--                    <i class="fa --><?php //echo $classSort ?><!--"></i>-->
+<!--                </a>-->
             </th>
 
             <?php if (!$isClientRole): ?>
-                <?php $classSort = ($order_by == 'cName') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+<!--                --><?php //$classSort = ($order_by == 'cName') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
                 <th>
-                    <a href="<?php echo $this->url('remediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'cName', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
-                        Client <i class="fa <?php echo $classSort ?>"></i>
-                    </a>
+<!--                    <a href="--><?php //echo $this->url('remediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'cName', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?><!--">-->
+                        Client
+<!--                    <i class="fa --><?php //echo $classSort ?><!--"></i>-->
+<!--                    </a>-->
                 </th>
             <?php endif; ?>
 
             <?php $classSort = ($order_by == 'status') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
-                <a href="<?php echo $this->url('remediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'status', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
-                    Status <i class="fa <?php echo $classSort ?>"></i>
-                </a>
+<!--                <a href="--><?php //echo $this->url('remediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'status', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?><!--">-->
+                    Status
+<!--                <i class="fa --><?php //echo $classSort ?><!--"></i>-->
+<!--                </a>-->
             </th>
 
             <?php $classSort = ($order_by == 'type') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
-                <a href="<?php echo $this->url('remediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'type', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
-                    Type <i class="fa <?php echo $classSort ?>"></i>
-                </a>
+<!--                <a href="--><?php //echo $this->url('remediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'type', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?><!--">-->
+                    Type
+<!--                <i class="fa --><?php //echo $classSort ?><!--"></i>-->
+<!--                </a>-->
             </th>
 
             <?php $classSort = ($order_by == 'date') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
-                <a href="<?php echo $this->url('remediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'date', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
-                    Date <i class="fa <?php echo $classSort ?>"></i>
-                </a>
+<!--                <a href="--><?php //echo $this->url('remediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'date', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?><!--">-->
+                    Date
+<!--                <i class="fa --><?php //echo $classSort ?><!--"></i>-->
+<!--                </a>-->
             </th>
 
             <th>&nbsp;</th>
@@ -174,13 +183,13 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
     </tbody>
 </table>
 
-<?php echo $this->paginationControl(
-    $this->paginator,
-    'sliding',
-    array('partial/paginator.phtml', 'Remediationplan'),
-    array('route' => 'list', 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'roleFilter' => $roleFilter, 'role' => 1, 'controller' => 'remediationplan', 'action' => 'list')
-);
-?>
+<?php //echo $this->paginationControl(
+//    $this->paginator,
+//    'sliding',
+//    array('partial/paginator.phtml', 'Remediationplan'),
+//    array('route' => 'list', 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'roleFilter' => $roleFilter, 'role' => 1, 'controller' => 'remediationplan', 'action' => 'list')
+//);
+//?>
 
 <div class="cboth"><br /></div>
 
@@ -188,6 +197,18 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
     jQuery(document).ready(function() {
         $('.multiple-locs').click(function() {
             $(this).closest('tr').siblings('tr.assess-' + $(this).data('ass_id')).toggle();
+
         });
     });
+
+    $(document).ready( function () {
+        $('#remediation-plan-list-table').DataTable(
+            {
+                "columnDefs": [
+                    { "orderable": false, "targets": 5 }
+                ]
+            }
+        );
+    } );
+
 </script>
