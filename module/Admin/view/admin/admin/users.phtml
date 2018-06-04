@@ -81,12 +81,12 @@
     </table>
 		<script>
 			$(document).ready( function () {
-				$('#users-list').DataTable({
-                "columnDefs": [
-                    { "orderable": false, "targets": 6 }
-                ]
+                $('#users-list').DataTable({
+                    "columnDefs": [
+                        {"orderable": false, "targets": 6}
+                    ]
+                });
             });
-			});
 			$('.dataTables_filter input[type="search"]').
 				css({'width':'95%','display':'inline-block'});
 
