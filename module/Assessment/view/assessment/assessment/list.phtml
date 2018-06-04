@@ -118,12 +118,6 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
 //?>
 
 <script>
-    jQuery(document).ready(function() {
-        $('.multiple-locs').click(function() {
-            $(this).closest('tr').siblings('tr.assess-' + $(this).data('ass_id')).toggle();
-
-        });
-    });
 
     $(document).ready( function () {
         $('#assessment-list-table').DataTable(
