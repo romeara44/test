@@ -74,12 +74,14 @@ $identity = $authService->getIdentity();
     </tbody>
 </table>
 <script>
-	$(document).ready( function () {
-		$('#business-list').DataTable();
-		$('.dataTables_filter input[type="search"]').
-			attr('placeholder','global search').
-			css({'width':'180px','display':'inline-block'});
-	});
-</script>
+			$(document).ready( function () {
+				$('#business-list').DataTable({
+                "columnDefs": [
+                    { "orderable": false, "targets": 7 }
+                ]
+            });
+			});
+			$('.dataTables_filter input[type="search"]').
+				css({'width':'95%','display':'inline-block'});</script>
 
 <div class="cboth"><br /></div>
