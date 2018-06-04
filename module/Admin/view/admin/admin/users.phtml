@@ -81,11 +81,14 @@
     </table>
 		<script>
 			$(document).ready( function () {
-				$('#users-list').DataTable();
-				$('.dataTables_filter input[type="search"]').
-					attr('placeholder','global search').
-					css({'width':'200px','display':'inline-block'});
+				$('#users-list').DataTable({
+                "columnDefs": [
+                    { "orderable": false, "targets": 6 }
+                ]
+            });
 			});
+			$('.dataTables_filter input[type="search"]').
+				css({'width':'95%','display':'inline-block'});
 
 		</script>
 </div>

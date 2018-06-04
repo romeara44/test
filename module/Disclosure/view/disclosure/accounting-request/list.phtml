@@ -65,28 +65,14 @@ $identity = $authService->getIdentity();
 
 <script>
 	$(document).ready( function () {
-		$('#accounting-list').DataTable();
+		$('#accounting-list').DataTable({
+				"columnDefs": [
+						{ "orderable": false, "targets": 6 }
+				]
+			});
 		$('.dataTables_filter input[type="search"]').
-			attr('placeholder','global search').
-			css({'width':'180px','display':'inline-block'});
+			css({'width':'95%','display':'inline-block'});
 	});
 </script>
 
 <div class="cboth"><br /></div>
-
-<script type="text/javascript">
-    jQuery(function() {
-        $(document).ready(function() {
-
-            $('#list_search_form').submit(function(e){
-                e.preventDefault();
-                var search = $('#list_search').val();
-                if(search === '') {
-                    window.location.href = $(this).attr('action');
-                } else if(search !== undefined) {
-                    window.location.href = $(this).attr('action') + '/search/' + search;
-                }
-            });
-        });
-    });
-</script>

@@ -91,10 +91,13 @@ $identity = $authService->getIdentity();
 </table>
 <script>
 	$(document).ready( function () {
-		$('#client-list').DataTable();
+		$('#client-list').DataTable({
+				"columnDefs": [
+						{ "orderable": false, "targets": 7 }
+				]
+			});
 		$('.dataTables_filter input[type="search"]').
-			attr('placeholder','global search').
-			css({'width':'180px','display':'inline-block'});
+			css({'width':'95%','display':'inline-block'});
 	});
 </script>
 
