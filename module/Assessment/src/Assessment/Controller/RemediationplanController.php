@@ -145,7 +145,6 @@ class RemediationplanController extends AbstractActionController
         $page = $this->params()->fromRoute('page') ? (int) $this->params()->fromRoute('page') : 1;
         $roleFilter = $this->params()->fromRoute('roleFilter') ? (int) $this->params()->fromRoute('roleFilter') : 0;
 
-
         $mappingSortCol = array(
             'id' => 'rp_id',
             'status' => '_status',
@@ -157,8 +156,8 @@ class RemediationplanController extends AbstractActionController
         $sortCol = isset($mappingSortCol[$orderBy]) ? $mappingSortCol[$orderBy] : 'rp_id';
         $paginator = $this->getRemediationplanTable()->getRemediationplans(true, $sortCol, $order, $this->getIdentity());
 
-        $paginator->setCurrentPageNumber(1);
-        $paginator->setItemCountPerPage($paginator->getTotalItemCount());
+        $paginator->setCurrentPageNumber($page);
+        $paginator->setItemCountPerPage(10);
 
         $res = [];
         foreach ($paginator as $rp) {
@@ -166,7 +165,7 @@ class RemediationplanController extends AbstractActionController
         }
 
         $view = new ViewModel(array(
-            'order_by' => 'date',
+            'order_by' => $orderBy,
             'order' => $order,
             'page' => $page,
             'paginator' => $paginator,
