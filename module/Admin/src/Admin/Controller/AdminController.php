@@ -89,8 +89,8 @@ class AdminController extends AbstractActionController
 
         $sortCol = isset($mappingSortCol[$orderBy]) ? $mappingSortCol[$orderBy] : 'u_id';
         $paginator = $this->getUserTable()->fetchAll(true, $sortCol, $order, $roleFilter, $isConsultant);
-        $paginator->setCurrentPageNumber($page);
-        $paginator->setItemCountPerPage(10);
+        $paginator->setCurrentPageNumber(1);
+        $paginator->setItemCountPerPage($paginator->getTotalItemCount());
 
         $view = new ViewModel(array(
             'order_by' => $orderBy,
