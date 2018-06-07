@@ -69,10 +69,13 @@ $identity = $authService->getIdentity();
 <script>
 	$(document).ready( function () {
 		$('#physical-list').DataTable({
-				"columnDefs": [
-						{ "orderable": false, "targets": 5 }
-				]
-			});
+			"order": [[ 1, "asc" ]],
+			"columnDefs": [
+				{"type": "num", "targets": 0},
+				{"type": "date", "targets": 4},
+				{ "orderable": false, "targets": 5 }
+			]
+		});
 		$('.dataTables_filter input[type="search"]').
 			css({'width':'95%','display':'inline-block'});
 	});

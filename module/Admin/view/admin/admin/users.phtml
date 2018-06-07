@@ -80,15 +80,17 @@
         </tbody>
     </table>
 		<script>
-			$(document).ready( function () {
-                $('#users-list').DataTable({
-                    "columnDefs": [
-                        {"orderable": false, "targets": 6}
-                    ]
-                });
-            });
+			$(document).ready(function(){
+				$('#users-list').DataTable({
+					"order": [[ 5, "desc" ]],
+					"columnDefs": [
+						{"type": "num", "targets": 0},
+						{"type": "date", "targets": 5},
+						{"orderable": false, "targets": 6}
+					]
+				});
+			});
 			$('.dataTables_filter input[type="search"]').
 				css({'width':'95%','display':'inline-block'});
-
 		</script>
 </div>

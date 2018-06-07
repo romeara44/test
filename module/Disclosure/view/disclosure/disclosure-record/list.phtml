@@ -72,10 +72,14 @@ $identity = $authService->getIdentity();
 <script>
 	$(document).ready( function () {
 		$('#disclosure-list').DataTable({
-				"columnDefs": [
-						{ "orderable": false, "targets": 6 }
-				]
-			});
+			"order": [[ 1, "asc" ]],
+			"columnDefs": [
+				{"type": "num", "targets": 0},
+				{"type": "date", "targets": 3},
+				{"type": "date", "targets": 5},
+				{ "orderable": false, "targets": 6 }
+			]
+		});
 		$('.dataTables_filter input[type="search"]').
 			css({'width':'95%','display':'inline-block'});
 	});
