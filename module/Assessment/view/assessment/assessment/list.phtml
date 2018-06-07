@@ -17,7 +17,6 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.css">
 
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/plug-ins/1.10.16/sorting/any-number.js"></script>
 
 <p></p>
 
@@ -34,6 +33,7 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
             <th>Type</th>
             <th>Date</th>
             <th></th>
+            <th>AssessmentId</th>
         </tr>
     </thead>
     <tbody>
@@ -104,6 +104,7 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
                         <?php endif; ?>
                     <?php endif; ?>
                 </td>
+                <td><?php echo ($a->a_id); ?></td>
             </tr>
 
         <?php endforeach; ?>
@@ -112,15 +113,15 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
 
 <script>
 
-
     $(document).ready( function () {
         $('#assessment-list-table').DataTable(
             {
                 "order": [],
                 "columnDefs": [
-                    { "type": "any-number", "targets": 0 },
                     { "type": "date", "targets": 4},
                     { "orderable": false, "targets": 5 }
+                    { "orderData": 6, "targets": 0},
+                    { "visible": false, "targets": 6}
                 ]
             }
         );
