@@ -34,6 +34,7 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
             <th>Date</th>
             <th></th>
             <th>AssessmentId</th>
+            <th>AssessmentVersionIndex</th>
         </tr>
     </thead>
     <tbody>
@@ -105,6 +106,7 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
                     <?php endif; ?>
                 </td>
                 <td><?php echo ($a->a_id); ?></td>
+                <td><?php echo ($a->a_version_index); ?></td>
             </tr>
 
         <?php endforeach; ?>
@@ -120,8 +122,8 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
                 "columnDefs": [
                     { "type": "date", "targets": 4},
                     { "orderable": false, "targets": 5 },
-                    { "orderData": 6, "targets": 0},
-                    { "visible": false, "targets": 6}
+                    { "orderData": [6, 7, 6], "targets": 0}
+                    { "visible": false, "targets": [6, 7]}
                 ]
             }
         );
