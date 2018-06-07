@@ -92,10 +92,14 @@ $identity = $authService->getIdentity();
 <script>
 	$(document).ready( function () {
 		$('#client-list').DataTable({
-				"columnDefs": [
-						{ "orderable": false, "targets": 7 }
-				]
-			});
+			"order": [[ 2, "asc" ]],
+			"columnDefs": [
+				{"type": "num", "targets": 0},
+				{"type": "date", "targets": 5},
+				{"type": "date", "targets": 6},
+				{ "orderable": false, "targets": 7 }
+			]
+		});
 		$('.dataTables_filter input[type="search"]').
 			css({'width':'95%','display':'inline-block'});
 	});

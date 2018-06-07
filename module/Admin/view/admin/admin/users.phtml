@@ -82,16 +82,15 @@
 		<script>
 			$(document).ready(function(){
 				$('#users-list').DataTable({
-						"order": [[ 1, "asc" ]],
-						"columnDefs": [
-								{"type": "num", "targets": 0},
-								{"type": "date", "targets": 5},
-								{"orderable": false, "targets": 6}
-						]
+					"order": [[ 5, "desc" ]],
+					"columnDefs": [
+						{"type": "num", "targets": 0},
+						{"type": "date", "targets": 5},
+						{"orderable": false, "targets": 6}
+					]
 				});
 			});
 			$('.dataTables_filter input[type="search"]').
 				css({'width':'95%','display':'inline-block'});
-
 		</script>
 </div>
