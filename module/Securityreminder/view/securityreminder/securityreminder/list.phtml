@@ -4,6 +4,9 @@ $authService = new \Zend\Authentication\AuthenticationService();
 $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
 $identity = $authService->getIdentity();
 ?>
+				
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.css"></link>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
 
 <div class="page-title">
     <h1 class="fleft security_reminders">Security reminders</h1>
@@ -20,29 +23,17 @@ $identity = $authService->getIdentity();
 
 <p></p>
 
-<table class="securityreminders" cellpadding="0" cellspacing="0">
+<table id="securityreminders-list" cellpadding="0" cellspacing="0">
     <thead>
         <tr>
             <?php $classSort = ($order_by == 'title') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
-            <th>
-                <a href="<?php echo $this->url('securityreminder', array('action' => 'list', 'page' => $page, 'order_by' => 'title', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
-                    Title <i class="fa <?php echo $classSort ?>"></i>
-                </a>
-            </th>
+            <th>Title</th>
 
             <?php $classSort = ($order_by == 'launched_date') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
-            <th>
-                <a href="<?php echo $this->url('securityreminder', array('action' => 'list', 'page' => $page, 'order_by' => 'launched_date', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
-                    Launched Date <i class="fa <?php echo $classSort ?>"></i>
-                </a>
-            </th>
+            <th>Launched Date</th>
 
             <?php $classSort = ($order_by == 'developed_by') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
-            <th>
-                <a href="<?php echo $this->url('securityreminder', array('action' => 'list', 'page' => $page, 'order_by' => 'developed_by', 'order' => $urlOrder, 'roleFilter' => $roleFilter, 'search' => $search)); ?>">
-                    Developed By <i class="fa <?php echo $classSort ?>"></i>
-                </a>
-            </th>
+            <th>Developed By</th>
 
             <th> Distribution Type</th>
 
@@ -63,105 +54,121 @@ $identity = $authService->getIdentity();
                 <td><?php echo $sr->_dt_type ?></td>
                 <td><?php echo $this->textHelper($sr->_sr_comment, 20); ?></td>
                 <td style="white-space: nowrap;" class="aright">
-                    <?php if ($sr->_sr_attachment): ?>
-                        <a style="margin-left: 10px;" href="" class="attachments" rel="<?php echo $sr->sr_id ?>" title="View Attachments"><i class="fa fa-paperclip"></i></a> &nbsp;
-                    <?php endif; ?>
-                    <a href="/securityreminder/edit/<?php echo $sr->sr_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
-                    <?php if ($sr->sr_active): ?>
-                        <?php $deleteUrl = '/securityreminder/delete/' . $sr->sr_id; ?>
-                        <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
-                    <?php elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
-                        <a href="/securityreminder/unarchive/<?php echo $sr->sr_id  ?>" class="">Unarchive</a>
-                    <?php endif; ?>
-                </td>
-            </tr>
-            <tr class="expandable" id="attachments<?php echo $sr->sr_id ?>">
-                <td>&nbsp;</td>
-                <?php foreach (array('Copy of Materials' => $copyOfMaterials, 'Reports' => $comments) as $keyAtt => $notes): ?>
-                <td colspan="2">
-                    <div>
-                        <div><strong><?php echo $keyAtt ?>:</strong></div>
-                        <div>
-                        <?php foreach ($notes as $note): ?>
-                            <?php if ($note->_files != ''): ?>
-                                <?php
-                                $_files = explode(',', $note->_files);
-                                ?>
-                                <?php foreach ($_files as $_file): ?>
-                                    <?php
-                                    $_file = explode('::', $_file);
-                                    $_fileName = $_file[0];
-                                    $_fileId = $_file[1];
-                                    ?>
-                                    <span style="float: left; margin-right: 5px;" class="i-file"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
-                        </div>
-                    </div>
-                </td>
-                <?php endforeach; ?>
-                <td>&nbsp;</td>
-            </tr>
+									<?php if ($sr->_sr_attachment): ?>
+											<a style="margin-left: 10px;" href="" class="attachments" rel="<?php echo $sr->sr_id ?>" title="View Attachments"><i class="fa fa-paperclip"></i></a> &nbsp;
+									<?php endif; ?>
+									<a href="/securityreminder/edit/<?php echo $sr->sr_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+									<?php if ($sr->sr_active): ?>
+											<?php $deleteUrl = '/securityreminder/delete/' . $sr->sr_id; ?>
+											<a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
+									<?php elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
+											<a href="/securityreminder/unarchive/<?php echo $sr->sr_id  ?>" class="">Unarchive</a>
+									<?php endif; ?>
+									<?php $tgrid = array("subgrid" => array()); ?>
+									<?php $ct = 0; ?>
+									<?php foreach (array('Copy of Materials' => $copyOfMaterials, 'Reports' => $comments) as $keyAtt => $notes): ?>
+										<?php $tgrid['subgrid'][$ct] = array("keyAtt" => $keyAtt); ?>
+										<?php foreach ($notes as $note): ?>
+											<?php if ($note->_files != ''): ?>
+												<?php	$_files = explode(',', $note->_files); ?>
+												<?php foreach ($_files as $_file): ?>
+													<?php
+														$_file = explode('::', $_file);
+														$_noteId = $note->note_id;
+														$_fileName = $_file[0];
+														$_fileId = $_file[1];
+													?>
+													<?php $ngrid = array("note_id" => $_noteId, "fileId" => $_fileId, "fileName" => $_fileName); ?>
+												<?php endforeach; ?>
+											<?php endif; ?>
+										<?php endforeach; ?>
+										<?php $tgrid['subgrid'][$ct]['notes'] = array($ngrid); ?>
+										<?php $ct++; ?>
+									<?php endforeach; ?>
 
+									<?php $jdat = json_encode($tgrid); ?>
+									<input type="hidden" id="data_json<?php echo $sr->sr_id ?>" value='<?php echo htmlentities($jdat); ?>' ></input>
+                </td>
+            </tr>
         <?php endforeach; ?>
     </tbody>
 </table>
 
-<?php echo $this->paginationControl(
-    $this->paginator,
-    'sliding',
-    array('partial/paginator.phtml', 'securityreminder'),
-    array('route' => 'list', 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'roleFilter' => $roleFilter, 'role' => 1, 'controller' => 'securityreminder', 'action' => 'list')
-);
-?>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$('#list_search_form').submit(function(e){
+				e.preventDefault();
+				var search = $('#list_search').val();
+				if(search === '') {
+						window.location.href = $(this).attr('action');
+				} else if(search !== undefined) {
+						window.location.href = $(this).attr('action') + '/search/' + search;
+				}
+		});
+		function format(jdat){
+			//alert('format d='+jdat);
+			var j = JSON.parse(jdat);
+			if(typeof j === 'undefined')
+				return '';
+			if(typeof j.subgrid === 'undefined')
+				return '';
+			var s = '<tr>';
+			s += '<td>&nbsp;</td>';
+			j.subgrid.forEach(function(e){
+				s += '<td colspan="2">';	
+        s += 		'<div>';
+        s += 			'<div><strong>' + e.keyAtt + ':</strong></div>';
+        s += 			'<div>';
+				if(typeof e.notes !== 'undefined'){
+					e.notes.forEach(function(e2) {
+						if(typeof e2.fileName !== "undefined" && typeof e2.fileId !== "undefined" && typeof e2.note_id !== "undefined"){
+              s +=	'<span style="float: left; margin-right: 5px;" class="i-file"></span><a href="/files/get/note/' + e2.note_id + '/' + e2.fileId + '" class="" target="_blank">' + e2.fileName + '</a><br/>';							
+						}
+					});
+				}
+        s += 			'</div>';
+        s += 		'</div>';
+			});
+					
+			s += 		'</td>';
+			s += 	'</td>';
+			s += '</tr>';
+
+			return s;
+		}
+
+		var table = $('#securityreminders-list').DataTable({
+			"order": [[ 1, "desc" ]],
+			"columnDefs": [
+				{"type": "date", "targets": 1},
+				{ "orderable": false, "targets": 5 }
+			]
+		});								
+				
+		$('.dataTables_filter input[type="search"]').
+			css({'width':'95%','display':'inline-block'});
+
+		$('.attachments').click(function(e){
+			e.preventDefault();
+			var $this = $(this);
+      var idA = $this.attr('rel');
+      var datx = $('#data_json' + idA).val();
+			var dat = datx.replace( /\&amp;/g, '&' );
+			var tr = $(this).closest('tr');
+			var row = table.row( tr );
+
+			if ( row.child.isShown() ) {
+					// This row is already open - close it
+					row.child.hide();
+					tr.removeClass('shown');
+			}
+			else {
+					// Open this row
+					row.child( format(dat) ).show();
+					tr.addClass('shown');
+			}			
+		});
+	});
+</script>
 
 <div class="cboth"><br /></div>
-
-<script type="text/javascript">
-    jQuery(function() {
-        $(document).ready(function() {
-            $('.sr_active_checkbox').click(function() {
-                var $this  = $(this);
-                var id  = $(this).attr('data-id');
-                var archived  = $(this).attr('data-archived') == 1 ? 0 : 1;
-
-                $.ajax({
-                    type:"POST",
-                    url:"/securityreminder/setstatus",
-                    data: {'id': id, 'archived': archived},
-                    success: function(data){
-                        if(data.result == 'true') {
-                            $this.attr('data-archived', archived);
-                            if(archived == 1) $this.attr('checked', true);
-                                else $this.attr('checked', false);
-                        }
-                    }
-                });
-
-            });
-
-            $('#list_search_form').submit(function(e){
-                e.preventDefault();
-                var search = $('#list_search').val();
-                if(search === '') {
-                    window.location.href = $(this).attr('action');
-                } else if(search !== undefined) {
-                    window.location.href = $(this).attr('action') + '/search/' + search;
-                }
-            });
-
-            jQuery('.expandable').hide();
-            jQuery('.attachments').click(function(e) {
-                e.preventDefault();
-                var $this = $(this);
-                var idA = $this.attr('rel');
-                if(jQuery('#attachments' + idA).is(':visible')) {
-                    jQuery('#attachments' + idA).slideUp();
-                } else {
-                    jQuery('#attachments' + idA).slideDown();
-                }
-            });
-        });
-    });
-</script>
