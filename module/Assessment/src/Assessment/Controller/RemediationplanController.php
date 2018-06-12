@@ -156,8 +156,8 @@ class RemediationplanController extends AbstractActionController
         $sortCol = isset($mappingSortCol[$orderBy]) ? $mappingSortCol[$orderBy] : 'rp_id';
         $paginator = $this->getRemediationplanTable()->getRemediationplans(true, $sortCol, $order, $this->getIdentity());
 
-        $paginator->setCurrentPageNumber($page);
-        $paginator->setItemCountPerPage(10);
+        $paginator->setCurrentPageNumber(1);
+        $paginator->setItemCountPerPage($paginator->getTotalItemCount());
 
         $res = [];
         foreach ($paginator as $rp) {
