@@ -33,6 +33,8 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
             <th>Type</th>
             <th>Date</th>
             <th></th>
+            <th>AssessmentId</th>
+            <th>AssessmentVersionIndex</th>
         </tr>
     </thead>
     <tbody>
@@ -103,33 +105,32 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
                         <?php endif; ?>
                     <?php endif; ?>
                 </td>
+                <td><?php echo ($a->a_id); ?></td>
+                <td><?php echo ($a->a_version_index); ?></td>
             </tr>
 
         <?php endforeach; ?>
     </tbody>
 </table>
 
-<?php //echo $this->paginationControl(
-//    $this->paginator,
-//    'sliding',
-//    array('partial/paginator.phtml', 'Assessment'),
-//    array('route' => 'list', 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'roleFilter' => $roleFilter, 'role' => 1, 'controller' => 'assessment', 'action' => 'list')
-//);
-//?>
-
 <script>
 
     $(document).ready( function () {
         $('#assessment-list-table').DataTable(
             {
+                "order": [],
                 "columnDefs": [
-                    { "orderable": false, "targets": 5 }
+                    { "type": "date", "targets": 4},
+                    { "orderable": false, "targets": 5 },
+                    { "orderData": [6, 7, 6], "targets": 0},
+                    { "visible": false, "targets": [6, 7]}
                 ]
             }
         );
         $('.dataTables_filter input[type="search"]').
         css({'width':'95%','display':'inline-block'});
     } );
+
 </script>
 
 <div class="cboth"><br /></div>
