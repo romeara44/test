@@ -63,42 +63,42 @@ $identity = $authService->getIdentity();
                 <td><?php echo $this->textHelper($tl->tl_attendees, 20); ?></td>
                 <td><?php echo $this->textHelper($tl->_tl_comment, 20); ?></td>
                 <td style="white-space: nowrap;" class="aright">
-										<?php if ($tl->_tl_attachment): ?>
-                        <a style="margin-left: 10px;" href="" class="attachments" rel="<?php echo $tl->tl_id ?>" title="View Attachments">
-													<i class="fa fa-paperclip"></i>
-												</a> &nbsp;
-                    <?php endif; ?>
-                    <a href="/traininglog/edit/<?php echo $tl->tl_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
-                    <?php if ($tl->tl_active): ?>
-                        <?php $deleteUrl = '/traininglog/delete/' . $tl->tl_id; ?>
-                        <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>                        
-                    <?php elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
-                        <a href="/traininglog/unarchive/<?php echo $tl->tl_id  ?>" class="">Unarchive</a>
-                    <?php endif; ?>
-										<?php $tgrid = array("subgrid" => array()); ?>
-										<?php $ct = 0; ?>
-										<?php foreach (array('Training materials' => $trainingMaterials, 'Reports' => $comments) as $keyAtt => $notes): ?>
-											<?php $tgrid['subgrid'][$ct] = array("keyAtt" => $keyAtt); ?>
-                      <?php foreach ($notes as $note): ?>
-												<?php if ($note->_files != ''): ?>
-													<?php	$_files = explode(',', $note->_files); ?>
-													<?php foreach ($_files as $_file): ?>
-														<?php
-															$_file = explode('::', $_file);
-															$_noteId = $note->note_id;
-															$_fileName = $_file[0];
-															$_fileId = $_file[1];
-														?>
-														<?php $ngrid = array("note_id" => $_noteId, "fileId" => $_fileId, "fileName" => $_fileName); ?>
-													<?php endforeach; ?>
-												<?php endif; ?>
-                      <?php endforeach; ?>
-											<?php $tgrid['subgrid'][$ct]['notes'] = array($ngrid); ?>
-											<?php $ct++; ?>
+									<?php if ($tl->_tl_attachment): ?>
+											<a style="margin-left: 10px;" href="" class="attachments" rel="<?php echo $tl->tl_id ?>" title="View Attachments">
+												<i class="fa fa-paperclip"></i>
+											</a> &nbsp;
+									<?php endif; ?>
+									<a href="/traininglog/edit/<?php echo $tl->tl_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+									<?php if ($tl->tl_active): ?>
+											<?php $deleteUrl = '/traininglog/delete/' . $tl->tl_id; ?>
+											<a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>                        
+									<?php elseif ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
+											<a href="/traininglog/unarchive/<?php echo $tl->tl_id  ?>" class="">Unarchive</a>
+									<?php endif; ?>
+									<?php $tgrid = array("subgrid" => array()); ?>
+									<?php $ct = 0; ?>
+									<?php foreach (array('Training materials' => $trainingMaterials, 'Reports' => $comments) as $keyAtt => $notes): ?>
+										<?php $tgrid['subgrid'][$ct] = array("keyAtt" => $keyAtt); ?>
+										<?php foreach ($notes as $note): ?>
+											<?php if ($note->_files != ''): ?>
+												<?php	$_files = explode(',', $note->_files); ?>
+												<?php foreach ($_files as $_file): ?>
+													<?php
+														$_file = explode('::', $_file);
+														$_noteId = $note->note_id;
+														$_fileName = $_file[0];
+														$_fileId = $_file[1];
+													?>
+													<?php $ngrid = array("note_id" => $_noteId, "fileId" => $_fileId, "fileName" => $_fileName); ?>
+												<?php endforeach; ?>
+											<?php endif; ?>
 										<?php endforeach; ?>
+										<?php $tgrid['subgrid'][$ct]['notes'] = array($ngrid); ?>
+										<?php $ct++; ?>
+									<?php endforeach; ?>
 
-										<?php $jdat = json_encode($tgrid); ?>
-										<input type="hidden" id="data_json<?php echo $tl->tl_id ?>" value='<?php echo htmlentities($jdat); ?>' ></input>
+									<?php $jdat = json_encode($tgrid); ?>
+									<input type="hidden" id="data_json<?php echo $tl->tl_id ?>" value='<?php echo htmlentities($jdat); ?>' ></input>
 				        </td>
             </tr>
         <?php endforeach; ?>
@@ -150,8 +150,10 @@ $identity = $authService->getIdentity();
 
 
 		var table = $('#traininglogs-list').DataTable({
+			"order": [[ 2, "desc" ]],
 			"columnDefs": [
-					{ "orderable": false, "targets": 9 }
+				{"type": "date", "targets": 2},
+				{ "orderable": false, "targets": 9 }
 			]
 		});								
 				
