@@ -26,7 +26,23 @@ class Module
 
         $translator = $e->getApplication()->getServiceManager()->get('translator');
         \Zend\Validator\AbstractValidator::setDefaultTranslator($translator);
+				
+				//handle the dispatch error (exception) 
+				$eventManager->attach(\Zend\Mvc\MvcEvent::EVENT_DISPATCH_ERROR, array($this, 'handleError'));
+				//handle the view render error (exception) 
+				$eventManager->attach(\Zend\Mvc\MvcEvent::EVENT_RENDER_ERROR, array($this, 'handleError'));	
+//handleError(throw new Exception('some error is thrown'));
     }
+		
+		public function handleError(MvcEvent $e)
+		{
+				//get the exception
+				$exception = $e->getParam('exception');
+				//...handle the exception... maybe log it and redirect to another page, 
+				//or send an email that an exception occurred...
+				
+				die('handleErorr here: message(' . $exception->getMessage() . ')');
+		}		
 
     public function getConfig()
     {
