@@ -11,51 +11,24 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
     <div class="cboth"></div>
 </div>
 
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
 <p></p>
 
-<table cellpadding="0" cellspacing="0">
+<table id="incident-remediation-plan-list-table" cellpadding="0" cellspacing="0">
     <thead>
         <tr>
-            <?php $classSort = ($order_by == 'id') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
-            <th>
-                <a href="<?php echo $this->url('breachremediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'id', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
-                    ID <i class="fa <?php echo $classSort ?>"></i>
-                </a>
-            </th>
-
-            <?php $classSort = ($order_by == 'bl_name') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
-            <th>
-                <a href="<?php echo $this->url('breachremediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'bl_name', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
-                    Name <i class="fa <?php echo $classSort ?>"></i>
-                </a>
-            </th>
-
+            <th>ID</th>
+            <th>Name</th>
             <?php if (!$isClientRole): ?>
-                <?php $classSort = ($order_by == 'cName') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
-                <th>
-                    <a href="<?php echo $this->url('breachremediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'cName', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
-                        Client <i class="fa <?php echo $classSort ?>"></i>
-                    </a>
-                </th>
+                <th>Client</th>
             <?php endif; ?>
-
-            <?php $classSort = ($order_by == 'status') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
-            <th>
-                <a href="<?php echo $this->url('breachremediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'status', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
-                    Status <i class="fa <?php echo $classSort ?>"></i>
-                </a>
-            </th>
-
-            <?php $classSort = ($order_by == 'date') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
-            <th>
-                <a href="<?php echo $this->url('breachremediationplan', array('action' => 'list', 'page' => $page, 'order_by' => 'date', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
-                    Date <i class="fa <?php echo $classSort ?>"></i>
-                </a>
-            </th>
-
-            <th>&nbsp;</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th></th>
         </tr>
     </thead>
+
     <tbody>
         <?php $isVersion = false; $counterVersion = 0; $paddingVersion = 0; $rowIdParent = ''; $isParentActive = false; $lastVersionIndex = 0;
         foreach ($this->paginator as $brp): ?>
@@ -119,12 +92,20 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
     </tbody>
 </table>
 
-<?php echo $this->paginationControl(
-    $this->paginator,
-    'sliding',
-    array('partial/paginator.phtml', 'Breachremediationplan'),
-    array('route' => 'list', 'order_by' => $order_by, 'order' => $order, 'page' => $page, 'roleFilter' => $roleFilter, 'role' => 1, 'controller' => 'breachremediationplan', 'action' => 'list')
-);
-?>
+<script>
+    $(document).ready( function () {
+        $('#incident-remediation-plan-list-table').DataTable(
+            {
+                "order": [],
+                "columnDefs": [
+                    { "type": "date", "targets": 4},
+                    { "orderable": false, "targets": 5 }
+                ]
+            }
+        );
+        $('.dataTables_filter input[type="search"]').
+        css({'width':'95%','display':'inline-block'});
+    } );
+</script>
 
 <div class="cboth"><br /></div>
