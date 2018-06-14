@@ -40,6 +40,9 @@ return array(
         'secure_db_key_file' => ROOT_PATH . '/c147572b91c6719b26c5.dbkey',
         'secure_file_key_file' => ROOT_PATH . '/ccb3177cdb1f576a6d31.filekey',
         'assessment_interview_autosave_interval' => 1,
+    ),
+    'view_manager' => array(
+        'display_exceptions' => true
     )
 );
 
