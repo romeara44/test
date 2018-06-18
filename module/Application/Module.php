@@ -14,7 +14,9 @@ use Zend\Mvc\MvcEvent;
 use Application\Model\ProvinceTable;
 use Zend\Db\ResultSet\ResultSet;
 use Zend\Db\TableGateway\TableGateway;
-
+use Zend\Mail;
+use Zend\Mail\Transport\Smtp as SmtpTransport;
+use Zend\Mail\Transport\SmtpOptions;
 
 class Module
 {
@@ -26,24 +28,53 @@ class Module
 
         $translator = $e->getApplication()->getServiceManager()->get('translator');
         \Zend\Validator\AbstractValidator::setDefaultTranslator($translator);
-				
+
 				//handle the dispatch error (exception) 
-				$eventManager->attach(\Zend\Mvc\MvcEvent::EVENT_DISPATCH_ERROR, array($this, 'handleError'));
+				$eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, array($this, 'handleError'));
 				//handle the view render error (exception) 
-				$eventManager->attach(\Zend\Mvc\MvcEvent::EVENT_RENDER_ERROR, array($this, 'handleError'));	
-//handleError(throw new Exception('some error is thrown'));
+				$eventManager->attach(MvcEvent::EVENT_RENDER_ERROR, array($this, 'handleError'));
     }
-		
 		public function handleError(MvcEvent $e)
 		{
-				//get the exception
-				$exception = $e->getParam('exception');
-				//...handle the exception... maybe log it and redirect to another page, 
-				//or send an email that an exception occurred...
-				
-				die('handleErorr here: message(' . $exception->getMessage() . ')');
-		}		
+			//get the exception
+			$exception = $e->getParam('exception');
 
+			$to = "jim.manton@skybeam.com"; // this is your Email address
+			$from = "jim.manton@skybeam.com"; // this is the sender's Email address
+			$first_name = 'jim';
+			$last_name = 'manton';
+			$subject = "Carosh global error handling.";
+			$message = $first_name . " " . $last_name . " this global error was returned:" . "\n\n" . $exception->getMessage();
+
+			$headers = "From:" . $from;
+
+			$mail = new Mail\Message();
+			$mail->setFrom('postmaster@click5dev7.com', 'HIPAA Suite');
+
+			$html = new \Zend\Mime\Part($message);
+			$html->type = 'text/html';
+			$body = new \Zend\Mime\Message;
+			$body->addPart($html);
+			$mail->setBody($body);
+			
+			$mail->setSubject($subject);
+			$options = new SmtpOptions();
+			$options
+					->setHost('smtp.sendgrid.net')
+					->setConnectionClass('login')
+					->setName('smtp.sendgrid.net')
+					->setConnectionConfig(array(
+							'auth' => 'login',
+							'username' => 'HIPAASuite',
+							'password' => '1948Box13',
+							'ssl' => 'tls',
+							'port' => 587
+					));
+			$transport = new SmtpTransport();
+			$transport->setOptions($options);
+			$mail->addTo($to, 'jim manton');
+			$transport->send($mail);
+		}
     public function getConfig()
     {
         return include __DIR__ . '/config/module.config.php';
