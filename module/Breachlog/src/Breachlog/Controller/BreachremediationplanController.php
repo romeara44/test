@@ -141,8 +141,8 @@ class BreachremediationplanController extends AbstractActionController
         $sortCol = isset($mappingSortCol[$orderBy]) ? $mappingSortCol[$orderBy] : 'brp_id';
         $paginator = $this->getBreachremediationplanTable()->getBreachremediationplans(true, $sortCol, $order, $this->getIdentity());
 
-        $paginator->setCurrentPageNumber($page);
-        $paginator->setItemCountPerPage(10);
+        $paginator->setCurrentPageNumber(1);
+        $paginator->setItemCountPerPage($paginator->getTotalItemCount());
 
         $view = new ViewModel(array(
             'order_by' => $orderBy,
