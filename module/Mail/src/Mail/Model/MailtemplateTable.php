@@ -85,7 +85,6 @@ class MailtemplateTable
 				echo '<br>this is u_lastname=' . $tosend->u_lastname;
 			}
 
-//die('<br>jrm debug 20.01');
 			$addTo = 'jim.manton@skybeam.com';
       $mail->addTo($addTo, 'jim');
 			$html = new \Zend\Mime\Part($message);
