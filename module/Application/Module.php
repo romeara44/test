@@ -17,6 +17,8 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Mail;
 use Zend\Mail\Transport\Smtp as SmtpTransport;
 use Zend\Mail\Transport\SmtpOptions;
+//use Mail\Model\Mailtemplate;
+use Zend\ServiceManager\ServiceManager;
 
 class Module
 {
@@ -38,43 +40,51 @@ class Module
 		{
 			//get the exception
 			$exception = $e->getParam('exception');
-
-			$to = "jim.manton@skybeam.com"; // this is your Email address
-			$from = "jim.manton@skybeam.com"; // this is the sender's Email address
-			$first_name = 'jim';
-			$last_name = 'manton';
-			$subject = "Carosh global error handling.";
-			$message = $first_name . " " . $last_name . " this global error was returned:" . "\n\n" . $exception->getMessage();
-
-			$headers = "From:" . $from;
-
-			$mail = new Mail\Message();
-			$mail->setFrom('postmaster@click5dev7.com', 'HIPAA Suite');
-
-			$html = new \Zend\Mime\Part($message);
-			$html->type = 'text/html';
-			$body = new \Zend\Mime\Message;
-			$body->addPart($html);
-			$mail->setBody($body);
-			
-			$mail->setSubject($subject);
-			$options = new SmtpOptions();
-			$options
-					->setHost('smtp.sendgrid.net')
-					->setConnectionClass('login')
-					->setName('smtp.sendgrid.net')
-					->setConnectionConfig(array(
-							'auth' => 'login',
-							'username' => 'HIPAASuite',
-							'password' => '1948Box13',
-							'ssl' => 'tls',
-							'port' => 587
-					));
-			$transport = new SmtpTransport();
-			$transport->setOptions($options);
-			$mail->addTo($to, 'jim manton');
-			$transport->send($mail);
+			$sm = $e->getApplication()->getServiceManager();
+			$mtt = $sm->get('Mail\Model\MailtemplateTable');
+			$controllerLoader = $e->getApplication()->getServiceManager()->get('ControllerLoader');
+			$routeMatch       = $e->getRouteMatch();
+			$controllerName   = $routeMatch->getParam('controller', 'not-found');
+			$controller = $controllerLoader->get($controllerName);
+			$sl = $controller->getServiceLocator();
+			$message = "message:" . $exception->getMessage();
+			$message .= "<br><br>backtrace: " . $this->get_caller_info();
+			$message .= "<br><br>trace: " . $exception->getTraceAsString();
+			$mtt->sendMail($sl, array('type' => 'error', 'message' => $message));
 		}
+		private function get_caller_info() {
+			
+				$c = '';
+				$file = '';
+				$func = '';
+				$class = '';
+				$trace = debug_backtrace();
+				if (isset($trace[2])) {
+						$file = $trace[1]['file'];
+						$func = $trace[2]['function'];
+						if ((substr($func, 0, 7) == 'include') || (substr($func, 0, 7) == 'require')) {
+								$func = '';
+						}
+				} else if (isset($trace[1])) {
+						$file = $trace[1]['file'];
+						$func = '';
+				}
+				if (isset($trace[3]['class'])) {
+						$class = $trace[3]['class'];
+						$func = $trace[3]['function'];
+						$file = $trace[2]['file'];
+				} else if (isset($trace[2]['class'])) {
+						$class = $trace[2]['class'];
+						$func = $trace[2]['function'];
+						$file = $trace[1]['file'];
+				}
+				if ($file != '') $file = basename($file);
+				$c = $file . ": ";
+				$c .= ($class != '') ? ":" . $class . "->" : "";
+				$c .= ($func != '') ? $func . "(): " : "";
+				return($c);
+		}		
+		
     public function getConfig()
     {
         return include __DIR__ . '/config/module.config.php';
