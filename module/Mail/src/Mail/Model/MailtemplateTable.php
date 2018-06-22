@@ -80,13 +80,8 @@ class MailtemplateTable
 					$addTo = $tosend->u_email;
 				$toName = $tosend->u_firstname . ' ' . $tosend->u_lastname;
 				$mail->addTo($tosend->u_email, $toName);
-				echo '<br>this is u_email=' . $tosend->u_email;
-				echo '<br>this is u_firstname=' . $tosend->u_firstname;
-				echo '<br>this is u_lastname=' . $tosend->u_lastname;
 			}
 
-			$addTo = 'jim.manton@skybeam.com';
-      $mail->addTo($addTo, 'jim');
 			$html = new \Zend\Mime\Part($message);
 			$html->type = 'text/html';
 			$body = new \Zend\Mime\Message;
