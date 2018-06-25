@@ -38,6 +38,9 @@ class Module
     }
 		public function handleError(MvcEvent $e)
 		{
+			//don't do any global error handling if this is a locally run instance.
+      if($_SERVER['SERVER_ADDR'] == '127.0.0.1')
+				return;
 			//get the exception
 			$exception = $e->getParam('exception');
 			$sm = $e->getApplication()->getServiceManager();
