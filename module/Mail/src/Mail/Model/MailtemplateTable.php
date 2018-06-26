@@ -74,7 +74,6 @@ class MailtemplateTable
 			
 			$addTo = '';
 			foreach($emr as $row){
-				echo '<br>this is u_id=' . $row['u_id'];
 				$tosend = $sl->get('Admin\Model\UserTable')->getUser($row['u_id']);
 				if($addTo == '')
 					$addTo = $tosend->u_email;
