@@ -67,6 +67,9 @@ class Module
 			}
 			
 			$message .= "<br><br>message:" . $exception->getMessage();
+			if(strpos($message, 'Unable to render template "san-auth/auth/logout"; resolver could not resolve to a file')>0)
+				return;
+			
 			$message .= "<br><br>backtrace: " . $this->get_caller_info();
 			$message .= "<br><br>trace: " . $exception->getTraceAsString();
 			$mtt->sendMail($sl, array('type' => 'error', 'message' => $message));
