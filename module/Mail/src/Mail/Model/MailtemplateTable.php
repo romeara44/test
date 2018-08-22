@@ -60,10 +60,43 @@ class MailtemplateTable
 
         return $row;
     }
+
 		private function sendMailerror($sl, $params){
       $mail = new Mail\Message();
 			$mail->setFrom('postmaster@click5dev7.com', 'HIPAA Suite');
 			$subject = 'Carosh global error message server(' . $_SERVER['SERVER_NAME'] . ')';
+      $mail->setSubject($subject);
+
+			$message = 'no message attached';	
+			if(isset($params['message'])){
+				$message = $params['message'];
+			}
+			$emr = $sl->get('Mail\Model\ErrormailrecipientsTable')->fetchAll();
+			
+			$addTo = '';
+			foreach($emr as $row){
+				$tosend = $sl->get('Admin\Model\UserTable')->getUser($row['u_id']);
+				if($addTo == '')
+					$addTo = $tosend->u_email;
+				$toName = $tosend->u_firstname . ' ' . $tosend->u_lastname;
+				$mail->addTo($tosend->u_email, $toName);
+			}
+
+			$html = new \Zend\Mime\Part($message);
+			$html->type = 'text/html';
+			$body = new \Zend\Mime\Message;
+			$body->addPart($html);
+			$mail->setBody($body);
+			
+			
+			$this->sendMailpackage($mail);
+			$sl->get('Mail\Model\MailsentTable')->saveMail(array('ms_subject' => $subject, 'ms_text' => $message, 'ms_addto' => $addTo));			
+		}
+
+		private function sendMailissue($sl, $params){
+      $mail = new Mail\Message();
+			$mail->setFrom('postmaster@click5dev7.com', 'HIPAA Suite');
+			$subject = 'Carosh user reporting issue: server(' . $_SERVER['SERVER_NAME'] . ')';
       $mail->setSubject($subject);
 
 			$message = 'no message attached';	
@@ -97,6 +130,12 @@ class MailtemplateTable
         if(isset($params['type'])){
 					if($params['type'] === 'error'){
 						$this->sendMailerror($sl, $params);
+						return;
+					}
+				}
+        if(isset($params['type'])){
+					if($params['type'] === 'issue'){
+						$this->sendMailissue($sl, $params);
 						return;
 					}
 				}
