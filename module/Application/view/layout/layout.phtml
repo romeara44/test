@@ -81,7 +81,7 @@
                             <a href="/sitesetting">Site Settings</a><br />
                         <?php endif ?>
                         <a href="/user/account">My Profile</a><br />
-												<a href="#role-report-issue-modal" class="confirmation-modal" onclick="">Report Issue</a><br />												
+												<a href="#role-report-issue-modal" class="confirmation-modal" onclick="$('.report-issue-msg').hide();">Report Issue</a><br />												
                         <a href="/auth/logout">Logout</a>
                     </div>
                         <?php if (!in_array($uRoleId, array(5, 6, 7))): ?>
