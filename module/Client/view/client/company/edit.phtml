@@ -90,6 +90,13 @@ $form->setAttribute('method', 'post');
                     echo $this->formElementErrors($fn);
                     ?>
                 </p>
+                <p>
+                    <?php $fn = $form->get('_company_types');
+                    echo $this->formLabel($fn);
+                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
                 <?php if($this->roleId == \Admin\Model\User::ROLE_ADMIN && $checkHasPartial):?>
                     <p style="border: 0" id="activatePartialUsersWrap">
                         <a id="activatePartialUsers" href="javascript:" class="button"><i class="fa"></i>Activate Partial Users</a>

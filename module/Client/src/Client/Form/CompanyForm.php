@@ -23,6 +23,7 @@ class CompanyForm extends Form
         ));
 
         $companyTable = $sl->get('Client\Model\CompanyTable');
+
         $parent_companies[0] = 'Please select';
         foreach ($companyTable->getCompaniesForParent($identity) as $key => $c) {
             $parent_companies[$key] = $c;
@@ -30,6 +31,7 @@ class CompanyForm extends Form
         if ($c_id) {
             unset($parent_companies[$c_id]);
         }
+
         $this->add(array(
             'name' => 'c_parent_c_id',
             'type' => 'Zend\Form\Element\Select',
@@ -104,6 +106,12 @@ class CompanyForm extends Form
             $consultants[$key] = $r;
         }
 
+        $types[''] = 'Please select';
+        $types = ['county', 'private office', 'hospital']; // This is hardcoded, will have to build a DB model for new table
+        foreach ($types as $index => $type) {
+            $types[$index] = $type;
+        }
+
         $this->add(array(
             'name' => '_c_cur_consultants',
             'type' => 'Zend\Form\Element\Select',
@@ -111,10 +119,20 @@ class CompanyForm extends Form
                 'multiple' => 'multiple',
             ),
             'options' => array(
-                'label' => 'Consultants',
+                'label' => 'Company Type',
                 'value_options' => $consultants
             ),
         ));
+
+        $this->add(array(
+            'name' => '_company_types',
+            'type' => 'Zend\Form\Element\Select',
+            'options' => array(
+                'label' => 'Consultants',
+                'value_options' => $types
+            ),
+        ));
+
 
         $this->add(array(
             'name' => 'c_name',
@@ -206,8 +224,6 @@ class CompanyForm extends Form
                 'value_options' => $sl->get('Client\Model\CompanyTable')->getUsersLimitsArray()
             ),
         ));
-
-        ////////////////////////////////////
 
         $this->add(array(
             'name' => 'adr_name[]',
