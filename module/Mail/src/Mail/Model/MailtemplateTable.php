@@ -61,9 +61,84 @@ class MailtemplateTable
         return $row;
     }
 
+		private function sendMailerror($sl, $params){
+      $mail = new Mail\Message();
+			$mail->setFrom('postmaster@click5dev7.com', 'HIPAA Suite');
+			$subject = 'Carosh global error message server(' . $_SERVER['SERVER_NAME'] . ')';
+      $mail->setSubject($subject);
+
+			$message = 'no message attached';	
+			if(isset($params['message'])){
+				$message = $params['message'];
+			}
+			$emr = $sl->get('Mail\Model\ErrormailrecipientsTable')->fetchAll();
+			
+			$addTo = '';
+			foreach($emr as $row){
+				$tosend = $sl->get('Admin\Model\UserTable')->getUser($row['u_id']);
+				if($addTo == '')
+					$addTo = $tosend->u_email;
+				$toName = $tosend->u_firstname . ' ' . $tosend->u_lastname;
+				$mail->addTo($tosend->u_email, $toName);
+			}
+
+			$html = new \Zend\Mime\Part($message);
+			$html->type = 'text/html';
+			$body = new \Zend\Mime\Message;
+			$body->addPart($html);
+			$mail->setBody($body);
+			
+			
+			$this->sendMailpackage($mail);
+			$sl->get('Mail\Model\MailsentTable')->saveMail(array('ms_subject' => $subject, 'ms_text' => $message, 'ms_addto' => $addTo));			
+		}
+
+		private function sendMailissue($sl, $params){
+      $mail = new Mail\Message();
+			$mail->setFrom('postmaster@click5dev7.com', 'HIPAA Suite');
+			$subject = 'Carosh user reporting issue: server(' . $_SERVER['SERVER_NAME'] . ')';
+      $mail->setSubject($subject);
+
+			$message = 'no message attached';	
+			if(isset($params['message'])){
+				$message = $params['message'];
+			}
+			$emr = $sl->get('Mail\Model\ErrormailrecipientsTable')->fetchAll();
+			
+			$addTo = '';
+			foreach($emr as $row){
+				$tosend = $sl->get('Admin\Model\UserTable')->getUser($row['u_id']);
+				if($addTo == '')
+					$addTo = $tosend->u_email;
+				$toName = $tosend->u_firstname . ' ' . $tosend->u_lastname;
+				$mail->addTo($tosend->u_email, $toName);
+			}
+
+			$html = new \Zend\Mime\Part($message);
+			$html->type = 'text/html';
+			$body = new \Zend\Mime\Message;
+			$body->addPart($html);
+			$mail->setBody($body);
+			
+			
+			$this->sendMailpackage($mail);
+			$sl->get('Mail\Model\MailsentTable')->saveMail(array('ms_subject' => $subject, 'ms_text' => $message, 'ms_addto' => $addTo));			
+		}
 
     public function sendMail($sl, $params = array())
     {
+        if(isset($params['type'])){
+					if($params['type'] === 'error'){
+						$this->sendMailerror($sl, $params);
+						return;
+					}
+				}
+        if(isset($params['type'])){
+					if($params['type'] === 'issue'){
+						$this->sendMailissue($sl, $params);
+						return;
+					}
+				}
         $authService = new \Zend\Authentication\AuthenticationService();
         $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
         $identity = $authService->getIdentity();
@@ -120,7 +195,6 @@ class MailtemplateTable
                 $mt->mt_text = str_replace('<client_deactivate_link>', 'https://hipaa.carosh.com/company/delete/' . $company->c_id, $mt->mt_text);
             }
         }
-
         if (isset($params['brpId'])) {
             $mt->mt_text = str_replace('<id>', $params['brpId'], $mt->mt_text);
         }
@@ -194,7 +268,7 @@ class MailtemplateTable
         }
 
 
-        $message = utf8_encode($message);
+				$message = utf8_encode($message);
         $message = str_replace('Â', '', $message);
         $message = str_replace('â¢', '&#8226;', $message);
 
@@ -217,10 +291,20 @@ class MailtemplateTable
                 $body->addPart($attach);
             }
         }
-        
+        if($_SERVER['SERVER_NAME'] != 'hipaa'){
+            $mail->addTo($addTo, $addToName);
+            $mail->addBcc('compliance@carosh.com');
+        }
         $mail->setBody($body);
 
         $mail->setSubject($subject);
+				
+				$this->sendMailpackage($mail);
+
+        $sl->get('Mail\Model\MailsentTable')->saveMail(array('ms_subject' => $subject, 'ms_text' => $message, 'ms_addto' => $addTo));			
+    }
+		private function sendMailpackage($mail){
+
 
         //$transport = new Mail\Transport\Sendmail();
         //echo $message;
@@ -271,7 +355,6 @@ class MailtemplateTable
         
         $transport = new SmtpTransport();
         $transport->setOptions($options);
-
         if($_SERVER['SERVER_ADDR'] == '127.0.0.1') {
             // Setup File transport
             $transport = new FileTransport();
@@ -283,19 +366,10 @@ class MailtemplateTable
             ));
             $transport->setOptions($options);
             $transport->send($mail);
-        } else if ($_SERVER['SERVER_NAME'] != 'hipaa') {
-            $mail->addTo($addTo, $addToName);
-            $mail->addBcc('compliance@carosh.com');
-
-            $transport->send($mail);
         } else {
-            //$mail->addTo('tomasz.boch@gmail.com', $addToName); // LOCAL
             $transport->send($mail);
         }
-
-        $sl->get('Mail\Model\MailsentTable')->saveMail(array('ms_subject' => $subject, 'ms_text' => $message, 'ms_addto' => $addTo));
-
-    }
+		}
 
     public function _getHtmlTemplate($sl, $content, $templateKey = '')
     {

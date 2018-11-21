@@ -81,6 +81,7 @@
                             <a href="/sitesetting">Site Settings</a><br />
                         <?php endif ?>
                         <a href="/user/account">My Profile</a><br />
+												<a href="#role-report-issue-modal" class="confirmation-modal" onclick="$('.report-issue-msg').hide();">Report Issue</a><br />												
                         <a href="/auth/logout">Logout</a>
                     </div>
                         <?php if (!in_array($uRoleId, array(5, 6, 7))): ?>
@@ -218,6 +219,72 @@
 
                 </script>
             </div>
+        </div>
+
+        <div id="role-report-issue-modal" style="display: none;">
+					<h3>Report Issue</h3>
+					<div>
+						<div>
+							<p id="report-issue-txt" class="report-issue-msg"></p>
+						<div>
+						<script>
+              $('.report-issue-msg').hide();
+						</script>
+						<form method="post" action="" class="inline">
+							<textarea id="report-issue-text" rows="12" cols="100" title="Enter and report an individual issue here."></textarea>
+						 </form>
+
+						<a id="report-issue" class="form-button" onclick="var o=new reportObj(); o.reportIssue();" title="Enter an issue above to report.">Report</a>
+						<a href="javascript:void(0);" onclick="jQuery.fancybox.close();" class="form-button">Cancel</a>
+
+						<script>
+								var owner = null;
+								class reportObj{
+									constructor() {
+										var t = this;
+										owner = t;
+										t.document = document;
+										$('.report-issue-msg').hide();
+										t.url = "/user/issue/";
+									}
+
+									ajaxCall(callback){
+										var t = this;
+										var is = t.document.getElementById('report-issue-text').value;
+										var dat = {"issue": is};
+										if(is == ""){
+                      t.document.getElementById('report-issue-txt').innerHTML = '<font size="4" color="red" type="bold">Please enter an issue.</font>';
+                      $('.report-issue-msg').show().animate({opacity: 1.0}, 3000).fadeOut(1000);
+											return;
+										}
+										
+										$.ajax({
+											url:t.url,
+											type:'post',
+											data:dat,
+											success:function(response){
+												callback();
+											}
+										});
+									}
+
+									reportIssue(){
+										var t = this;
+										t.ajaxCall(t.finish);
+									}
+
+
+									finish(){
+										var t = owner;
+										t.document.getElementById('report-issue-text').value = '';
+										t.document.getElementById('report-issue-txt').innerHTML = '<font size="4" color="green" type="bold">Issue successfully reported.</font>';
+										$('.report-issue-msg').show().animate({opacity: 1.0}, 3000).fadeOut(1000);
+										setTimeout(function(){ jQuery.fancybox.close(); }, 2500);
+									}
+								}
+
+						</script>
+					</div>
         </div>
 
         <div class="modules-access-box">
