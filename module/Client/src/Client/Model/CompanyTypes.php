@@ -23,32 +23,4 @@ class CompanyTypes
         return get_object_vars($this);
     }
 
-    public function getInputFilter()
-    {
-        if (!$this->inputFilter) {
-            $inputFilter = new InputFilter();
-            $factory = new InputFactory();
-
-            $inputFilter->add($factory->createInput(array(
-                'name' => 'company_type_id',
-                'required' => true,
-                'filters' => array(
-                    array('name' => 'Int'),
-                ),
-            )));
-
-            $inputFilter->add($factory->createInput(array(
-                'name' => 'name',
-                'required' => true,
-                'filters' => array(
-                    array('name' => 'String'),
-                ),
-            )));
-
-            $this->inputFilter = $inputFilter;
-        }
-
-        return $this->inputFilter;
-    }
-
 }
