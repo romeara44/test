@@ -107,9 +107,10 @@ class CompanyForm extends Form
         }
 
         $types[''] = 'Please select';
-        $types = ['county', 'private office', 'hospital']; // This is hardcoded, will have to build a DB model for new table
-        foreach ($types as $index => $type) {
-            $types[$index] = $type;
+        $companyTypesTable = $sl->get('Client\Model\CompanyTypesTable');
+
+        foreach ($companyTypesTable->getCompanyTypes() as $index => $type) {
+            $types[$index] = $type->name;
         }
 
         $this->add(array(
@@ -119,7 +120,7 @@ class CompanyForm extends Form
                 'multiple' => 'multiple',
             ),
             'options' => array(
-                'label' => 'Company Type',
+                'label' => 'Consultants',
                 'value_options' => $consultants
             ),
         ));
@@ -128,7 +129,7 @@ class CompanyForm extends Form
             'name' => '_company_types',
             'type' => 'Zend\Form\Element\Select',
             'options' => array(
-                'label' => 'Consultants',
+                'label' => 'Company Type',
                 'value_options' => $types
             ),
         ));
