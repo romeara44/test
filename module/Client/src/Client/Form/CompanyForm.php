@@ -110,7 +110,7 @@ class CompanyForm extends Form
         $companyTypesTable = $sl->get('Client\Model\CompanyTypesTable');
 
         foreach ($companyTypesTable->getCompanyTypes() as $index => $type) {
-            $types[$index] = $type->name;
+            $types[$type->company_type_id] = $type->name;
         }
 
         $this->add(array(
@@ -126,7 +126,7 @@ class CompanyForm extends Form
         ));
 
         $this->add(array(
-            'name' => '_company_types',
+            'name' => 'company_type_id',
             'type' => 'Zend\Form\Element\Select',
             'options' => array(
                 'label' => 'Company Type',

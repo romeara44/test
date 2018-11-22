@@ -91,7 +91,7 @@ $form->setAttribute('method', 'post');
                     ?>
                 </p>
                 <p>
-                    <?php $fn = $form->get('_company_types');
+                    <?php $fn = $form->get('company_type_id');
                     echo $this->formLabel($fn);
                     echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
                     echo $this->formElementErrors($fn);
