@@ -55,6 +55,7 @@ class Company
     public $c_renewal_date;
     public $c_renewal_email_recipients;
     public $c_deny_renewal_email_sending;
+    public $company_type_id;
 
     protected $inputFilter;
 
@@ -93,6 +94,7 @@ class Company
         $this->c_renewal_date     = (isset($data['c_renewal_date'])) ? $data['c_renewal_date'] : null;
         $this->c_renewal_email_recipients     = (isset($data['c_renewal_email_recipients'])) ? $data['c_renewal_email_recipients'] : null;
         $this->c_deny_renewal_email_sending     = (isset($data['c_deny_renewal_email_sending'])) ? $data['c_deny_renewal_email_sending'] : null;
+        $this->company_type_id     = (isset($data['company_type_id'])) ? $data['company_type_id'] : null;
     }
 
     public function getArrayCopy()
