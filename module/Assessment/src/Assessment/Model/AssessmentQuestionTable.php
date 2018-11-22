@@ -32,6 +32,8 @@ class AssessmentQuestionTable implements ServiceLocatorAwareInterface
         return $this->serviceLocator;
     }
 
+    // I couldn't find anywhere that this function was used. If we do use this function in the future,
+    // it needs to be modified to use a company_type_id for question selection.
     public function getQuestion($id)
     {
         $id = (int)$id;
@@ -79,6 +81,7 @@ class AssessmentQuestionTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
         $select->where('aq_type = ' . $type);
         $select->where('aq_active = 1');
+        $select->where('company_type_id = ' . $company->company_type_id); // when is aObj undefined?
         $select->join(array('aqo' => 'assessments_questions_options'), 'aqo_aq_id = aq_id', array('*', '_options' => new \Zend\Db\Sql\Expression('GROUP_CONCAT(CONCAT(aqo_id, "::", aqo_title) ORDER BY aqo_order)')), 'left');
         $select->join(array('aqc' => 'assessments_questions_categories'), 'aq_aqc_id = aqc_id', array('*'), 'left');
 
