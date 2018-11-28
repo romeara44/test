@@ -125,12 +125,7 @@ $form->setAttribute('method', 'post');
                 <?php
                 $fn = $form->get('c_other_phone');
                 echo $this->formLabel($fn);
-                echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
-                echo $this->formElementErrors($fn);
-                ?>
-                <?php
-                $fn = $form->get('c_other_phone_inner');
-                echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
                 echo $this->formElementErrors($fn);
                 ?>
             </p>
