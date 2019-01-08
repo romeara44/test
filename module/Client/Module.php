@@ -109,6 +109,17 @@ class Module
                     $resultSetPrototype->setArrayObjectPrototype(new \Client\Model\CompanyTrainingManagers());
                     return new TableGateway('company_training_managers', $dbAdapter, null, $resultSetPrototype);
                 },
+                'Client\Model\CompanyTypesTable' =>  function($sm) {
+                    $tableGateway = $sm->get('CompanyTypesTableGateway');
+                    $table = new \Client\Model\CompanyTypesTable($tableGateway);
+                    return $table;
+                },
+                'CompanyTypesTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new \Client\Model\CompanyTypes());
+                    return new TableGateway('company_type', $dbAdapter, null, $resultSetPrototype);
+                },
             ),
         );
     }
