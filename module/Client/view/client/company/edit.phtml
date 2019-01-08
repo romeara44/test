@@ -90,6 +90,16 @@ $form->setAttribute('method', 'post');
                     echo $this->formElementErrors($fn);
                     ?>
                 </p>
+                <p>
+                    <?php
+                    if ($this->roleId == \Admin\Model\User::ROLE_ADMIN || $this->roleId == \Admin\Model\User::ROLE_SENIOR_CONSULTANT) {
+                        $fn = $form->get('company_type_id');
+                        echo $this->formLabel($fn);
+                        echo $this->formSelect($fn->setAttributes(array('class' => 'form-control')));
+                        echo $this->formElementErrors($fn);
+                    }
+                    ?>
+                </p>
                 <?php if($this->roleId == \Admin\Model\User::ROLE_ADMIN && $checkHasPartial):?>
                     <p style="border: 0" id="activatePartialUsersWrap">
                         <a id="activatePartialUsers" href="javascript:" class="button"><i class="fa"></i>Activate Partial Users</a>
@@ -118,12 +128,7 @@ $form->setAttribute('method', 'post');
                 <?php
                 $fn = $form->get('c_other_phone');
                 echo $this->formLabel($fn);
-                echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
-                echo $this->formElementErrors($fn);
-                ?>
-                <?php
-                $fn = $form->get('c_other_phone_inner');
-                echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
                 echo $this->formElementErrors($fn);
                 ?>
             </p>

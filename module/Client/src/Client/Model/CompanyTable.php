@@ -368,6 +368,7 @@ class CompanyTable implements ServiceLocatorAwareInterface
             'c_rel_type'    => 0,
             'c_type'    => 0,
             'c_parent_c_id'    => 0,
+            'company_type_id'    => $company->company_type_id,
         );
 
         if (in_array($identity['u_role_id'], array(User::ROLE_SALES_REP, User::ROLE_SENIOR_CONSULTANT, User::ROLE_ADMIN))) {
