@@ -270,19 +270,22 @@ class BusinessassociateController extends AbstractActionController
                     $userObj = $this->getUserTable()->getUser($baObj->ba_contact_u_id);
                     $form->get('u_id')->setValue($baObj->ba_contact_u_id);
 
-                    $form->get('u_firstname')->setValue($userObj->u_firstname);
-                    $form->get('u_lastname')->setValue($userObj->u_lastname);
-                    $form->get('u_title')->setValue($userObj->u_title);
-                    $form->get('u_office_phone')->setValue($userObj->u_office_phone);
-                    $form->get('u_office_phone_inner')->setValue($userObj->u_office_phone_inner);
-                    $form->get('u_direct_phone')->setValue($userObj->u_direct_phone);
-                    $form->get('u_direct_phone_inner')->setValue($userObj->u_direct_phone_inner);
-                    $form->get('u_cell_phone')->setValue($userObj->u_cell_phone);
-                    $form->get('u_other_phone')->setValue($userObj->u_other_phone);
-                    $form->get('u_other_phone_inner')->setValue($userObj->u_other_phone_inner);
-                    $form->get('u_fax')->setValue($userObj->u_fax);
-                    $form->get('u_email')->setValue($userObj->u_email);
-
+                    if ($userObj) 
+                    {
+                        $form->get('u_firstname')->setValue($userObj->u_firstname);
+                        $form->get('u_lastname')->setValue($userObj->u_lastname);
+                        $form->get('u_title')->setValue($userObj->u_title);
+                        $form->get('u_office_phone')->setValue($userObj->u_office_phone);
+                        $form->get('u_office_phone_inner')->setValue($userObj->u_office_phone_inner);
+                        $form->get('u_direct_phone')->setValue($userObj->u_direct_phone);
+                        $form->get('u_direct_phone_inner')->setValue($userObj->u_direct_phone_inner);
+                        $form->get('u_cell_phone')->setValue($userObj->u_cell_phone);
+                        $form->get('u_other_phone')->setValue($userObj->u_other_phone);
+                        $form->get('u_other_phone_inner')->setValue($userObj->u_other_phone_inner);
+                        $form->get('u_fax')->setValue($userObj->u_fax);
+                        $form->get('u_email')->setValue($userObj->u_email);
+                    }
+                    
                     $checkIfUserAnswered = (int) $this->getBusinessassociateanswerTable()->checkIfAnswersExists($id);
                     if ($checkIfUserAnswered) {
                         $answers = $this->getBusinessassociateanswerTable()->getBaAnswers($id);

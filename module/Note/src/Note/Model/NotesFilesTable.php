@@ -72,4 +72,58 @@ class NotesFilesTable
     {
         $this->tableGateway->update(array('nf_active' => 1), array('nf_f_id' => $id));
     }
+
+    // public function cloneNoteFiles($noteId, Note $note)
+    // {
+    //     //Audit Record Note Files
+    //     $sourceFiles = $this->getFilesByNoteId($note->note_id);
+    //     foreach ($sourceFiles as $sourceFile) {
+
+    //         // Get the source file from the files table record
+    //         $sourceFile = $this->getServiceLocator()->get('Application\Model\FilesTable')->getFile($sourceFile->nf_f_id);
+            
+    //         $newFile = array();
+    //         $newFile['f_name'] = $sourceFile->f_name;
+    //         $newFile['f_type'] = $sourceFile->f_type;
+    //         $newFile['f_create_date'] = $sourceFile->f_create_date;
+    //         $newFile['f_encrypted'] = $sourceFile->f_encrypted;
+            
+    //         $savedFileId = $this->getServiceLocator()->get('Application\Model\FilesTable')->saveFile($newFile);
+
+    //         $newNoteFile = array();
+    //         $newNoteFile['nf_f_id'] = $savedFileId;
+    //         $newNoteFile['nf_note_id'] = $noteId;
+    //         $newNoteFile['nf_active'] = $sourceFile->nf_active;
+            
+    //         $savedNoteFileId = $this->saveFile($newNoteFile);
+
+    //         $notesFolder = 'public/data/notefiles';
+
+    //         mkdir($notesFolder . '/' . $noteId);
+    //         copy($notesFolder . '/' . $sourceFile->nf_note_id . '/' . $sourceFile->f_id, $notesFolder . '/' . $noteId . '/' . $savedFileId);
+
+    //     }
+    // }
+
+    public function cloneNoteFile($savedFileId, $savedAuditNoteId, $sourceAuditRecordFile) {
+
+        $newNoteFile = array();
+        $newNoteFile['nf_f_id'] = $savedFileId;
+        $newNoteFile['nf_note_id'] = $savedAuditNoteId;
+        $newNoteFile['nf_active'] = $sourceAuditRecordFile->nf_active;
+        
+        //$savedNoteFileId = $this->getServiceLocator()->get('Note\Model\NotesFilesTable')->saveFile($newNoteFile);
+        $savedNoteFileId = $this->saveFile($newNoteFile);
+
+        return $savedNoteFileId;
+    }
+
+    public function clonePhysicalFile($savedAuditNoteId, $sourceAuditRecordFile, $sourceFile, $savedFileId) {
+
+        $notesFolder = 'public/data/notefiles';
+
+        mkdir($notesFolder . '/' . $savedAuditNoteId);
+        copy($notesFolder . '/' . $sourceAuditRecordFile->nf_note_id . '/' . $sourceFile->f_id, $notesFolder . '/' . $savedAuditNoteId . '/' . $savedFileId);
+    }
+                        
 }

@@ -22,12 +22,9 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
 <table id="assessment-list-table" cellpadding="0" cellspacing="0">
     <thead>
         <tr>
+            
+            <th>Client</th>
             <th>ID</th>
-
-            <?php if (!$isClientRole): ?>
-                <th>Client</th>
-            <?php endif; ?>
-
             <th>Status</th>
             <th>Type</th>
             <th>Date</th>
@@ -83,10 +80,9 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
             $classBold = '';
             ?>
             <tr>
+                
+                <td style="padding-left: <?php echo $paddingVersion ?>px"><?php if ($isVersion): ?><i class="fa fa-code-fork"></i> &nbsp; <?php endif ?><a href="/assessment/editlist/<?php echo $a->a_id ?>"><?php echo stripslashes($a->_client_name) ?></a></td>
                 <td><?php echo $rowId ?><?php echo $postFix ?></td>
-                <?php if (!$isClientRole): ?>
-                    <td style="padding-left: <?php echo $paddingVersion ?>px"><?php if ($isVersion): ?><i class="fa fa-code-fork"></i> &nbsp; <?php endif ?><a href="/assessment/editlist/<?php echo $a->a_id ?>"><?php echo stripslashes($a->_client_name) ?></a></td>
-                <?php endif; ?>
                 <td><?php echo $this->asessmentProgressBar($a) ?></td>
                 <td><?php echo \Assessment\Model\Assessment::$typesNames[$a->a_type] ?></td>
                 <td><?php echo ($a->a_create_date != '0000-00-00 00:00:00') ? $this->formatDateA($a->a_create_date) : '' ?></td>

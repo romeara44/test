@@ -20,6 +20,7 @@ class AuthController extends AbstractActionController
     protected $form;
     protected $storage;
     protected $authservice;
+    protected $companyTable;
 
     public function onDispatch(\Zend\Mvc\MvcEvent $e)
     {
@@ -55,6 +56,16 @@ class AuthController extends AbstractActionController
         }
         return $this->userTable;
     }
+
+    public function getCompanyTable()
+    {
+        if (!$this->companyTable) {
+            $sm = $this->getServiceLocator();
+            $this->companyTable = $sm->get('Client\Model\CompanyTable');
+        }
+        return $this->companyTable;
+    }
+    
 
     public function loginAction()
     {
@@ -186,8 +197,8 @@ class AuthController extends AbstractActionController
 
     public function authenticateAction()
     {
-        $captchaContainer = new Container('captcha');
-
+        $captchaContainer = new Container('captcha');     
+        
         $showCaptcha = $captchaContainer->offsetExists('show');
         $showCaptcha = false;
 
@@ -224,7 +235,7 @@ class AuthController extends AbstractActionController
                 $company_id = $request->getPost('u_company_id');
                 if (!$company_id) {
                     $users    = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getCompaniesByUserEmail($request->getPost('u_email'));
-                
+
                     if ($users->count() > 1) {
                         
                         $companies = array();
@@ -261,6 +272,7 @@ class AuthController extends AbstractActionController
 
                     $usersDb = $this->getServiceLocator()->get('Admin\Model\UserTable');
                     $user    = $usersDb->getUserByEmail($request->getPost('u_email'), $company_id);
+                    $senior_consultant_company_id = $company_id;
 
                     if($user) {
                         if(!$user->u_active || $user->u_locked || !$user->u_confirmed) {
@@ -293,6 +305,7 @@ class AuthController extends AbstractActionController
 
                         $container = new Container('application_vars');
                         $container->storage = $config['application_vars'];
+
                     }
 
                     $result = 0;
@@ -316,22 +329,25 @@ class AuthController extends AbstractActionController
 
                         $this->getAuthService()->setStorage($this->getSessionStorage());
 
-                        $dataStorage['u_email']                  = $request->getPost('u_email');
-                        $dataStorage['u_firstname']              = $user->u_firstname;
-                        $dataStorage['u_title']                  = $user->u_title;
-                        $dataStorage['u_lastname']               = $user->u_lastname;
-                        $dataStorage['u_role_id']                = $user->u_role_id;
-                        $dataStorage['u_id']                     = $user->u_id;
-                        $dataStorage['u_senior_consultant_u_id'] = $user->u_senior_consultant_u_id;
-                        $dataStorage['u_company_id']             = $user->u_company_id;
-                        $dataStorage['u_office_phone']           = $user->u_office_phone;
-                        $dataStorage['u_register']               = $user->u_register;
-                        $dataStorage['u_first_login']            = $user->u_first_login;
-                        $dataStorage['u_company_id_admin']       = $user->u_company_id_admin;
-                        $dataStorage['u_grant_to_disclosures']   = $user->u_grant_to_disclosures;
-                        $dataStorage['u_grant_to_breach']        = $user->u_grant_to_breach;
-                        $dataStorage['has_modules_access']       = $user->u_role_id == \Admin\Model\User::ROLE_ADMIN ? 1 : 0;
-
+                        $dataStorage['u_email']                     = $request->getPost('u_email');
+                        $dataStorage['u_firstname']                 = $user->u_firstname;
+                        $dataStorage['u_title']                     = $user->u_title;
+                        $dataStorage['u_lastname']                  = $user->u_lastname;
+                        $dataStorage['u_role_id']                   = $user->u_role_id;
+                        $dataStorage['u_id']                        = $user->u_id;
+                        $dataStorage['u_senior_consultant_u_id']    = $user->u_senior_consultant_u_id;
+                        $dataStorage['u_company_id']                = $user->u_company_id;
+                        $dataStorage['u_office_phone']              = $user->u_office_phone;
+                        $dataStorage['u_register']                  = $user->u_register;
+                        $dataStorage['u_first_login']               = $user->u_first_login;
+                        $dataStorage['u_company_id_admin']          = $user->u_company_id_admin;
+                        $dataStorage['u_grant_to_disclosures']      = $user->u_grant_to_disclosures;
+                        $dataStorage['u_grant_to_breach']           = $user->u_grant_to_breach;
+                        $dataStorage['has_modules_access']          = $user->u_role_id == \Admin\Model\User::ROLE_ADMIN ? 1 : 0;
+                        $dataStorage['u_senior_consultant_c_id']    = is_null($user->u_senior_consultant_c_id) ? 0 : $user->u_senior_consultant_c_id ;
+                        $dataStorage['audit_signoff_approve']       = (int)$user->audit_signoff_approve;
+                        
+                        
                         $this->getAuthService()->getStorage()->write($dataStorage);
 
                         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Authenticate');
@@ -420,7 +436,7 @@ class AuthController extends AbstractActionController
 
         $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
     }
-
+    
     public function getAccessForModulesAction()
     {
         $request = $this->getRequest();
@@ -439,7 +455,19 @@ class AuthController extends AbstractActionController
                     return new JsonModel(array('result' => 1));
                 }
             } else if($action == 'get_access' && isset($code)) {
-                if($this->getUserTable()->getModulesAccess($identity['u_id'], $code)) {
+                                
+                $company = $this->getCompanyTable()->getCompanyInformationById($identity['u_company_id']);
+
+                //rto 2-1-2022: Suppress Secondary Authentication is set by company and is used in a demo situation. When consultants demo systems 
+                //to clients they do not want to wait for the email to come through with the temporary code, used for incidents response.
+                if ((int) $company->suppress_secondary_auth === 1) {
+                    $identity['has_modules_access'] = 1;
+
+                    $this->getAuthService()->setStorage($this->getSessionStorage());
+                    $this->getAuthService()->getStorage()->write($identity);
+                    return new JsonModel(array('result' => 1));
+                }
+                else if($this->getUserTable()->getModulesAccess($identity['u_id'], $code)) {
                     $identity['has_modules_access'] = 1;
 
                     $this->getAuthService()->setStorage($this->getSessionStorage());

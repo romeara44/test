@@ -1,17 +1,7 @@
 <?php
 use Assessment\Model\Assessment;
 ?>
-<?php if (count($this->loc_rps) > 1) : ?>
-<div class="tab_nav">
-    <ul class="ul_tabs">
-    <?php foreach ($this->loc_rps as $rp_id => $loc_name): ?>
-        <li <?php echo $this->id == $rp_id ? 'class="active_tab"' : ''; ?> >
-        <a href="/remediationplan/edit/<?php echo $rp_id; ?>" class="panel-tabs"><?php echo $loc_name; ?></a>
-        </li>
-    <?php endforeach; ?>
-    </ul>
-</div>
-<?php endif; ?>
+
 <div class="page-title">
     <h1 class="fleft"><?php echo $this->rpObj->rp_type == Assessment::TYPE_SECURITY_RISK ? 'Security' : 'Privacy'; ?> Remediation Plan for <?php echo (!$this->isPdf) ? '<br/>' : '' ?><?php echo $this->rpObj->_client_name ?>
     <?php foreach ($this->actions as $rpa): ?>
@@ -29,7 +19,7 @@ use Assessment\Model\Assessment;
     <?php if (!$this->isPdf): ?>
         <a href="/remediationplan/edit/<?php echo $rpObj->rp_id ?>/type/pdf" class="button" title="Download as PDF"><i class="fa fa-download"></i> PDF</a>
         <a href="/remediationplan/edit/<?php echo $rpObj->rp_id ?>/type/csv" class="button" title="Download as CSV"><i class="fa fa-download"></i> CSV</a>
-        <a href="/remediationplan/summary/<?php echo $rpObj->rp_id ?>" class="button" title="Summary view">Summary view</a>
+        <a href="/remediationplan/summary/<?php echo $rpObj->rp_id ?>?return_url=<?php echo $return_url ?>" class="button" title="Summary view">Summary view</a>
     <?php endif; ?>
     <div class="cboth"></div>
 </div>
@@ -119,28 +109,28 @@ use Assessment\Model\Assessment;
             <th>Policy number</th>
             <?php $classSort = ($order_by == 'status') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
-                <a href="<?php echo $this->url('remediationplan', array('action' => 'edit', 'id' => $this->id, 'order_by' => 'status', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'edit', 'id' => $this->id, 'order_by' => 'status', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>?return_url=<?php echo $return_url ?>">
                     Status <i class="fa <?php echo $classSort ?>"></i>
                 </a>
             </th>
 
             <?php $classSort = ($order_by == 'assignee') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
-                <a href="<?php echo $this->url('remediationplan', array('action' => 'edit', 'id' => $this->id, 'order_by' => 'assignee', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'edit', 'id' => $this->id, 'order_by' => 'assignee', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>?return_url=<?php echo $return_url ?>">
                     Assignee <i class="fa <?php echo $classSort ?>"></i>
                 </a>
             </th>
             
             <?php $classSort = ($order_by == 'approver') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
-                <a href="<?php echo $this->url('remediationplan', array('action' => 'edit', 'id' => $this->id, 'order_by' => 'approver', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'edit', 'id' => $this->id, 'order_by' => 'approver', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>?return_url=<?php echo $return_url ?>">
                     Approver <i class="fa <?php echo $classSort ?>"></i>
                 </a>
             </th>
 
             <?php $classSort = ($order_by == 'date') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
-                <a href="<?php echo $this->url('remediationplan', array('action' => 'edit', 'id' => $this->id, 'order_by' => 'date', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'edit', 'id' => $this->id, 'order_by' => 'date', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>?return_url=<?php echo $return_url ?>">
                     Target Date <i class="fa <?php echo $classSort ?>"></i>
                 </a>
             </th>
@@ -295,7 +285,7 @@ use Assessment\Model\Assessment;
     </div>
 <?php endif; ?>
 
-<form action="/remediationplan/edit/<?php echo $this->id ?>" name="" style="width: 600px;" id="formNote" method="POST" enctype="multipart/form-data" class="col2" >
+<form action="/remediationplan/edit/<?php echo $this->id ?>?return_url=<?php echo $return_url ?>" name="" style="width: 600px;" id="formNote" method="POST" enctype="multipart/form-data" class="col2" >
     <input id="rp_performed_u_id_hidden" name="rp_performed_u_id" type="hidden" value="<?php echo $this->rpObj->rp_performed_u_id ?>" />
     <input id="rp_incident_date_hidden" name="rp_incident_date" type="hidden" value="<?php echo ($this->rpObj->rp_incident_date != '0000-00-00') ? $this->rpObj->_rp_incident_date_formatted : '' ?>" />
     <input id="rp_remediation_date_hidden" name="rp_remediation_date" type="hidden" value="<?php echo ($this->rpObj->rp_remediation_date != '0000-00-00') ? $this->rpObj->_rp_remediation_date_formatted : '' ?>" />
@@ -319,6 +309,8 @@ use Assessment\Model\Assessment;
         $fn->setValue($this->id);
         echo $this->formHidden($fn);
         ?>
+
+        
 
         <p style="border: 0;">
             <strong style="line-height: 30px;">Notes</strong><br />
@@ -416,6 +408,9 @@ use Assessment\Model\Assessment;
         </p>
     <?php endif; ?>
 
+    <a href="#History" class="active">[...]</a>
+        <span class="mw-headline" id="History">History</span>
+        
     <div class="cboth"></div>
 
     <?php if ($this->writable && !$this->isPdf): ?>

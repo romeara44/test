@@ -1,0 +1,121 @@
+<div class="col-left">
+    <form action="/audit/newaudit" method="get" name="companyForm" id="companyForm">
+        <?php //Company dropdown ?>
+        <h2 style="padding-top: 0">Company</h2>
+        <select id="company" name="company">
+            <<option value="">Choose Company...</option>
+                    
+            <?php foreach ($companies as $key => $r): ?>
+                <option <?php echo $selectedCompany == $key ? 'SELECTED' : '' ?> value=<?php echo $key ?>><?php echo $companies[$key] ?></option>
+            <?php endforeach; ?>
+        </select>
+        
+    </form>
+</div>
+
+
+<form action="/audit/newaudit" method="post" name="auditCreationForm" id="auditCreationForm">
+    <input id="postCompanyId" type="hidden" name="postCompanyId" value="" />
+
+    <?php //Remediation Plan dropdown rp_id?>
+    <div class="col-left">
+        <h2 style="padding-top: 0">Remediation Plan</h2>
+        <select id="selectedRemediationPlan" name="selectedRemediationPlan">
+            <<option value="">Choose Remediation Plan...</option>
+            
+            <?php foreach ($remediationPlans as $row): ?>
+                <?php //$result = (!isset($row->rp_version_index_item)) ? ('(' . $row->rp_version_index . ')') : ('(' . $row->rp_version_index . '-' . $row->rp_version_index_item . '-' . (($row->rp_type == 1) ? 'S' : 'P') . ')');?>
+                <?php $result = (!isset($row->rp_version_index_item)) ? ('(' . $row->rp_version_index . '-' . (($row->rp_type == 1) ? 'S' : 'P') . ')') : ('(' . $row->rp_version_index . '-' . $row->rp_version_index_item . '-' . (($row->rp_type == 1) ? 'S' : 'P') . ')');?>
+                <option value=<?php echo $row->rp_id ?>><?php echo $result . '  ' . $row->_client_name . ' - ' . date("m-d-Y", strtotime($row->rp_remediation_date)) ?></option>
+            <?php endforeach; ?>
+        </select>
+
+    </div>
+
+    <div class="cboth"></div>
+
+    <?php $maxInRows = 3; $counterRoles = 0; $last = ''; ?>         
+
+    <?php foreach ($auditRoles as $ar): ?>
+        <div class="col3"><br />
+            <style>
+                .form-modal-block {
+                    display: inline-block;
+                    margin-left: 2%;
+                }
+            </style>
+
+            <div class="form-modal-block">
+                <strong style="line-height: 32px;">
+                    <div id="rolename <?php echo $ar->hipaa_suite_module_role_id;?>"><?php echo $ar->_role_name;?></div>
+                </strong>
+            </div>
+            <div  class="form-modal-block">
+
+                <?php echo "<div id='alias-form-role-id' style='display: none;'></div>"; ?>
+                <?php echo "<div id='alias-form-company-id' style='display: none;'></div>"; ?>
+
+                <a href="#role-rename-modal" class="confirmation-modal" onclick="setDomElements(<?php echo $ar->hipaa_suite_module_role_id; ?>, <?php echo $this->company_id;?>)"><i class="fa fa-pencil"></i></a>
+                <script>
+                    function setDomElements(arId, companyId) {
+                        document.getElementById("alias-form-role-id").innerText = arId;
+                        document.getElementById("alias-form-company-id").innerText = companyId;
+                    }
+                </script>
+
+            </div>
+
+        <p>Assign role</p>
+            <select name="auditRoleLocationContact[<?php echo $ar->hipaa_suite_module_role_id ?>]" id="auditRoleLocationContact[<?php echo $ar->hipaa_suite_module_role_id ?>]" class="contactSelect w225">
+
+                <option value="">Select Contact</option>
+                <option value="">---</option>
+                <?php $selected = ''; ?>
+                
+                <?php foreach ($this->companyUsers as $u): ?>
+                    <option <?php echo $selected == $u->u_id ? 'SELECTED' : '' ?> value="<?php echo $u->u_id ?>"><?php echo $u->u_firstname . ' ' . $u->u_lastname ?></option>
+                <?php endforeach; ?>
+
+                <option value="addNewContactSelect">&rarr; Add New Contact</option>
+            </select>
+            
+        
+        </div>
+        
+
+    <?php $counterRoles++; endforeach; ?>
+    
+    <p style="color: red; font-size: 16px; font-weight: 600;"><?php echo $validationError ?></p>
+
+    <div class="cboth"></div>
+        <div class="form-buttons">
+            <input id="saveAndContinue" type="button" value="Save and Continue" class="form-button" />
+            <input id="save" type="button" value="Save" class="form-button" />
+            <div class="fleft">or</div>
+            
+            <a href="/audit/list" class="cancel">Cancel</a>
+        </div>
+    </div>
+    
+</form>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        
+        $('#company').change(function() {
+            document.getElementById('companyForm').submit();
+        });
+
+        $('#saveAndContinue').click(function() {
+            document.getElementById("postCompanyId").value = document.querySelector('#company').value;
+            document.getElementById('auditCreationForm').submit();
+        });
+
+        $('#save').click(function() {
+            document.getElementById("postCompanyId").value = document.querySelector('#company').value;
+            document.getElementById('auditCreationForm').submit();
+        });
+
+    });
+
+</script>

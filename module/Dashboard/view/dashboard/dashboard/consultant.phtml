@@ -4,7 +4,10 @@
 </div>
 
 <p style="padding: 8px 0 0 0;">
-    <a href="/company/edit" class="button" style="padding: 0 15px;"><i class="fa fa-plus-circle"></i> Add Company</a>
+    <?php if (in_array($this->roleId, array(\Admin\Model\User::ROLE_SENIOR_CONSULTANT))) : ?>
+        <a href="/company/edit" class="button" style="padding: 0 15px;"><i class="fa fa-plus-circle"></i> Add Company</a>
+    <?php endif; ?>
+    
     <a href="/client/edit" class="button" style="padding: 0 15px;"><i class="fa fa-plus-circle"></i> Add Contact</a>
     <a href="/businessassociate/edit" class="button" style="padding: 0 15px;"><i class="fa fa-plus-circle"></i> Add Business Associate</a>
     <a href="/breachlog/edit" class="with-access button" style="padding: 0 15px;"><i class="fa fa-plus-circle"></i> Add Incident Log</a>

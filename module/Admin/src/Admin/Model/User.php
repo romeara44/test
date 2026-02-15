@@ -18,6 +18,7 @@ class User
     const ROLE_BUSINESS_ASSOCIATE = 6;
     const ROLE_PARTIAL = 7;
     const ROLE_TRAIL = 8;
+    const ROLE_TRIAL = 8;
 
     /*
      * u_active
@@ -59,6 +60,7 @@ class User
     public $u_company_id_admin;
     public $u_grant_to_disclosures;
     public $u_grant_to_breach;
+    public $audit_signoff_approve;
     public $u_forgot_password;
     public $u_failed_logins_count;
     public $u_locked;
@@ -66,57 +68,77 @@ class User
     public $u_modules_access_code;
     public $u_modules_access_code_created;
     public $u_create_date;
+    public $u_senior_consultant_c_id;
+    public $licensed_user;
+    //public $isCompanyAdmin;
 
     public $_rolename;
     public $_username;
 
-    protected $inputFilter;
+    //protected $inputFilter;
+    public $inputFilter;
 
     public function exchangeArray($data)
     {
-        $this->u_id     = (isset($data['u_id'])) ? $data['u_id'] : null;
-        $this->u_role_id     = (isset($data['u_role_id'])) ? $data['u_role_id'] : null;
-        $this->u_senior_consultant_u_id     = (isset($data['u_senior_consultant_u_id'])) ? $data['u_senior_consultant_u_id'] : null;
-        $this->u_company_id     = (isset($data['u_company_id'])) ? $data['u_company_id'] : null;
-        $this->u_password     = (isset($data['u_password'])) ? $data['u_password'] : null;
-        $this->u_firstname     = (isset($data['u_firstname'])) ? $data['u_firstname'] : null;
-        $this->u_lastname     = (isset($data['u_lastname'])) ? $data['u_lastname'] : null;
-        $this->u_title     = (isset($data['u_title'])) ? $data['u_title'] : null;
-        $this->u_company     = (isset($data['u_company'])) ? $data['u_company'] : null;
-        $this->u_email     = (isset($data['u_email'])) ? $data['u_email'] : null;
-        $this->u_office_phone     = (isset($data['u_office_phone'])) ? $data['u_office_phone'] : null;
-        $this->u_office_phone_inner     = (isset($data['u_office_phone_inner'])) ? $data['u_office_phone_inner'] : null;
-        $this->u_direct_phone     = (isset($data['u_direct_phone'])) ? $data['u_direct_phone'] : null;
-        $this->u_direct_phone_inner     = (isset($data['u_direct_phone_inner'])) ? $data['u_direct_phone_inner'] : null;
-        $this->u_cell_phone     = (isset($data['u_cell_phone'])) ? $data['u_cell_phone'] : null;
-        $this->u_other_phone     = (isset($data['u_other_phone'])) ? $data['u_other_phone'] : null;
-        $this->u_other_phone_inner     = (isset($data['u_other_phone_inner'])) ? $data['u_other_phone_inner'] : null;
-        $this->u_fax     = (isset($data['u_fax'])) ? $data['u_fax'] : null;
-        $this->u_address1     = (isset($data['u_address1'])) ? $data['u_address1'] : null;
-        $this->u_address2     = (isset($data['u_address2'])) ? $data['u_address2'] : null;
-        $this->u_state_id     = (isset($data['u_state_id'])) ? $data['u_state_id'] : null;
-        $this->u_city     = (isset($data['u_city'])) ? $data['u_city'] : null;
-        $this->u_zip     = (isset($data['u_zip'])) ? $data['u_zip'] : null;
-        $this->u_active     = (isset($data['u_active'])) ? $data['u_active'] : null;
-        $this->u_hash     = (isset($data['u_hash'])) ? $data['u_hash'] : null;
-        $this->u_sent_password     = (isset($data['u_sent_password'])) ? $data['u_sent_password'] : null;
-        $this->u_status     = (isset($data['u_status'])) ? $data['u_status'] : null;
-        $this->_rolename     = (isset($data['_rolename'])) ? $data['_rolename'] : null;
-        $this->u_confirm_email     = (isset($data['u_confirm_email'])) ? $data['u_confirm_email'] : null;
-        $this->u_register     = (isset($data['u_register'])) ? $data['u_register'] : null;
-        $this->u_first_login     = (isset($data['u_first_login'])) ? $data['u_first_login'] : null;
-        $this->u_confirmed     = (isset($data['u_confirmed'])) ? $data['u_confirmed'] : null;
-        $this->u_company_id_admin     = (isset($data['u_company_id_admin'])) ? $data['u_company_id_admin'] : null;
-        $this->u_grant_to_disclosures = (isset($data['u_grant_to_disclosures'])) ? $data['u_grant_to_disclosures'] : null;
-        $this->u_grant_to_breach = (isset($data['u_grant_to_breach'])) ? $data['u_grant_to_breach'] : null;
-        $this->u_forgot_password     = (isset($data['u_forgot_password'])) ? $data['u_forgot_password'] : null;
-        $this->u_failed_logins_count     = (isset($data['u_failed_logins_count'])) ? $data['u_failed_logins_count'] : null;
-        $this->u_locked     = (isset($data['u_locked'])) ? $data['u_locked'] : null;
-        $this->u_locked_unlocked_date     = (isset($data['u_locked_unlocked_date'])) ? $data['u_locked_unlocked_date'] : null;
-        $this->u_modules_access_code     = (isset($data['u_modules_access_code'])) ? $data['u_modules_access_code'] : null;
-        $this->u_modules_access_code_created     = (isset($data['u_modules_access_code_created'])) ? $data['u_modules_access_code_created'] : null;
-        $this->u_create_date     = (isset($data['u_create_date'])) ? $data['u_create_date'] : null;
-        $this->_username     = (isset($data['_username'])) ? $data['_username'] : null;
+        $this->u_id                             = (isset($data['u_id'])) ? $data['u_id'] : null;
+        $this->u_role_id                        = (isset($data['u_role_id'])) ? $data['u_role_id'] : null;
+        $this->u_senior_consultant_u_id         = (isset($data['u_senior_consultant_u_id'])) ? $data['u_senior_consultant_u_id'] : null;
+        $this->u_company_id                     = (isset($data['u_company_id'])) ? $data['u_company_id'] : null;
+        $this->u_password                       = (isset($data['u_password'])) ? $data['u_password'] : null;
+        $this->u_firstname                      = (isset($data['u_firstname'])) ? $data['u_firstname'] : null;
+        $this->u_lastname                       = (isset($data['u_lastname'])) ? $data['u_lastname'] : null;
+        $this->u_title                          = (isset($data['u_title'])) ? $data['u_title'] : null;
+        $this->u_company                        = (isset($data['u_company'])) ? $data['u_company'] : null;
+        $this->u_email                          = (isset($data['u_email'])) ? $data['u_email'] : null;
+        $this->u_office_phone                   = (isset($data['u_office_phone'])) ? $data['u_office_phone'] : null;
+        $this->u_office_phone_inner             = (isset($data['u_office_phone_inner'])) ? $data['u_office_phone_inner'] : null;
+        $this->u_direct_phone                   = (isset($data['u_direct_phone'])) ? $data['u_direct_phone'] : null;
+        $this->u_direct_phone_inner             = (isset($data['u_direct_phone_inner'])) ? $data['u_direct_phone_inner'] : null;
+        $this->u_cell_phone                     = (isset($data['u_cell_phone'])) ? $data['u_cell_phone'] : null;
+        $this->u_other_phone                    = (isset($data['u_other_phone'])) ? $data['u_other_phone'] : null;
+        $this->u_other_phone_inner              = (isset($data['u_other_phone_inner'])) ? $data['u_other_phone_inner'] : null;
+        $this->u_fax                            = (isset($data['u_fax'])) ? $data['u_fax'] : null;
+        $this->u_address1                       = (isset($data['u_address1'])) ? $data['u_address1'] : null;
+        $this->u_address2                       = (isset($data['u_address2'])) ? $data['u_address2'] : null;
+        $this->u_state_id                       = (isset($data['u_state_id'])) ? $data['u_state_id'] : null;
+        $this->u_city                           = (isset($data['u_city'])) ? $data['u_city'] : null;
+        $this->u_zip                            = (isset($data['u_zip'])) ? $data['u_zip'] : null;
+        $this->u_active                         = (isset($data['u_active'])) ? $data['u_active'] : null;
+        $this->u_hash                           = (isset($data['u_hash'])) ? $data['u_hash'] : null;
+        $this->u_sent_password                  = (isset($data['u_sent_password'])) ? $data['u_sent_password'] : null;
+        $this->u_status                         = (isset($data['u_status'])) ? $data['u_status'] : null;
+        
+        $this->u_confirm_email                  = (isset($data['u_confirm_email'])) ? $data['u_confirm_email'] : null;
+        $this->u_register                       = (isset($data['u_register'])) ? $data['u_register'] : null;
+        $this->u_first_login                    = (isset($data['u_first_login'])) ? $data['u_first_login'] : null;
+        $this->u_confirmed                      = (isset($data['u_confirmed'])) ? $data['u_confirmed'] : null;
+        $this->u_company_id_admin               = (isset($data['u_company_id_admin'])) ? $data['u_company_id_admin'] : null;
+        $this->u_grant_to_disclosures           = (isset($data['u_grant_to_disclosures'])) ? $data['u_grant_to_disclosures'] : null;
+        $this->u_grant_to_breach                = (isset($data['u_grant_to_breach'])) ? $data['u_grant_to_breach'] : null;
+        $this->audit_signoff_approve            = (isset($data['audit_signoff_approve'])) ? $data['audit_signoff_approve'] : null;
+        $this->u_forgot_password                = (isset($data['u_forgot_password'])) ? $data['u_forgot_password'] : null;
+        $this->u_failed_logins_count            = (isset($data['u_failed_logins_count'])) ? $data['u_failed_logins_count'] : null;
+        $this->u_locked                         = (isset($data['u_locked'])) ? $data['u_locked'] : null;
+        $this->u_locked_unlocked_date           = (isset($data['u_locked_unlocked_date'])) ? $data['u_locked_unlocked_date'] : null;
+        $this->u_modules_access_code            = (isset($data['u_modules_access_code'])) ? $data['u_modules_access_code'] : null;
+        $this->u_modules_access_code_created    = (isset($data['u_modules_access_code_created'])) ? $data['u_modules_access_code_created'] : null;
+        $this->u_create_date                    = (isset($data['u_create_date'])) ? $data['u_create_date'] : null;
+        $this->u_senior_consultant_c_id         = (isset($data['u_senior_consultant_c_id'])) ? $data['u_senior_consultant_c_id'] : null;
+        $this->licensed_user                    = (isset($data['licensed_user'])) ? $data['licensed_user'] : null;
+        $this->_username                        = (isset($data['_username'])) ? $data['_username'] : null;
+        $this->_rolename                        = (isset($data['_rolename'])) ? $data['_rolename'] : null;
+        //$this->isCompanyAdmin                   = $this->DetermineCompanyAdmin($data['u_company_id_admin'], $data['u_company_id']);
+
+    }
+
+    private function DetermineCompanyAdmin($u_company_id_admin, $u_company_id)
+    {
+        $isCompanyAdmin = false;
+        if ((isset($u_company_id_admin)) && (isset($u_company_id)) && $u_company_id_admin == $u_company_id)
+        {
+            $isCompanyAdmin = true;
+        }
+        return $isCompanyAdmin;
     }
 
     public function getArrayCopy()
@@ -176,7 +198,6 @@ class User
                             'allow' => \Zend\Validator\Hostname::ALLOW_ALL
                         ),
                     ),
-                    //$ee
                 ),
             )));
 

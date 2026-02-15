@@ -71,6 +71,8 @@ class IndexController extends AbstractActionController
         } else {
             return $this->redirect()->toRoute('auth', array('controller' => 'auth', 'action' => 'authenticate'));
         }
+
+        
     }
 
 }

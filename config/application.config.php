@@ -25,7 +25,12 @@ return array(
         'Disclosure',
         'Reporting',
         'Itassetinventory',
-        'Physicalsecuritychange'
+        'Physicalsecuritychange',
+        'Audit',
+        //'Blog',
+        'Trainee'
+        //'Album',
+        //'Library',
         ),
     'module_listener_options' => array(
         'module_paths' => array(

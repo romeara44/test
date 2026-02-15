@@ -1,0 +1,49 @@
+<ht>Add Trainee Post</h1>
+
+<?php 
+$request = new \Zend\Http\PhpEnvironment\Request();
+$http_referer = $request->getServer('HTTP_REFERER');
+$parsed = parse_url($http_referer, PHP_URL_PATH); //dashboard/client
+
+// within a view script
+$form = $this->form;
+$form->prepare();
+
+echo $this->form()->openTag($form);  // <form action="" method="post" >
+
+
+
+// Render the opening tag
+?>
+
+<div class="form-group">
+    <?php echo $this->formRow($form->get('department')); ?>
+</div>
+
+<p class="form-group">
+    <?php echo $this->formRow($form->get('firstname')); ?>
+</p>
+
+<p class="form-group">
+    <?php echo $this->formRow($form->get('lastname')); ?>
+</p>
+
+<div class="form-group">
+    <?php echo $this->formRow($form->get('email')); ?>
+</div>
+
+<div class="form-group">
+    <?php echo $this->formRow($form->get('jobtitle')); ?>
+</div>
+
+<div class="form-group">
+    <?php echo $this->formRow($form->get('username')); ?>
+</div>
+
+<div class="form-group">
+    <?php echo $this->formRow($form->get('traineetype')); ?>
+</div>
+
+<?php echo $this->formSubmit($form->get('submit')); ?>
+
+<?php echo $this->form()->closeTag(); ?>

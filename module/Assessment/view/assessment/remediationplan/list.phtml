@@ -15,9 +15,11 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
     <div class="cboth"></div>
 </div>
 
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.css">
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/rowgroup/1.0.2/js/dataTables.rowGroup.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/rowgroup/1.1.4/css/rowGroup.dataTables.min.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/rowgroup/1.1.4/js/dataTables.rowGroup.min.js"></script>
+
 
 <p></p>
 <style>
@@ -31,9 +33,7 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
     <thead>
         <tr>
 
-            <?php if (!$isClientRole): ?>
-                <th>Client</th>
-            <?php endif; ?>
+            <th>Client</th>
             <th>ID</th>
             <th>Status</th>
             <th>Type</th>
@@ -127,12 +127,14 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
             ?>
 
             <tr <?php if ($multiple) : ?>class="assess-<?php echo $rp->rp_a_id ?>" <?php endif; ?> >
-                <?php if (!$isClientRole): ?>
-                    <td class="<?php echo $classBold ?>" style="padding-left: <?php echo $paddingVersion ?>px">
-                        <?php if ($isVersion): ?><i class="fa fa-code-fork"></i>
-                        <?php endif ?><a href="/remediationplan/summary/<?php echo $rp->rp_id ?>">
-                            <?php echo $client_name; ?><?php echo !$rp->rp_a_id ? ' <span class="remediationplan_imported_list">(imported)</span>' : ''?></a></td>
-                <?php endif; ?>
+                
+                <td class="<?php echo $classBold ?>" style="padding-left: <?php echo $paddingVersion ?>px">
+                    <?php if ($isVersion): ?>
+                        <i class="fa fa-code-fork"></i>
+                    <?php endif ?>
+                    <a href="/remediationplan/summary/<?php echo $rp->rp_id ?>">
+                        <?php echo $client_name; ?><?php echo !$rp->rp_a_id ? ' <span class="remediationplan_imported_list">(imported)</span>' : ''?></a></td>
+
                 <td><?php echo $rowId ?><?php echo $postFix ?></td>
                 <td class="<?php echo $classBold ?>"><?php echo \Assessment\Model\Remediationplan::$statusesNames[$rp->rp_status]  ?></td>
                 <td class="<?php echo $classBold ?>"><?php echo \Assessment\Model\Assessment::$typesNames[$rp->rp_type] ?></td>

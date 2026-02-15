@@ -66,7 +66,7 @@ class AdminController extends AbstractActionController
 
     public function dashboardAction()
     {
-
+        $stuff - "test";
     }
 
     public function usersAction()

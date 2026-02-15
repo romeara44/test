@@ -1,32 +1,28 @@
 <?php
-/**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/ZendSkeletonApplication for the canonical source repository
- * @copyright Copyright (c) 2005-2013 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
- */
+ // Filename: /module/Assessment/src/Assessment/Controller/RemediationplanController.php
 
 namespace Assessment\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
-use Zend\View\Renderer\PhpRenderer;
-use Zend\View\Resolver;
-use Note\Form\NoteForm;
-use Assessment\Form\TaskForm;
-use Note\Model\Note;
-use Assessment\Model\Remediationplanaction;
-use Mail\Model\Mailtemplate;
-use Zend\Session\Container;
 use Assessment\Form\ImportForm;
+use Assessment\Form\TaskForm;
 use Assessment\Model\Remediationplan;
+use Assessment\Model\Remediationplanaction;
+use Assessment\Service\IdentityServiceInterface;
+
+use Mail\Model\Mailtemplate;
+
+use Note\Model\Note;
+use Note\Form\NoteForm;
 
 use Zend\Mail;
 use Zend\Mail\Transport\Smtp as SmtpTransport;
 use Zend\Mail\Transport\SmtpOptions;
+use Zend\Mvc\Controller\AbstractActionController;
+use Zend\Session\Container;
 use Zend\View\Model\JsonModel;
-
+use Zend\View\Model\ViewModel;
+use Zend\View\Renderer\PhpRenderer;
+use Zend\View\Resolver;
 
 class RemediationplanController extends AbstractActionController
 {
@@ -42,12 +38,16 @@ class RemediationplanController extends AbstractActionController
         $this->layout()->searchRoleFilter = 'remediationplan';
         $container = new Container('activity');
         $container->activity = time();
+
         $this->layout()->flashMessagesSuccess = $this->flashMessenger()->getSuccessMessages();
         $this->layout()->flashMessagesErrors = $this->flashMessenger()->getErrorMessages();
+
         if (!$this->hasIdentity()) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         }
+        
         $identity = $this->getIdentity();
+
         if (!in_array($identity['u_role_id'], array(1, 2, 3, 5,8))) {
             return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
         } else if ($identity['u_first_login'] == 1) {
@@ -57,68 +57,7 @@ class RemediationplanController extends AbstractActionController
         return parent::onDispatch($e);
     }
 
-    public function getRemediationplanTable()
-    {
-        if (!$this->remediationplanTable) {
-            $sm = $this->getServiceLocator();
-            $this->remediationplanTable = $sm->get('Assessment\Model\RemediationplanTable');
-        }
-        return $this->remediationplanTable;
-    }
 
-    public function getRemediationplanactionTable()
-    {
-        if (!$this->remediationplanactionTable) {
-            $sm = $this->getServiceLocator();
-            $this->remediationplanactionTable = $sm->get('Assessment\Model\RemediationplanactionTable');
-        }
-        return $this->remediationplanactionTable;
-    }
-
-    public function getNoteTable()
-    {
-        if (!$this->noteTable) {
-            $sm = $this->getServiceLocator();
-            $this->noteTable = $sm->get('Note\Model\NoteTable');
-        }
-        return $this->noteTable;
-    }
-
-    public function getMailtemplateTable()
-    {
-        if (!$this->mailtemplateTable) {
-            $sm = $this->getServiceLocator();
-            $this->mailtemplateTable = $sm->get('Mail\Model\MailtemplateTable');
-        }
-        return $this->mailtemplateTable;
-    }
-
-    public function getNotefilesTable()
-    {
-        if (!$this->noteFilesTable) {
-            $sm = $this->getServiceLocator();
-            $this->noteFilesTable = $sm->get('Note\Model\NotesFilesTable');
-        }
-        return $this->noteFilesTable;
-    }
-
-    public function getCompanyRolesTable()
-    {
-        if (!$this->companyRolesTable) {
-            $sm = $this->getServiceLocator();
-            $this->companyRolesTable = $sm->get('Client\Model\CompanyRolesTable');
-        }
-        return $this->companyRolesTable;
-    }
-
-    public function getUserTable()
-    {
-        if (!$this->userTable) {
-            $sm = $this->getServiceLocator();
-            $this->userTable = $sm->get('Admin\Model\UserTable');
-        }
-        return $this->userTable;
-    }
 
     public function getIdentity()
     {
@@ -154,7 +93,10 @@ class RemediationplanController extends AbstractActionController
         );
 
         $sortCol = isset($mappingSortCol[$orderBy]) ? $mappingSortCol[$orderBy] : 'rp_id';
-        $paginator = $this->getRemediationplanTable()->getRemediationplans(true, $sortCol, $order, $this->getIdentity());
+        
+        $identity = $this->getIdentity();
+        
+        $paginator = $this->getRemediationplanTable()->getRemediationplans(true, $sortCol, $order, $identity);
 
         $paginator->setCurrentPageNumber(1);
         $paginator->setItemCountPerPage($paginator->getTotalItemCount());
@@ -186,6 +128,8 @@ class RemediationplanController extends AbstractActionController
         $orderBy = $this->params()->fromRoute('order_by') ? $this->params()->fromRoute('order_by') : 'id';
         $order = $this->params()->fromRoute('order') ? $this->params()->fromRoute('order') : 'DESC';
         $roleFilter = $this->params()->fromRoute('roleFilter') ? (int) $this->params()->fromRoute('roleFilter') : 0;
+        $return_url = $this->params()->fromQuery('return_url') ? $this->params()->fromQuery('return_url') : 'remediationplan_list';
+
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_RP, $id);
 
@@ -359,6 +303,7 @@ class RemediationplanController extends AbstractActionController
             'urlOrder' => $order == 'ASC' ? 'DESC' : 'ASC',
             'roleFilter' => $roleFilter,            
             'loc_rps' => $loc_rps,
+            'return_url' => $return_url,
         ));
 
         if ($type == 'pdf') {
@@ -432,9 +377,14 @@ class RemediationplanController extends AbstractActionController
         return $view;
     }
 
-    public function summaryAction()
+    public function editauditAction()
     {
         $id = (int) $this->params('id');
+        $type = $this->params('type');
+
+        $policiesParam = $this->params('policies');
+        $audit_record_idParam = $this->params('ar_id');
+        
         $orderBy = $this->params()->fromRoute('order_by') ? $this->params()->fromRoute('order_by') : 'id';
         $order = $this->params()->fromRoute('order') ? $this->params()->fromRoute('order') : 'DESC';
         $roleFilter = $this->params()->fromRoute('roleFilter') ? (int) $this->params()->fromRoute('roleFilter') : 0;
@@ -526,9 +476,284 @@ class RemediationplanController extends AbstractActionController
             'assignee' => '_contact_name',
             'approver' => '_approver_name',
             'date' => 'rpa_target_date',
+        );
+        
+        $sortCol = isset($mappingSortCol[$orderBy]) ? $mappingSortCol[$orderBy] : '';
+        
+        $rpObj = $this->getRemediationplanTable()->getRemediationplan($id);
+        $rpObj->_client_name = stripslashes($rpObj->_client_name);
+        //$actions = $this->getRemediationplanactionTable()->getRemediationplanactions($id, $sortCol, $order);
+        $actions = $this->getRemediationplanactionTable()->getRemediationplanactionsByPolicy($id, $policiesParam, $sortCol, $order);
+
+        $actions->buffer();
+        $noteTable = $this->getNoteTable();
+        $identity = $this->getIdentity();
+
+        $userTable = $this->getServiceLocator()->get('Admin\Model\UserTable');
+        $contacts = array();
+        $contactsApr = array();
+
+        if ($rpObj->rp_c_id) {
+            $userConsultants = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getByCompany($rpObj->rp_c_id);
+
+            $company = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getCompany($rpObj->rp_c_id);
+            $roleTable = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable');
+            $aliasArray = $roleTable->getDefaultAliasMapper($rpObj->rp_c_id);
+
+            $actionsArray = array();
+            foreach ($actions as $index => $action) {
+                $actionsArray[$index] = $action;
+                $actionsArray[$index]->rpa_threat = $roleTable->interpolateAliases($action->rpa_threat, $aliasArray);
+                $actionsArray[$index]->rpa_action_plan = $roleTable->interpolateAliases($action->rpa_action_plan, $aliasArray);
+            }
+
+            $actions = $actionsArray;
+
+            if($company) {
+                $userPrimary = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUser($company->c_primary_contact_u_id);
+                if (is_object($userPrimary)) {
+                    $contacts[$userPrimary->u_id] = $userPrimary->u_firstname . ' ' . $userPrimary->u_lastname;
+                    $contactsApr[$userPrimary->u_id] = $userPrimary->u_firstname . ' ' . $userPrimary->u_lastname;
+                }
+            }
+
+            if (is_object($userConsultants)) {
+                foreach ($userConsultants as $userConsultant) {
+                    $contacts[$userConsultant->_u_id] = $userConsultant->_u_firstname . ' ' . $userConsultant->_u_lastname;
+                    $contactsApr[$userConsultant->_u_id] = $userConsultant->_u_firstname . ' ' . $userConsultant->_u_lastname;
+                }
+            }
+        }
+        $loc_rps = [];
+        if ($rpObj->rp_a_id) {
+            $complianceOfficersIds = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->getComplianceOfficers($rpObj->rp_a_id);
+            $complianceOfficers = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUsersByIds($complianceOfficersIds);
+            foreach ($complianceOfficers as $key => $r) {
+                $contacts[$key] = $r;
+                $contactsApr[$key] = $r;
+            }
+            $rps = $this->getRemediationplanTable()->getRpLocs($rpObj->rp_a_id);
+
+            foreach ($rps as $rp) {
+                $loc_actions = $this->getRemediationplanactionTable()->getRemediationplanactions($rp->rp_id);
+                foreach ($loc_actions as $rpa){
+                    if($rpa->rpa_adr_id === null){
+                        $loc_rps[$rp->rp_id] = 'Additional Tasks';
+                    } else {
+                        $loc_rps[$rp->rp_id] = $rpa->_location_name;
+                    }        
+                    break;
+                }
+            }
+        }
+        $view = new ViewModel(array(
+            'id' => $id,
+            'formNote' => $formNote,
+            'notes' => $notes,
+            'rpObj' => $rpObj,
+            'actions' => $actions,
+            'writable' => is_object($rpObj) ? $rpObj->rp_writable : false,
+            'noteTable' => $noteTable,
+            'isAdmin' => $identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN ? true : false,
+            'contacts' => $contacts,
+            'contactsApr' => $contactsApr,
+            'approverAccepter' => $this->getRemediationplanTable()->getApproverAccepter($rpObj->rp_id),
+            'order_by' => $orderBy,
+            'order' => $order,
+            'urlOrder' => $order == 'ASC' ? 'DESC' : 'ASC',
+            'roleFilter' => $roleFilter,            
+            'loc_rps' => $loc_rps,
+            'policies' => $policiesParam,
+            'audit_record_id' => $audit_record_idParam
+        ));
+
+        if ($type == 'pdf') {
+            $domLibPath =  $_SERVER['DOCUMENT_ROOT'] . '/../vendor';
+
+            $domLibPath = $domLibPath . "/dompdf/dompdf_config.inc.php";
+            require_once $domLibPath;
+
+            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Get pdf for remediationplan "' . $id . '"');
+
+            $renderer = $this->getServiceLocator()->get('Zend\View\Renderer\RendererInterface');
+
+            $approverAccepter = $this->getRemediationplanTable()->getApproverAccepter($rpObj->rp_id);
+            $approver_name = '';
+            if ($rpObj->_approver_name) {
+                $approver_name = $rpObj->_approver_name;
+            } else {
+                foreach ($approverAccepter as $contact) {
+                    if ($contact->_u_id == $rpObj->rp_approver_u_id || (!$rpObj->rp_approver_u_id && in_array(9, $contact->_ar_id))) {
+                        $approver_name = $contact->_u_name;
+                        break;
+                    }
+                }
+            }
+
+            $accepter_name = '';
+            if ($rpObj->_accepter_name) {
+                $accepter_name = $rpObj->_accepter_name;
+            } else {
+                foreach ($approverAccepter as $contact) {
+                    if ($contact->_u_id == $rpObj->rp_accepter_u_id || (!$rpObj->rp_accepter_u_id && in_array(10, $contact->_ar_id))) {
+                        $accepter_name = $contact->_u_name;
+                        break;
+                    }
+                }
+            }
+
+            $model = new ViewModel(array(
+                'id' => $id,
+                'formNote' => $formNote,
+                'notes' => $notes,
+                'rpObj' => $rpObj,
+                'actions' => $actions,
+                'writable' => $rpObj->rp_writable,
+                'noteTable' => $noteTable,
+                'isPdf' => true,
+                'approver_name' => $approver_name,
+                'accepter_name' => $accepter_name,
+            ));
+            $model->setTemplate('remediationplan/pdfTemplate');
+
+            $html = $renderer->render($model);
+
+            $html = str_replace('§', '&#167;', $html);
+
+            set_time_limit(300);
+            ini_set('memory_limit', '-1');
+
+            require_once './vendor/mylib/library/mpdf60/mpdf.php';
+
+            $mpdf = new \mPDF('utf-8', 'A4-L'); 
+  
+            $mpdf->WriteHTML($html);
+            $mpdf->Output('remediationplan_ ' . date('Y_m_d_h_i_s', time()) . '.pdf', 'D');
+
+            exit();
+        } elseif ($type == 'csv') {
+            $this->_generateCsv($notes, $rpObj, $actions);
+        }
+
+        return $view;
+    }
+
+    public function summaryAction()
+    {
+        $id = (int) $this->params('id');
+        $orderBy = $this->params()->fromRoute('order_by') ? $this->params()->fromRoute('order_by') : 'id';
+        $order = $this->params()->fromRoute('order') ? $this->params()->fromRoute('order') : 'DESC';
+        $roleFilter = $this->params()->fromRoute('roleFilter') ? (int) $this->params()->fromRoute('roleFilter') : 0;
+        //$source = $this->params()->fromQuery('source');
+        $request = new \Zend\Http\PhpEnvironment\Request();
+        $http_referer = $request->getServer('HTTP_REFERER');
+        $parsed = parse_url($http_referer, PHP_URL_PATH); //dashboard/client
+        $return_url = $this->params()->fromQuery('return_url') ? $this->params()->fromQuery('return_url') : 'remediationplan_list';
+
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_RP, $id);
+
+        $request = $this->getRequest();
+
+        $this->getRemediationplanTable()->setStatus($id, \Assessment\Model\Remediationplan::STATUS_OPEN);
+
+        $noteform = $request->isPost() && (int) $request->getPost('noteform');
+        $formNote = new NoteForm($this->getServiceLocator());
+
+        $notes = null;
+        $rpObj = null;
+        if ((int) $id) {
+            $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_RP);
+        }
+
+        if ($request->isPost()) {
+            $post = $request->getPost();
+
+            if ($noteform) {
+                if ($post['requestreview'] == 1) {
+                    $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'requestreview', 'rpId' => $id, 'uId' => $post['rp_approver_u_id']));
+                    $this->flashMessenger()->addSuccessMessage('Request Review sent');
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Request review sent, remediationplan "' . $id . '"');
+                    
+                    if ($parsed == '/dashboard/client') {
+                        return $this->redirect()->toRoute('dashboard', array('controller' => 'dashboard', 'action' => 'client'));
+                    } else {
+                        return $this->redirect()->toRoute('remediationplan', array('controller' => 'remediationplan', 'action' => 'list'));
+                    }
+                }
+
+                $fieldValues = array( 'rp_initials'          => $post['rp_initials']
+                                    , 'rp_initials_approver' => $post['rp_initials_approver']
+                                    , 'rp_performed_u_id'    => $post['rp_performed_u_id']
+                                    , 'rp_approver_u_id'     => $post['rp_approver_u_id']
+                                    , 'rp_accepter_u_id'     => $post['rp_accepter_u_id']
+                                    );
+
+                $fieldValues['rp_approved_date'] = \DateTime::createFromFormat('m/d/Y', $post['rp_approved_date'])->format('Y-m-d');
+                $fieldValues['rp_accepted_date'] = \DateTime::createFromFormat('m/d/Y', $post['rp_accepted_date'])->format('Y-m-d');
+                if (!empty($post['rp_incident_date'])) {
+                    $fieldValues['rp_incident_date'] = \DateTime::createFromFormat('m/d/Y', $post['rp_incident_date'])->format('Y-m-d');
+                }
+                if (!empty($post['rp_remediation_date'])) {
+                    $fieldValues['rp_remediation_date'] = \DateTime::createFromFormat('m/d/Y', $post['rp_remediation_date'])->format('Y-m-d');
+                }
+
+                $this->getRemediationplanTable()->setFieldValues($id, $fieldValues);
+
+                if ($post['save_and_copy_button']) {
+                    $id = $this->getRemediationplanTable()->clonePlan($id, $post);
+                } else if($post['signedoff_clone'] == 1){
+                    $this->getRemediationplanTable()->clonePlan($id, $post, true);
+                }
+                
+                if ($post['signedoff'] == 1) {
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Sign off remediationplan "' . $id . '"');
+                    $this->getRemediationplanTable()->setStatus($id, \Assessment\Model\Remediationplan::STATUS_SIGNED_OFF);
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_SIGNEDOFF, \Application\Model\LogsTable::ITEM_TYPE_RP, $id);
+                } else if($post['save_button']) {
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Save remediationplan "' . $id . '"');
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_EDIT, \Application\Model\LogsTable::ITEM_TYPE_RP, $id);
+                }
+
+                $note = new Note();
+                $formNote->setInputFilter($note->getInputFilter($this->getServiceLocator(), $id));
+                $formNote->setData($request->getPost());
+
+                if ($formNote->isValid()) {
+                    $post['note_item_id'] = $id;
+                    $note->exchangeArray($post);
+                    $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
+                    $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
+
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Save remediationplan "' . $id . '"');
+                    $this->flashMessenger()->addSuccessMessage('Plan saved');
+                }
+
+                if (($post['sourceWindow'] == '/dashboard/client') || ($parsed == '/dashboard/client')) {
+                    return $this->redirect()->toRoute('dashboard', array('controller' => 'dashboard', 'action' => 'client'));
+                } else {
+                    return $this->redirect()->toRoute('remediationplan', array('controller' => 'remediationplan', 'action' => 'list'));
+                }
+                
+            }
+        } else {
+            if ((int) $id) {
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open edit remediationplan "' . $id . '" page');
+            }
+        }
+        
+        //$source = ($this->params()->fromQuery('source') !== null) ? $this->params()->fromQuery('source') : '';
+
+        $mappingSortCol = array(
+            'status' => 'rpa_status',
+            'type' => 'rpa_type',
+            'assignee' => '_contact_name',
+            'approver' => '_approver_name',
+            'date' => 'rpa_target_date',
             'risk_score' => 'rpa_risk_level',
             'policy_number' => 'rpa_policy',
-            'status_change_date' => 'rpa_latest_action_date',
+            'status_change_date' => 'rpa_latest_action_date'//,
+            //'source' => $source,
         );
         
         $sortCol = isset($mappingSortCol[$orderBy]) ? $mappingSortCol[$orderBy] : '';
@@ -609,6 +834,213 @@ class RemediationplanController extends AbstractActionController
             'urlOrder' => $order == 'ASC' ? 'DESC' : 'ASC',
             'roleFilter' => $roleFilter,            
             'loc_rps' => $loc_rps,
+            'return_url' => $return_url,
+        ));
+
+        return $view;
+    }
+
+    public function summaryauditAction()
+    {
+        $policiesParam = null;
+        $audit_record_idParam = null;
+
+        $request = $this->getRequest();
+
+        //$test = (int) $this->params('audit');
+        $auditId = $this->params()->fromQuery('audit');
+
+        $id = (int) $this->params('id');
+        $orderBy = $this->params()->fromRoute('order_by') ? $this->params()->fromRoute('order_by') : 'id';
+        $order = $this->params()->fromRoute('order') ? $this->params()->fromRoute('order') : 'DESC';
+        $roleFilter = $this->params()->fromRoute('roleFilter') ? (int) $this->params()->fromRoute('roleFilter') : 0;
+        $policiesParam = $this->params('policies');
+        $audit_record_idParam = $this->params('ar_id');
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_RP, $id);
+
+        $request = $this->getRequest();
+
+        if ($request->isPost()) {
+            $post = $request->getPost();
+            
+            $policiesParam = $post['policies'];
+            $audit_record_idParam = $post['audit_record_id'];
+        }
+
+        $this->getRemediationplanTable()->setStatus($id, \Assessment\Model\Remediationplan::STATUS_OPEN);
+
+        $noteform = $request->isPost() && (int) $request->getPost('noteform');
+        $formNote = new NoteForm($this->getServiceLocator());
+
+        $notes = null;
+        $rpObj = null;
+        if ((int) $id) {
+           // $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_RP);
+            $notes = $this->getServiceLocator()->get('Note\Model\NoteTable')->getNotes($id, \Note\Model\Note::NOTE_RP);
+        }
+
+        if ($request->isPost()) {
+            $post = $request->getPost();
+
+            if ($noteform) {
+                if ($post['requestreview'] == 1) {
+                    $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'requestreview', 'rpId' => $id, 'uId' => $post['rp_approver_u_id']));
+                    $this->flashMessenger()->addSuccessMessage('Request Review sent');
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Request review sent, remediationplan "' . $id . '"');
+                    return $this->redirect()->toRoute('remediationplan', array('controller' => 'remediationplan', 'action' => 'list'));
+                }
+
+                $fieldValues = array( 'rp_initials'          => $post['rp_initials']
+                                    , 'rp_initials_approver' => $post['rp_initials_approver']
+                                    , 'rp_performed_u_id'    => $post['rp_performed_u_id']
+                                    , 'rp_approver_u_id'     => $post['rp_approver_u_id']
+                                    , 'rp_accepter_u_id'     => $post['rp_accepter_u_id']
+                                    );
+
+                $fieldValues['rp_approved_date'] = \DateTime::createFromFormat('m/d/Y', $post['rp_approved_date'])->format('Y-m-d');
+                $fieldValues['rp_accepted_date'] = \DateTime::createFromFormat('m/d/Y', $post['rp_accepted_date'])->format('Y-m-d');
+                if (!empty($post['rp_incident_date'])) {
+                    $fieldValues['rp_incident_date'] = \DateTime::createFromFormat('m/d/Y', $post['rp_incident_date'])->format('Y-m-d');
+                }
+                if (!empty($post['rp_remediation_date'])) {
+                    $fieldValues['rp_remediation_date'] = \DateTime::createFromFormat('m/d/Y', $post['rp_remediation_date'])->format('Y-m-d');
+                }
+
+                $this->getRemediationplanTable()->setFieldValues($id, $fieldValues);
+
+                if ($post['save_and_copy_button']) {
+                    $id = $this->getRemediationplanTable()->clonePlan($id, $post);
+                } else if($post['signedoff_clone'] == 1){
+                    $this->getRemediationplanTable()->clonePlan($id, $post, true);
+                }
+                
+                if ($post['signedoff'] == 1) {
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Sign off remediationplan "' . $id . '"');
+                    $this->getRemediationplanTable()->setStatus($id, \Assessment\Model\Remediationplan::STATUS_SIGNED_OFF);
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_SIGNEDOFF, \Application\Model\LogsTable::ITEM_TYPE_RP, $id);
+                } else if($post['save_button']) {
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Save remediationplan "' . $id . '"');
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_EDIT, \Application\Model\LogsTable::ITEM_TYPE_RP, $id);
+                }
+
+                $note = new Note();
+                $formNote->setInputFilter($note->getInputFilter($this->getServiceLocator(), $id));
+                $formNote->setData($request->getPost());
+
+                if ($formNote->isValid()) {
+                    $post['note_item_id'] = $id;
+                    $note->exchangeArray($post);
+                    $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
+                    $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles());
+
+                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Save remediationplan "' . $id . '"');
+                    $this->flashMessenger()->addSuccessMessage('Plan saved');
+                }
+
+                return $this->redirect()->toRoute('audit', array('controller' => 'audit', 'action' => 'edit', 'id' => ($post['audit_id'])));
+            }
+        } else {
+            if ((int) $id) {
+                $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open edit remediationplan "' . $id . '" page');
+            }
+        }
+        
+        $mappingSortCol = array(
+            'status' => 'rpa_status',
+            'type' => 'rpa_type',
+            'assignee' => '_contact_name',
+            'approver' => '_approver_name',
+            'date' => 'rpa_target_date',
+            'risk_score' => 'rpa_risk_level',
+            'policy_number' => 'rpa_policy',
+            'status_change_date' => 'rpa_latest_action_date'
+        );
+        
+        $sortCol = isset($mappingSortCol[$orderBy]) ? $mappingSortCol[$orderBy] : '';
+        
+        $rpObj = $this->getRemediationplanTable()->getRemediationplan($id);
+        $rpObj->_client_name = stripslashes($rpObj->_client_name);
+        //$actions = $this->getRemediationplanactionTable()->getRemediationplanactions($id, $sortCol, $order);
+        //$actions = $this->getRemediationplanactionTable()->getRemediationplanactionsByPolicy(283, "AS-130; AS-205; AS-110; AS-135", $sortCol, $order);
+        $actions = $this->getRemediationplanactionTable()->getRemediationplanactionsByPolicy($id, $policiesParam, $sortCol, $order);
+
+        $actions->buffer();
+
+        $noteTable = $this->getNoteTable();
+
+        $identity = $this->getIdentity();
+
+        $userTable = $this->getServiceLocator()->get('Admin\Model\UserTable');
+        $contacts = array();
+        $contactsApr = array();
+
+        if ($rpObj->rp_c_id) {
+            $userConsultants = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getByCompany($rpObj->rp_c_id);
+
+            $company = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getCompany($rpObj->rp_c_id);
+
+            if($company) {
+                $userPrimary = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUser($company->c_primary_contact_u_id);
+                if (is_object($userPrimary)) {
+                    $contacts[$userPrimary->u_id] = $userPrimary->u_firstname . ' ' . $userPrimary->u_lastname;
+                    $contactsApr[$userPrimary->u_id] = $userPrimary->u_firstname . ' ' . $userPrimary->u_lastname;
+                }
+            }
+
+            if (is_object($userConsultants)) {
+                foreach ($userConsultants as $userConsultant) {
+                    $contacts[$userConsultant->_u_id] = $userConsultant->_u_firstname . ' ' . $userConsultant->_u_lastname;
+                    $contactsApr[$userConsultant->_u_id] = $userConsultant->_u_firstname . ' ' . $userConsultant->_u_lastname;
+                }
+            }
+        }
+        $loc_rps = [];
+        if ($rpObj->rp_a_id) {
+            $complianceOfficersIds = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleLocationContactTable')->getComplianceOfficers($rpObj->rp_a_id);
+            $complianceOfficers = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUsersByIds($complianceOfficersIds);
+            foreach ($complianceOfficers as $key => $r) {
+                $contacts[$key] = $r;
+                $contactsApr[$key] = $r;
+            }
+            $rps = $this->getRemediationplanTable()->getRpLocs($rpObj->rp_a_id);
+
+            foreach ($rps as $rp) {
+                $loc_actions = $this->getRemediationplanactionTable()->getRemediationplanactions($rp->rp_id);
+                foreach ($loc_actions as $rpa){
+                    if($rpa->rpa_adr_id === null){
+                        $loc_rps[$rp->rp_id] = 'Additional Tasks';
+                    } else {
+                        $loc_rps[$rp->rp_id] = $rpa->_location_name;
+                    }        
+                    break;
+                }
+            }
+        }
+
+        $formTask = new TaskForm($this->getServiceLocator(), $rpObj);
+
+        $view = new ViewModel(array(
+            'id' => $id,
+            'formNote' => $formNote,
+            'formTask' => $formTask,
+            'notes' => $notes,
+            'rpObj' => $rpObj,
+            'actions' => $actions,
+            'writable' => is_object($rpObj) ? $rpObj->rp_writable : false,
+            'noteTable' => $noteTable,
+            'isAdmin' => $identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN ? true : false,
+            'contacts' => $contacts,
+            'contactsApr' => $contactsApr,
+            'approverAccepter' => $this->getRemediationplanTable()->getApproverAccepter($rpObj->rp_id),
+            'order_by' => $orderBy,
+            'order' => $order,
+            'urlOrder' => $order == 'ASC' ? 'DESC' : 'ASC',
+            'roleFilter' => $roleFilter,            
+            'loc_rps' => $loc_rps,
+            'policies' => $policiesParam,
+            'audit_id' => $auditId,
+            'audit_record_id' => $audit_record_idParam
         ));
 
         return $view;
@@ -1426,5 +1858,71 @@ class RemediationplanController extends AbstractActionController
             $res[$user->_u_id] = array('u_id' => $user->_u_id, 'u_firstname' => $user->_u_firstname, 'u_lastname' => $user->_u_lastname);
         }
         return new JsonModel($res);
+    }
+
+    //=============================================================================================
+    // DATABASE TABLE
+    // ============================================================================================
+    public function getRemediationplanTable()
+    {
+        if (!$this->remediationplanTable) {
+            $sm = $this->getServiceLocator();
+            $this->remediationplanTable = $sm->get('Assessment\Model\RemediationplanTable');
+        }
+        return $this->remediationplanTable;
+    }
+
+    public function getRemediationplanactionTable()
+    {
+        if (!$this->remediationplanactionTable) {
+            $sm = $this->getServiceLocator();
+            $this->remediationplanactionTable = $sm->get('Assessment\Model\RemediationplanactionTable');
+        }
+        return $this->remediationplanactionTable;
+    }
+
+    public function getNoteTable()
+    {
+        if (!$this->noteTable) {
+            $sm = $this->getServiceLocator();
+            $this->noteTable = $sm->get('Note\Model\NoteTable');
+        }
+        return $this->noteTable;
+    }
+
+    public function getMailtemplateTable()
+    {
+        if (!$this->mailtemplateTable) {
+            $sm = $this->getServiceLocator();
+            $this->mailtemplateTable = $sm->get('Mail\Model\MailtemplateTable');
+        }
+        return $this->mailtemplateTable;
+    }
+
+    public function getNotefilesTable()
+    {
+        if (!$this->noteFilesTable) {
+            $sm = $this->getServiceLocator();
+            $this->noteFilesTable = $sm->get('Note\Model\NotesFilesTable');
+        }
+        return $this->noteFilesTable;
+    }
+
+    public function getCompanyRolesTable()
+    {
+        if (!$this->companyRolesTable) {
+            $sm = $this->getServiceLocator();
+            $this->companyRolesTable = $sm->get('Client\Model\CompanyRolesTable');
+        }
+        return $this->companyRolesTable;
+    }
+
+    public function getUserTable()
+    {
+        if (!$this->userTable) {
+            $sm = $this->getServiceLocator();
+            $this->userTable = $sm->get('Admin\Model\UserTable');
+        }
+        return $this->userTable;
     }
 }

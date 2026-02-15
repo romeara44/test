@@ -6,6 +6,12 @@ use Zend\Db\TableGateway\TableGateway;
 
 class Module
 {
+    // public function onBootstrap(MvcEvent $e) {
+    //     $eventManager = $e->getApplication()->getEventManager();
+    //     $moduleRouteListener = new ModuleRouteListener();
+    //     $moduleRouteListener->attach($eventManager);
+    // }
+
     public function getConfig()
     {
         return include __DIR__ . '/config/module.config.php';
@@ -24,8 +30,14 @@ class Module
 
     public function getServiceConfig()
     {
+        //return include __DIR__ . '/config/service.config.php';
         return array(
+            //'invokables' => array(
+            //    'Traininglog\Service\ITraininglogService' => 'Traininglog\Service\TraininglogService'
+        	//
+            //),
             'factories' => array(
+                
                 'Traininglog\Model\TraininglogRegulationTable' =>  function($sm) {
                         $tableGateway = $sm->get('TraininglogRegulationTableGateway');
                         $table = new \Traininglog\Model\TraininglogRegulationTable($tableGateway);
@@ -100,7 +112,80 @@ class Module
                         $resultSetPrototype = new ResultSet();
                         $resultSetPrototype->setArrayObjectPrototype(new \Traininglog\Model\Employeemasterlist());
                         return new TableGateway('employee_master_list', $dbAdapter, null, $resultSetPrototype);
-                }
+                },
+
+                'Traininglog\Model\TrainingReportTable' =>  function($sm) {
+                    $tableGateway = $sm->get('TrainingReportTableGateway');
+                    $table = new \Traininglog\Model\TrainingReportTable($tableGateway);
+                    return $table;
+                },
+                'TrainingReportTableGateway' => function ($sm) {
+                        $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                        $resultSetPrototype = new ResultSet();
+                        $resultSetPrototype->setArrayObjectPrototype(new \Traininglog\Model\TrainingReport());
+                        return new TableGateway('training_report', $dbAdapter, null, $resultSetPrototype);
+                },
+                // 'Traininglog\Repository\IPost1Repository' => function(\Zend\ServiceManager\ServiceLocatorInterface $serviceLocator) {
+                //     $post1Repository = new \Traininglog\Repository\Post1Repository();
+                //     $post1Repository->setDbAdapter($serviceLocator->get('Zend\Db\Adapter\Adapter'));
+                //     return $post1Repository;
+                // },
+                // 'Traininglog\Service\ITraininglogService' => function(\Zend\ServiceManager\ServiceLocatorInterface $serviceLocator) {
+                //     $traininglogService = new \Traininglog\Service\TraininglogService();
+                //     $traininglogService->setPost1Repository($serviceLocator->get('Traininglog\Repository\Post1Repository'));
+
+                //     return $traininglogService;
+                // }
+                //'Traininglog\Model\TrainingUserTestTable' =>  function($sm) {
+                //    $tableGateway = $sm->get('TrainingUserTestTableGateway');
+                //    $table = new \Traininglog\Model\TrainingUserTestTable($tableGateway);
+                //    return $table;
+                //},
+                //'TrainingUserTestTableGateway' => function ($sm) {
+                //        $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                //        $resultSetPrototype = new ResultSet();
+                //        $resultSetPrototype->setArrayObjectPrototype(new \Traininglog\Model\TrainingUserTest());
+                //        return new TableGateway('training_user_test', $dbAdapter, null, $resultSetPrototype);
+                //},
+
+
+                'Traininglog\Model\TraineeUserTable' =>  function($sm) {
+                    $tableGateway = $sm->get('TraineeUserTableGateway');
+                    $table = new \Traininglog\Model\TraineeUserTable($tableGateway);
+                    return $table;
+                },
+                'TraineeUserTableGateway' => function ($sm) {
+                        $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                        $resultSetPrototype = new ResultSet();
+                        $resultSetPrototype->setArrayObjectPrototype(new \Traininglog\Model\TraineeUser());
+                        return new TableGateway('trainee_user', $dbAdapter, null, $resultSetPrototype);
+                },
+
+                'Traininglog\Model\TovutiUserTable' =>  function($sm) {
+                    $tableGateway = $sm->get('TovutiUserTableGateway');
+                    $table = new \Traininglog\Model\TovutiUserTable($tableGateway);
+                    return $table;
+                },
+                'TovutiUserTableGateway' => function ($sm) {
+                        $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                        $resultSetPrototype = new ResultSet();
+                        $resultSetPrototype->setArrayObjectPrototype(new \Traininglog\Model\TovutiUser());
+                        return new TableGateway('tovuti_user', $dbAdapter, null, $resultSetPrototype);
+                },
+
+
+                'Traininglog\Model\TovutiUserGroupTable' =>  function($sm) {
+                    $tableGateway = $sm->get('TovutiUserGroupTableGateway');
+                    $table = new \Traininglog\Model\TovutiUserGroupTable($tableGateway);
+                    return $table;
+                },
+                'TovutiUserGroupTableGateway' => function ($sm) {
+                        $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                        $resultSetPrototype = new ResultSet();
+                        $resultSetPrototype->setArrayObjectPrototype(new \Traininglog\Model\TovutiUserGroup());
+                        return new TableGateway('tovuti_user_group', $dbAdapter, null, $resultSetPrototype);
+                },
+
             ),
         );
     }

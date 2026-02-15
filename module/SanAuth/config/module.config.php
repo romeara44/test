@@ -1,6 +1,11 @@
 <?php
 
 return array(
+    'service_manager' => array(
+        'invokables' => array(
+            //'SanAuth\Service\IdentityServiceInterface' => 'SanAuth\Service\IdentityService'
+        )
+    ),
     'controllers' => array(
         'invokables' => array(
             'SanAuth\Controller\Auth' => 'SanAuth\Controller\AuthController',

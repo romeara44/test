@@ -75,8 +75,8 @@ class CompanyForm extends Form
         ));
 
         $c_parent_types[0] = 'Please select';
-        $c_parent_types[\Client\Model\Company::PARENT_TYPE_OPERATION] = 'Operating Company Parent';
-        $c_parent_types[\Client\Model\Company::PARENT_TYPE_HOLDING] = 'Holding Company Parent';
+        $c_parent_types[\Client\Model\Company::PARENT_TYPE_OPERATION] = 'Operating Organization Parent';
+        $c_parent_types[\Client\Model\Company::PARENT_TYPE_HOLDING] = 'Holding Organization Parent';
 
         $this->add(array(
             'name' => 'c_parent_type',
@@ -88,7 +88,7 @@ class CompanyForm extends Form
         ));
 
         $c_child_types[0] = 'Please select';
-        $c_child_types[\Client\Model\Company::CHILD_TYPE_AS_COMPANY] = 'treat as a Company';
+        $c_child_types[\Client\Model\Company::CHILD_TYPE_AS_COMPANY] = 'Treat as a Organization';
         $c_child_types[\Client\Model\Company::CHILD_TYPE_LOCATION_ONLY] = 'Location Only';
 
         $this->add(array(
@@ -129,7 +129,7 @@ class CompanyForm extends Form
             'name' => 'company_type_id',
             'type' => 'Zend\Form\Element\Select',
             'options' => array(
-                'label' => 'Company Type',
+                'label' => 'Organization Type',
                 'value_options' => $types
             ),
         ));
@@ -141,7 +141,7 @@ class CompanyForm extends Form
                 'type'  => 'text',
             ),
             'options' => array(
-                'label' => 'Company name',
+                'label' => 'Organization Name',
             )
         ));
 

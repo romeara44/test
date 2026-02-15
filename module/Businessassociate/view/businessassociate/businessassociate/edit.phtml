@@ -11,6 +11,8 @@ $form->setAttribute('action', '/businessassociate/edit');
 $form->setAttribute('method', 'post');
 
 // Render the opening tag
+use Admin\Model\User;
+
 ?>
 
 <style>
@@ -56,10 +58,27 @@ $form->setAttribute('method', 'post');
                 ?>
 
                 <p>
-                    <?php $fn = $form->get('ba_c_id');
-                    echo $this->formLabel($fn);
-                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control required')));
-                    echo $this->formElementErrors($fn);
+                    <?php 
+                        $fn = $form->get('ba_c_id');
+                        $identity = $authService->getIdentity();
+                        if(isset($identity, $fn)){
+                            // Check if the user's role is not ROLE_TRIAL.
+                            //if($identity['u_role_id'] != \Admin\Model\User::ROLE_CLIENT){
+
+                                // Retrieve the select element's options.
+                                $options = $fn->getValueOptions();
+
+                                // If there are at least two options, set the second one as the default value.
+                                if (count($options) > 1) {
+                                    $keys = array_keys($options); // Extract option keys.
+                                    $fn->setValue($keys[1]); // Set the second option as the default.
+                                }
+                            //}
+                        }
+                        
+                        echo $this->formLabel($fn);
+                        echo $this->formSelect($fn->setAttributes(['class' => 'form-control required']));
+                        echo $this->formElementErrors($fn);
                     ?>
                 </p>
 

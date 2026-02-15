@@ -82,7 +82,7 @@ $identity = $authService->getIdentity();
 												<?php endforeach; ?>
 											<?php endif; ?>
 										<?php endforeach; ?>
-										<?php $tgrid['subgrid'][$ct]['notes'] = array($ngrid); ?>
+										<?php $tgrid['subgrid'][$ct]['notes'] = array(isset($ngrid)); ?>
 										<?php $ct++; ?>
 									<?php endforeach; ?>
 

@@ -74,6 +74,9 @@ class Module
                     return new TableGateway('notes', $dbAdapter, null, $resultSetPrototype);
                 },
 
+
+
+
                 'Client\Model\CompanyRolesTable' =>  function($sm) {
                     $tableGateway = $sm->get('CompanyRolesTableGateway');
                     $table = new \Client\Model\CompanyRolesTable($tableGateway);
@@ -109,6 +112,7 @@ class Module
                     $resultSetPrototype->setArrayObjectPrototype(new \Client\Model\CompanyTrainingManagers());
                     return new TableGateway('company_training_managers', $dbAdapter, null, $resultSetPrototype);
                 },
+
                 'Client\Model\CompanyTypesTable' =>  function($sm) {
                     $tableGateway = $sm->get('CompanyTypesTableGateway');
                     $table = new \Client\Model\CompanyTypesTable($tableGateway);
@@ -120,6 +124,79 @@ class Module
                     $resultSetPrototype->setArrayObjectPrototype(new \Client\Model\CompanyTypes());
                     return new TableGateway('company_type', $dbAdapter, null, $resultSetPrototype);
                 },
+
+                'Client\Model\CompanyModuleRoleTable' =>  function($sm) {
+                    $tableGateway = $sm->get('CompanyModuleRoleTableGateway');
+                    $table = new \Client\Model\CompanyModuleRoleTable($tableGateway);
+                    return $table;
+                },
+                'CompanyModuleRoleTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new \Client\Model\CompanyModuleRole());
+                    return new TableGateway('company_module_role', $dbAdapter, null, $resultSetPrototype);
+                },
+
+                'Client\Model\CompanyMasterRoleTable' =>  function($sm) {
+                    $tableGateway = $sm->get('CompanyMasterRoleTableGateway');
+                    $table = new \Client\Model\CompanyMasterRoleTable($tableGateway);
+                    return $table;
+                },
+                'CompanyMasterRoleTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new \Client\Model\CompanyMasterRole());
+                    return new TableGateway('company_master_role', $dbAdapter, null, $resultSetPrototype);
+                },
+
+                'Client\Model\CompanyModuleRoleAliasTable' =>  function($sm) {
+                    $tableGateway = $sm->get('CompanyModuleRoleAliasTableGateway');
+                    $table = new \Client\Model\CompanyModuleRoleAliasTable($tableGateway);
+                    return $table;
+                },
+                'CompanyModuleRoleAliasTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new \Client\Model\CompanyModuleRoleAlias());
+                    return new TableGateway('company_module_role_alias', $dbAdapter, null, $resultSetPrototype);
+                },
+
+                'Client\Model\HipaaSuiteModuleRoleTable' =>  function($sm) {
+                    $tableGateway = $sm->get('HipaaSuiteModuleRoleTableGateway');
+                    $table = new \Client\Model\HipaaSuiteModuleRoleTable($tableGateway);
+                    return $table;
+                },
+                'HipaaSuiteModuleRoleTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new \Client\Model\HipaaSuiteModuleRole());
+                    return new TableGateway('hipaa_suite_module_role', $dbAdapter, null, $resultSetPrototype);
+                },
+
+                'Client\Model\HipaaSuiteModuleTable' =>  function($sm) {
+                    $tableGateway = $sm->get('HipaaSuiteModuleTableGateway');
+                    $table = new \Client\Model\HipaaSuiteModuleTable($tableGateway);
+                    return $table;
+                },
+                'HipaaSuiteModuleTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new \Client\Model\HipaaSuiteModule());
+                    return new TableGateway('hipaa_suite_module', $dbAdapter, null, $resultSetPrototype);
+                },
+
+                'Client\Model\HipaaSuiteTypesTable' =>  function($sm) {
+                    $tableGateway = $sm->get('HipaaSuiteTypesTableGateway');
+                    $table = new \Client\Model\HipaaSuiteTypesTable($tableGateway);
+                    return $table;
+                },
+                'HipaaSuiteTypesTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new \Client\Model\HipaaSuiteTypes());
+                    return new TableGateway('lu_hipaa_suite_type', $dbAdapter, null, $resultSetPrototype);
+                },
+                
             ),
         );
     }

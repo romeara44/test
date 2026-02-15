@@ -4,6 +4,7 @@ $authService = new \Zend\Authentication\AuthenticationService();
 $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
 $identity = $authService->getIdentity();
 $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
+$isAdminRole = $identity['u_role_id'] == 1 ? 1 : 0;
 ?>
 
 <div class="page-title">
@@ -32,21 +33,33 @@ $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
     </thead>
     <tbody>
         <?php foreach ($this->paginator as $bl): ?>
+            <?php $viewText = '?type=view';
+            if (isset($bl->breach_locked) && ($bl->breach_locked == "0" || $isAdminRole)):
+                $viewText = '';
+            endif; 
+            ?>
             <tr>
-                <td><?php echo $bl->bl_id ?></td>
-                <td><a href="/breachlog/edit/<?php echo $bl->bl_id ?>"><?php echo $bl->bl_name ?></a></td>
+                <td>
+                    <?php if ($bl->bl_name == ""): ?>
+                        <a href="/breachlog/edit/<?php echo $bl->bl_id . $viewText ?>">
+                    <?php endif; ?>
+                    <?php echo $bl->bl_id ?>
+                </td>
+                <td><a href="/breachlog/edit/<?php echo $bl->bl_id . $viewText ?>"><?php echo $bl->bl_name ?></a></td>
                 <?php if (!$isClientRole): ?>
                     <td><?php echo stripslashes($bl->_client_name) ?></td>
                 <?php endif; ?>
-                <td><?php echo $bl->bl_reportable ? 'Yes' : 'No' ?></td>
-                <td><?php echo ($bl->bl_date_of_occurrence != '0000-00-00 00:00:00') ? $this->formatDateA($bl->bl_date_of_occurrence) : '' ?></td>
+                <td><?php echo $bl->bl_reportable == 1 ? 'Yes' : 'No' ?></td>
+                <td><?php echo ($bl->bl_date_of_occurrence != '0000-00-00 00:00:00' && $bl->bl_date_of_occurrence != '') ? $this->formatDateA($bl->bl_date_of_occurrence) : '' ?></td>
                 <td style="white-space: nowrap;" class="aright">
-										<?php if ($bl->bl_accepter_u_id === 0 || $bl->bl_accepter_u_id === NULL): ?>
+										<?php //if ($bl->bl_accepter_u_id == "0" || $bl->bl_accepter_u_id === NULL): ?>
+                                        <?php if (isset($bl->breach_locked) && ($bl->breach_locked == "0") || $isAdminRole): ?>
 											<a href="/breachlog/edit/<?php echo $bl->bl_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
 										<?php endif; ?>										
 										<!--even though this is /breachlog/edit send a url var type=view. 
 											this will make it read only for anybody to view.-->
                     <a href="/breachlog/edit/<?php echo $bl->bl_id . '?type=view' ?>" title="View Only"><i class="fa fa-book"></i></a> &nbsp;
+                    <a href="/breachlog/clone/<?php echo $bl->bl_id ?>" title="Clone"><i class="fa fa-copy"></i></a> &nbsp;
                     <?php if ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN): ?>
                         <?php if ($bl->bl_active): ?>
                             <?php $deleteUrl = '/breachlog/delete/' . $bl->bl_id; ?>

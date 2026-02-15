@@ -9,6 +9,7 @@ use Zend\InputFilter\InputFilterInterface;
 class Address
 {
     public $adr_id;
+    public $department;
     public $adr_address1;
     public $adr_address2;
     public $adr_city;
@@ -35,22 +36,23 @@ class Address
 
     public function exchangeArray($data)
     {
-        $this->adr_id     = (isset($data['adr_id'])) ? $data['adr_id'] : null;
-        $this->adr_address1     = (isset($data['adr_address1'])) ? $data['adr_address1'] : null;
-        $this->adr_address2     = (isset($data['adr_address2'])) ? $data['adr_address2'] : null;
-        $this->adr_city     = (isset($data['adr_city'])) ? $data['adr_city'] : null;
-        $this->adr_state_id     = (isset($data['adr_state_id'])) ? $data['adr_state_id'] : null;
-        $this->adr_zip     = (isset($data['adr_zip'])) ? $data['adr_zip'] : null;
-        $this->adr_name     = (isset($data['adr_name'])) ? $data['adr_name'] : null;
-        $this->adr_phone     = (isset($data['adr_phone'])) ? $data['adr_phone'] : null;
-        $this->adr_phone_inner     = (isset($data['adr_phone_inner'])) ? $data['adr_phone_inner'] : null;
-        $this->adr_other_phone     = (isset($data['adr_other_phone'])) ? $data['adr_other_phone'] : null;
-        $this->adr_other_phone_inner     = (isset($data['adr_other_phone_inner'])) ? $data['adr_other_phone_inner'] : null;
-        $this->adr_fax     = (isset($data['adr_fax'])) ? $data['adr_fax'] : null;
-        $this->adr_email     = (isset($data['adr_email'])) ? $data['adr_email'] : null;
+        $this->adr_id                   = (isset($data['adr_id'])) ? $data['adr_id'] : null;
+        $this->department               = (isset($data['department'])) ? $data['department'] : null;
+        $this->adr_address1             = (isset($data['adr_address1'])) ? $data['adr_address1'] : null;
+        $this->adr_address2             = (isset($data['adr_address2'])) ? $data['adr_address2'] : null;
+        $this->adr_city                 = (isset($data['adr_city'])) ? $data['adr_city'] : null;
+        $this->adr_state_id             = (isset($data['adr_state_id'])) ? $data['adr_state_id'] : null;
+        $this->adr_zip                  = (isset($data['adr_zip'])) ? $data['adr_zip'] : null;
+        $this->adr_name                 = (isset($data['adr_name'])) ? $data['adr_name'] : null;
+        $this->adr_phone                = (isset($data['adr_phone'])) ? $data['adr_phone'] : null;
+        $this->adr_phone_inner          = (isset($data['adr_phone_inner'])) ? $data['adr_phone_inner'] : null;
+        $this->adr_other_phone          = (isset($data['adr_other_phone'])) ? $data['adr_other_phone'] : null;
+        $this->adr_other_phone_inner    = (isset($data['adr_other_phone_inner'])) ? $data['adr_other_phone_inner'] : null;
+        $this->adr_fax                  = (isset($data['adr_fax'])) ? $data['adr_fax'] : null;
+        $this->adr_email                = (isset($data['adr_email'])) ? $data['adr_email'] : null;
 
-        $this->_state_name     = (isset($data['_state_name'])) ? $data['_state_name'] : null;
-        $this->_state_code     = (isset($data['_state_code'])) ? $data['_state_code'] : null;
+        $this->_state_name              = (isset($data['_state_name'])) ? $data['_state_name'] : null;
+        $this->_state_code              = (isset($data['_state_code'])) ? $data['_state_code'] : null;
     }
 
     public function getArrayCopy()

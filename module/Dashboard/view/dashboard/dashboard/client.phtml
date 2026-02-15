@@ -1,6 +1,8 @@
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
 <div class="page-title">
     <h1 class="fleft">Dashboard</h1>
-    <?php if($usRoleId != 7):?><a href="/breachlog/edit" class="with-access button"><i class="fa fa-plus-circle"></i> Add New Incident Log</a><?php endif;?>
     <div class="cboth"></div>
 </div>
 
@@ -11,5 +13,158 @@
 <p>Your Consultant is <?php echo is_object($uConsultant) ? $uConsultant->u_firstname : '' ?> <?php echo is_object($uConsultant) ? $uConsultant->u_lastname : ''?>&nbsp;
 	<?php echo is_object($uConsultant) ? $uConsultant->u_office_phone : '' ?> &nbsp;<a href="mailto:<?php echo is_object($uConsultant) ? $uConsultant->u_email : ''?>"><?php echo is_object($uConsultant) ? $uConsultant->u_email : '' ?></a>
 <?php endif; ?>
+
+<style>
+body {
+  
+}
+
+.product-filter {
+  display: flex;
+  flex-direction: column;
+  
+  background-color: #4fbcf7;
+  color: black;
+}
+
+.product-item {
+    display: flex;
+    background-color: #d5e9f3;
+
+}
+
+</style>
+
+
+
+<div class="product-filter">
+  <div>Initial Setup/Periodic Updates</div>
+</div>
+<div class="product-filter">
+
+  <?php if ($is_company_admin) : ?>
+    <div class="product-item">&nbsp;&nbsp;1. &nbsp;&nbsp;<a class="" href="/organization/edit/<?php echo $u_company_id ?>"> Update Organization Information  ( <?php echo $c_name ?> )</a></div>
+  <?php else : ?>
+    <div class="product-item">&nbsp;&nbsp;1. &nbsp;&nbsp; Update Organization Information  ( <?php echo $c_name ?> )</div>
+  <?php endif; ?>
+  
+  <div class="product-item">&nbsp;&nbsp;2. &nbsp;&nbsp;<a class="" href="/contact/edit"> Add/Update Contacts</a></div>
+  
+
+  <?php if ($is_company_admin) : ?>
+    <div class="product-item">&nbsp;&nbsp;3. &nbsp;&nbsp; <?php echo '<a class="" href="/organization/edit/' .  $u_company_id  . '#tab3" > Assign Roles</a>';?></div>
+  <?php else : ?>
+    <div class="product-item">&nbsp;&nbsp;3. &nbsp;&nbsp; Assign Roles</div>
+  <?php endif; ?>
+
+</div>
+<br>
+<div class="product-filter">
+  <div>Risk Assessment/Remediation Plan</div>
+</div>
+<div class="product-filter">
+  <div class="product-item">&nbsp;&nbsp;1. &nbsp;&nbsp;<a href="/assessment/edit/0/step/1"> Complete a New Security Risk Assessment</a></div>
+  <div class="product-item">&nbsp;&nbsp;2. &nbsp;&nbsp;
+    <?php if ($rp_security_id > 0) : ?>
+      <a rel="dashboard" href="/remediationplan/summary/<?php echo $rp_security_id; ?>?return_url=dashboard"> Review Security Remediation Plan</a></div>
+    <?php else : ?>
+        <div> Review Security Remediation Plan</div></div>
+    <?php endif; ?>
+
+  <div class="product-item">&nbsp;&nbsp;3. &nbsp;&nbsp;
+    <?php if ($rp_security_id > 0) : ?>
+      <a href="/remediationplan/summary/<?php echo $rp_security_id; ?>"> Approve and Sign-Off Security Remediation Plan</a></div>
+      <?php else : ?>
+        <div> Approve and Sign-Off Security Remediation Plan</div></div>
+    <?php endif; ?>
+
+  <div class="product-item">&nbsp;&nbsp;4. &nbsp;&nbsp;<a href="/assessment/edit/0/step/1"> Complete a New Privacy Risk Assessment</a></div>
+  <div class="product-item">&nbsp;&nbsp;5. &nbsp;&nbsp;
+    <?php if ($rp_privacy_id > 0) : ?>
+      <a href="/remediationplan/summary/<?php echo $rp_privacy_id; ?>"> Review Privacy Remediation Plan</a></div>
+    <?php else : ?>
+        <div> Review Privacy Remediation Plan</div></div>
+    <?php endif; ?>
+  
+  <div class="product-item">&nbsp;&nbsp;6. &nbsp;&nbsp;
+    <?php if ($rp_privacy_id > 0) : ?>
+      <a href="/remediationplan/summary/<?php echo $rp_privacy_id ?>"> Approve and Sign-Off Privacy Remediation Plan</a>
+      <?php else : ?>
+        <div> Approve and Sign-Off Privacy Remediation Plan</div>
+      <?php endif; ?>
+  </div>
+</div>
+<br>
+<div class="product-filter">
+  <div>Remediation</div>
+</div>
+<div cl5lass="product-item">&nbsp;&nbsp;1. &nbsp;&nbsp;<a href="../../Policy_Templates.zip" dowload>Download Policies and Procedures to Customize</a></div>
+  <div class="product-item">&nbsp;&nbsp;2. &nbsp;&nbsp;<a href="../../System_Logs.pdf" download>Compile System Logs</a></div>
+  <div class="product-item">&nbsp;&nbsp;3. &nbsp;&nbsp;<a href="../../Compliance_Checklist.pdf" download>Download Compliance Checklist</a></div>
+</div>
+
+<br>
+
+<div class="product-filter">
+    <div>Audit Program</div>
+</div>
+<div class="product-filter">
+    <?php if ($audit_signoff_approve) : ?>
+      <div class="product-item">&nbsp;&nbsp;1. &nbsp;&nbsp;<a href="/audit/newaudit">Start a New Audit (2nd year of program)</a></div>
+      <div class="product-item">&nbsp;&nbsp;2. &nbsp;&nbsp;<a href="/audit/list">Approve and Sign-Off Audit</a></div>
+    <?php else : ?>
+      <div class="product-item">&nbsp;&nbsp;1. &nbsp;&nbsp;<a>Start a New Audit (2nd year of program)</a></div>
+      <div class="product-item">&nbsp;&nbsp;2. &nbsp;&nbsp;<a>Approve and Sign-Off Audit</a></div>
+    <?php endif; ?>
+
+    
+</div>
+
+<br>
+
+<div class="product-filter">
+    <div>Incident Response</div>
+</div>
+<div class="product-filter">
+    <div class="product-item">&nbsp;&nbsp;1. &nbsp;&nbsp;<a href="/breachlog/list">Log Incident and Investigation Information</a></div>
+    <div class="product-item">&nbsp;&nbsp;2. &nbsp;&nbsp;<a href="/breachremediationplan/list">Complete Breach Remediation, if necessary</a></div>
+</div>
+
+<br>
+
+<div class="product-filter">
+    <div>Training</div>
+</div>
+<div class="product-filter">
+    <div class="product-item">&nbsp;&nbsp;1. &nbsp;&nbsp;<a href="/traininglog/employeemasterlist">Add/Update Employees</a></div>
+
+    <?php if (isset($training_report_id)) : ?>
+      <div class="product-item">&nbsp;&nbsp;2. &nbsp;&nbsp;<a href=<?php echo $training_report_id ?> target="_blank">View Training Report</a></div>
+    <?php else : ?>
+      <div class="product-item">&nbsp;&nbsp;2. &nbsp;&nbsp;<a>View Training Report</a></div>
+    <?php endif; ?>
+
+</div>
+
+<br>
+
+<div class="product-filter">
+    <div>Misc. Forms and Logs</div>
+    </div>
+<div class="product-filter">
+    <div class="product-item">&nbsp;&nbsp;1. &nbsp;&nbsp;<a href="/itassetinventory/list">Track Asset Inventory</a></div>
+    <div class="product-item">&nbsp;&nbsp;2. &nbsp;&nbsp;<a href="/physicalsecuritychange/list">Track Physical Security Changes</a></div>
+</div>
+
+<br>
+
+<div class="product-filter">
+    <div>Accounting for Disclosures</div>
+</div>
+<div class="product-filter">
+    <div class="product-item">&nbsp;&nbsp;1. &nbsp;&nbsp;<a href="/disclosurerecord/list">Track Disclosures</a></div>
+    <div class="product-item">&nbsp;&nbsp;2. &nbsp;&nbsp;<a href="/accountingrequest/list">Track Requests for Accounting of Disclosure Records</a></div>
+</div>
+
 
 <div class="cboth"><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /></div>

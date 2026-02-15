@@ -125,6 +125,19 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
         return $resultSet;
     }
 
+
+    public function getLocationPerRemediationPlanId($a_id)
+    {
+        $select = $this->tableGateway->getSql()->select();
+        
+        $select->where('rp_a_id =' . $a_id);
+        
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        return $resultSet;
+    }
+
+
     public function getSearchResultsSelect($searchValue, $identity)
     {
         $select = $this->tableGateway->getSql()->select();
@@ -392,6 +405,43 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
 
         return $row;
     }
+
+    public function getRemediationplanByRemediationId($id)
+    {
+        $id  = (int) $id;
+
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('rp_id = ' . $id);
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        $row = $resultSet->current();
+        if (!$row) {
+            return false;
+        }
+
+        return $row;
+    }
+
+    //Use Remediation Plan to get Location/Address ID
+    public function getLocationIdByRemediationplanId($id)
+    {
+        $id  = (int) $id;
+
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('rp_id = ' . $id);
+        
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        $row = $resultSet->current();
+        if (!$row) {
+            return false;
+        }
+
+        
+        return $row->rp_adr_id;
+    }
+
 
     public function getRemediationplanByAIdAdrId($id, $adr_id)
     {
@@ -720,6 +770,51 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
         return $newId;
     }
 
+    public function getOldestOpenSecurityRemediationplan($companyId)
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $where_str = 'rp_c_id = ' . $companyId . ' AND rp_active = 1 AND rp_type = 1 AND rp_status = ' . Remediationplan::STATUS_OPEN ;
+
+        $select->where($where_str);
+
+        $orders[] = 'rp_remediation_date DESC';
+        $orders[] = 'rp_id ASC';
+
+        $select->order($orders);
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        $row = $resultSet->current();
+        if (!$row) {
+            return false;
+        }
+        return $row;
+
+    }
+
+    public function getOldestOpenPrivacyRemediationplan($companyId)
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $where_str = 'rp_c_id = ' . $companyId . ' AND rp_active = 1 AND rp_type = 2 AND rp_status = ' . Remediationplan::STATUS_OPEN ;
+
+        $select->where($where_str);
+
+        $orders[] = 'rp_remediation_date DESC';
+        $orders[] = 'rp_id ASC';
+
+        $select->order($orders);
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        $row = $resultSet->current();
+        if (!$row) {
+            return false;
+        }
+        return $row;
+
+    }
+
+
     public function getApproverAccepter($id)
     {
         $id     = (int) $id;
@@ -776,4 +871,256 @@ class RemediationplanTable implements ServiceLocatorAwareInterface
         return $result;
     }
 
+
+    public function getAuditReviewApprove($id)
+    {
+
+        $id     = (int) $id;
+        $result = array();
+
+        $select = $this->tableGateway->getSql()->select();
+        $select->columns(array(new \Zend\Db\Sql\Expression('DISTINCT(u1.u_id) as u_id')));
+        $select->where('rp_id = ' . $id);
+        $select->join(array('arlc' => 'assessments_roles_locations_contacts'), 'arlc.arlc_a_id = rp_a_id', array(), 'inner');
+        $select->join(array('ar' => 'assessments_roles'), 'arlc.arlc_ar_id = ar.ar_id', array('_ar_id' => 'ar_id'), 'inner');
+        $select->join(array('u1' => 'users'), 'arlc.arlc_u_id = u1.u_id', array('_u_id' => 'u_id', '_u_name' => new \Zend\Db\Sql\Expression('CONCAT(u1.u_firstname, " ", u1.u_lastname)')), 'inner');
+        $select->where('ar.ar_id IN(8)');
+        
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        if(!$resultSet->count()) {
+            $select = $this->tableGateway->getSql()->select();
+            $select->where('rp_id = ' . $id);
+            $select->join(array('cr' => 'company_roles'), 'cr.cr_c_id = rp_c_id', array('_ar_id' => 'cr_ar_id'), 'inner');
+            $select->join(array('u1' => 'users'), 'cr.cr_u_id = u1.u_id', array('_u_id' => 'u_id', '_u_name' => new \Zend\Db\Sql\Expression('CONCAT(u1.u_firstname, " ", u1.u_lastname)')), 'inner');
+            $select->where('cr.cr_ar_id IN(8)');
+
+            $resultSet = $this->tableGateway->selectWith($select);
+        }
+        
+        if($resultSet->count()) {
+            foreach ($resultSet as $key => $rs) {
+                if(!isset($result[$rs->_u_id])) {
+                    $result1[$rs->_u_id] = array("u_id" => $rs->_u_id, "u_name" => $rs->_u_name);
+
+                } else {
+                    //$result[$rs->_u_id]->_ar_id[] = $rs->_ar_id;
+                }
+            }
+        }
+
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('rp_id = ' . $id);
+        $select->join(array('c' => 'companies'), 'c.c_id = rp_c_id', array(), 'inner');
+        $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = c.c_id', array(), 'inner');
+        $select->join(array('u1' => 'users'), 'cc.cc_consultant_id = u1.u_id', array('_u_id' => 'u_id', '_u_name' => new \Zend\Db\Sql\Expression('CONCAT(u1.u_firstname, " ", u1.u_lastname)')), 'inner');
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        if($resultSet) {
+            foreach ($resultSet as $rs) {
+                if(!isset($result[$rs->_u_id])) {
+                    $result[$rs->_u_id] = array("u_id" => $rs->_u_id, "u_name" => $rs->_u_name);
+
+                }
+            }
+        }
+        
+        return $result;
+    }
+
+    public function getRemediationplansByCompanyId($selectedCompanyId){
+        
+        $selectedCompanyId     = (int) $selectedCompanyId;
+        $select = $this->tableGateway->getSql()->select();
+        $where_str = 'rp_c_id = ' . $selectedCompanyId .  ' AND rp_active = 1';
+
+        $select->where($where_str);
+
+        $orders[] = 'rp_remediation_date DESC';
+        $orders[] = 'rp_id ASC';
+
+        $select->order($orders);
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        return $resultSet;
+        
+    }
+
+    public function getOpenRemediationplansByCompanyId($selectedCompanyId){
+        
+        $selectedCompanyId     = (int) $selectedCompanyId;
+        $select = $this->tableGateway->getSql()->select();
+        $where_str = 'rp_c_id = ' . $selectedCompanyId .  ' AND rp_active = 1' . ' AND rp_status = 20';
+
+        $select->where($where_str);
+
+        $orders[] = 'rp_remediation_date DESC';
+        $orders[] = 'rp_id ASC';
+
+        $select->order($orders);
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        return $resultSet;
+        
+    }
+
+
+    public function getRemediationPlansWithinOneYear(){
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+        
+        //$select = new Select('remediation_plans');
+        $select = $this->tableGateway->getSql()->select();
+        
+        if ($identity['u_role_id'] == User::ROLE_ADMIN) {
+            $lastYear = date("Y-m-d", strtotime("-1 years"));
+            $where_str = 'rp_remediation_date >= ' . $lastYear .  ' AND rp_active = 1';
+
+        } else {
+            $where_str = '';
+            if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
+                $where_str .= 'rp_consultant_u_id = ' . $identity['u_id'];
+            } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
+                $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
+                $ids[] = $identity['u_id'];
+                $where_str .= 'rp_consultant_u_id IN (' . implode(',', $ids) . ')';
+            } elseif ($identity['u_role_id'] == User::ROLE_CLIENT && $identity['u_company_id']) {
+                $companies = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getClientCompanies($identity['u_id']);
+                $companies[] = $identity['u_company_id'];
+
+                $where_str .= 'rp_c_id IN (' . implode(',', $companies) . ') ';
+            }
+
+            $companies_ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getCompaniesIdsForConsultant($identity['u_id']);
+            if ($companies_ids) {
+                if ($where_str) {
+                    $where_str = '(' . $where_str . ' OR rp_c_id IN (' . implode(',', $companies_ids) . '))';
+                  } else {
+                    $where_str = 'rp_c_id IN (' . implode(',', $companies_ids) . ')';
+                  }
+            }
+            if ($where_str) {
+                $where_str .= ' AND rp_active = 1';
+            } else {
+                $where_str = 'rp_active = 1';
+            }
+            $select->where($where_str);
+        }
+
+        $orders[] = 'rp_remediation_date DESC';
+        $orders[] = 'rp_id ASC';
+
+        $select->order($orders);
+
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        return $resultSet;
+        
+    }
+
+    public function getRemediationPlansWithinOneYearPairs(){
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
+        $select = $this->tableGateway->getSql()->select();
+        
+        if ($identity['u_role_id'] == User::ROLE_ADMIN) {
+            $lastYear = date("Y-m-d", strtotime("-1 years"));
+            $where_str = 'rp_remediation_date >= ' . $lastYear .  ' AND rp_active = 1';
+
+        } else {
+            $where_str = '';
+            if ($identity['u_role_id'] == User::ROLE_CONSULTANT) {
+                $where_str .= 'rp_consultant_u_id = ' . $identity['u_id'];
+            } elseif ($identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
+                $ids = $this->getServiceLocator()->get('Admin\Model\UserTable')->getConsultantIdsForSenior($identity['u_id']);
+                $ids[] = $identity['u_id'];
+                $where_str .= 'rp_consultant_u_id IN (' . implode(',', $ids) . ')';
+            } elseif ($identity['u_role_id'] == User::ROLE_CLIENT && $identity['u_company_id']) {
+                $companies = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getClientCompanies($identity['u_id']);
+                $companies[] = $identity['u_company_id'];
+
+                $where_str .= 'rp_c_id IN (' . implode(',', $companies) . ') ';
+            }
+
+            $companies_ids = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable')->getCompaniesIdsForConsultant($identity['u_id']);
+            if ($companies_ids) {
+                if ($where_str) {
+                    $where_str = '(' . $where_str . ' OR rp_c_id IN (' . implode(',', $companies_ids) . '))';
+                  } else {
+                    $where_str = 'rp_c_id IN (' . implode(',', $companies_ids) . ')';
+                  }
+            }
+            if ($where_str) {
+                $where_str .= ' AND rp_active = 1';
+            } else {
+                $where_str = 'rp_active = 1';
+            }
+            $select->where($where_str);
+        }
+
+        $orders[] = 'rp_remediation_date DESC';
+        $orders[] = 'rp_id ASC';
+
+        $select->order($orders);
+
+
+        $resultSet = $this->tableGateway->selectWith($select);
+        $rps = array();
+        foreach ($resultSet as $rp) {
+            $rps[] = $rp->c_name;
+        }
+
+        return $resultSet;
+        
+    }
+
+    public function getListOfRemediationPlans($selectedCompanyId) {
+        
+        $remediationPlans = [];
+
+        $securityRemediationPlanResult = $this->getServiceLocator()->get('Assessment\Model\RemediationplanTable')->getLastOpenRemediationplanByCompanyId($selectedCompanyId, Assessment::TYPE_SECURITY_RISK);
+        $privacyRemediationPlanResult = $this->getServiceLocator()->get('Assessment\Model\RemediationplanTable')->getLastOpenRemediationplanByCompanyId($selectedCompanyId, Assessment::TYPE_PRIVACY_RISK);
+        if ($securityRemediationPlanResult) {
+            array_push($remediationPlans, $securityRemediationPlanResult);
+        }
+        
+        if ($privacyRemediationPlanResult) {
+            array_push($remediationPlans, $privacyRemediationPlanResult);
+        }
+
+        return $remediationPlans;
+    }
+
+    public function getLastOpenRemediationplanByCompanyId($selectedCompanyId, $remediationType){
+        
+        $selectedCompanyId     = (int) $selectedCompanyId;
+        $select = $this->tableGateway->getSql()->select();
+        $where_str = 'rp_c_id = ' . $selectedCompanyId .  ' AND rp_active = 1' . ' AND rp_status = ' . Remediationplan::STATUS_OPEN . ' AND rp_type = ' . $remediationType;
+
+        $select->where($where_str);
+
+        $orders[] = 'rp_remediation_date DESC';
+        $orders[] = 'rp_id ASC';
+
+        $select->order($orders);
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        $row = $resultSet->current();
+
+        if (!$row) {
+            return false;
+        }
+
+        return ($row);
+
+    }
+    
 }

@@ -76,7 +76,7 @@ class UserForm extends Form
                 'type'  => 'text',
             ),
             'options' => array(
-                'label' => 'First name',
+                'label' => 'First Name',
             )
         ));
         $this->add(array(

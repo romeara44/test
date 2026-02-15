@@ -1,11 +1,20 @@
+<script src="https://kit.fontawesome.com/e1b4bd3382.js" crossorigin="anonymous"></script>
 <?php
+
+// Filename: /module/Traininglog/view/traininglog/traininglog/edit.phtml:
+
+
+$request = new \Zend\Http\PhpEnvironment\Request();
+$http_referer = $request->getServer('HTTP_REFERER');
+$parsed = parse_url($http_referer, PHP_URL_PATH); //dashboard/client
 
 // within a view script
 $form = $this->form;
 $form->prepare();
 
 // Assuming the "contact/process" route exists...
-$form->setAttribute('action', '/traininglog/edit');
+//$form->setAttribute('action', 'edittovutisuser');
+$form->setAttribute('action', 'edit');
 
 // Set the method attribute for the form
 $form->setAttribute('method', 'post');
@@ -13,523 +22,227 @@ $form->setAttribute('method', 'post');
 // Render the opening tag
 ?>
 
+<div class="page-title">
+    <h1 class="fleft">Edit Trainee</h1>
+    <div class="cboth"></div>
 
-    <div class="page-title">
-        <h1 class="fleft"><?php if($this->tlId) {?>Edit <?php } else {?>Add New <?php }?>Training Log</h1>
-        <div class="cboth"></div>
-    </div>
-
-    <p></p>
-
-<div class="col-left">
-    <form action="/traininglog/edit/<?php echo $this->tlId ?>" method="post" enctype="multipart/form-data" name="traininglog" id="traininglog">
-        <input type="hidden" id="_tl_cur_regulations_hidden" name="_tl_cur_regulations" value="<?php echo $this->tlObj ? implode(',', $this->tlObj->_tl_cur_regulations) : ''; ?>">
-        <?php
-            $fn = $form->get('tl_id');
-            echo $this->formHidden($fn);
-        ?>
-        <?php
-            $fn = $form->get('tl_active');
-            echo $this->formHidden($fn);
-        ?>
-
-        <?php
-            $authService = new \Zend\Authentication\AuthenticationService();
-            $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
-            $identity = $authService->getIdentity();
-        ?>
-
-        <p>
-            <?php $fn = $form->get('tl_company_id');
-            echo $this->formLabel($fn);
-            echo $this->formSelect($fn->setAttributes(array('class'=>'form-control required', 'id' => 'company')));
-            echo $this->formElementErrors($fn);
-            ?>
-        </p>
-        
-        <p>
-            <?php $fn = $form->get('tl_title');
-            echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
-            echo $this->formElementErrors($fn);
-            ?>
-        </p>
-
-        <p>
-            <?php $fn = $form->get('tl_tlt_id');
-            echo $this->formLabel($fn);
-            echo $this->formSelect($fn->setAttributes(array('id'=>'type', 'class'=>'form-control required')));
-            echo $this->formElementErrors($fn);
-            ?>
-        </p>
-
-        <p id="_tl_type_name_wrap" style="border: 0;display: none">
-            <label for="_tl_type_name">Type Name</label>
-            <input type="text" name="_tl_type_name" id="_tl_type_name" value="<?php echo $tlObj ? $tlObj->_tl_type_name : ''?>" required disabled="disabled">
-        </p>
-
-        <p>
-            <?php
-            $fn = $form->get('tl_conducted_date');
-            if ($this->tlObj):
-                $fn->setValue($this->formatDateA($this->tlObj->tl_conducted_date, false, true));
-            endif;
-            echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'tl_conducted_date', 'readonly' => 'readonly')));
-            echo $this->formElementErrors($fn);
-            ?>
-        </p>
-        
-        <p>
-            <?php
-            $fn = $form->get('tl_hire_date');
-            if ($this->tlObj && $this->tlObj->tl_hire_date):
-                $fn->setValue($this->formatDateA($this->tlObj->tl_hire_date, false, true));
-            endif;
-            echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'tl_hire_date', 'readonly' => 'readonly')));
-            echo $this->formElementErrors($fn);
-            ?>
-        </p>
-
-        <p>
-            <?php
-            $fn = $form->get('_tl_trainer');
-            echo $this->formLabel($fn);
-            echo $this->formSelect($fn->setAttributes(array('class'=>'form-control required', 'id'=>'_tl_trainer')));
-            echo $this->formElementErrors($fn);
-            ?>
-        </p>
-
-        <p id="_tl_trainer_name_wrap" style="border: 0;display: none">
-            <label for="_tl_trainer_name">Trainer Name</label>
-            <input type="text" name="_tl_trainer_name" id="_tl_trainer_name" value="<?php echo $this->tlObj ? $this->tlObj->_tl_trainer_name : ''; ?>" required disabled="disabled">
-        </p>
-
-        <p>
-            <label for="_search_regulation">Regulation Number or Regulation Description</label>
-            <div class="hold_input">
-                <a href="javascript:void(0)" id="list_search-button"><i class="fa fa-search"></i></a>
-                <input type="text" name="_search_regulation" id="_search_regulation" class="form-control">
-            </div>
-        </p>
-
-        <p>
-        <div style="width: 750px; height: 300px; overflow-y: scroll;">
-            <table id="_regulations_table">
-                <thead>
-                <tr>
-                <th>Policy&Procedure Name</th>
-                <th>Policy&Procedure Number</th>
-                <th>Regulation Number</th>
-                </tr>
-                </thead>
-                <tbody>
-                <?php foreach ($regulations as $value) : ?>
-                <tr id="<?php echo $value->rg_id; ?>">
-                <td><?php echo $value->rg_pp_name; ?></td>
-                <td><?php echo $value->rg_pp_number; ?></td>
-                <td><?php echo $value->rg_number; ?></td>
-                </tr>
-                <?php endforeach; ?>
-                <tr id="-1">
-                <td colspan="3">Other</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        </p>
-
-        <div>
-            <?php foreach ($regulations as $value) {?>
-                <div id="_regulation_wrap_<?php echo $value->rg_id?>" style="display:none">
-                    <p>
-                        <label for="regulation_pp_name_<?php echo $value->rg_id?>">Policy&Procedure Name</label>
-                        <input type="text" name="_regulation[<?php echo $value->rg_id?>][rg_pp_name]" id="_regulation_pp_name_<?php echo $value->rg_id?>" value="<?php echo $value->rg_pp_name?>" readonly="readonly" disabled="disabled">
-                    </p>
-                    <p style="border: 0;">
-                        <label for="regulation_pp_number_<?php echo $value->rg_id?>">Policy&Procedure Number</label>
-                        <input type="text" name="_regulation[<?php echo $value->rg_id?>][rg_pp_number]" id="_regulation_pp_number_<?php echo $value->rg_id?>" value="<?php echo $value->rg_pp_number?>" readonly="readonly" disabled="disabled">
-                    </p>
-                    <p style="border: 0;">
-                        <label for="regulation_number_<?php echo $value->rg_id?>">Regulation Number</label>
-                        <input type="text" name="_regulation[<?php echo $value->rg_id?>][rg_number]" id="_regulation_number_<?php echo $value->rg_id?>" value="<?php echo $value->rg_number?>" readonly="readonly" disabled="disabled">
-                    </p>
-                    <?php if($value->rg_u_owner_id): ?>
-                        <p style="border: 0;">
-                            <label for="regulation_description_<?php echo $value->rg_id?>">Regulation Description</label>
-                            <input type="text" name="_regulation[<?php echo $value->rg_id?>][rg_description]" id="_regulation_description_<?php echo $value->rg_id?>" value="<?php echo $value->rg_description?>" readonly="readonly" disabled="disabled">
-                        </p>
-                    <?php endif; ?>
-                </div>
-            <?php }?>
-        
-            <div id="_regulation_wrap_-1" style="display:none">
-                <p>
-                    <label for="regulation_pp_name_-1">Policy&Procedure Name</label>
-                    <input type="text" name="_regulation[-1][rg_pp_name]" id="_regulation_pp_name_-1" value="">
-                </p>
-                <p style="border: 0;">
-                    <label for="regulation_pp_number_-1">Policy&Procedure Number</label>
-                    <input type="text" name="_regulation[-1][rg_pp_number]" id="_regulation_pp_number_-1" value="">
-                </p>
-                <p style="border: 0;">
-                    <label for="regulation_number_-1">Regulation Number</label>
-                    <input type="text" name="_regulation[-1][rg_number]" id="_regulation_number_-1" value="">
-                </p>
-                <p style="border: 0;">
-                    <label for="regulation_description_-1">Regulation Description</label>
-                    <input type="text" name="_regulation[-1][rg_description]" id="_regulation_description_-1" value="">
-                </p>
-            </div>
-        </div>
-
-        <div class="cboth"></div>
-
-        <p style="overflow: hidden;"> 
-            <strong style="line-height: 30px;">Attendees</strong><br />
-            <?php
-                $fn = $form->get('_tl_eml_items');
-            ?>
-            <div id="eml-select" <?php if (!$fn->getValueOptions()) : ?> style="display:none" <?php endif; ?> >            
-            <?php
-            echo $this->formSelect($fn->setAttributes(array('class'=>'', 'id'=>'_tl_eml_items')));
-            echo $this->formElementErrors($fn);
-            ?>
-            <div class="cboth"></div>
-            </div>
-            <a id="browseFile_attendees" style="margin-right: 130px; float:right" href="javascript:" class="button"><i class="fa fa-plus-circle"></i> Import from CSV</a>
-            <div id="filesToUploadBox_attendees">
-
-            </div>
-            <?php
-                $fn = $form->get('tl_attendees');
-            ?>
-            <span class="description_text" id="tl_attendees_help" style="display: none">To view the attendees added, please save your changes. You can then make any edits you might need to make to this page</span>
-            <?php
-                echo $this->formTextarea($fn->setAttributes(array('class'=>'', 'style' => 'width: 450px; height: 85px;')));
-                echo $this->formElementErrors($fn);
-            ?>
-            <span class="description_text">"CSV file format: First name, Last name, title, email address"</span>
-        </p>
-
-        <p style="border: 0;">
-            <strong style="line-height: 30px;">Training materials</strong><br />
-            <a id="browseFile_training" href="javascript:" class="button"><i class="fa fa-plus-circle"></i> Browse Files...</a>
-            <br /><br /><br />
-        </p>
-
-        <div class="cboth"></div>
-        <div id="filesToUploadBox_training">
-
-        </div>
-            <?php if ($trainingMaterials): ?>
-            <?php foreach ($trainingMaterials as $note): ?>
-                <div class="note">
-                    <strong><?php echo $note->_username ?></strong> <small> on <?php echo $note->_note_create_date_format ?></small><br />
-                    <p>
-                        <?php echo $note->note_text ?><br />
-                        <?php if ($note->_files != ''): ?>
-                            <?php
-                            $_files = explode(',', $note->_files);
-                            ?>
-                            <strong>Training materials:</strong><br />
-                            <?php foreach ($_files as $_file): ?>
-                                <?php
-                                $_file = explode('::', $_file);
-                                $_fileName = $_file[0];
-                                $_fileId = $_file[1];
-                                ?>
-                                <span style="float: left; margin-right: 5px;" class="''?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><span>&nbsp;</span><a href="/files/delete/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="remove-uploaded-training">X</a><br/>
-
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </p>
-                </div>
-            <?php endforeach; ?>
-            <?php endif; ?>
-        <div class="cboth"></div>
-
-        <p>
-            <strong style="line-height: 30px;">Comments</strong><br />
-            <?php
-            $fn = $formNote->get('note_text');
-            echo $this->formTextarea($fn->setAttributes(array('style' => 'width: 450px;')));
-            echo $this->formElementErrors($fn);
-            ?>
-
-        </p>
-        <p style="border: 0;">
-            <strong style="line-height: 30px;">Upload Reports</strong><br />
-            <a id="browseFile_comments" href="javascript:" class="button"><i class="fa fa-plus-circle"></i> Browse Files...</a>
-            <br /><br /><br />
-        </p>
-
-        <div class="cboth"></div>
-        <div id="filesToUploadBox_comments">
-
-        </div>
-        
-        <div class="cboth"></div>
-        
-        <?php if ($this->tlId && is_object($comments) && ($comments->count())): ?>
-            <?php foreach ($comments as $note): ?>
-                <div class="note">
-                    <strong><?php echo $note->_username ?></strong> <small> on <?php echo $note->_note_create_date_format ?></small><br />
-                        <?php if ($note->note_text != ''): ?>
-                            <strong>Comments:</strong><br />
-                            <?php echo $note->note_text ?><br />
-                        <?php endif; ?>
-                        <?php if ($note->_files != ''): ?>
-                            <?php
-                            $_files = explode(',', $note->_files);
-                            ?>
-                            <strong>Reports:</strong><br />
-                            <?php foreach ($_files as $_file): ?>
-                                <?php
-                                $_file = explode('::', $_file);
-                                $_fileName = $_file[0];
-                                $_fileId = $_file[1];
-                                ?>
-                                <span style="float: left; margin-right: 5px;" class="''?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><span>&nbsp;</span><a href="/files/delete/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="remove-uploaded-training">X</a><br/>
-
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </p>
-                </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
-        
-        <div class="cboth"></div>
-        
-        <div class="form-buttons">
-            <input type="submit" value="Save" class="form-button" />
-            <div class="fleft">or</div>
-            <a href="/traininglog/list" class="cancel">Cancel</a>
-        </div>
-
-    <?php echo $this->form()->closeTag() ?>
 </div>
 
-<div class="cboth"><br /></div>
+<p></p>
 
 
-<script type="text/javascript">
-    jQuery(function() {
-        $('#traininglog').validate();
+<div class="col-left">
+    <div id="tab1">
+        <form action="edit<?php echo $this->id ?>" method="post" name="edit" id="edit">
+          <?php
+              $fn = $form->get('tovutiuserid');
+              echo $this->formHidden($fn);
+          ?>
 
-        var browseFilesCounter = {'attendees':0, 'training':0, 'comments':0};
-        
-        $(document).ready(function() {
-            $('a[id^=browseFile_]').click(function() {
-                var type  = $(this).attr('id').split('_');
-                var count = 0;
+          <?php if ($isAdmin): ?>
+            <p>
+              <?php
+                $fn = $form->get('companyname');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+                echo $this->formElementErrors($fn);
+              ?>
+            </p>
+
+              <p>
+                <?php
+                  $fn = $form->get('tovutiid');
+                  echo $this->formLabel($fn);
+                  echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+                  echo $this->formElementErrors($fn);
+                ?>
+              </p>
+            <?php else: ?>
+              <?php
+                $fn = $form->get('companyname');
+                echo $this->formHidden($fn);
+              ?>
+
+              <?php
+                $fn = $form->get('tovutiid');
+                echo $this->formHidden($fn);
+              ?>
+            <?php endif; ?>
+
+          <p>
+          
+            <?php
+              $fn = $form->get('firstname');
+              echo $this->formLabel($fn);
+              echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+              echo $this->formElementErrors($fn);
+            ?>
+          </p>
+
+          <p>
+            <?php
+              $fn = $form->get('lastname');
+              echo $this->formLabel($fn);
+              echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+              echo $this->formElementErrors($fn);
+            ?>
+          
+          </p>
+
+          <p>
+            <div class="tooltip">
+              <i class="fas fa-info-circle"></i><span class="tooltiptext">Employees email address at which they will receive all training notification emails.</span>
+              <label for="email" style="width: auto">Email</label>
+            </div>
+          
+            <?php
+              $fn = $form->get('email');
+              //echo $this->formLabel($fn);
+              echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+              echo $this->formElementErrors($fn);
+            ?>
+          </p>
+
+          <p>
+            <div class="tooltip">
+              <i class="fas fa-info-circle"></i><span class="tooltiptext">The department of the organization that the employee works within.</span>
+              <label for="department" style="width: auto">Department</label>
+            </div>
+            <div>
+              <?php
+                //$fn = $form->get('department');
+                ////echo $this->formLabel($fn);
+                //echo $this->formSelect($fn->setAttributes(array('class'=>'form-control required')));
+                //echo $this->formElementErrors($fn);
+              ?>
+              <select name="department" id="department" class="w175">
                 
-                switch(type[1]) {
-                    case 'attendees':
-                        $('#tl_attendees_help').show();
-                        count = browseFilesCounter.attendees;
-                        break;
-                    case 'training':
-                        count = browseFilesCounter.training;
-                        break;
-                    case 'comments':
-                        count = browseFilesCounter.comments;
-                        break;
-                }
+                
+                <?php foreach ($departments1 as $key => $ar): ?>
+                    <option <?php echo $ar == $tovutiDatabaseObject->department ? ' SELECTED' : ''  ?> value=<?php echo $key ?>><?php echo $ar ?></option>
+                <?php endforeach; ?>
+                
+            </select>
+            </div>
+          </p>
 
-                if(count > 0) {
-                    if(type[1] == 'attendees') return;
-                    var prevFile = $('#file_' + type[1] + '_' + (count - 1)).val();
-                    if(prevFile == undefined || prevFile == '') {
-                        $('#file_' + type[1] + '_' + (count - 1)).click();
-                        return;
-                    }
-                }
+          <p>
+            <div class="tooltip">
+              <i class="fas fa-info-circle"></i><span class="tooltiptext">The employees current job title within the organization.</span>
+              <label for="jobtitle" style="width: auto">Job Title</label>
+            </div>
+            <div>
+              <?php
+                $fn = $form->get('jobtitle');
+                //echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+                echo $this->formElementErrors($fn);
+              ?>
+            </div>
+          </p>
 
-                switch(type[1]) {
-                    case 'attendees':
-                        $('#filesToUploadBox_' + type[1]).append('<p><input type="file" name="' + type[1] + '[]" id="file_' + type[1] + '_' + count + '" /></p>');
-                        ++browseFilesCounter.attendees;
-                        break;
-                    case 'training':
-                        $('#filesToUploadBox_' + type[1]).append('<p><input type="file" name="' + type[1] + '[]" id="file_' + type[1] + '_' + count + '" /><a href="javascript:void(0)" class="remove-upload-training">X</a></p>');
-                        ++browseFilesCounter.training;
-                        break;
-                    case 'comments':
-                        $('#filesToUploadBox_' + type[1]).append('<p><input type="file" name="' + type[1] + '[]" id="file_' + type[1] + '_' + count + '" /><a href="javascript:void(0)" class="remove-upload-comments">X</a></p>');
-                        ++browseFilesCounter.comments;
-                        break;
-                }
+          <p>
+            <div class="tooltip">
+              <i class="fas fa-info-circle"></i><span class="tooltiptext">User name that employee will use to log in to the training system.  This is normally the employee’s email address.</span>
+              <label for="username" style="width: auto">User Name</label>
+            </div>
+            <?php
+              $fn = $form->get('username');
+              //echo $this->formLabel($fn);
+              echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+              echo $this->formElementErrors($fn);
+            ?>
+          </p>
+          
+          <p>
+              <div style="padding-top: 0">
+                <div class="tooltip">
+                  <i class="fas fa-info-circle"></i><span class="tooltiptext">An Essential User is a user who has access to ePHI on a frequent or regular basis. An Occasional User is a user that does not have access to ePHI on a frequent or regular basis but rather may come across ePHI on an infrequent or occasional basis.</span>
+                  <label for="traineetype" style="width: auto">Trainee Type</label>
+                </div>
+              </div>
+              <select name="departments" id="departments" class="w175">
+                  
+                  <?php foreach ($departments as $ar): ?>
+                      <option <?php echo $ar->id == $selectedDepartment->id ? ' SELECTED' : ''  ?> value=<?php echo $ar->id ?>><?php echo $ar->group_name ?></option>
+                  <?php endforeach; ?>
+                  
+              </select>
+          </p>
+          
 
-                $('#file_' + type[1] + '_' + count).click();
+          <p>
+            <?php
+              $fn = $form->get('registerdate');
+              echo $this->formLabel($fn);
+              echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'disabled' => 'disabled')));
+              echo $this->formElementErrors($fn);
+            ?>
+          
+          </p>
 
-            });
+          <p>
+            <?php
+              $fn = $form->get('lastvisitdate');
+              echo $this->formLabel($fn);
+              echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'disabled' => 'disabled')));
+              echo $this->formElementErrors($fn);
+            ?>
+          
+          </p>
+
+          <p>
+            <?php
+              $fn = $form->get('requirereset');
+              echo $this->formLabel($fn);
+              echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+              echo $this->formElementErrors($fn);
+            ?>
+              
             
-            $( "#tl_conducted_date, #tl_hire_date" ).datepicker({dateFormat: 'mm/dd/yy'});
+          </p>
 
-            if($('#type option:selected').val() != '1') {
-                $("#tl_hire_date").datepicker("disable").val('-');
-            }
+          <p>              
+            <?php
+              // <label for="status">Status:</label>
 
-            $('#type').change(function(){
-                if($('#type option:selected').val() != '1') {
-                    $("#tl_hire_date").datepicker("disable").val('-');
-                } else {
-                    $("#tl_hire_date").val('').attr('disabled',false).datepicker('enable');
-                }
-            });
+              // <select name="status" id="status">
+              //   <option value="active">Active</option>
+              //   <option value="disabled">Disabled</option>
+              // </select>
+            ?>
+
+              <?php
+                $fn = $form->get('status');
+                echo $this->formLabel($fn);
+                echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+              ?>
+          </p>
+         
+    
+<div class="cboth"></div>
+
+<div class="form-buttons">
+    <input id="save" type="submit" name="save" value="Save" class="form-button" />
+    <a href="/traininglog/employeemasterlist" class="cancel">Cancel</a>
+</div>
+
+<?php echo $this->form()->closeTag(); ?>
+
+<?php
+  if(isset($_POST['submit']))
+  {
+    $getcar=$_POST['litmosTeam'];
+  }
+?>
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+
+        $('#save').click(function() {
+            //document.getElementById('addlitmosuser').submit();
         });
 
-        $('#_tl_trainer').change(function(){
-            if($('#_tl_trainer option:selected').val() == '-1') {
-                $('#_tl_trainer_name_wrap').css('display', 'block');
-                $('#_tl_trainer_name').attr('disabled', false);
-            } else {
-                $('#_tl_trainer_name_wrap').css('display', 'none');
-                $('#_tl_trainer_name').attr('disabled', true);
-            }
-        });
-
-        $('#type').change(function(){
-            if($('#type option:selected').val() == '-1') {
-                $('#_tl_type_name_wrap').css('display', 'block');
-                $('#_tl_type_name').attr('disabled', false);
-            } else {
-                $('#_tl_type_name_wrap').css('display', 'none');
-                $('#_tl_type_name').attr('disabled', true);
-            }
-        });
-
-        $("#company").change(function(){
-            getCompanyUsers()
-        });
-
-        function getCompanyUsers()
-        {
-            var cId = $("#company option:selected").val();
-            
-            if(cId != undefined && cId != '') {
-                $.ajax({
-                    type:"GET",
-                    url:"/traininglog/gettrainers/" + cId,
-                    success: function(data){
-                        var html = '<option value="">Please Select</option>';
-                        $.each(data.trainers, function(index, value) {
-                            html += '<option value="' + index + '">' + value + '</option>';
-                        });
-                        html += '<option value="-1">Other</option>';
-                        $('#_tl_trainer').html(html);
-
-                        html = '';
-                        $.each(data.list, function(index, value) {
-                            html += '<option value="' + index + '">' + value + '</option>';
-                        });
-                        $('#_tl_eml_items').html(html);
-                        if (html) {
-                            $('#eml-select').show();
-                        } else {
-                            $('#eml-select').hide();
-                        }
-                    }
-                });
-            }
-        }
-
-        function searchRegulations()
-        {
-            var value = $('#_search_regulation').val().toLowerCase();
-            if (value) {
-                $('#_regulations_table tbody tr').hide();
-                $('#_regulations_table th:nth-child(3), #_regulations_table td:nth-child(3)').show();
-                $('#_regulations_table tbody td').each(function(i, v) {
-                    var $td = $(v);
-                    if ($td.text().toLowerCase().indexOf(value) != -1) {
-                        $td.closest('tr').show();
-                    }
-                });
-            } else {
-                $('#_regulations_table th:nth-child(3), #_regulations_table td:nth-child(3)').hide();
-                $('#_regulations_table tbody tr').show();
-            }
-        }
-
-        $('#_search_regulation').keyup(function(e){            
-            searchRegulations();                   
-        });
-
-        $('#list_search-button').click(function(){
-            //searchRegulations();
-        });
-
-        searchRegulations();
-
-        $('#_regulations_table tbody tr').click(function() {
-            $(this).toggleClass('tr-selected');
-            regulationHandle();
-        });
-
-        function regulationHandle()
-        {
-            $('div[id^=_regulation_wrap_]').css('display', 'none');
-
-            $('#_regulations_table tbody tr').each(function(i, v){
-                if ($(v).hasClass('tr-selected')) {
-                    $('#_regulation_wrap_' + $(v).prop('id')).css('display', 'block');
-                }                
-            });
-        }
-
-        var cur_regulations_hidden = $('#_tl_cur_regulations_hidden').val();
-        if (cur_regulations_hidden) {
-            var cur_regulations = cur_regulations_hidden.split(',');
-            for (var i = 0; i <  cur_regulations.length; i++) {
-                $('#_regulations_table tbody tr#' + cur_regulations[i]).toggleClass('tr-selected');
-            };
-            regulationHandle();
-        }     
-
-        $('#traininglog').submit(function(e) {
-            var value = '';
-            $('#_regulations_table tbody tr.tr-selected').each(function(i, v) {
-                value += $(v).prop('id') + ',';                
-            });
-            if (value) {
-                value = value.slice(0, -1);
-            }
-            $('#_tl_cur_regulations_hidden').val(value);
-        });
-
-        $('#filesToUploadBox_training').on('click', '.remove-upload-training', function() {
-            $(this).parent().remove();
-            browseFilesCounter.training--;
-        });
-
-        $('body').on('click', '.remove-uploaded-training', function(e) {
-            e.preventDefault();
-            var link = $(this);
-            $.ajax({
-                type:"POST",
-                url:link.prop('href'),
-                success: function(data){
-                    if (data == '1') {
-                        link.prev('span').remove();
-                        link.prev('a').remove();
-                        link.prev('span').remove();
-                        link.next('br').remove();
-                        link.remove();
-                    } else if (data == '0') {
-                        link.closest('div.note').remove();
-                    } else {
-                        alert(data);
-                    }
-                }
-            });
-        });
-
-        $('#filesToUploadBox_comments').on('click', '.remove-upload-comments', function() {
-            $(this).parent().remove();
-            browseFilesCounter.comments--;
-        });
     });
+
 </script>

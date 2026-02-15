@@ -1,4 +1,4 @@
-g/*
+/*
 Theme Name: HIPAA Suite by The Carosh Group
 Version: 1.0
 Author: click5 Interactive
@@ -1630,4 +1630,36 @@ form.chart select {
 	float:left;
 	width:318px;
 	position:relative;
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 400px;
+    background-color: #034f84;
+    color: white;
+    text-align: left;
+    padding: 15px 10px;
+    border-radius: 6px;
+    bottom: 100%;
+    left: 50%;
+    margin-left: 0px; /* Use half of the width (120/2 = 60), to center the tooltip */
+    line-height: 150%;
+        font-size: 12px;
+
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+}
+
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+    visibility: visible;
 }

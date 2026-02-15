@@ -218,10 +218,31 @@ class UserTable implements ServiceLocatorAwareInterface
         return (bool)($value < 1 || $resultSet < $value);
     }
 
+    public function getAvailableLicenseCount($companyId)
+    {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('u_active = 1');
+        $select->where('u_company_id = ' . $companyId);
+        $select->where('licensed_user = 1');
+
+        $resultSet = $this->tableGateway->selectWith($select)->count();
+
+        $value = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getUsersLimit($companyId);
+
+        $result = $value < 1 ? 0 : $value - $resultSet;
+
+        return (int)$result;
+    }
+
     public function getUser($id)
     {
         $id  = (int) $id;
         $rowset = $this->tableGateway->select(array('u_id' => $id));
+        
         $row = $rowset->current();
         if (!$row) {
             return false;
@@ -274,15 +295,20 @@ class UserTable implements ServiceLocatorAwareInterface
             'u_zip' => $user->u_zip,
             'u_state_id' => $user->u_state_id,
             'u_confirmed' => isset($user->u_confirmed) ? $user->u_confirmed : 1,
+            'u_senior_consultant_c_id' => $user->u_senior_consultant_c_id,
+            'licensed_user' => isset($user->licensed_user) ? $user->licensed_user : 0
         );
 
         if (!(int) $user->u_senior_consultant_u_id) {
             unset($data['u_senior_consultant_u_id']);
         }
+        
+        $isCompanyAdmin = $this->DetermineCompanyAdmin($identity['u_company_id_admin'], $identity['u_company_id']);
 
-        if($identity['u_role_id'] == User::ROLE_ADMIN || $identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT) {
+        if($identity['u_role_id'] == User::ROLE_ADMIN || $identity['u_role_id'] == User::ROLE_SENIOR_CONSULTANT || $isCompanyAdmin) {
             $data['u_grant_to_disclosures'] = $user->u_grant_to_disclosures ? $user->u_grant_to_disclosures : 0;
             $data['u_grant_to_breach'] = $user->u_grant_to_breach ? $user->u_grant_to_breach : 0;
+            $data['audit_signoff_approve'] = $user->audit_signoff_approve ? $user->audit_signoff_approve : 0;
         }
 
         if (!(int) $user->u_state_id) {
@@ -598,6 +624,36 @@ class UserTable implements ServiceLocatorAwareInterface
         $users = array();
         foreach ($resultSet as $rs) {
             $users[$rs->u_id] = $rs->u_firstname . ' ' . $rs->u_lastname;
+        }
+
+        return $users;
+    }
+
+    //getFullContactsByCompanyId($identity['u_company_id'], $sortCol, $activeFilter)
+    //public function getAll($paginated = false, $orderBy = null, $order = null, $params = array())
+    public function getFullContactsByCompanyId($cId = 0, $orderBy = null, $order = null, $activeFilter, $withConsultants = false)
+    {
+        $users = [];
+        $select = $this->tableGateway->getSql()->select();
+
+        $select->where('u_company_id = ' . (int) $cId);
+        
+        if ($activeFilter == 1) {
+            $select->where('u_active = 1');
+        } elseif ($activeFilter == 2) {
+            $select->where('u_active = 0');
+        }
+        if ($orderBy) {
+            $order = $order ? $order : 'ASC';
+            $select->order($orderBy . ' ' . $order);
+        }
+        //$select->order('u_locked_unlocked_date DESC');
+        $resultSet = $this->tableGateway->selectWith($select);
+        
+        
+        foreach ($resultSet as $user) {
+            $users[$user->u_id] = $user;
+
         }
 
         return $users;
@@ -994,4 +1050,32 @@ class UserTable implements ServiceLocatorAwareInterface
         }
         return $adminId;
     }
+
+    
+    public function getUsedLicenseCount($companyId)
+    {
+        $authService = new \Zend\Authentication\AuthenticationService();
+        $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+        $identity = $authService->getIdentity();
+
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('u_active = 1');
+        $select->where('u_company_id = ' . $companyId);
+        $select->where('licensed_user = 1');
+
+        $resultSet = $this->tableGateway->selectWith($select)->count();
+
+        return (int)$resultSet;
+    }
+
+    public function DetermineCompanyAdmin($u_company_id_admin, $u_company_id)
+    {
+        $isCompanyAdmin = false;
+        if ((isset($u_company_id_admin)) && (isset($u_company_id)) && $u_company_id_admin == $u_company_id)
+        {
+            $isCompanyAdmin = true;
+        }
+        return $isCompanyAdmin;
+    }
+
 }

@@ -6,7 +6,7 @@
                 <ul>
                     <?php foreach ($item['items'] as $value) {?>
                         <?php if(($value['url'] != '/company/edit' || ($value['url'] == '/company/edit' && $checkClientLimitCompany))): ?>
-                            <li <?php if(isset($value['disabled'])) {?> class="disabled" disabled="disabled"<?php }?>><a class="<?php echo (isset($value['class']) ? $value['class'] . ' ' : '')?>" href="<?php echo isset($item['disabled']) ? 'javascript:;' : $value['url'] ?>"><?php echo $value['title'] ?></a></li>
+                            <li <?php if(isset($value['disabled'])) {?> class="disabled" disabled="disabled"<?php }?>><a class="<?php echo (isset($value['class']) ? $value['class'] . ' ' : '')?>" href="<?php echo isset($item['disabled']) ? 'javascript:;' : $value['url'] ?>" target="<?php echo isset($value['target']) ? $value['target'] : '_self' ?>" ><?php echo $value['title'] ?></a></li>
                         <?php endif; ?>
                     <?php } ?>
                 </ul>

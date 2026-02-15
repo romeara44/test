@@ -5,8 +5,8 @@ $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
 $identity = $authService->getIdentity();
 ?>
 				
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.css"></link>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.min.css"></link>
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/2.0.3/js/dataTables.min.js"></script>
 
 <div class="page-title">
     <h1 class="fleft">Training Logs</h1>
@@ -163,8 +163,8 @@ $identity = $authService->getIdentity();
 		$('.attachments').click(function(e) {
 			e.preventDefault();
 			var $this = $(this);
-      var idA = $this.attr('rel');
-      var datx = $('#data_json' + idA).val();
+      		var idA = $this.attr('rel');
+      		var datx = $('#data_json' + idA).val();
 			var dat = datx.replace( /\&amp;/g, '&' );
 			
 			var tr = $(this).closest('tr');

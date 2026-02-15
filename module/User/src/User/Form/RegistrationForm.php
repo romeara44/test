@@ -19,7 +19,7 @@ class RegistrationForm extends Form
                 'type'  => 'text',
             ),
             'options' => array(
-                'label' => 'First name <span class="span-required">*</span>',
+                'label' => 'First Name <span class="span-required">*</span>',
             )
         ));
 

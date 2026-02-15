@@ -156,6 +156,33 @@ class NoteTable implements ServiceLocatorAwareInterface
         return $row;
     }
 
+    public function getNoteByAndItemId($note_item_type, $note_item_id, $note_subitem_id)
+    {
+        $note_item_id  = (int) $note_item_id;
+
+        $select = $this->tableGateway->getSql()->select();
+
+        $select->columns(array('note_id'          => 'note_id',
+                               'note_text'        =>  new \Zend\Db\Sql\Expression('IF(note_encrypted,' . DbCrypt::decryptField('note_text', false) . ', note_text)'),
+                               'note_u_id'        => 'note_u_id',
+                               'note_item_type'   => 'note_item_type',
+                               'note_item_id'     => 'note_item_id',
+                               'note_subitem_id'  => 'note_subitem_id',
+                               'note_active'      => 'note_active',
+                               'note_create_date' => 'note_create_date',
+                               'note_encrypted'   => 'note_encrypted'
+                              )
+                            );
+
+        $select->join(array('u' => 'users'), 'note_u_id = u_id', array('_username' => new \Zend\Db\Sql\Expression('CONCAT(u_firstname, " ", u_lastname)')));
+
+        $select->where('note_item_type = ' . $note_item_type . '&& note_item_id = ' . $note_item_id . '&& note_subitem_id = ' . $note_subitem_id);
+
+        $resultSet = $this->tableGateway->selectWith($select);
+        
+        return $resultSet;
+    }
+
     public function saveNote(Note $note, $files = null, $isCopy = false, $fileName = 'notesFiles', $encrypt = false)
     {
         $authService = new \Zend\Authentication\AuthenticationService();
@@ -368,4 +395,22 @@ class NoteTable implements ServiceLocatorAwareInterface
     {
         $this->tableGateway->update(array('note_active' => 1), array('note_id' => $id));
     }
+
+    public function cloneNote(Note $sourceAuditRecordNote, $savedAuditRecordId, $savedAuditRecordItemId) {
+        $newNote = new Note();
+
+        $newNote->note_text = $sourceAuditRecordNote->note_text;
+        $newNote->note_u_id = $sourceAuditRecordNote->note_u_id;
+        $newNote->note_item_type = $sourceAuditRecordNote->note_item_type;
+        $newNote->note_active = $sourceAuditRecordNote->note_active;
+        $newNote->note_create_date = $sourceAuditRecordNote->note_create_date;
+        $newNote->note_encrypted = $sourceAuditRecordNote->note_encrypted;
+        $newNote->note_item_id = $savedAuditRecordId;  //Audit Record ID
+        $newNote->note_subitem_id = $savedAuditRecordItemId;  //Audit Record Item ID
+
+        $savedAuditNoteId = $this->saveNote($newNote, null, true, '', false);
+
+        return $savedAuditNoteId;
+    }
+
 }

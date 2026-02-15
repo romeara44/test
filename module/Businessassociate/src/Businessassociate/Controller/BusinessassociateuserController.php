@@ -156,7 +156,7 @@ class BusinessassociateuserController extends AbstractActionController
                 return $this->redirect()->toRoute('businessassociateuser', array('controller' => 'businessassociateuser', 'action' => 'questionsform'));
             } else {
                 $ba = $this->getServiceLocator()->get('Businessassociate\Model\BusinessassociateTable')->getBusinessassociateByContactId($identity['u_id']);
-                $checkIfUserAnswered = (int) $this->getBusinessassociateanswerTable()->checkIfAnswersExists($ba->ba_id);
+                $checkIfUserAnswered = (int) $this->getBusinessassociateanswerTable()->checkIfAnswersExists(isset($ba->ba_id) ? $ba->ba_id : 0);
                 if ($checkIfUserAnswered) {
                     $answers = $this->getBusinessassociateanswerTable()->getBaAnswers($ba->ba_id);
                 }
@@ -168,14 +168,14 @@ class BusinessassociateuserController extends AbstractActionController
             $viewModel->setVariable('answers', $answers);
             $viewModel->setTemplate('businessassociate/businessassociateuser/questionsanswers.phtml');
         }*/
-
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Questions form for business associate "' . $ba->ba_id . '"');
+        $test = isset($ba->ba_id) ? $ba->ba_id : 0;
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Questions form for business associate "' . isset($ba->ba_id) ? $ba->ba_id : 0 . '"');     
 
         $viewModel->setVariables(array(
             'questions' => $questions,
             'answers' => $answers,
             'signoff' => isset($ba->ba_status) && ($ba->ba_status == 1) ? 1 : 0,
-            'baId' => $ba->ba_id,
+            'baId' => isset($ba->ba_id) ? $ba->ba_id : 0,
         ));
 
         return $viewModel;

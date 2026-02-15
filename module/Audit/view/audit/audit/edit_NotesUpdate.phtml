@@ -1,0 +1,649 @@
+<?php
+$title = "{$audit_title} Audit";
+$this->headTitle($title);
+?>
+
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+
+<?php
+
+if ($audit_record->audit_record_id == 0):
+    $form = $this->form;
+    $form->prepare();
+
+    // Assuming the "contact/process" route exists...
+    $form->setAttribute('action', '/audit/edit');
+
+    // Set the method attribute for the form
+    $form->setAttribute('method', 'post');
+else:
+    $form->setAttribute('action', $this->url('audit', array('action' => 'edit')));
+    $form->setAttribute('method', 'post');
+    $form->prepare();
+endif;
+
+?>
+
+<link rel="stylesheet" href="/css/auditstyle.css" type="text/css" media="screen" />
+
+<form action="/audit/edit/<?php echo $audit_record->audit_record_id ?>" method="post" enctype="multipart/form-data" name="audit" id="audit">
+
+<p></p>
+
+<div class="fright" style="width: 480px;">
+    <p style="padding: 20px 0 0 190px;">
+        <input type="checkbox" name="checkbox1" id="answeredCheckbox" class="checkbox" value="" />
+        <label for="answeredCheckbox" class="checkbox">Show Only Un-Answered Questions</label>
+    </p>
+</div>
+
+<div class="question_type_group">
+        
+    <p class="labelBold">
+        <?php $fn = $form->get('question_type');
+        echo $this->formLabel($fn);
+        echo $this->formSelect($fn->setAttributes(array('class'=>'form-control', 'id' => 'questionType')));
+        echo $this->formElementErrors($fn);
+        ?>
+    </p>
+        
+</div>
+<br>
+
+<input id="signedoff" type="hidden" name="signedoff" value="0" />
+<input id="saveclose" type="hidden" name="saveclose" value="0" />
+<input id="openremediation" type="hidden" name="openremediation" value="0" />
+<input id="rp_id" type="hidden" name="rp_id" value="<?php echo $audit_record->rp_id ?>" />
+<input id="audit_record_id" type="hidden" name="audit_record_id" value="<?php echo $audit_record->audit_record_id ?>" />
+<input id="audit_status_id" type="hidden" name="audit_status_id" value="<?php echo $audit_record->audit_status_id ?>" />
+
+<?php
+foreach ($this->auditRecordSectionItems as $aris):?>
+<div class="audit_section_group" id="audit_section_group_<?php echo $aris->audit_record_section_id?>" style="display:block">
+    <div class="performance_group" id="remediation_section_<?php echo $aris->audit_record_section_id?>">
+        <div class="performance_title">
+            <?php echo $aris->_key_activity;?>
+        </div>
+
+        <div class="performance_description">
+            <?php echo $aris->_performance_description;?>
+        </div>
+
+        <div class="policy_group" id="policy_group_<?php echo $aris->audit_record_section_id?>">
+            
+            <?php $pp_numbers = explode("; ", $aris->_performance_policy_numbers);?>
+            <?php foreach ($pp_numbers as $item): ?>
+                <label style="color:#b6c1cb"><input type="checkbox" name="<?php echo $aris->audit_record_section_id?>_<?php echo $item ?>" class="<?php echo $aris->audit_record_section_id?>_policy" /><?php echo $item ?></label>
+                <a style="margin-left: 10px;" href="" class="notes" rel="<?php echo 14487 ?>" title="View Notes"><i class="fa fa-file-text-o fa-1"></i></a>
+            <?php endforeach; ?>
+            <button type="submit" onclick="addSelectedPolicies('_<?php echo $aris->audit_record_section_id?>')" id="open_button_<?php echo $aris->audit_record_section_id?>" formaction="/remediationplan/summaryaudit/<?php echo $audit_record->rp_id ?>?audit=<?php echo $audit_record->audit_record_id ?>" class="form-button">Open</button>
+        </div>
+        
+        <tr class="expandable" id="notes<?php echo 14487 ?>">
+            <?php $colspan = 2; ?>
+            <?php foreach ($aris->_performance_notes as $notesTask): ?>
+                <td colspan="<?php echo $colspan ?>">                            
+                    <?php if (is_object($notesTask)): ?>
+                        <div>
+                            <div><strong><?php echo 'test' ?>:</strong></div>
+                            <div>
+                                <?php //$notesTask->buffer() ?>
+                                <?php //foreach ($notesTask as $note): ?>
+                                    <?php //if ($note->note_text != ''): ?>
+                                        <div>
+                                            <?php echo $notesTask->note_text ?>
+                                        </div>
+                                    <?php //endif; ?>
+                                <?php //endforeach; ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </td>
+                <?php //$colspan = 2; ?>
+            <?php endforeach; ?>
+        </tr>
+
+    </div>    
+
+    
+
+    <div class="audit_groups" id="audit_groups_<?php echo $aris->audit_record_section_id?>">
+    <?php foreach ($aris->_audit_items as $key => $ari): ?>
+        <div class="audit_group">
+            <div>
+                
+                <div class="audit_inquiry"><?php echo $ari->_inquiry_description?></div>
+                
+                <div class="status">
+                    <?php if ($ari->item_status_id == "1"): ?>
+                        <label><input type="radio" name="status[<?php echo $ari->audit_record_item_id;?>]" value="1" checked>Pass</label><br>
+                    <?php else: ?>
+                        <label><input type="radio" name="status[<?php echo $ari->audit_record_item_id;?>]" value="1">Pass</label><br>
+                    <?php endif; ?>
+
+                    <?php if ($ari->item_status_id == "2"): ?>
+                        <label><input type="radio" name="status[<?php echo $ari->audit_record_item_id;?>]" value="2" checked>Fail</label><br>
+                    <?php else: ?>
+                        <label><input type="radio" name="status[<?php echo $ari->audit_record_item_id;?>]" value="2">Fail</label><br>
+                    <?php endif; ?>
+
+                </div>
+
+                <div class="comment_group">
+                    <strong style="line-height: 30px;">Notes</strong><br />
+                    <textarea rows="2" cols="20" name="notes[<?php echo $ari->audit_record_item_id ?>]" id="notes[<?php echo $ari->audit_record_item_id ?>]" oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"' placeholder="Notes" ></textarea>
+                    <p style="border: 0;">
+                        <strong style="line-height: 30px;">Attachments</strong><br />
+                        <?php if (!$this->isClosed): ?>
+                            <a rel="<?php echo $ari->audit_record_item_id ?>" href="javascript:" class="browseFile button"><i class="fa fa-plus-circle"></i> Browse Files...</a>
+                        <?php endif; ?>
+                    </p>
+                    <div class="cboth"></div>
+                    <div id="filesToUploadBox<?php echo $ari->audit_record_item_id ?>"></div>
+
+                    <?php if (isset($ari->_notes) && ($ari->_notes->count())): ?>
+                        <?php foreach ($ari->_notes as $note): ?>
+                            <div class="note">
+                                <strong><?php echo $note->_username ?></strong> <small> on <?php echo $note->_note_create_date_format ?></small><br />
+                                <p>
+                                    <?php echo $note->note_text ?><br />
+                                    <?php if ($note->_files != ''): ?>
+                                        <?php
+                                            $_files = explode(',', $note->_files);
+                                        ?>
+                                        <strong>Attachments:</strong><br />
+                                        <?php foreach ($_files as $_file): ?>
+                                            <?php
+                                                $_file = explode('::', $_file);
+                                                $_fileName = $_file[0];
+                                                $_fileId = $_file[1];
+                                            ?>
+                                            <span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </p>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+
+                    
+                </div>
+
+            </div>
+        </div>
+    <?php endforeach; ?>
+    </div>
+</div>
+<br>
+<?php endforeach; ?>
+</div>
+
+<div class="signoff_group1" >
+    <h2>Sign off</h2>
+
+    <?php if ($isSignedOffError == "1"): ?>
+        <h3 style="color:red;" class="signOffErrorText">Unanswered Questions Still Exist, Signoff Cannot Occur</h3>
+    <?php else: ?>
+        <h3 style="color:red; display:none;" class="signOffErrorText">Unanswered Questions Still Exist, Signoff Cannot Occur</h3>
+    <?php endif; ?>
+
+    <div class="cboth"></div>
+
+    <p style="border: 0;"><label style="width:195px"><strong>Reviewed and approved by</strong></label>
+        <select name="audit_review_approve_u_id" id="audit_reviewed_approved_u_id" id="" class="w175 valid_input form-control required">
+            <option value="">Please Select</option>
+            <option value="">---</option>
+            <?php foreach ($this->reviewApprove as $contact): ?>
+                <option <?php echo $selectedReviewedId == $contact['u_id'] ? 'SELECTED' : '' ?> value="<?php echo $contact['u_id'] ?>"><?php echo $contact['u_name'] ?></option>
+            <?php endforeach; ?>
+        </select>
+    </p>
+
+    <p style="border: 0;"><label>Initials</label>
+        <input type="text" name="audit_review_approve_initial" class="valid_input form-control required" id="audit_review_approve_initial" value="<?php echo $this->audit_record->reviewed_initials ?>" />
+    </p>
+
+    <p style="border: 0;">
+        <label>Date: 
+        <input type="text" name="audit_review_approve_date" readonly="readonly" class="valid_input form-control required" id="audit_review_approve_date" value="<?php echo ($this->audit_record->reviewed_date != '0000-00-00' || $this->audit_record->reviewed_date != '') ? $this->audit_record->reviewed_date : ''?>"></label>
+    </p>
+
+    <div class="cboth"></div>
+
+    <p style="border: 0;"><label style="width:195px"><strong>Auditor approved by</strong></label>
+        <select name="auditor_approve_u_id" id="auditor_approve_u_id" id="" class="w175 valid_input form-control required">
+            <option value="">Please Select</option>
+            <option value="">---</option>
+            <?php foreach ($this->auditorApprove as $contact): ?>
+                <option <?php echo $selectedAuditorApprovedId == $contact['u_id'] ? 'SELECTED' : '' ?> value="<?php echo $contact['u_id'] ?>"><?php echo $contact['u_name'] ?></option>
+            <?php endforeach; ?>
+        </select>
+    </p>
+
+    <p style="border: 0;">
+        <label>Initials</label>
+        <input type="text" name="auditor_approve_initial" class="valid_input form-control required" id="auditor_approve_initial" value="<?php echo $this->audit_record->auditor_approve_initials ?>" />
+    </p>
+
+    <p style="border: 0;">
+        <label>Date: </label>
+        <input type="text" name="auditor_approve_date" readonly="readonly" class="valid_input form-control required" id="auditor_approve_date" value="<?php echo ($this->audit_record->auditor_approve_date != '0000-00-00' || $this->audit_record->auditor_approve_date != '') ? $this->audit_record->auditor_approve_date : ''?>">
+    </p>
+</div>
+
+
+
+
+<div class="cboth"></div>
+
+<div class="form-buttons">
+    <?php if((int)$audit_record->audit_status_id !== 6): ?>
+        
+        <input type="submit" id="save" value="Save" class="form-button" />
+        <input type="button" id="save_and_close_button" value="Save and Close" class="form-button" />
+        <input type="button" id="signedoff_button" value="Sign-off and Close" class="form-button" />
+        <div class="fleft">or</div>
+    <?php endif; ?>
+    
+    <a href="/audit/list" class="cancel">Cancel</a>
+</div>
+
+</form>
+
+<script type="text/javascript">
+    var isChanged = false;
+    var isSubmit = false;
+
+    function addSelectedPolicies(inputValue) {
+        
+        let policyCheckboxes = null;
+        let pol = '';
+    
+        policyCheckboxes = document.querySelectorAll('#policy_group' + inputValue + ' input[type="checkbox"]:checked');
+        
+        for (var i = 0; i < policyCheckboxes.length; i++) {
+            var currentPolicyCheckbox = policyCheckboxes[i];
+            var str = currentPolicyCheckbox.name;
+            var pos = str.indexOf("_");          
+            var substringValue = str.substring(pos + 1, str.length);
+            
+            pol += substringValue + '; ';
+        }
+        
+        let inputPolicies = document.createElement("input");
+        inputPolicies.setAttribute("type", "hidden");
+        inputPolicies.setAttribute("name", "policies");
+        inputPolicies.setAttribute("value", pol);
+    
+        document.querySelector('#audit').appendChild(inputPolicies);
+        
+    }
+    
+    
+
+    jQuery(document).ready(function() {
+        $('section_status').change(function(){
+            $('#' + status[157]).prop('checked',true);
+        })
+                
+        $('#questionType').change(function(){
+            audit.submit();
+        });
+        
+        $(function() {
+
+            $('input[type="radio"]').change(function() {
+
+                let audit_status_id = document.querySelector('#audit_status_id').value;
+                
+                if (audit_status_id != 6){
+                    var tempArray1 = [<?php echo json_encode($ari->_notes); ?>];
+                
+                    $.ajax({
+                        type:"POST",
+                        //url: '/audit/saveItemStatus/',
+                        url: '/audit/saveItemStatus',//this.url,
+                        data: {value: this.name + '|' + $(this).val(), files: tempArray1},//$(this).serialize(), // get all form field value in serialize form
+                        success: function(){
+                        $("#show_message").fadeIn();
+                        //$("#ajax-form").fadeOut();
+                        }
+                    });
+                }
+
+            });
+            
+        });
+
+        $('#answeredCheckbox').click(function() {
+            var divs = document.querySelectorAll('.audit_section_group'), i;
+
+            if ($(this).is(':checked')) {
+                HideAsweredQuestions.call(this, divs);
+
+            } else {
+                ShowAllQuestions.call(this, divs);
+            }
+        });
+        
+        
+        function ShowAllQuestions(divs){
+            for (i = 0; i < divs.length; ++i) {
+                divs[i].style.display = "";
+            }
+        }
+        
+        function HideAsweredQuestions(divs) {
+            
+            for (i = 0; i < divs.length; ++i) {
+                    let auditgroups = divs[i].children[1].children;
+                    let audit_record_item_counter = 0;
+                    let item_checked_counter = 0;
+
+                    for (const auditgroup of auditgroups) {
+                        audit_record_item_counter++;
+                       
+                        let rbs1 = auditgroup.querySelectorAll('input');
+                        let statuschecked = false;
+
+                        //Loop through all item status radio buttons, to see if one radio button is checked, if it is checked, add to the counter.
+                        for (const rb of rbs1) {
+                            if (statuschecked == true){
+                                break;
+                            }
+
+                            if (rb.checked) {
+                                statuschecked = true;                             
+                                break;
+                            }
+                        }
+
+                        if (statuschecked == true){                            
+                            item_checked_counter++;
+                        }
+                    }
+                    
+                    //if total item count and item checked count are equal, then all items have either a Pass, Fail, or Substitue checkbox checked so the group can be hidden.
+                    if (audit_record_item_counter == item_checked_counter){
+                        divs[i].style.display = "none";
+                    }
+                    else {
+                        divs[i].style.display = "";
+                    }
+                }
+        }
+
+        $( "#audit_review_approve_date, #auditor_approve_date" ).datepicker({dateFormat: 'mm/dd/yy'});
+
+        $("#save_and_close_button").click(function(){
+            isChanged = false;
+
+            $('#saveclose').val(1);
+            audit.submit();
+        });
+
+        $('#signedoff_button').click(function() {
+            
+            let unansweredQuestion = 0;
+            
+            //Access the array elements 
+            var tempArray = [<?php echo json_encode($this->auditRecordSectionItems); ?>];
+            
+            tempArrayA = tempArray[0];
+            // Display the array elements 
+            for(var i = 0; i < tempArrayA.length; i++){ 
+                
+                let aItems = tempArrayA[i]._audit_items;
+                
+                for ( let j = 0; j < aItems.length; j++){
+                    
+                    if (aItems[j].item_status_id == 4)
+                    unansweredQuestion++;
+                }
+                
+            }
+            
+            if (unansweredQuestion < 1) {
+                document.querySelectorAll(".signOffErrorText")[0].style.display = 'none';
+                isChanged = false;
+                $('#signedoff').val(1);
+                audit.submit();
+            }
+            else {
+                document.querySelectorAll(".signOffErrorText")[0].style.display = '';
+                
+                document.getElementById("answeredCheckbox").checked = true;
+                var divs = document.querySelectorAll('.audit_section_group'), i;
+                HideAsweredQuestions.call(this, divs);
+            }
+
+        });
+    
+        $('#saveAndContinue').click(function() {
+            isChanged = false;
+            
+            document.getElementById("rp_id").value = "<?php echo $audit_record->rp_id ?>";
+            //document.getElementById("policies").value = ;
+    
+            document.getElementById('policyForm').submit();
+            
+            
+        });
+
+        var browseFilesCounter = new Object();
+        $('.browseFile').click(function() {
+            var aqId = $(this).attr('rel');
+
+            if (browseFilesCounter[aqId] == undefined) {
+                browseFilesCounter[aqId] = 1;
+            } else {
+                browseFilesCounter[aqId]++;
+            }
+            $('#filesToUploadBox' + aqId).append('<input type="file" name="notesFiles[' + aqId + '][]" id="file' + aqId + '_' + browseFilesCounter[aqId] + '" />');
+
+            $('#file' + aqId + '_' + browseFilesCounter[aqId]).unbind('click');
+
+            $('#file' + aqId + '_' + browseFilesCounter[aqId]).click(function() {
+                //resetActivity();
+            })
+
+        });
+
+        // $('textarea').on('change',function(){
+        //     isChanged = true;
+        // });
+        
+        // window.addEventListener('beforeunload', function (e) {
+        //     console.log('ischange value = ' + isChanged);
+        // });
+
+        // window.onbeforeunload = function (e) {
+        //     let elements = document.querySelectorAll('input[type="file"]');
+        //     alert('IM in the onbefore event');
+        //     if (t === undefined) {
+        //         return 'Undefined value!';
+        //     }
+
+        //     //if(elements.length > 0) {
+        //         return 'It looks like you have been editing something. '
+        //                     + 'If you leave before saving, your changes will be lost.';
+        //     //}
+
+        //     // and
+
+        //     if(elements.length === 0) {
+        //         return "you don't have elements";
+                
+        //     }
+
+        //     //if (isset(x)) {
+        //     //if (isChanged && (!isSubmit)) {
+        //         //return 'It looks like you have been editing something. '
+        //         //            + 'If you leave before saving, your changes will be lost.';
+        //     //}
+        //     //else {
+        //         console.log(x);
+        //     //}
+        // };
+        // ///////////////////////////////////////////
+        // window.addEventListener('beforeunload', function (e) {
+        //     console.log('Calling the following; delete e[returnValue];')
+        //     //delete e['returnValue'];
+        //     let elements = document.querySelectorAll('input[type="file"]');
+
+        //     //if (((elements === undefined) || (elements.length === 0)) && isChanged == false ) {
+        //     if (isChanged == false ) {
+        //         console.log('isChanged = false')
+        //         delete e['returnValue'];
+        //     }
+        //     else {
+        //         // Cancel the event
+        //         e.preventDefault(); // If you prevent default behavior in Mozilla Firefox prompt will always be shown
+        //         // Chrome requires returnValue to be set
+        //         e.returnValue = '';
+        //     }
+
+        // });
+        // ///////////////////////////////////////////
+        // ////////////////////////////////////////// TRYING THIS CODE
+        'use strict';
+        (() => {
+                const modified_inputs = new Set();
+                const defaultValue = 'defaultValue';
+                // store default values
+                addEventListener('beforeinput', evt => {
+                const target = evt.target;
+                if (!(defaultValue in target.dataset)) {
+                    target.dataset[defaultValue] = ('' + (target.value || target.textContent)).trim();
+                }
+            });
+
+            // detect input modifications
+            addEventListener('input', evt => {
+                const target = evt.target;
+                let original = target.dataset[defaultValue];
+
+                let current = ('' + (target.value || target.textContent)).trim();
+
+                if (original !== current) {
+                    if (!modified_inputs.has(target)) {
+                    modified_inputs.add(target);
+                    }
+                } else if (modified_inputs.has(target)) {
+                    modified_inputs.delete(target);
+                }
+            });
+
+            addEventListener('saved', function(e) {
+                    console.log('Saved modified_inputs: '. modified_inputs);
+                    modified_inputs.clear()
+                },
+                false
+            );
+
+            addEventListener('beforeunload', evt => {
+                if (modified_inputs.size && isChanged) {
+                    const unsaved_changes_warning = 'Changes you made may not be saved.';
+                    evt.returnValue = unsaved_changes_warning;
+                    return unsaved_changes_warning;
+                }
+            });
+
+            //////////////////////////////////////
+            // var area = container.querySelector('textarea');
+            // if (area.addEventListener) {
+            //     area.addEventListener('input', function() {
+            //         // event handling code for sane browsers
+            //         console.log('textarea modified in input section');
+            //     }, false);
+            // } else if (area.attachEvent) {
+            //     area.attachEvent('onpropertychange', function() {
+            //         // IE-specific event handling code
+            //         console.log('textarea modified in input section');
+            //     });
+            // }
+            var area = document.querySelector('textarea');
+            if (area.addEventListener) {
+                area.addEventListener('change', function() {
+                    console.log('onchange textarea modified in input section');
+                }, false);
+            }
+            else if (area.attachEvent) {
+                area.attachEvent('onpropertychange', function() {
+                // IE-specific event handling code
+                console.log('property textarea modified in input section');
+                });
+            }
+
+        })();
+        // ////////////////////////////////////////// TRYING THIS CODE
+        // window.addEventListener('beforeunload', function (e) {
+        //     // the absence of a returnValue property on the event will guarantee the browser unload happens
+        //     delete e['returnValue'];
+        // });
+
+        // $('#save').click(function () {
+        //     isSubmit = true;
+        // });
+
+        // $('#save_and_close_button').click(function () {
+        //     isSubmit = true;
+        // });
+
+        // $('#signedoff_button').click(function () {
+        //     isSubmit = true;
+        // });
+
+        // $('.onchange').change(function () {
+        //     isChanged = true;
+        //     console.log('isChange' + isChanged);
+        // });
+        // (document.querySelector(".comment_group > textarea").value).onchange = function (e) {
+        // // some things
+        //     alert("Changed to " + this.value);
+        // }
+
+        //document.querySelector(".comment_group > > textarea").value = "foo";
+        // $(document.querySelector(".comment_group > textarea")).change(function () {
+        //     console.log('Text area change');
+        //     console.log(isChanged);
+        //     isChanged = true;
+        // });
+
+        //const textArea = document.getElementById('my_text_area');
+        // const textArea = document.querySelector(".comment_group > textarea");
+        // textArea.addEventListener('input', () => {
+        //     // var textLn =  textArea.value.length;
+        //     // if(textLn >= 100) {
+        //     //     textArea.style.fontSize = '10pt';
+        //     // }
+        //     console.log('Text area change');
+        //     console.log(isChanged);
+        //     isChanged = true;
+        // });
+        // function changeRecs() {
+        //     alert('has changed in mehtod Chloe');
+        // }
+
+        $('.comment_group > textarea').on('input selectionchange propertychange', function() {
+
+            isChanged = true;
+        });
+
+        $('#audit').submit(function() {
+            console.log("submit");
+            isChanged = false;
+        });
+
+        $('#sign-off-btn-no').click(function() {
+            jQuery.fancybox.close();
+            $('#requestreview').val('');
+            $('#signedoff_clone').val('');
+            $('#signedoff').val(1);
+            $('.valid_input').addClass('required');
+            $('#formNote').submit();
+        });
+        
+    });
+</script>

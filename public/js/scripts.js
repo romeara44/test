@@ -3,9 +3,9 @@ var heightWhiteBlock = function(){
         $('#canvas').css('min-height', window.innerHeight - $('#header-wrap').outerHeight() - $('#footer-wrap').outerHeight());
 
 
-        console.log(window.innerHeight);
-        console.log($('#header-wrap').outerHeight());
-        console.log($('#footer-wrap').outerHeight());
+        //console.log(window.innerHeight);
+        //console.log($('#header-wrap').outerHeight());
+        //console.log($('#footer-wrap').outerHeight());
     }
 };
 

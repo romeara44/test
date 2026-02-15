@@ -253,12 +253,12 @@ class CompanyController extends AbstractActionController
                     $companyId = $this->getCompanyTable()->saveCompany($company);
                     $this->getCompanyTable()->saveAddresses($companyId, $post);
 
-                    $this->flashMessenger()->addSuccessMessage('Company saved');
+                    $this->flashMessenger()->addSuccessMessage('Organization saved');
 
                     if ($id) {
-                        $this->getLogTable()->saveUserFileLog('Update company "' . $companyId . '"');
+                        $this->getLogTable()->saveUserFileLog('Update organization "' . $companyId . '"');
                     } else {
-                        $this->getLogTable()->saveUserFileLog('Add new company "' . $companyId . '"');
+                        $this->getLogTable()->saveUserFileLog('Add new organization "' . $companyId . '"');
                     }
 
                     if(isset($post['save_continue'])) {
@@ -315,7 +315,7 @@ class CompanyController extends AbstractActionController
 
         //if($identity['u_company_id'] != $id) {
             $this->getCompanyTable()->deleteCompany($id);
-            $this->flashMessenger()->addSuccessMessage('Company has been deleted');
+            $this->flashMessenger()->addSuccessMessage('Organization has been deleted');
         //}
 
         $this->getLogTable()->saveUserFileLog('Delete company "' . $id . '"');

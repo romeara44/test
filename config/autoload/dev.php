@@ -20,6 +20,7 @@ return array(
         'user'           => 'root',
         'password'       => 'Orriginalp1zza',
         'driver_options' => array(
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
         ),
     ),

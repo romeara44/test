@@ -1,0 +1,870 @@
+<?php
+
+$request = new \Zend\Http\PhpEnvironment\Request();
+$http_referer = $request->getServer('HTTP_REFERER');
+$parsed = parse_url($http_referer, PHP_URL_PATH); //dashboard/client
+$disable = true;
+
+// within a view script
+$form = $this->form;
+$form->prepare();
+
+// Assuming the "contact/process" route exists...
+$form->setAttribute('action', '/organization/edit');
+
+// Set the method attribute for the form
+$form->setAttribute('method', 'post');
+
+// Render the opening tag
+?>
+
+<style>
+      
+      article {
+        width: 150px;
+        margin: 5px;
+      }
+
+      section {
+        display: flex;
+        padding: 5px;
+    }
+ 
+</style>
+
+<script src="https://kit.fontawesome.com/e1b4bd3382.js" crossorigin="anonymous"></script>
+
+<div class="page-title">
+    <h1 class="fleft"><?php if ($this->cId): ?>Organization Details<?php else: ?>Add New Organization<?php endif; ?></h1>
+    <?php if($roleId != \Admin\Model\User::ROLE_TRIAL) : ?>
+    <a href="/contact/edit/company/<?php echo $this->cId ?>" class="button"><i class="fa fa-plus-circle"></i> Add New Contact</a>
+    <?php endif; ?>
+    <?php if ($this->cId): ?>
+        <ul id="tabs-nav">
+            <li><a href="#tab1">Details</a></li>
+            <li><a href="#tab2">Notes</a></li>
+            <li><a <?php if($roleId == \Admin\Model\User::ROLE_PARTIAL){ ?>class="disabled"<?php }?> href="#tab3">Roles</a></li>
+            <?php if($administrationAccess): ?>
+                <li><a id="tab4Link" href="#tab4">Administration</a></li>
+            <?php endif; ?>
+        </ul>
+        <div class="cboth"></div>
+    <?php endif; ?>
+
+    <div class="cboth"></div>
+
+</div>
+
+<p></p>
+
+<div class="col-left">
+    <div id="tab1">
+        <form action="/organization/edit/<?php echo $this->cId ?>" method="post" name="company" id="company">
+            <input type="hidden" id="sourceWindow" name="sourceWindow" value="<?php echo $parsed ?>">
+            <?php
+                $fn = $form->get('c_id');
+                echo $this->formHidden($fn);
+            ?>
+
+            <?php if (in_array($this->roleId, array(\Admin\Model\User::ROLE_SALES_REP, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_ADMIN))): ?>
+                <p>
+                    <?php $fn = $form->get('c_rel_type');
+                    echo $this->formLabel($fn);
+                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control', 'id' => 'c_rel_type')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p id="c_rel_type_1">
+                    <?php $fn = $form->get('c_parent_type');
+                    echo $this->formLabel($fn);
+                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p id="c_rel_type_2">
+                    <?php $fn = $form->get('c_child_type');
+                    echo $this->formLabel($fn);
+                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p id="c_parent_c_id">
+                    <?php $fn = $form->get('c_parent_c_id');
+                    echo $this->formLabel($fn);
+                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p id="c_child_c_ids">
+                    <?php $fn = $form->get('_c_child_c_ids');
+                    echo $this->formLabel($fn);
+                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+            <?php endif; ?>
+
+            <?php if (in_array($this->roleId, array(\Admin\Model\User::ROLE_SALES_REP, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_ADMIN))): ?>
+                <p>
+                    <?php $fn = $form->get('_c_cur_consultants');
+                    echo $this->formLabel($fn);
+                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+            <?php endif; ?>
+            <?php if (in_array($this->roleId, array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_PARTIAL, \Admin\Model\User::ROLE_CONSULTANT, $this->roleId == \Admin\Model\User::ROLE_CLIENT && $administrationAccess ))): ?>
+                <p>
+                    <?php
+                    if (in_array($this->roleId, array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_PARTIAL))) {
+                        $fn = $form->get('company_type_id');
+                        echo $this->formLabel($fn);
+                        echo $this->formSelect($fn->setAttributes(array('class' => 'form-control')));
+                        echo $this->formElementErrors($fn);
+
+                    }
+                    else {
+                        $fn = $form->get('company_type_id');
+                        echo $this->formHidden($fn);
+                    }
+                    ?>
+                </p>
+            <?php endif; ?>
+
+            <?php if (in_array($this->roleId, array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_SENIOR_CONSULTANT ))): ?>
+                <p>
+                    <?php
+                    if (in_array($this->roleId, array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_SENIOR_CONSULTANT))) {
+                        $fn = $form->get('hipaa_suite_type_id');
+                        echo $this->formLabel($fn);
+                        echo $this->formSelect($fn->setAttributes(array('class' => 'form-control')));
+                        echo $this->formElementErrors($fn);
+
+                    }
+                    else {
+                        $fn = $form->get('hipaa_suite_type_id');
+                        echo $this->formHidden($fn);
+                    }
+                    ?>
+                </p>
+            <?php endif; ?>
+
+            <?php if (in_array($this->roleId, array(\Admin\Model\User::ROLE_SALES_REP, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_ADMIN))): ?>
+                <?php if($this->roleId == \Admin\Model\User::ROLE_ADMIN && $checkHasPartial):?>
+                    <p style="border: 0" id="activatePartialUsersWrap">
+                        <a id="activatePartialUsers" href="javascript:" class="button"><i class="fa"></i>Activate Partial Users</a>
+                    </p>
+                <?php endif;?>
+                <h2>Organization Information</h2>
+            <?php endif; ?>
+
+            <p>
+                <?php
+                $fn = $form->get('c_name');
+                echo $this->formLabel($fn);
+
+                if (in_array($this->roleId, array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_PARTIAL))) {
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'enabled'=> 'enabled')));
+                }
+                else {
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'disabled'=> 'disabled')));
+                }
+
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('c_phone');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('c_other_phone');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('c_fax');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('c_email');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('c_website');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+
+            <?php //if($this->roleId == \Admin\Model\User::ROLE_ADMIN && $checkHasPartial):?>
+            <?php if (in_array($this->roleId, array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_SENIOR_CONSULTANT))): ?>
+                <?php $disable = false; ?>
+            <?php endif; ?>
+
+            <section class="col-left">
+                <p>
+                    <article>
+                        <label>Purchased</label>
+                        <input type="text" name="licensed_user"  <?php echo $disable ? "disabled" : "" ?> class="valid_input form-control" id="purchasedLicenses" value=<?php echo $purchasedLicense ?> />
+                    </article>
+
+                    <article>
+                        <label>Used</label>
+                        <input type="text" name="license_used" disabled="disabled" class="valid_input form-control" id="usedLicenses" value=<?php echo $usedLicense ?> />
+                    </article>
+
+                    <article>
+                        <label>Available</label>
+                        <input type="text" name="license_available" disabled="disabled" class="valid_input form-control" id="availableLicenses" value=<?php echo $purchasedLicense - $this->usedLicense ?> />
+                        
+                    </article>
+                </p>
+                
+            </section>
+
+            <section>
+                <p style="padding: 2px 0 12px 0; line-height: 14px; border-top: 0;">
+                    <legend style="padding-bottom: 5px">Sub Type</legend> 
+                    <input type="checkbox" name="is_training_sub_type" <?php if(is_object($companyObj) && $companyObj->is_training_sub_type) :?>checked="checked"<?php endif; ?> id="hipaaSubType" class="checkbox" value="1" />
+                    <label for="primaryContact" class="checkbox">Training</label>
+
+                    <input type="checkbox" name="is_oig_express_sub_type" <?php if(is_object($companyObj) && $companyObj->is_oig_express_sub_type) :?>checked="checked"<?php endif; ?> id="hipaaSubType" class="checkbox" value="1" />
+                    <label for="primaryContact" class="checkbox">OIG Express</label>
+
+                    <input type="checkbox" name="is_osha_express_sub_type" <?php if(is_object($companyObj) && $companyObj->is_osha_express_sub_type) :?>checked="checked"<?php endif; ?> id="hipaaSubType" class="checkbox" value="1" />
+                    <label for="primaryContact" class="checkbox">OSHA Express</label>
+                    
+                </p>
+            </section>
+            
+
+            <?php if ($this->roleId == \Admin\Model\User::ROLE_ADMIN && $ownerContact && in_array($ownerContact->u_role_id, array(\Admin\Model\User::ROLE_CLIENT, \Admin\Model\User::ROLE_PARTIAL))): ?>
+                <p>
+                    <?php
+                    $fn = $form->get('c_users_limit');
+                    echo $this->formLabel($fn);
+                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+            <?php endif; ?>
+
+            <?php if ($this->cId): ?>
+                <?php $counter = 1;
+
+                foreach ($this->addresses as $address): ?>
+                    <h2>
+                        <?php if ($counter == 1): ?>
+                            Primary Location
+                        <?php else: ?>
+                            Location #<?php echo $counter ?> <a class="i-delete" href="/organization/deleteaddress/<?php echo $this->cId ?>/adrId/<?php echo $address->adr_id ?>"><i class="fa fa-trash-o"></i></a>
+                        <?php endif; ?>
+                    </h2>
+                    <div class="tooltip">
+                        <i class="fas fa-info-circle"></i><span class="tooltiptext">Identifies the location(s) that will be shown on the risk assessment and remediation plans.</span>
+                    </div>
+                    
+                    <div id="<?php echo ($counter == 1) ? 'location' : '' ?>">
+                        <p>
+                            <label for="exists_department[<?php echo $address->adr_id ?>]">Department</label>
+                            <input type="text" value="<?php echo $address->department ?>" class="form-control" name="exists_department[<?php echo $address->adr_id ?>]">
+                        </p>
+                        <p>
+                            <label for="exists_adr_name[<?php echo $address->adr_id ?>]">Name</label>
+                            <input type="text" value="<?php echo $address->adr_name ?>" class="form-control" name="exists_adr_name[<?php echo $address->adr_id ?>]">
+                        </p>
+                        <p>
+                            <label for="exists_adr_address1[<?php echo $address->adr_id ?>]">Address 1</label>
+                            <input type="text" value="<?php echo $address->adr_address1 ?>" class="form-control" name="exists_adr_address1[<?php echo $address->adr_id ?>]">
+                        </p>
+
+                        <p>
+                            <label for="exists_adr_address2[<?php echo $address->adr_id ?>]">Address 2</label>
+                            <input type="text" value="<?php echo $address->adr_address2 ?>" class="form-control" name="exists_adr_address2[<?php echo $address->adr_id ?>]">
+                        </p>
+
+                        <p>
+                            <label for="exists_adr_city[<?php echo $address->adr_id ?>]">City</label>
+                            <input type="text" value="<?php echo $address->adr_city ?>" class="form-control" name="exists_adr_city[<?php echo $address->adr_id ?>]">
+                        </p>
+
+                        <p>
+                            <?php $fn = $form->get('adr_state_id[]');
+                            $fn->setValue($address->adr_state_id);
+                            $fn->setName('exists_adr_state_id[' . $address->adr_id .']');
+                            echo $this->formLabel($fn);
+                            echo $this->formSelect($fn->setAttributes(array('class'=>'form-control'))); ?>
+                        </p>
+
+                        <p>
+                            <label for="exists_adr_zip[<?php echo $address->adr_id ?>]">ZIP Code</label>
+                            <input type="text" value="<?php echo $address->adr_zip ?>" class="form-control" name="exists_adr_zip[<?php echo $address->adr_id ?>]">
+                        </p>
+                    </div>
+                <?php $counter++; endforeach; ?>
+            <?php endif; ?>
+
+            <?php if (!$this->cId || !count($this->addresses)): ?>
+                <h2>Primary Location</h2>
+                <div id="location">
+                    <p>
+                        <?php
+                        $fn = $form->get('department[]');
+                        echo $this->formLabel($fn);
+                        echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                        echo $this->formElementErrors($fn);
+                        ?>
+                    </p>    
+                    <p>
+                        <?php
+                        $fn = $form->get('adr_name[]');
+                        echo $this->formLabel($fn);
+                        echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                        echo $this->formElementErrors($fn);
+                        ?>
+                    </p>
+                    <p>
+                        <?php
+                        $fn = $form->get('adr_address1[]');
+                        echo $this->formLabel($fn);
+                        echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                        echo $this->formElementErrors($fn);
+                        ?>
+                    </p>
+                    <p>
+                        <?php
+                        $fn = $form->get('adr_address2[]');
+                        echo $this->formLabel($fn);
+                        echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                        echo $this->formElementErrors($fn);
+                        ?>
+                    </p>
+                    <p>
+                        <?php
+                        $fn = $form->get('adr_city[]');
+                        echo $this->formLabel($fn);
+                        echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                        echo $this->formElementErrors($fn);
+                        ?>
+                    </p>
+                    <p>
+                        <?php $fn = $form->get('adr_state_id[]');
+                        echo $this->formLabel($fn);
+                        echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                        echo $this->formElementErrors($fn);
+                        ?>
+                    </p>
+                    <p>
+                        <?php
+                        $fn = $form->get('adr_zip[]');
+                        echo $this->formLabel($fn);
+                        echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                        echo $this->formElementErrors($fn);
+                        ?>
+                    </p>
+                </div>
+            <?php endif; ?>
+
+            <?php if (in_array($this->roleId, array( \Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_PARTIAL, \Admin\Model\User::ROLE_CONSULTANT, $this->roleId == \Admin\Model\User::ROLE_CLIENT && $administrationAccess ))): ?>
+                <div class="cboth"></div>
+                <div class="form-buttons">
+                    <a id="addLocationButton" href="javascript:" onclick="return addLocation()" class="button"><i class="fa fa-plus-circle"></i> Add Additional Location</a>
+                    <a id="addDepartmentButton" href="javascript:" onclick="return addLocation()" class="button"><i class="fa fa-plus-circle"></i> Add Additional Department</a>
+                </div>
+                
+            <?php endif; ?>
+
+            <div class="cboth"></div>
+            <div class="form-buttons">
+                <?php if ($this->roleId != \Admin\Model\User::ROLE_TRIAL): ?>
+                    <input id="save" type="submit" name="save" value="Save" class="form-button" />
+                    <input id="saveAndContinue" type="submit" name="save_continue" value="Save and Continue" class="form-button" />
+                    <div class="fleft">or</div>
+                    
+                <?php endif;?>
+
+                <?php if($parsed == '/dashboard/client'): ?>
+                    <a href="/dashboard/client" class="cancel">Cancel</a>
+                <?php else: ?>
+                    <a href="/organization/list" class="cancel">Cancel</a>
+                <?php endif; ?>
+
+            </div>
+        <?php echo $this->form()->closeTag() ?>
+    </div>
+
+    <?php if ($this->cId): ?>
+        <div id="tab2">
+            
+            <div>
+                <div class="tooltip">
+                    <i class="fas fa-info-circle"></i><span class="tooltiptext">This is a free text field where you can add any notes about the company.  Notes in this field should pertain to the organization as a whole. Note fields will be available throughout the whole system so your notes can be segregated for specific purposes.</span>
+                </div>
+                <h3>Add a note about this Organization</h3>
+            </div>
+
+            <form action="/organization/edit/<?php echo $this->cId ?>" name="" id="" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="noteform" value="1" />
+
+                <?php
+                $fn = $formNote->get('note_id');
+                echo $this->formHidden($fn);
+                ?>
+
+                <?php
+                $fn = $formNote->get('note_item_type');
+                $fn->setValue(1);
+                echo $this->formHidden($fn);
+                ?>
+
+                <?php
+                $fn = $formNote->get('note_item_id');
+                $fn->setValue($this->cId);
+                echo $this->formHidden($fn);
+                ?>
+
+                <p>
+                    <?php
+                    $fn = $formNote->get('note_text');
+                    echo $this->formTextarea($fn->setAttributes(array('class' => 'double')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+
+                <div class="tooltip">
+                    <p style="border: 0;">
+                        <i class="fas fa-info-circle"></i><span class="tooltiptext">Attachment fields will be available throughout the whole system so segregate your attachments for specific purposes.  These attachments should be about the organization as a whole.</span>
+                        <strong style="line-height: 30px;">Attachments</strong><br />
+                        <a id="browseFile" href="javascript:" class="button"><i class="fa fa-plus-circle"></i> Browse Files...</a>
+                    </p>
+                </div>
+               
+
+                <div class="cboth"></div>
+                <div id="filesToUploadBox">
+
+                </div>
+
+                <div class="cboth"></div>
+                <div class="form-buttons">
+                    <?php if ($this->roleId != \Admin\Model\User::ROLE_TRIAL): ?>
+                        <input type="submit" value="Save" class="form-button" />
+                        <div class="fleft">or</div>
+                    <?php endif;?>
+                    
+                    <?php if($parsed == '/dashboard/client'): ?>
+                        <a href="/dashboard/client" class="cancel">Cancel</a>
+                    <?php else: ?>
+                        <a href="/organization/list" class="cancel">Cancel</a>
+                    <?php endif; ?>
+
+                </div>
+                <div class="cboth"><br /></div>
+
+            </form>
+
+            <?php if ($this->cId && is_object($notes) && ($notes->count())): ?>
+                <?php foreach ($notes as $note): ?>
+                    <div class="note">
+                        <strong><?php echo $note->_username ?></strong> <small> on <?php echo $note->_note_create_date_format ?></small><br />
+                        <p>
+                            <?php echo $note->note_text ?><br />
+                            <?php if ($note->_files != ''): ?>
+                                <?php
+                                    $_files = explode(',', $note->_files);
+                                ?>
+                                <strong>Attachments:</strong><br />
+                                <?php foreach ($_files as $_file): ?>
+                                    <?php
+                                        $_file = explode('::', $_file);
+                                        $_fileName = $_file[0];
+                                        $_fileId = $_file[1];
+                                    ?>
+                                    <span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </p>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($this->cId && $roleId != \Admin\Model\User::ROLE_PARTIAL): ?>
+        <div id="tab3">
+            <div>
+                <div>
+                    <div class="tooltip">
+                        <i class="fas fa-info-circle"></i><span class="tooltiptext">The contacts that you assign to each role will be the default for each location or department within your organization.  However, you will have the ability to adjust the roles as needed for each location or department during the Risk Assessment process.</span>
+                    </div>
+                </div>
+                <div>    
+                    <h3><div><?php echo $companyObj->c_name ?> Default Roles</div></h3>
+                </div>
+                
+            </div>
+
+            <form action="/organization/edit/<?php echo $this->cId ?>" name="rolesform" id="" method="POST">
+                <?php $counterRoles = 1; ?>
+                <?php foreach ($this->assessmentsRoles as $ar): ?>
+
+                <div class="col4  <?php echo ($counterRoles && $counterRoles % 2 == 0 ? 'last' : 'company-role-first') ?>"><br />
+
+                    <p>
+                        <style>
+                            .form-modal-block {
+                                display: inline-block;
+                                margin-left: 2%;
+                            }
+                        </style>
+                        <div class="form-modal-block">
+                            <strong style="line-height: 32px;">
+                            <div class="tooltip"><i class="fas fa-info-circle"></i>
+                                <span class="tooltiptext"><?php echo $ar['tooltip'];?></span>
+                            </div>
+
+                            <div id="rolename <?php echo $ar['ar_id'];?>"><?php echo $ar['ar_name'];?></div>
+                                
+                            </strong>
+                        </div>
+
+                        <div  class="form-modal-block">
+
+                            <?php echo "<div id='alias-form-role-id' style='display: none;'></div>"; ?>
+                            <?php echo "<div id='alias-form-company-id' style='display: none;'></div>"; ?>
+
+                            <div class="tooltip">
+                                <a href="#role-rename-modal" class="confirmation-modal" onclick="setDomElements(<?php echo $ar['ar_id']; ?>, <?php echo $this->cId;?>)"><i class="fa fa-pencil"></i></a>
+                                <span class="tooltiptext">Ability to customize the role to match organizations structure.  This is optional functionality.</span>
+                            </div>
+
+                            <script>
+                                function setDomElements(arId, companyId) {
+                                    document.getElementById("alias-form-role-id").innerText = arId;
+                                    document.getElementById("alias-form-company-id").innerText = companyId;
+                                }
+                            </script>
+                        </div>
+
+                    <p>
+                        Assign role
+                    </p>
+                        <select name="rolesform[<?php echo $ar['ar_id'] ?>]" id="" class="contactSelect w225">
+                            <option value="">Select Contact</option>
+                            <option value="">---</option>
+
+                            <?php foreach ($this->contacts as $u): ?>
+                                <?php $selected = ''; ?>
+                                <?php if (isset($this->existsCompanyRoles) && isset($this->existsCompanyRoles[$ar['ar_id']]) && ($this->existsCompanyRoles[$ar['ar_id']] == $u->u_id)):
+                                    $selected = ' SELECTED ';
+                                endif; ?>
+
+                                <option <?php echo $selected ?> value="<?php echo $u->u_id ?>"><?php echo $u->u_firstname . ' ' . $u->u_lastname ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </p>
+                </div>
+
+                <?php $counterRoles++; endforeach; ?>
+
+                <div class="cboth"><br /></div>
+                <div class="form-buttons">
+                    <?php if ($this->roleId != \Admin\Model\User::ROLE_TRIAL): ?>
+                        <input type="submit" value="Save" class="form-button" />
+                        <div class="fleft">or</div>
+                    <?php endif;?>
+                    <a href="/organization/list" class="cancel">Cancel</a>
+                </div>
+                <div class="cboth"><br /></div>
+            </form>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($administrationAccess): ?>
+        <div id="tab4">
+            <h3>Users Login History</h3>
+
+            <form action="javascript:;" name="usersLoginHistoryForm" id="usersLoginHistoryForm">
+
+                <p style="border-bottom:0">
+                    <input type="text" id="fromDate" name="fromDate" value="<?php echo $fromDate?>" class="form-control company-admin-date" />
+                    <input type="text" id="toDate" name="toDate" value="<?php echo $toDate?>" class="form-control company-admin-date" />
+                    <input type="submit" id="usersLoginHistoryBtn" name="search" value="Search" class="form-button" />
+                </p>
+
+            </form>
+            <div class="administrationBlockWrap usersLoginHistory">
+
+            </div>
+
+            <h3>Locked Users</h3>
+
+            <div class="administrationBlockWrap lockedUsers">
+
+            </div>
+
+            <?php if (in_array($this->roleId, array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_SENIOR_CONSULTANT))) : ?>
+            <h3>Renewal date</h3>
+            <div class="administrationBlockWrap">
+            <form action="/organization/edit/<?php echo $this->cId ?>" name="" id="" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="renewalform" value="1" />
+                <p>
+                    <?php
+                    $fn = $formRenewal->get('c_renewal_date');
+                    $fn->setValue($this->formatDateA($this->companyObj->c_renewal_date, false, true));
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'c_renewal_date', 'readonly' => 'readonly')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php $fn = $formRenewal->get('c_renewal_email_recipients');
+                    echo $this->formLabel($fn);
+                    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <p>
+                    <?php
+                    $fn = $formRenewal->get('c_deny_renewal_email_sending');
+                    echo $this->formLabel($fn);
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+                <div class="cboth"><br /></div>
+                <div class="form-buttons">
+                    <input type="submit" value="Save" class="form-button" />
+                </div>
+                <div class="cboth"><br /></div>
+            </form>
+            </div>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+</div>
+<?php if ($this->cId && is_array($contacts) && (count($contacts))): ?>
+    <div class="col-right">
+        <h3 style="padding-top: 0;">Related Contacts</h3>
+
+        <?php foreach ($contacts as $user): ?>
+            <h5>
+                <span class="fleft"><?php echo $user->u_firstname ?> <?php echo $user->u_lastname ?></span>
+                <?php if ($user->u_id == $primaryContactId): ?>
+                    <span class="label primary">Primary Contact</span>
+                <?php endif; ?>
+                <?php if (in_array($user->u_id, $trainingManagerIds)): ?>
+                    <span class="label primary">Training Manager</span>
+                <?php endif; ?>
+                <?php if ($user->u_company_id_admin == $cId): ?>
+                    <span class="label primary">Organization Admin</span>
+                <?php endif; ?>
+                <?php if ($user->u_grant_to_disclosures): ?>
+                    <span class="label primary">Grant to Disclosures</span>
+                <?php endif; ?>
+                <?php if ($user->u_grant_to_breach): ?>
+                    <span class="label primary">Grant to Breach</span>
+                <?php endif; ?>
+                <br class="cboth" />
+                <em style="font-weight: 400;"><?php echo $user->u_title ?></em>
+            </h5>
+            <p><small>Office Phone:</small> <?php echo $user->u_office_phone ?> <?php echo $user->u_office_phone_inner != '' ? ' x ' . $user->u_office_phone_inner : '' ?><br /><small>Email:</small> <a href="mailto:<?php echo $user->u_email ?>"><?php echo $user->u_email ?></a></p>
+            <p><a href="/contact/edit/<?php echo $user->u_id ?>" class="button
+                <?php if ($roleId == \Admin\Model\User::ROLE_TRIAL) : ?> disabled<?php endif; ?>"><i class="fa fa-pencil"></i> Contact Details</a></p>
+
+            <div class="cboth"><br /></div>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
+
+<div class="cboth"><br /></div>
+
+<script type="text/javascript">
+
+    var browseFilesCounter = 0;
+    $(document).ready(function() {
+        
+        $( "#c_renewal_date" ).datepicker({dateFormat: 'mm/dd/yy'});
+        $('#fromDate, #toDate').datepicker({dateFormat: 'mm/dd/yy'});
+
+        $('#browseFile').click(function() {
+            $('#filesToUploadBox').append('<input type="file" name="notesFiles[]" id="file' + browseFilesCounter + '" />');
+
+            $('#file' + browseFilesCounter).click();
+            browseFilesCounter++;
+        });
+
+        $( "#tabs-nav a.disabled" ).click(function(e){
+            e.preventDefault();
+            $('.need-activation-box').show().animate({opacity: 1.0}, 3000).fadeOut(1000);
+            return false;
+        });
+
+        function getAdministrationData(url, wrapper)
+        {
+            $.ajax({
+                type: "GET",
+                url: url,
+                data: {'from': $('#fromDate').val(), 'to': $('#toDate').val()},
+                success: function(data) {
+                    wrapper.html(data);
+                }
+            });
+        }
+
+        $('#tab4Link').click(function(e) {
+            e.preventDefault();
+            var url = "/company/usersloginhistory/" + <?php echo $this->cId?>;
+            getAdministrationData(url, $('.usersLoginHistory'))
+            url = "/company/lockedusers/" + <?php echo $this->cId?>;
+            getAdministrationData(url, $('.lockedUsers'))
+        });
+
+        $('#usersLoginHistoryBtn').click(function(e) {
+            e.preventDefault();
+            var url = "/company/usersloginhistory/" + <?php echo $this->cId?>;
+            getAdministrationData(url, $('.usersLoginHistory'));
+        });
+
+       $('.administrationBlockWrap').on('click', '.pagination a', function(e) {
+
+           e.preventDefault();
+           var url = $(this).attr('href');
+           if(url == '#') return false;
+
+           var wrapper = $(this).closest('.administrationBlockWrap');
+
+           getAdministrationData(url, wrapper);
+       });
+
+       $('.administrationBlockWrap').on('click', '.unlockUser', function(e) {
+
+           e.preventDefault();
+           var $this = $(this);
+           var url = $this.attr('href');
+           if(url == '#') return false;
+
+           $.ajax({
+                type: "GET",
+                url: url,
+                success: function(data) {
+                   var wrapper = $this.closest('.administrationBlockWrap');
+                   url = $(wrapper).find('.pagination a#current').attr('href');
+                   if(url != '#') {
+                       getAdministrationData(url, wrapper);
+                   } else {
+                      url = "/company/lockedusers/" + <?php echo $this->cId?>;
+                      getAdministrationData(url, $('.lockedUsers'))
+                   }
+                }
+           });
+       });
+
+    });
+
+    var counterLocation = <?php if ($this->cId): ?><?php echo $this->addresses->count() + 1 ?><?php else: ?>2<?php endif;?>;
+    var locationAddress = $('#location').html();
+
+    locationAddress = locationAddress.replace(/exists_/g, '');
+
+    function addLocation()
+    {
+        var locationHtml = '<div id="location' + counterLocation + '" class="additionalLocation"><h2>Location #' + counterLocation + ' <a onclick="$(this).parent().parent().remove()" class="i-delete" href="javascript:"><i class="fa fa-trash-o"></i></a></h2>' + locationAddress + '</div>';
+        $('#addLocationButton').before(locationHtml);
+        $('#location' + counterLocation).find('input').val('');
+        $('#location' + counterLocation).find('select').val('');
+
+        $('#location' + counterLocation + ' input, #location' + counterLocation + ' select').each(function() {
+            var name = $(this).attr('name');
+            var n = name.indexOf("[");
+            var newName = name.substr(0, n) + '[]';
+            $(this).attr('name', newName);
+        });
+
+        counterLocation++;
+    }
+
+    function changed_company_rel_type(){
+        var val = $('#c_rel_type').val();
+        if(val == <?php echo \Client\Model\Company::RELATION_TYPE_PARENT; ?>) {
+            $('#c_rel_type_1').show();
+            $('#c_rel_type_2').hide();
+            $('#c_parent_c_id').hide();
+            $('#c_child_c_ids').show();
+        } else if (val == <?php echo \Client\Model\Company::RELATION_TYPE_CHILD; ?>) {
+            $('#c_rel_type_1').hide();
+            $('#c_rel_type_2').show();
+            $('#c_parent_c_id').show();
+            $('#c_child_c_ids').hide();
+        } else {
+            $('#c_rel_type_1').hide();
+            $('#c_rel_type_2').hide();
+            $('#c_parent_c_id').hide();
+            $('#c_child_c_ids').hide();
+        }
+    }
+
+    changed_company_rel_type();
+
+    $('#c_rel_type').change(function() {changed_company_rel_type();});
+
+</script>
+
+<script type="text/javascript">
+    jQuery(function() {
+        $('#company').validate();
+        //jQuery("#phone, #otherphone, #fax").mask("(999) 999-9999");
+        $("input[name=c_phone], input[name=c_other_phone], input[name=c_fax]").mask("(999) 999-9999");
+
+        $(document).ready(function() {
+            jQuery('#activatePartialUsers').click(function(){
+                $.ajax({
+                    type:"POST",
+                    url:"/company/activatepartialusers",
+                    data: {'id': <?php echo $this->cId?>},
+                    success: function(data){
+                        if(data.result === true) {
+                            $('#activatePartialUsersWrap').html('<span class="msg-successful">Users activated successfull!</span>');
+                            setTimeout("$('#activatePartialUsersWrap').fadeOut(1000)", 2000);
+                        } else {
+                            $('#activatePartialUsersWrap').append('<span class="msg-failure">Cannot activate users!</span>');
+                        }
+                    }
+                });
+            });
+
+            <?php if ($roleId == \Admin\Model\User::ROLE_TRIAL) : ?>
+            $('input[type=submit]').prop('disabled', true);
+            <?php endif; ?>
+        });
+    });
+
+    document.getElementById("company").addEventListener("submit", enableCompanyName);
+    //Need to remove Disabled attribute on form submit so the company name (c_name) can be passed back to the controller for the following Roles; Consultant, Client with Company Admin Priviledges
+    function enableCompanyName() {
+        
+        var eleman = document.querySelector("input[name='c_name']");
+        eleman.removeAttribute("disabled");
+        
+    }
+</script>

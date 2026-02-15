@@ -27,7 +27,7 @@ class BusinessassociateForm extends Form
             'name' => 'ba_c_id',
             'type' => 'Zend\Form\Element\Select',
             'options' => array(
-                'label' => 'Company',
+                'label' => 'Company *',
                 'value_options' => $companies
             ),
         ));
@@ -38,7 +38,7 @@ class BusinessassociateForm extends Form
                 'type'  => 'text',
             ),
             'options' => array(
-                'label' => 'Name',
+                'label' => 'Name *',
             )
         ));
 
@@ -262,7 +262,7 @@ class BusinessassociateForm extends Form
                 'type'  => 'text',
             ),
             'options' => array(
-                'label' => 'First name',
+                'label' => 'First Name *',
             )
         ));
         $this->add(array(
@@ -271,7 +271,7 @@ class BusinessassociateForm extends Form
                 'type'  => 'text',
             ),
             'options' => array(
-                'label' => 'Last Name',
+                'label' => 'Last Name *',
             ),
         ));
 
@@ -361,7 +361,7 @@ class BusinessassociateForm extends Form
                 'type'  => 'text',
             ),
             'options' => array(
-                'label' => 'E-mail',
+                'label' => 'E-mail *',
             ),
         ));
 

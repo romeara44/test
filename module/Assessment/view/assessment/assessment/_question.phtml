@@ -48,14 +48,14 @@ $_optionsT = explode(',', $_options);
                 <?php echo $note->note_text ?><br />
                 <?php if ($note->_files != ''): ?>
                     <?php
-                    $_files = explode(',', $note->_files);
+                        $_files = explode(',', $note->_files);
                     ?>
                     <strong>Attachments:</strong><br />
                     <?php foreach ($_files as $_file): ?>
                         <?php
-                        $_file = explode('::', $_file);
-                        $_fileName = $_file[0];
-                        $_fileId = $_file[1];
+                            $_file = explode('::', $_file);
+                            $_fileName = $_file[0];
+                            $_fileId = $_file[1];
                         ?>
                         <span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
 

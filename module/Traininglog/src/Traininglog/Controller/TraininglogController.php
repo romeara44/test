@@ -1,32 +1,54 @@
 <?php
-/**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/ZendSkeletonApplication for the canonical source repository
- * @copyright Copyright (c) 2005-2013 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
- */
+// Filename: /module/Traininglog/src/Traininglog/Controller/TraininglogController.php
 
 namespace Traininglog\Controller;
 
+use Traininglog\Service\TovutiServiceInterface;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\Session\Container;
 use Zend\View\Model\ViewModel;
+use Zend\View\Model\JsonModel;
 
-use Traininglog\Form\TraininglogForm;
-use Note\Form\NoteForm;
 use Admin\Model\User;
-use Note\Model\Note;
+use Client\Model\CompanyTable;
 use Traininglog\Model\Regulation;
 use Traininglog\Model\Traininglogtype;
 use Traininglog\Model\Traininglog;
-use Zend\Session\Container;
-use Zend\View\Model\JsonModel;
+use Traininglog\Model\LitmosUser;
+use Traininglog\Model\TraineeUser;
+
 use Traininglog\Form\EmployeemasterlistForm;
+use Traininglog\Form\EditTovutiUserForm;
+use Traininglog\Form\TraininglogForm;
+use Traininglog\Form\TovutiUserForm;
+
+use Traininglog\Model\TovutiUser;
+use Traininglog\Model\TovutiUserGroup;
 
 class TraininglogController extends AbstractActionController
 {
-    protected $userTable;
-    protected $noteTable;
+    //protected $userTable;
+    protected $companyTable;
+    private $form;
+
+    /**
+     * @var \Traininglog\Service\TovutiServiceInterface
+     */
+    protected $tovutiService;
+
+    public function __construct(TovutiServiceInterface $tovutiService)
+    {
+        $this->tovutiService = $tovutiService;
+    }
+
+    // public function indexAction()
+    // {
+    //     return new ViewModel(array(
+    //         'posts' => $this->postService->findAllPosts()
+    //     ));
+    // }
+
+
 
     public function onDispatch(\Zend\Mvc\MvcEvent $e)
     {
@@ -47,14 +69,24 @@ class TraininglogController extends AbstractActionController
         return parent::onDispatch($e);
     }
 
-    public function getUserTable()
-    {
-        if (!$this->userTable) {
-            $sm = $this->getServiceLocator();
-            $this->userTable = $sm->get('Admin\Model\UserTable');
-        }
-        return $this->userTable;
-    }
+    // public function onBootstrap($e)
+    // {
+    //     // some stuff
+    //     $eventManager = $e->getApplication()->getEventManager();
+    //     $eventManager->attach("dispatch", function($e) {
+    //         echo "Dispatch!";
+    //     });
+    //     // some stuff
+    // }
+
+    // public function getUserTable()
+    // {
+    //     if (!$this->userTable) {
+    //         $sm = $this->getServiceLocator();
+    //         $this->userTable = $sm->get('Admin\Model\UserTable');
+    //     }
+    //     return $this->userTable;
+    // }
 
     public function getIdentity()
     {
@@ -63,15 +95,6 @@ class TraininglogController extends AbstractActionController
         $identity = $authService->getIdentity();
 
         return $identity;
-    }
-
-    public function getNoteTable()
-    {
-        if (!$this->noteTable) {
-            $sm = $this->getServiceLocator();
-            $this->noteTable = $sm->get('Note\Model\NoteTable');
-        }
-        return $this->noteTable;
     }
 
     public function getTraininglogTable()
@@ -110,6 +133,15 @@ class TraininglogController extends AbstractActionController
         return $this->companyRolesTable;
     }
 
+    public function getCompanyTable()
+    {
+        if (!isset($this->companyTable)) {
+            $sm = $this->getServiceLocator();
+            $this->companyTable = $sm->get('Client\Model\CompanyTable');
+        }
+        return $this->companyTable;
+    }
+
     public function getEmployeemasterlistTable()
     {
         if (!isset($this->employeemasterlistTable)) {
@@ -128,264 +160,432 @@ class TraininglogController extends AbstractActionController
         return $identity;
     }
 
-    public function listAction()
-    {
-        $orderBy    = $this->params()->fromRoute('order_by')   ? $this->params()->fromRoute('order_by')         : 'id';
-        $order      = $this->params()->fromRoute('order')      ? $this->params()->fromRoute('order')            : 'DESC';
-        $page       = $this->params()->fromRoute('page')       ? (int) $this->params()->fromRoute('page')       : 1;
-        $roleFilter = $this->params()->fromRoute('roleFilter') ? (int) $this->params()->fromRoute('roleFilter') : 0;
-        $search     = $this->params()->fromRoute('search')     ? $this->params()->fromRoute('search')           : null;
-
-        $mappingSortCol = array(
-            'title'          => 'tl_title',
-            'type'           => 'tl_tlt_id',
-            'conducted_date' => 'tl_conducted_date',
-            'hire_date'      => 'tl_hire_date',
-            'trainer'        => '_tl_trainer_name'
-        );
-
-        $mappingTypeItem = array(
-            0 => null,
-            1 => 1,
-            2 => 0
-        );
-
-        $sortCol   = isset($mappingSortCol[$orderBy]) ? $mappingSortCol[$orderBy] : 'tl_id';
-        $paginator = $this->getTraininglogTable()->getTraininglogs(true, $sortCol, $order, $this->getIdentity(), $search, $mappingTypeItem[$roleFilter]);
-      
-        $paginator->setCurrentPageNumber(1);
-        $paginator->setItemCountPerPage(0);
-
-        $view = new ViewModel(array(
-            'order_by'    => $orderBy,
-            'order'       => $order,
-            'page'        => $page,
-            'paginator'   => $paginator,
-            'hasIdentity' => $this->hasIdentity(),
-            'roleFilter'  => $roleFilter,
-            'search'      => $search,
-            'noteTable' => $this->getNoteTable(),
-        ));
-
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open traininglog list page');
-
-        return $view;
-    }
-
-    public function editAction()
-    {
-        $request = $this->getRequest();
-
-        $id = (int) $this->params('id');
-        $noteform = $request->isPost() && (int) $request->getPost('noteform');
-
-        if (!$this->hasIdentity()) {
-            $this->flashMessenger()->addErrorMessage('You must log in');
-            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
-        }
-
-        $formNote = new NoteForm($this->getServiceLocator());
-
-        $notes = null;
-        $tlObj = null;
-
-        $comments          = null;
-        $trainingMaterials = null;
-        
-        if ((int) $id) {
-            $tlObj             = $this->getTraininglogTable()->getTraininglog($id);
-            $trainingMaterials = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_TLT);
-            $comments          = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_TLC);
-        }
-        
-        $form = new TraininglogForm($this->getServiceLocator(), $tlObj);
-
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $tl = new Traininglog();
-            $post = $request->getPost();
-
-            if($post['_tl_trainer'] != '-1') {
-                list($post['tl_trainer_type'], $post['tl_trainer_id']) = explode('_', $post['_tl_trainer']);
-            }
-
-            $ymds['tl_conducted_date'] = \DateTime::createFromFormat('m/d/Y', $post['tl_conducted_date']);
-            $ymds['tl_hire_date']      = \DateTime::createFromFormat('m/d/Y', $post['tl_hire_date']);
-            foreach($ymds as $ymdKey => $ymd) {
-                if (is_object($ymd)) {
-                    $post[$ymdKey] = $ymd->format('Y-m-d');
-                } else {
-                    $post[$ymdKey] = '0000-00-00';
-                }
-            }
-            $tl->tl_company_id           = (isset($post['tl_company_id']))           ? $post['tl_company_id']           : null;
-            $form = new TraininglogForm($this->getServiceLocator(), $tl);
-            $form->setInputFilter($tl->getInputFilter($this->getServiceLocator(), $id));
-            $form->setData($post);
-
-            if ($form->isValid()) {
-                $tl->exchangeArray($post);
-                $this->getTraininglogTable()->setServiceLocator($this->getServiceLocator());
-                $attendeesFile = $request->getFiles('attendees');
-                if(isset($attendeesFile[0]['tmp_name']) && $attendeesFile[0]['tmp_name']) {
-                    if (($handle = fopen($attendeesFile[0]['tmp_name'], "r")) !== FALSE) {
-                        while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                           $tl->tl_attendees .= implode(', ', $data) . "\r\n";
-                        }
-                        fclose($handle);
-                    }
-                }
-
-                if ($tl->_tl_cur_regulations) {
-                    $tl->_tl_cur_regulations = explode(',', $tl->_tl_cur_regulations);
-                }
-
-                $tlId = $this->getTraininglogTable()->saveTraininglog($tl);
-
-                if((int)$id) {
-                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Update trainiglog "' . $tlId . '"');
-                } else {
-                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Add new trainiglog "' . $tlId . '"');
-                }
-
-                // save files
-                $note = new Note();
-                $noteData['note_text'] = '';
-                $noteData['note_item_type'] = \Note\Model\Note::NOTE_TLT;
-                $noteData['note_item_id'] = $tlId;
-                $note->exchangeArray($noteData);
-                $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-                $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles(), false, 'training');
-
-                $note = new Note();
-                $noteData['note_text'] = $post['note_text'];
-                $noteData['note_item_type'] = \Note\Model\Note::NOTE_TLC;
-                $noteData['note_item_id'] = $tlId;
-                $note->exchangeArray($noteData);
-                $this->getNoteTable()->setServiceLocator($this->getServiceLocator());
-                $noteId = $this->getNoteTable()->saveNote($note, $request->getFiles(), false, 'comments');
-                
-                return $this->redirect()->toRoute('traininglog', array('controller' => 'traininglog', 'action' => 'list'));
-            } else {
-
-                if ((int) $id) {
-                    $form->bind($tlObj);
-                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open edit trainiglog "' . $id . '" page');
-                } else {
-                    $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open add new trainiglog page');
-                }
-            }
-
-        } else {
-            $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_BREACHLOG, $id);
-
-            if ((int) $id) {
-                $tlObj->tl_conducted_date = ($tlObj->tl_conducted_date != '0000-00-00') ? $tlObj->tl_conducted_date : '';
-                $tlObj->tl_hire_date      = ($tlObj->tl_hire_date != '0000-00-00') ? $tlObj->tl_hire_date : '';
-                $form->bind($tlObj);
-            }
-        }
-
-        return array(
-            'form' => $form,
-            'trainingMaterials' => $trainingMaterials,
-            'comments' => $comments,
-            'formNote' => $formNote,
-            'tlId' => $id,
-            'tlObj' => $tlObj,
-            'regulations' => $this->getRegulationTable()->getRegulations()
-        );
-    }
-
-    public function deleteAction()
-    {
-        $id = $this->params('id');
-
-        $this->getTraininglogTable()->deleteTraininglog($id);
-        $this->flashMessenger()->addSuccessMessage('Training log has been deleted');
-
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_DELETE, \Application\Model\LogsTable::ITEM_TYPE_TL, $id);
-        
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Delete trainiglog "' . $id . '"');
-        
-        return $this->redirect()->toRoute('traininglog', array('controller' => 'traininglog', 'action' => 'list'));
-    }
-
-    public function setstatusAction()
-    {
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $post = $request->getPost();
-        }
-
-        $id = $this->params('id');
-        $archived = $this->params('archived');
-
-        $this->getTraininglogTable()->setTraininglogStatus($id, $archived);
-
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Set status "' . $archived . '" for traininglog "' . $id . '" page');
-
-        return new JsonModel(array('result' => 'true'));
-    }
-
-    public function unarchiveAction()
-    {
-        $id = $this->params('id');
-
-        $this->getTraininglogTable()->unarchiveTraininglog($id);
-        $this->flashMessenger()->addSuccessMessage('Training log has been unarchived');
-
-        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Unarchive traininglog "' . $id . '"');
-
-        return $this->redirect()->toRoute('traininglog', array('controller' => 'traininglog', 'action' => 'list'));
-
-    }
-
-    public function gettrainersAction()
-    {
-        $cId = $this->params('id');
-
-        $trainers = $this->getTraininglogTable()->getTrainers($cId);
-
-        $list = $this->getEmployeemasterlistTable()->getEmployeemasterlist($cId);
-
-        /*if($list) {
-            $list = array('-1' => 'Please select') + $list;
-        }*/
-
-        return new JsonModel(array('trainers' => $trainers, 'list' => $list));
-    }
-
     public function employeemasterlistAction()
     {
-        $identity = $this->getIdentity();
-        if (!in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_CLIENT,
-            \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_CONSULTANT))) {
-            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
-        }
-
-        if ($identity['u_role_id'] == \Admin\Model\User::ROLE_CLIENT) {
-            $clientObj = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getClientCompany($identity['u_company_id']);
-            if($this->getServiceLocator()->get('Client\Model\CompanyTrainingManagersTable')->getTrainingManagerCompaniesIds($identity['u_id'])) {
-            } else {
-                return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
-            }            
-        }
-
-        $request = $this->getRequest(); 
-        if ($request->isPost()) {
-            $this->getEmployeemasterlistTable()->saveEmployeemasterlists($request->getPost());
-            return $this->redirect()->toRoute('traininglog', array('controller' => 'traininglog', 'action' => 'employeemasterlist'));
         
+        $cId = $this->params('company_id');
+        
+        $identity = $this->getIdentity();
+        $isAdmin = $identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN ? true : false;
+        $companyObject = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getClientCompany($identity['u_company_id']);
+
+        if($isAdmin) {
+            $listOfTovutiUserPerCompany = $this->getServiceLocator()->get('Traininglog\Model\TovutiUserTable')->getAllTovutiUser();
+            
         } else {
-            $form = new EmployeemasterlistForm($this->getServiceLocator());
-            $lists = $this->getEmployeemasterlistTable()->getEmployeemasterlists();
+            $listOfTovutiUserPerCompany = $this->getServiceLocator()->get('Traininglog\Model\TovutiUserTable')->getAllTovutiUsersByCompanyName($companyObject->c_name);
         }
 
+        //getAllTovutiUser
+        //$form = new EmployeemasterlistForm($this->getServiceLocator());
+        $traineeUsers = [];
+        foreach ($listOfTovutiUserPerCompany as $value) {
+            $traineeUser = [];
+            $traineeUser['Id'] = $value->tovuti_id;
+            $traineeUser['Department'] = $value->department;
+            $traineeUser['FirstName'] = $value->first_name;
+            $traineeUser['LastName'] = $value->last_name;
+            $traineeUser['Email'] = $value->email;
+            $traineeUser['JobTitle'] = $value->job_title;
+            $traineeUser['UserName'] = $value->user_name;
+            $traineeUser['RegisteredDate'] = $value->register_date;
+            array_push($traineeUsers, $traineeUser);
+        }
+        
         return array(
-            'lists' => $lists,
-            'form' => $form,
+            //'lists' => $listOfTovutiUserPerCompany,
+            //'form' => $form,
+            'traineeUsers' => $traineeUsers,
+            'paginationDetails' => count($traineeUsers),
         );
     }
+
+    function editAction(){
+        $identity = $this->getIdentity();
+        $clientObj = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getClientCompany($identity['u_company_id']);
+        
+        //$jobTitles1 = $this->getServiceLocator()->get('Traininglog\Model\TovutiUserTable')->getAllJobTitlesByCompanyName($clientObj->c_name);
+
+        $request = $this->getRequest();
+
+        if ($request->isPost()) {
+            $departments1 = $this->getServiceLocator()->get('Traininglog\Model\TovutiUserTable')->getAllDepartmentsByCompanyName($this->params()->fromPost('companyname'));
+
+            $post = $request->getPost();
+            $tovuti_user_id = $this->params()->fromPost('tovutiuserid');
+            $company_name = $this->params()->fromPost('companyname');
+            $tovuti_id = $this->params()->fromPost('tovutiid');
+            $firstname = $this->params()->fromPost('firstname');
+            $lastname = $this->params()->fromPost('lastname');
+            $email = $this->params()->fromPost('email');
+            $jobtitle = $this->params()->fromPost('jobtitle');
+            $department = $departments1[$this->params()->fromPost('department')];
+            $username = $this->params()->fromPost('username');
+            $departments = $this->params()->fromPost('departments');
+            $requirereset = $this->params()->fromPost('requirereset');
+            $status = $this->params()->fromPost('status');
+            
+            //Get Current User from Tovuti to know what ID is in the UserGroup array
+            $currentTovutiUserResponse = $this->tovutiService->GetTovutiUser($tovuti_id);
+            $currentTovutiUserObject = $this->tovutiService->SetTovutiUser($currentTovutiUserResponse);
+            $currentTovutiUserDTOObject = $this->tovutiService->SetTovutiUserDTO($currentTovutiUserResponse);
+
+            $fieldValues = [];
+            
+            $customFieldsUpdated = $this->tovutiService->UpdateTovutiCustomField($currentTovutiUserResponse['customFields'], array('field' => TovutiUser::CUSTOM_FIELD_FIRST_NAME, 'value' => $firstname));
+            $customFieldsUpdated = $this->tovutiService->UpdateTovutiCustomField($customFieldsUpdated, array('field' => TovutiUser::CUSTOM_FIELD_LAST_NAME, 'value' => $lastname));
+            $customFieldsUpdated = $this->tovutiService->UpdateTovutiCustomField($customFieldsUpdated, array('field' => TovutiUser::CUSTOM_FIELD_DEPARTMENT, 'value' => $department));
+            $customFieldsUpdated = $this->tovutiService->UpdateTovutiCustomField($customFieldsUpdated, array('field' => TovutiUser::CUSTOM_FIELD_JOB_TITLE, 'value' => $jobtitle));
+
+            $userGroups = isset($departments) ? [2, $departments] : [2];
+            
+            $data = array(
+                'name' => "{$firstname} {$lastname}",
+                //'username' => $username,
+                //'email' => $email,
+                'requireReset' => $requirereset,
+                'status' => $status,
+                'customFields' => $customFieldsUpdated,
+                'userGroupIds' => $userGroups
+            );
+
+            $updateUserToTovuti = $this->tovutiService->updateUserToTovuti($data, $tovuti_id);
+            $currentTovutiUserObjectToSaveToDatabase = $currentTovutiUserObject;
+            $currentTovutiUserObjectToSaveToDatabase->tovuti_user_id = $tovuti_user_id;
+            $currentTovutiUserObjectToSaveToDatabase->first_name = $firstname;
+            $currentTovutiUserObjectToSaveToDatabase->last_name = $lastname;
+            $currentTovutiUserObjectToSaveToDatabase->name = "{$firstname} {$lastname}";
+            $currentTovutiUserObjectToSaveToDatabase->email = $email;
+            $currentTovutiUserObjectToSaveToDatabase->job_title = $jobtitle;
+            $currentTovutiUserObjectToSaveToDatabase->department = $department;
+            $currentTovutiUserObjectToSaveToDatabase->user_name = $username;
+            $currentTovutiUserObjectToSaveToDatabase->user_group_id = $departments;
+            $currentTovutiUserObjectToSaveToDatabase->require_reset = (isset($requirereset)) ? $requirereset : false;
+            $currentTovutiUserObjectToSaveToDatabase->status = $status;
+
+            $saveTovutiUserGroupRecordResponse = $this->getServiceLocator()->get('Traininglog\Model\TovutiUserTable')->saveTovutiUserRecord($currentTovutiUserObjectToSaveToDatabase);
+
+            return $this->redirect()->toRoute('traininglog', array('controller' => 'traininglog', 'action' => 'employeemasterlist'));
+        }        
+
+        
+        $tovutiUserId = trim($this->params()->fromQuery('tovuti_id'));
+        
+        $getTovutiUserResponse = $this->tovutiService->GetTovutiUser($tovutiUserId);
+        if ($getTovutiUserResponse == null) {
+            $viewParams = array(
+                'form' => new TovutiUserForm($this->getServiceLocator(), $this->getServiceLocator()->get('Traininglog\Model\TovutiUserTable')->getAllDepartmentsByCompanyName($clientObj->c_name)),
+            );
+            
+            return new ViewModel($viewParams);
+        }
+
+        $tovutiUser = $this->tovutiService->SetTovutiUser($getTovutiUserResponse);
+        $tovutiDatabaseObject = $this->getServiceLocator()->get('Traininglog\Model\TovutiUserTable')->getTovutiUserFomDatabase($tovutiUser->tovuti_id);
+        $tovutiUser->tovuti_user_id = $tovutiDatabaseObject->tovuti_user_id;
+        $saveTovutiUserGroupRecordResponse = $this->getServiceLocator()->get('Traininglog\Model\TovutiUserTable')->saveTovutiUserRecord($tovutiUser);
+
+        //Re-pull database object to ensure accurate data since data was pulled from Tovuti and saved.
+        $tovutiDatabaseObject = $this->getServiceLocator()->get('Traininglog\Model\TovutiUserTable')->getTovutiUserFomDatabase($tovutiUser->tovuti_id);
+
+        if (isset($tovutiDatabaseObject->company_name)){
+            $local_company_name = $tovutiDatabaseObject->company_name;
+        } else {
+            $local_company_name = $clientObj->c_name;
+        }
+
+        $departments1 = $this->getServiceLocator()->get('Traininglog\Model\TovutiUserTable')->getAllDepartmentsByCompanyName($local_company_name);  
+        
+        $form = new TovutiUserForm($this->getServiceLocator(), $departments1);
+
+
+        //TODO: Fill information in form and open form.
+        $form->get('tovutiuserid')->setValue($tovutiDatabaseObject->tovuti_user_id);
+        $form->get('tovutiid')->setValue($tovutiDatabaseObject->tovuti_id);
+        $form->get('companyname')->setValue($tovutiDatabaseObject->company_name);
+        $form->get('firstname')->setValue($tovutiDatabaseObject->first_name);
+        $form->get('lastname')->setValue($tovutiDatabaseObject->last_name);        
+        $form->get('email')->setValue($tovutiDatabaseObject->email);
+        $form->get('department')->setValue(in_array($tovutiDatabaseObject->department, $departments1));
+        $form->get('jobtitle')->setValue($tovutiDatabaseObject->job_title);
+        $form->get('username')->setValue($tovutiDatabaseObject->user_name);
+        $form->get('registerdate')->setValue($tovutiDatabaseObject->register_date);
+        $form->get('lastvisitdate')->setValue($tovutiDatabaseObject->last_visit_date);
+        $form->get('requirereset')->setValue(isset($tovutiDatabaseObject->require_reset) ? $tovutiDatabaseObject->require_reset : false);
+        $form->get('status')->setValue($tovutiDatabaseObject->status);
+        
+        $companyDepartments = $this->getServiceLocator()->get('Traininglog\Model\TovutiUserGroupTable')->getAllTovutiUserGroupsPerCompany($local_company_name);
+        $tovutiUserGroups = $this->tovutiService->GetUserGroupsByCompanyName($companyDepartments);
+        $tovutiUserGroupSelected = '';
+        foreach ($tovutiUserGroups as $individualUserGroup) {
+            if ($individualUserGroup->id == $tovutiDatabaseObject->user_group_id) {
+                $tovutiUserGroupSelected = $individualUserGroup;
+            }
+        }
+
+        $viewParams = array(
+            'form' => $form,
+            'tovutiDatabaseObject' => $tovutiDatabaseObject,
+            'departments' => $tovutiUserGroups,
+            'selectedDepartment' => $tovutiUserGroupSelected,
+            'isAdmin' => $identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN ? true : false,
+            'departments1' => $departments1
+        );
+
+        $viewModel = new ViewModel($viewParams);
+        
+        return $viewModel;
+    }
+
+    public function inactivatetovutiuserAction() {
+        $disabledStatus = 'disabled';
+
+        $tovutiUserId = trim($this->params()->fromQuery('tovuti_id'));
+        $getTovutiUserResponse = $this->tovutiService->GetTovutiUser($tovutiUserId);
+        
+        $data = array(
+            'name' => $getTovutiUserResponse['name'],
+            'requireReset' => $getTovutiUserResponse['requireReset'],
+            'status' => $disabledStatus,
+            'customFields' => $getTovutiUserResponse['customFields'],
+            'userGroupIds' => $getTovutiUserResponse['userGroupIds']
+        );
+
+        $updateUserToTovuti = $this->tovutiService->updateUserToTovuti($data, $tovutiUserId);
+        $tovutiDatabaseObject = $this->getServiceLocator()->get('Traininglog\Model\TovutiUserTable')->getTovutiUserFomDatabase($tovutiUserId);
+        $tovutiDatabaseObject->status = $disabledStatus;
+        $saveTovutiUserGroupRecordResponse = $this->getServiceLocator()->get('Traininglog\Model\TovutiUserTable')->saveTovutiUserRecord($tovutiDatabaseObject);
+        
+        return $this->redirect()->toRoute('traininglog', array('controller' => 'traininglog', 'action' => 'employeemasterlist'));
+    }
+
+    // public function addAction()
+    //  {
+    //      $form = new AlbumForm();
+    //      $form->get('submit')->setValue('Add');
+
+    //      $request = $this->getRequest();
+    //      if ($request->isPost()) {
+    //          $album = new Album();
+    //          $form->setInputFilter($album->getInputFilter());
+    //          $form->setData($request->getPost());
+
+    //          if ($form->isValid()) {
+    //              $album->exchangeArray($form->getData());
+    //              $this->getAlbumTable()->saveAlbum($album);
+
+    //              // Redirect to list of albums
+    //              return $this->redirect()->toRoute('album');
+    //          }
+    //      }
+    //      return array('form' => $form);
+    //  }
+
+    //public function addlitmosuserAction() {
+    public function addAction() {
+        $identity = $this->getIdentity();
+        $clientObj = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getClientCompany($identity['u_company_id']);
+        $departments1 = $this->getServiceLocator()->get('Traininglog\Model\TovutiUserTable')->getAllDepartmentsByCompanyName($clientObj->c_name);  
+        $jobTitles1 = $this->getServiceLocator()->get('Traininglog\Model\TovutiUserTable')->getAllJobTitlesByCompanyName($clientObj->c_name);
+        
+        if(isset($_POST['cancel'])) {
+            return $this->redirect()->toRoute('traininglog', array('controller' => 'traininglog', 'action' => 'employeemasterlist'));
+        }
+
+        $clientObj = $this->getServiceLocator()->get('Client\Model\CompanyTable')->getClientCompany($identity['u_company_id']);
+        $form = new TovutiUserForm($this->getServiceLocator(), $this->getServiceLocator()->get('Traininglog\Model\TovutiUserTable')->getAllDepartmentsByCompanyName($clientObj->c_name));
+        $form->get('submit')->setValue('Add');
+        $identity = $this->getIdentity();
+        
+
+        $request = $this->getRequest();
+
+        if ($request->isPost()) {
+            $post = $request->getPost();
+            $tovuti_user_id = $this->params()->fromPost('tovutiuserid');
+            $company_name = $this->params()->fromPost('companyname');
+            $tovuti_id = $this->params()->fromPost('tovutiid');
+            $firstname = $this->params()->fromPost('firstname');
+            $lastname = $this->params()->fromPost('lastname');
+            $email = $this->params()->fromPost('email');
+            $jobtitle = $this->params()->fromPost('jobtitle');
+            //$jobtitle = $jobTitles1[$this->params()->fromPost('jobtitle')];
+            //$department = $this->params()->fromPost('department');
+            $department = $departments1[$this->params()->fromPost('department')];
+            $username = $this->params()->fromPost('username');
+            $departments = $this->params()->fromPost('departments');
+            $requirereset = $this->params()->fromPost('requirereset');
+            $status = $this->params()->fromPost('status');
+            
+            $userGroups = is_null($departments) ? [2] : [2, $departments];
+            $customField = array(
+                'companyname' => $clientObj->c_name,
+                'firstname' => $firstname,
+                'lastname' => $lastname,
+                'department' => $department,
+                'jobtitle' => $jobtitle
+            );
+            $customFieldsResponse = $this->tovutiService->InsertTovutiCustomField($customField);
+            $temp = [];
+            $data = array(
+                'name' => "{$firstname} {$lastname}",
+                'password' => 'Training123',
+                'username' => $username,
+                'email' => $email,
+                'requireReset' => 1,
+                'status' => 'active', //$status,
+                'customFields' => $customFieldsResponse,
+                'userGroupIds' => $userGroups,
+                'enrolledCourseIds' => array(),
+                'accessLevels' => array(1, 2),
+                'objects' => []
+            );
+
+            $addNewUserToTovuti = $this->tovutiService->addNewUserToTovuti($data);
+            //TODO $addNewToTovuti could be error, should do something to handle this.
+            //errors[0] = The username has already been taken.
+            //errors[0] = The username field is required.
+            //errors[0] = The email must be a valid email address.
+
+            //TODO: Update Database
+            //saveTovutiUserRecord(TovutiUser $tovuti_user)
+            //$currentTovutiUserObjectToSaveToDatabase = $addNewUserToTovuti;
+            $currentTovutiUserObjectToSaveToDatabase = new TovutiUser();
+            $currentTovutiUserObjectToSaveToDatabase->tovuti_id = $addNewUserToTovuti['id'];
+            $currentTovutiUserObjectToSaveToDatabase->first_name = $firstname;
+            $currentTovutiUserObjectToSaveToDatabase->last_name = $lastname;
+            $currentTovutiUserObjectToSaveToDatabase->company_name = $clientObj->c_name;
+            $currentTovutiUserObjectToSaveToDatabase->department = $department;
+            $currentTovutiUserObjectToSaveToDatabase->job_title = $jobtitle;
+            $currentTovutiUserObjectToSaveToDatabase->name = "{$firstname} {$lastname}";
+            $currentTovutiUserObjectToSaveToDatabase->user_name = $username;
+            $currentTovutiUserObjectToSaveToDatabase->email = $email;
+            $currentTovutiUserObjectToSaveToDatabase->user_group_id = $departments;
+            $currentTovutiUserObjectToSaveToDatabase->register_date = $addNewUserToTovuti['registerDate'];
+            $currentTovutiUserObjectToSaveToDatabase->last_visit_date = $addNewUserToTovuti['lastvisitDate'];
+            $currentTovutiUserObjectToSaveToDatabase->require_reset = 1;
+            $currentTovutiUserObjectToSaveToDatabase->status = 'active';
+
+            $saveTovutiUserGroupRecordResponse = $this->getServiceLocator()->get('Traininglog\Model\TovutiUserTable')->saveTovutiUserRecord($currentTovutiUserObjectToSaveToDatabase);
+            //TODO if ID does not come back there was an error.
+
+            return $this->redirect()->toRoute('traininglog', array('controller' => 'traininglog', 'action' => 'employeemasterlist'));
+        }
+
+        //TODO: Fill information in form and open form.
+        //$form->get('tovutiuserid')->setValue($tovutiDatabaseObject->tovuti_user_id);
+        //$form->get('tovutiid')->setValue($tovutiDatabaseObject->tovuti_id);
+        $form->get('companyname')->setValue($clientObj->c_name);
+        $form->get('firstname')->setValue("");//$tovutiDatabaseObject->first_name);
+        $form->get('lastname')->setValue("");//$tovutiDatabaseObject->last_name);        
+        $form->get('email')->setValue("");//$tovutiDatabaseObject->email);
+        //$form->get('department')->setValue($tovutiDatabaseObject->department);
+        $form->get('department')->setValue("");
+        //$form->get('jobtitle')->setValue($tovutiDatabaseObject->job_title);
+        $form->get('jobtitle')->setValue("");
+        $form->get('username')->setValue("");//$tovutiDatabaseObject->user_name);
+        $form->get('registerdate')->
+        setValue("");//$tovutiDatabaseObject->register_date);
+        $form->get('lastvisitdate')->setValue("");//$tovutiDatabaseObject->last_visit_date);
+        $form->get('requirereset')->setValue(1);//$tovutiDatabaseObject->require_reset);
+        $form->get('status')->setValue("active");//$tovutiDatabaseObject->status);
+        // $form->get('litmosuserid')->setValue($queryStringLitmosUserId);
+
+        //TODO Fix this 10-28-2023
+        //$result = $this->GetLitmosUser($litmosUserId);      
+        
+        //$teamsResponse = $this->GetTeamsByCompany($clientObj->c_id);
+        //$companyDepartments = $this->getServiceLocator()->get('Traininglog\Model\TraineeUserTable')->getDepartmentsByCompany($clientObj->c_name);
+        $companyDepartments = $this->getServiceLocator()->get('Traininglog\Model\TovutiUserGroupTable')->getAllTovutiUserGroupsPerCompany($clientObj->c_name);
+        $tovutiUserGroups = $this->tovutiService->GetUserGroupsByCompanyName($companyDepartments);
+        $tovutiUserGroupSelected = new TovutiUserGroup();
+        
+        $viewParams = array(
+            'form' => $form,
+            // 'teams' => $teams,
+            // 'secondaryTeamId' => $this->GetSecondaryTeamByUserId($litmosUserId, $litmosParentTeamId),
+            //'tovutiDatabaseObject' => $tovutiDatabaseObject,
+            'departments' => $tovutiUserGroups,
+            'selectedDepartment' => $tovutiUserGroupSelected,//array('id' => 0, 'group_name' => ''),
+            'isAdmin' => $identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN ? true : false,
+        );
+
+        $viewModel = new ViewModel($viewParams);
+        
+        return $viewModel;
+    }
+
+    
+
+  function GetTeamList(){
+    //https://api.tovuti.io/api/v1/user/1622116/
+    $ch = curl_init();
+    $url = "https://yourdomain.com/api/v1/users/create";
+    $curl = curl_init($url);
+
+    $headers = [
+        //"Authorization: apikey ce06ab98-4c7a-407f-a8b8-e593f64a4365"
+        'x-api-key: 520|zBnGj3EFTLDoHoMeF1e1Zmtm9q0XulrVVBiyUD6D',
+        'Content-Type: application/json',
+
+    ];
+
+        
+    $url = "https://carosh.tovuti.io/api/v1/users/groups/89";
+    $curl = curl_init($url);
+    $header = array();
+    $header[] = 'Content-type: application/json';
+    $header[] = 'x-public-key: api_pk_FC733AF9059C48F0BEAD3D512A656485';
+    $header[] = 'x-api-key: api_sk_DDD02AFFF4CA4D57AD71A1284456C7B7';
+    //if you want to send filters in the body of the request
+    $body = new stdClass();
+    $body->user = 601;
+    curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($curl, CURLOPT_VERBOSE, false);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+    curl_setopt($curl, CURLOPT_POST, true);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($body));
+    $result = curl_exec($curl);
+    curl_close($curl);
+    return $result;
+  }
+
+
+
+    function DoesUserExistInLitmos($username) {
+        
+        $ch = curl_init();
+    
+        $headers = [
+            'APIKEY: ce06ab98-4c7a-407f-a8b8-e593f64a4365',
+            'Content-Type: application/json',
+    
+        ];
+    
+        $url = 'https://api.litmos.com/v1.svc/users/' . $username . '?source=hipaasuite&format=json';
+
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_HTTPHEADER => $headers
+        ]);
+        
+        $response = curl_exec($ch);
+        $status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        return $status_code === 404 ? false : true;        
+        
+    }
+
+
+
+
+
+
 
 }

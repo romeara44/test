@@ -14,7 +14,7 @@ $form->setAttribute('method', 'post');
 ?>
 
 <div class="page-title">
-    <h1 class="fleft"><?php if ($this->cId): ?>Company Details<?php else: ?>Add New Company<?php endif; ?></h1>
+    <h1 class="fleft"><?php if ($this->cId): ?>Organization Details<?php else: ?>Add New Organization<?php endif; ?></h1>
     <?php if($roleId != \Admin\Model\User::ROLE_TRAIL) : ?>
     <a href="/client/edit/company/<?php echo $this->cId ?>" class="button"><i class="fa fa-plus-circle"></i> Add New Contact</a>
     <?php endif; ?>
@@ -90,29 +90,45 @@ $form->setAttribute('method', 'post');
                     echo $this->formElementErrors($fn);
                     ?>
                 </p>
+            <?php endif; ?>
+            <?php if (in_array($this->roleId, array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_PARTIAL, \Admin\Model\User::ROLE_CONSULTANT, $this->roleId == \Admin\Model\User::ROLE_CLIENT && $administrationAccess ))): ?>
                 <p>
                     <?php
-                    if ($this->roleId == \Admin\Model\User::ROLE_ADMIN || $this->roleId == \Admin\Model\User::ROLE_SENIOR_CONSULTANT) {
+                    if (in_array($this->roleId, array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_PARTIAL))) {
                         $fn = $form->get('company_type_id');
                         echo $this->formLabel($fn);
                         echo $this->formSelect($fn->setAttributes(array('class' => 'form-control')));
                         echo $this->formElementErrors($fn);
+
+                    }
+                    else {
+                        $fn = $form->get('company_type_id');
+                        echo $this->formHidden($fn);
                     }
                     ?>
                 </p>
+            <?php endif; ?>
+            <?php if (in_array($this->roleId, array(\Admin\Model\User::ROLE_SALES_REP, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_ADMIN))): ?>
                 <?php if($this->roleId == \Admin\Model\User::ROLE_ADMIN && $checkHasPartial):?>
                     <p style="border: 0" id="activatePartialUsersWrap">
                         <a id="activatePartialUsers" href="javascript:" class="button"><i class="fa"></i>Activate Partial Users</a>
                     </p>
                 <?php endif;?>
                 <h2>Company Information</h2>
-            <?php endif; ?> 
+            <?php endif; ?>
 
             <p>
                 <?php
                 $fn = $form->get('c_name');
                 echo $this->formLabel($fn);
-                echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+
+                if (in_array($this->roleId, array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_PARTIAL))) {
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'enabled'=> 'enabled')));
+                }
+                else {
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'disabled'=> 'disabled')));
+                }
+
                 echo $this->formElementErrors($fn);
                 ?>
             </p>
@@ -269,10 +285,10 @@ $form->setAttribute('method', 'post');
                 </div>
             <?php endif; ?>
 
-            <?php if (in_array($this->roleId, array(\Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_ADMIN))): ?>
-            <p>
-                <a id="addLocationButton" href="javascript:" onclick="return addLocation()" class="button"><i class="fa fa-plus-circle"></i> Add Additional Location</a>
-            </p>
+            <?php if (in_array($this->roleId, array( \Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_PARTIAL, \Admin\Model\User::ROLE_CONSULTANT, $this->roleId == \Admin\Model\User::ROLE_CLIENT && $administrationAccess ))): ?>
+                <p>
+                    <a id="addLocationButton" href="javascript:" onclick="return addLocation()" class="button"><i class="fa fa-plus-circle"></i> Add Additional Location</a>
+                </p>
             <?php endif; ?>
 
             <div class="cboth"></div>
@@ -282,6 +298,7 @@ $form->setAttribute('method', 'post');
                     <input id="saveAndContinue" type="submit" name="save_continue" value="Save and Continue" class="form-button" />
                     <div class="fleft">or</div>
                 <?php endif;?>
+
                 <a href="/client/list" class="cancel">Cancel</a>
             </div>
         <?php echo $this->form()->closeTag() ?>
@@ -335,7 +352,7 @@ $form->setAttribute('method', 'post');
                         <input type="submit" value="Save" class="form-button" />
                         <div class="fleft">or</div>
                     <?php endif;?>
-                    <a href="/company/list" class="cancel">Cancel</a>
+                    <a href="/client/list" class="cancel">Cancel</a>
                 </div>
                 <div class="cboth"><br /></div>
 
@@ -432,7 +449,7 @@ $form->setAttribute('method', 'post');
                         <input type="submit" value="Save" class="form-button" />
                         <div class="fleft">or</div>
                     <?php endif;?>
-                    <a href="/company/list" class="cancel">Cancel</a>
+                    <a href="/client/list" class="cancel">Cancel</a>
                 </div>
                 <div class="cboth"><br /></div>
             </form>
@@ -541,6 +558,25 @@ $form->setAttribute('method', 'post');
 <script type="text/javascript">
 
     var browseFilesCounter = 0;
+
+    $(document).ready(function() {
+        function getQueryStringParams() {
+            var params = {};
+            var queryString = window.location.search.substring(1);
+            var vars = queryString.split('&');
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split('=');
+                params[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
+            }
+            return params;
+        }
+        var params = getQueryStringParams();
+        if (params.is_redirected === 'true' && params.tab === '3') {
+            $('#tabs-nav a[href="#tab3"]').click();
+        }
+
+    });
+
     $(document).ready(function() {
         $( "#c_renewal_date" ).datepicker({dateFormat: 'mm/dd/yy'});
         $('#fromDate, #toDate').datepicker({dateFormat: 'mm/dd/yy'});
@@ -696,4 +732,13 @@ $form->setAttribute('method', 'post');
             <?php endif; ?>
         });
     });
+
+    document.getElementById("company").addEventListener("submit", enableCompanyName);
+    //Need to remove Disabled attribute on form submit so the company name (c_name) can be passed back to the controller for the following Roles; Consultant, Client with Company Admin Priviledges
+    function enableCompanyName() {
+        
+        var eleman = document.querySelector("input[name='c_name']");
+        eleman.removeAttribute("disabled");
+        
+    }
 </script>

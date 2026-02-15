@@ -9,6 +9,7 @@ use Zend\ServiceManager\ServiceLocatorInterface;
 
 use Zend\Db\ResultSet\ResultSet;
 use Zend\Db\Sql\Select;
+use Zend\Db\Sql\Where;
 use Zend\Paginator\Adapter\DbSelect;
 use Zend\Paginator\Paginator;
 use Assessment\Model\Remediationplanaction;
@@ -51,9 +52,64 @@ class RemediationplanactionTable implements ServiceLocatorAwareInterface
         $select->join(array('u2' => 'users'), new \Zend\Db\Sql\Expression('rpa_approver_u_id = u2.u_id'), array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)')), 'left');
         $select->join(array('adr' => 'addresses'), new \Zend\Db\Sql\Expression('adr_id = rpa_adr_id'), array('_location_name' => new \Zend\Db\Sql\Expression('adr_name')), 'left');
 
-        $orderStr = '';//'-rpa_adr_id DESC, _rpa_risk_level_sort DESC';
-        $orderStr = '-rpa_adr_id DESC';
+        //$orderStr = '';//'-rpa_adr_id DESC, _rpa_risk_level_sort DESC';
+        $orderStr = '-rpa_adr_id DESC, _rpa_risk_level_sort DESC';
+        //$orderStr = '-rpa_adr_id DESC';
         
+        $order = $order ? $order : 'ASC';
+        
+        if ($orderBy) {
+            $orderStr .= ', ' . $orderBy . ' ' . $order;
+        }
+        
+        $select->order(new \Zend\Db\Sql\Expression($orderStr));
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        return $resultSet;
+    }
+
+    public function getRemediationplanactionsByPolicy($rpId = 0, $policies, $orderBy = null, $order = null)
+    {
+        
+        $pol = explode("; ", $policies);
+
+        $rpId  = (int) $rpId;
+
+        $select = $this->tableGateway->getSql()->select();
+
+        $select->columns(
+            array('*',
+                '_rpa_latest_action_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(rpa_latest_action_date, "%m/%d/%Y")'),
+            )
+        );
+
+        $select->where->equalTo('rpa_rp_id', $rpId);
+        $select->where->and;
+        $select->where->equalTo('rpa_active', 1);
+        
+        if (count($pol) > 1){
+            $predicateSet = $select->where->nest();
+            $predicateSet->and->like('rpa_policy', '%' . $pol[0] . '%');
+            
+            for ($x = 1; $x < count($pol); $x++){
+                if ($pol[$x] != ''){
+                    $predicateSet->or->like('rpa_policy', '%' . $pol[$x] . '%');
+                }
+            }
+
+            $predicateSet->unnest();
+        }
+        else {
+            $select->where->like('rpa_policy', '%' . $pol[0] . '%');
+        }
+          
+        $select->join(array('u' => 'users'), new \Zend\Db\Sql\Expression('rpa_contact_u_id = u_id'), array('_rpa_risk_level_sort' => new \Zend\Db\Sql\Expression('IF(rpa_risk_level = 3, -1, rpa_risk_level)'), '_contact_name' => new \Zend\Db\Sql\Expression('CONCAT(u.u_firstname, " ", u.u_lastname)'), '_rpa_target_date_formatted' => new \Zend\Db\Sql\Expression('DATE_FORMAT(rpa_target_date, "%m/%d/%Y")')), 'left');
+        $select->join(array('u2' => 'users'), new \Zend\Db\Sql\Expression('rpa_approver_u_id = u2.u_id'), array('_approver_name' => new \Zend\Db\Sql\Expression('CONCAT(u2.u_firstname, " ", u2.u_lastname)')), 'left');
+        $select->join(array('adr' => 'addresses'), new \Zend\Db\Sql\Expression('adr_id = rpa_adr_id'), array('_location_name' => new \Zend\Db\Sql\Expression('adr_name')), 'left');
+
+        $orderStr = '-rpa_adr_id DESC, _rpa_risk_level_sort DESC';
+             
         $order = $order ? $order : 'ASC';
         
         if ($orderBy) {

@@ -32,7 +32,7 @@ class ClientForm extends Form
             'name' => 'u_company_id',
             'type' => 'Zend\Form\Element\Select',
             'options' => array(
-                'label' => 'Company',
+                'label' => 'Organization',
                 'value_options' => $companies
             ),
         ));
@@ -44,7 +44,7 @@ class ClientForm extends Form
                 'type'  => 'text',
             ),
             'options' => array(
-                'label' => 'First name',
+                'label' => 'First Name',
             )
         ));
         $this->add(array(
@@ -72,7 +72,7 @@ class ClientForm extends Form
                 'type'  => 'text',
             ),
             'options' => array(
-                'label' => 'Company',
+                'label' => 'Organization',
             ),
         ));
 

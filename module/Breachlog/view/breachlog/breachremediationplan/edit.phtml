@@ -171,6 +171,13 @@
 
 <?php if ($this->writable && !$this->isPdf): ?>
     <p><a href="/breachremediationplan/edittask/0/brpId/<?php echo $brpObj->brp_id ?>" class="fancybox button fright"><i class="fa fa-plus-circle"></i> Add</a></p>
+    <div id="confirmation-sign-off-modal">
+        <h3>Do you want a new plan created?</h3>
+        <div class="form-buttons">
+            <a id="sign-off-btn-yes" href="javascript:void(0);" class="form-button">Yes</a>
+            <a id="sign-off-btn-no" href="javascript:void(0);" class="form-button">No</a>
+        </div>
+    </div>
 <?php endif; ?>
 
 <form action="/breachremediationplan/edit/<?php echo $this->id ?>" name="" style="width: 600px;" id="formNote" method="POST" enctype="multipart/form-data" class="col2" >
@@ -253,6 +260,7 @@
 
     <?php if ($this->writable && !$this->isPdf): ?>
         <input id="signedoff" type="hidden" name="signedoff" value="0" />
+        <input id="signedoff_clone" type="hidden" name="signedoff_clone" value="0" />
         <input id="requestreview" type="hidden" name="requestreview" value="0" />
         <input type="hidden" name="noteform" value="1" />
         <?php
@@ -373,7 +381,9 @@
             <?php if ($brpObj->brp_approver_u_id): ?>
                 <input type="button" onclick="$('#requestreview').val(1); $('#formNote').submit()" value="Request Review" class="form-button" />
             <?php endif; ?>
-            <input type="button" onclick="if ($('#brp_initials_approver').val() == '') $('#brp_initials_approver_val').show(); else {  $('#signedoff').val(1); $('#formNote').submit() }" value="Sign-off and Close" class="form-button" />
+            <?php //<input type="button" onclick="if ($('#brp_initials_approver').val() == '') $('#brp_initials_approver_val').show(); else {  $('#signedoff').val(1); $('#formNote').submit() }" value="Sign-off and Close" class="form-button" />?>
+            
+            <input type="button" id="signedoff_button" value="Sign-off and Close" class="form-button" />
             <div class="fleft">or</div>
             <a href="/breachremediationplan/list" class="cancel">Cancel</a>
         <?php else: ?>
@@ -540,5 +550,46 @@
             jQuery("#toggle-edit-show-3").show();
             jQuery("#toggle-edit-3").hide();
         });
+
+        $('#sign-off-btn-yes').click(function() {
+            jQuery.fancybox.close();
+            $('#requestreview').val('');
+            $('#signedoff').val(1);
+            $('#signedoff_clone').val(1);
+            $('.valid_input').addClass('required');
+            $('#formNote').submit();
+        });
+
+        $('#sign-off-btn-no').click(function() {
+            jQuery.fancybox.close();
+            $('#requestreview').val('');
+            $('#signedoff_clone').val('');
+            $('#signedoff').val(1);
+            $('.valid_input').addClass('required');
+            $('#formNote').submit();
+        });
     });
+
+    jQuery('#signedoff_button').fancybox({
+            'href' : '#confirmation-sign-off-modal',
+            'width': '500',
+            'autoDimensions': false,
+            'hideOnContentClick': false,
+            'closeBtn': false,
+            'helpers' : {
+                'overlay' : {
+                    'closeClick': false,
+                    'locked': false
+                }
+            },
+            'keys' : {
+                close  : null
+            },
+            'beforeShow': function () {
+                jQuery.fancybox.wrap.bind("contextmenu", function (e) {
+                    return false;
+                });
+            }
+        });
+
 </script>

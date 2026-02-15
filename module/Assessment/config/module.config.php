@@ -1,12 +1,22 @@
 <?php
 
 return array(
+    'service_manager' => array(
+        'invokables' => array(
+            'Assessment\Service\IdentityServiceInterface' => 'Assessment\Service\IdentityService',
+            
+        )
+    ),
     'controllers' => array(
+        'factories' => array(
+            'Assessment\Controller\Remediationplan' => 'Assessment\Factory\RemediationplanControllerFactory'
+        ),
         'invokables' => array(
             'Assessment\Controller\Assessment' => 'Assessment\Controller\AssessmentController',
-            'Assessment\Controller\Remediationplan' => 'Assessment\Controller\RemediationplanController',
+            //'Assessment\Controller\Remediationplan' => 'Assessment\Controller\RemediationplanController',
             'Assessment\Controller\Alias' => 'Assessment\Controller\AliasController',
         ),
+        
     ),
 
     // The following section is new and should be added to your file
@@ -69,7 +79,7 @@ return array(
             'remediationplan' => array(
                 'type'    => 'segment',
                 'options' => array(
-                    'route'    => '/remediationplan[/:action][/:id][/page/:page][/order_by/:order_by][/:order][/roleFilter/:roleFilter][/rpId/:rpId][/type/:type][/add_atts/:add_atts]',
+                    'route'    => '/remediationplan[/:action][/:id][/page/:page][/order_by/:order_by][/:order][/roleFilter/:roleFilter][/rpId/:rpId][/type/:type][/add_atts/:add_atts][/policies/:policies][/ar_id/:ar_id]',
                     'constraints' => array(
                         'action' => '(?!\bpage\b)(?!\border_by\b)[a-zA-Z][a-zA-Z0-9_-]*',
                         'id'     => '[0-9]+',

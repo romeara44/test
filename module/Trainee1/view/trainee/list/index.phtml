@@ -1,0 +1,11 @@
+<!-- Filename: /module/Trainee/view/blog/list/index.phtml -->
+<h1>Blog</h1>
+
+<?php foreach ($this->posts as $post): ?>
+<article>
+    <h1 id="post<?= $post->getLitmosUserId() ?>"><?= $post->getUserName() ?></h1>
+    <p>
+        <?= $post->getLastName() ?>
+    </p>
+</article>
+<?php endforeach ?>

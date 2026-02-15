@@ -117,9 +117,9 @@ class AssessmentRoleTable implements ServiceLocatorAwareInterface
             $resultSet->buffer();
             foreach ($resultSet as $i => $v) {
                 if (array_key_exists($v->ar_id, $ts)) {
-                    $results[] = array('ar_name' => $ts[$v->ar_id], 'ar_id' => $v->ar_id);
+                    $results[] = array('ar_name' => $ts[$v->ar_id], 'ar_id' => $v->ar_id, 'tooltip' => $v->tooltip);
                 } else {
-                    $results[] = array('ar_name' => $v->ar_name, 'ar_id' => $v->ar_id);
+                    $results[] = array('ar_name' => $v->ar_name, 'ar_id' => $v->ar_id, 'tooltip' => $v->tooltip);
                 }
             }
 

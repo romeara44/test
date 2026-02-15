@@ -182,21 +182,37 @@ class BreachremediationplanController extends AbstractActionController
         if ($request->isPost()) {
             $post = $request->getPost();
             $form->setData($post);
+
             if ($noteform) {
                 if ($post['requestreview'] == 1) {
                     $this->getServiceLocator()->get('Mail\Model\MailtemplateTable')->sendMail($this->getServiceLocator(), array('templateKey' => 'requestreview', 'brpId' => $id, 'uId' => $post['brp_approver_u_id']));
                     $this->flashMessenger()->addSuccessMessage('Request Review sent');
                     return $this->redirect()->toRoute('breachremediationplan', array('controller' => 'breachremediationplan', 'action' => 'list'));
                 }
-                $id = $this->getBreachremediationplanTable()->clonePlan($id);
+
+                
 
 
                 $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_initials', $post['brp_initials'], true);
                 $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_initials_approver', $post['brp_initials_approver'], true);
-
                 $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_performed_u_id', $post['brp_performed_u_id']);
-                $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_approver_u_id', $post['brp_approver_u_id']);
-                $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_accepter_u_id', $post['brp_accepter_u_id']);
+                
+                                $brp_approver_u_id = $post['brp_approver_u_id'];
+                if($brp_approver_u_id == ''){
+                    $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_approver_u_id', 0);
+                }
+                else{
+                    $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_approver_u_id', $post['brp_approver_u_id']);
+                }
+                
+                $brp_accepter_u_id = $post['brp_accepter_u_id'];
+                if($brp_accepter_u_id == ''){
+                    $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_accepter_u_id', 0);                    
+                }
+                else{
+                    $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_accepter_u_id', $post['brp_accepter_u_id']);
+                }
+                
                 $this->getBreachremediationplanTable()->setRegulations($id, $post['_brp_cur_regulations'] , $post['_regulation']);
 
                 if (!$post['signedoff']) {
@@ -222,6 +238,11 @@ class BreachremediationplanController extends AbstractActionController
                     }
                     $this->getBreachremediationplanTable()->setFieldValue($id, 'brp_remediation_date', $ymd2, true);
                 }
+
+
+                if($post['signedoff_clone'] == 1){
+                    $newid = $this->getBreachremediationplanTable()->clonePlan($id, $post, true);
+                }                 
 
                 if ($post['signedoff'] == 1) {
                     $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Sign off breachlog action "' . $id . '"');

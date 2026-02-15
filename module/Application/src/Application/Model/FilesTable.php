@@ -41,4 +41,21 @@ class FilesTable
     {
         $this->tableGateway->delete('f_id = ' . $id);
     }
+
+    public function cloneFile($sourceFile) {
+        // Get the source file from the files table record
+        //$sourceFile = $this->getServiceLocator()->get('Application\Model\FilesTable')->getFile($sourceAuditRecordFile->nf_f_id);
+                                    
+        $newFile = array();
+        $newFile['f_name'] = $sourceFile->f_name;
+        $newFile['f_type'] = $sourceFile->f_type;
+        $newFile['f_create_date'] = $sourceFile->f_create_date;
+        $newFile['f_encrypted'] = $sourceFile->f_encrypted;
+        
+        //$savedFileId = $this->getServiceLocator()->get('Application\Model\FilesTable')->saveFile($newFile);
+        $savedFileId = $this->saveFile($newFile);
+
+        return $savedFileId;
+    }
+
 }

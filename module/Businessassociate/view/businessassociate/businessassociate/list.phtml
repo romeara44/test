@@ -4,16 +4,21 @@ $authService = new \Zend\Authentication\AuthenticationService();
 $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
 $identity = $authService->getIdentity();
 ?>
-				
+
+
+<script src="https://kit.fontawesome.com/e1b4bd3382.js" crossorigin="anonymous"></script>
+
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.css">
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
 
 <div class="page-title">
+    <div class="tooltip">
+        <i class="fas fa-info-circle"></i><span class="tooltiptext" style="top: 100%; height: 80px;">A person or organization that performs a function or activity on behalf of a covered entity (with access to the covered entity’s PHI) but is not part of the covered entity’s workforce. A Business Associate can also be a covered entity in its own right. Also see Part II, 45 CFR 160.103.</span>
+    </div>
     <h1 class="fleft">Business Associates</h1>
     <a href="/businessassociate/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Business Associate</a>
     <div class="cboth"></div>
 </div>
-
 
 <p></p>
 

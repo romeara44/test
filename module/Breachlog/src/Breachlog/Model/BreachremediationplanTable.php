@@ -613,12 +613,14 @@ class BreachremediationplanTable implements ServiceLocatorAwareInterface
         return true;
     }
 
-    public function clonePlan($id)
+    public function clonePlan($id, $post = false, $signedOffCopy = false)
     {
         $brp = $this->getBreachremediationplan($id);
 
-        // writable to false
-        $this->tableGateway->update(array('brp_writable' => 0, 'brp_status' => DbCrypt::encryptValue(\Breachlog\Model\Breachremediationplan::STATUS_CLOSED)), array('brp_id' => $id));
+        if(!$signedOffCopy) {
+            // writable to false
+            $this->tableGateway->update(array('brp_writable' => 0, 'brp_status' => DbCrypt::encryptValue(\Breachlog\Model\Breachremediationplan::STATUS_CLOSED)), array('brp_id' => $id));
+        }
 
         // create new row
         $brp->brp_id            = 0;

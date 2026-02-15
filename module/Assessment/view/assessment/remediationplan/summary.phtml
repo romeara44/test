@@ -1,18 +1,15 @@
 <?php
 use Assessment\Model\Assessment;
+//$request = new \Zend\Http\PhpEnvironment\Request();
+//$http_referer = $request->getServer('HTTP_REFERER');
+//$parsed = parse_url($http_referer, PHP_URL_PATH); //dashboard/client
+//$sourceWindow = 'dashboard'; //preg_split("#/#", $parsed); //[1] dashboard or remediationplan
+//$return_url = $request->params()->fromQuery('return_url') ? $this->params()->fromQuery('return_url') : 'remediationplan_list';
+
 ?>
-<?php if (count($this->loc_rps) > 1) : ?>
-<div class="tab_nav">
-    <ul class="ul_tabs">
-    <?php foreach ($this->loc_rps as $rp_id => $loc_name): ?>
-        <li <?php echo $this->id == $rp_id ? 'class="active_tab"' : ''; ?> >
-        <a href="/remediationplan/summary/<?php echo $rp_id; ?>" class="panel-tabs"><?php echo $loc_name; ?></a>
-        </li>
-    <?php endforeach; ?>
-    </ul>
-</div>
-<?php endif; ?>
+
 <div class="page-title">
+    
     <h1 class="fleft"><?php echo $this->rpObj->rp_type == Assessment::TYPE_SECURITY_RISK ? 'Security' : 'Privacy'; ?> Remediation Plan for <?php echo (!$this->isPdf) ? '<br/>' : '' ?><?php echo $this->rpObj->_client_name ?>
     <?php foreach ($this->actions as $rpa): ?>
     <?php
@@ -29,7 +26,7 @@ use Assessment\Model\Assessment;
     <?php if (!$this->isPdf): ?>
         <a href="/remediationplan/edit/<?php echo $rpObj->rp_id ?>/type/pdf" class="button" title="Download as PDF"><i class="fa fa-download"></i> PDF</a>
         <a href="/remediationplan/edit/<?php echo $rpObj->rp_id ?>/type/csv" class="button" title="Download as CSV"><i class="fa fa-download"></i> CSV</a>
-        <a href="/remediationplan/edit/<?php echo $rpObj->rp_id ?>" class="button" title="Detailed view">Detailed view</a>
+        <a href="/remediationplan/edit/<?php echo $rpObj->rp_id ?>?return_url=<?php echo $return_url ?>" class="button" title="Detailed view">Detailed view</a>
     <?php endif; ?>
     <div class="cboth"></div>
 </div>
@@ -115,13 +112,14 @@ use Assessment\Model\Assessment;
         <tr>
             <?php $classSort = ($order_by == 'date') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
-                <a href="<?php echo $this->url('remediationplan', array('action' => 'summary', 'id' => $this->id, 'order_by' => 'date', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'summary', 'id' => $this->id, 'order_by' => 'date', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>?return_url=<?php echo $return_url ?>">
+                
                     Target Date <i class="fa <?php echo $classSort ?>"></i>
                 </a>
             </th>
             <?php $classSort = ($order_by == 'risk_score') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
-                <a href="<?php echo $this->url('remediationplan', array('action' => 'summary', 'id' => $this->id, 'order_by' => 'risk_score', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">Risk score <i class="fa <?php echo $classSort ?>"></i>
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'summary', 'id' => $this->id, 'order_by' => 'risk_score', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">Risk score <i class="fa <?php echo $classSort ?>?return_url=<?php echo $return_url ?>"></i>
                 </a>
             </th>
             <?php $classSort = ($order_by == 'policy_number') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
@@ -131,28 +129,28 @@ use Assessment\Model\Assessment;
             </th>
             <?php $classSort = ($order_by == 'status') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
-                <a href="<?php echo $this->url('remediationplan', array('action' => 'summary', 'id' => $this->id, 'order_by' => 'status', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'summary', 'id' => $this->id, 'order_by' => 'status', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>?return_url=<?php echo $return_url ?>">
                     Status <i class="fa <?php echo $classSort ?>"></i>
                 </a>
             </th>
 
             <?php $classSort = ($order_by == 'assignee') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
-                <a href="<?php echo $this->url('remediationplan', array('action' => 'summary', 'id' => $this->id, 'order_by' => 'assignee', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'summary', 'id' => $this->id, 'order_by' => 'assignee', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>?return_url=<?php echo $return_url ?>">
                     Assignee <i class="fa <?php echo $classSort ?>"></i>
                 </a>
             </th>
             
             <?php $classSort = ($order_by == 'approver') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
-                <a href="<?php echo $this->url('remediationplan', array('action' => 'summary', 'id' => $this->id, 'order_by' => 'approver', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'summary', 'id' => $this->id, 'order_by' => 'approver', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>?return_url=<?php echo $return_url ?>">
                     Approver <i class="fa <?php echo $classSort ?>"></i>
                 </a>
             </th>
 
             <?php $classSort = ($order_by == 'status_change_date') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
             <th>
-                <a href="<?php echo $this->url('remediationplan', array('action' => 'summary', 'id' => $this->id, 'order_by' => 'status_change_date', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'summary', 'id' => $this->id, 'order_by' => 'status_change_date', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>?return_url=<?php echo $return_url ?>">
                     Status change date <i class="fa <?php echo $classSort ?>"></i>
                 </a>
             </th>
@@ -185,6 +183,7 @@ use Assessment\Model\Assessment;
     <option value="10"><?= \Assessment\Model\Remediationplanaction::$statusesNames[\Assessment\Model\Remediationplanaction::STATUS_PENDING_APPROVAL] ?></option>
     <option value="30"><?= \Assessment\Model\Remediationplanaction::$statusesNames[\Assessment\Model\Remediationplanaction::STATUS_PENDING_IMPLEMENTATION] ?></option>
     <option value="20"><?= \Assessment\Model\Remediationplanaction::$statusesNames[\Assessment\Model\Remediationplanaction::STATUS_COMPLETED] ?></option>
+    <option value="40"><?= \Assessment\Model\Remediationplanaction::$statusesNames[\Assessment\Model\Remediationplanaction::STATUS_AUDITED] ?></option>
     </select>
     </td>
     <td>
@@ -229,7 +228,7 @@ use Assessment\Model\Assessment;
         <?php $notesTaskAttText = $this->noteTable->getNotes($rpa->rpa_id, \Note\Model\Note::NOTE_RPA, 0, 'text'); ?>
         <?php $notesTaskAssessmentsText = $this->noteTable->getNotesForRemedTask($rpa->rpa_id, $adrId, 'text'); ?>
 
-        <tr<?php if ($this->writable): ?> class="editable" data-id="<?= $rpa->rpa_id ?>" <?php endif; ?>>
+        <tr <?php if ($this->writable): ?> class="editable" data-id="<?= $rpa->rpa_id ?>" <?php endif; ?>>
             <td><?php echo $rpa->_rpa_target_date_formatted ?></td>
             <td class="tdSmall"><?php echo \Assessment\Model\Remediationplanaction::$levelsNames[$rpa->rpa_risk_level] ?></td>
             <td class="tdSmall"><?php echo $rpa->rpa_policy ?></td>
@@ -237,15 +236,21 @@ use Assessment\Model\Assessment;
             <td><?php echo $rpa->_contact_name ?></td>
             <td><?php echo $rpa->_approver_name ?></td>
             <td><?php echo $rpa->rpa_latest_action_date ? $rpa->_rpa_latest_action_date_formatted : ''; ?></td>
-            <td class="aright nowrap">                
+            <td class="aright nowrap">
+                <a href="/remediationplan/edittask/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>" id="edittask<?php echo $rpa->rpa_id ?>" class="fancybox" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+                <?php /* <a href="/remediationplan/planemail/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>" class="fancybox" title="Email Assignee"><i class="fa fa-envelope"></i></a> &nbsp; */ ?>
                 <?php if ($this->writable): ?>
-                    <?php $deleteUrl = '/remediationplan/deletetask/' . $rpa->rpa_id . '/rpId/' . $rpObj->rp_id . '/type/summary'; ?>
+                    <?php $deleteUrl = '/remediationplan/deletetask/' . $rpa->rpa_id . '/rpId/' . $rpObj->rp_id; ?>
                     <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete" title="Delete"><i class="fa fa-trash-o"></i></a>
                 <?php endif; ?>
-                <a style="margin-left: 10px;" href="" class="attachments" rel="<?php echo $rpa->rpa_id ?>" title="View Attachments"><i class="fa fa-paperclip"></i></a>
-                <a style="margin-left: 10px;" href="" class="notes" rel="<?php echo $rpa->rpa_id ?>" title="View Notes"><i class="fa fa-file-text-o fa-1"></i></a>
+                <?php if ($notesTaskAtt->count() || ($notesTaskAssessments && $notesTaskAssessments->count())): ?>
+                    <a style="margin-left: 10px;" href="" class="attachments" rel="<?php echo $rpa->rpa_id ?>" title="View Attachments"><i class="fa fa-paperclip"></i></a>
+                <?php endif; ?>
+                <?php if ($notesTaskAttText->count() || ($notesTaskAssessments && $notesTaskAssessmentsText->count())): ?>
+                    <a style="margin-left: 10px;" href="" class="notes" rel="<?php echo $rpa->rpa_id ?>" title="View Notes"><i class="fa fa-file-text-o fa-1"></i></a>
+                <?php endif; ?>
             </td>
-        </tr>
+         </tr>
 
         <?php //if (!$this->writable): ?>
 
@@ -323,7 +328,8 @@ use Assessment\Model\Assessment;
     </div>
 <?php endif; ?>
 
-<form action="/remediationplan/summary/<?php echo $this->id ?>" name="" style="width: 600px;" id="formNote" method="POST" enctype="multipart/form-data" class="col2" >
+<form action="/remediationplan/summary/<?php echo $this->id ?>?return_url=<?php echo $return_url ?>" name="" style="width: 600px;" id="formNote" method="POST" enctype="multipart/form-data" class="col2" >
+    <input type="hidden" id="sourceWindow" name="sourceWindow" value="<?php echo $return_url ?>">
     <input id="rp_performed_u_id_hidden" name="rp_performed_u_id" type="hidden" value="<?php echo $this->rpObj->rp_performed_u_id ?>" />
     <input id="rp_incident_date_hidden" name="rp_incident_date" type="hidden" value="<?php echo ($this->rpObj->rp_incident_date != '0000-00-00') ? $this->rpObj->_rp_incident_date_formatted : '' ?>" />
     <input id="rp_remediation_date_hidden" name="rp_remediation_date" type="hidden" value="<?php echo ($this->rpObj->rp_remediation_date != '0000-00-00') ? $this->rpObj->_rp_remediation_date_formatted : '' ?>" />
@@ -486,12 +492,21 @@ use Assessment\Model\Assessment;
             <?php endif; ?>
             <input type="button" id="signedoff_button" value="Sign-off and Close" class="form-button" />
             <div class="fleft">or</div>
-            <a href="/remediationplan/list" class="cancel">Cancel</a>
+            <?php if($return_url == 'dashboard'): ?>
+                <a href="/dashboard/client" class="cancel">Cancel</a>
+            <?php else: ?>
+                <a href="/remediationplan/list" class="cancel">Cancel</a>
+            <?php endif; ?>
         <?php else: ?>
             <?php if (!$this->isPdf): ?>
                 <div class="cboth"></div>
                 <?php if (!$this->isAdmin): ?>
-                    <a href="/remediationplan/list" class="form-button">Back</a>
+                    <?php if($return_url == 'dashboard'): ?>
+                        <a href="/dashboard/client" class="form-button">Back</a>
+                    <?php else: ?>
+                        <a href="/remediationplan/list" class="form-button">Back</a>
+                    <?php endif; ?>
+                    
                 <?php endif; ?>
             <?php endif; ?>
         <?php endif; ?>
@@ -500,7 +515,11 @@ use Assessment\Model\Assessment;
             <?php $deleteUrl = '/remediationplan/reopen/' . $rpObj->rp_id; ?>
             <a href="#confirmation-box-modal" onclick="$('#confirmation-box-modal h3').html('Are you sure you want to re-open this plan ?'); $('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="form-button confirmation-modal">Re-Open Plan</a>
             <div class="fleft">or</div>
-            <a href="/remediationplan/list" class="cancel">Cancel</a>
+            <?php if($return_url == 'dashboard'): ?>
+                <a href="/dashboard/client" class="cancel">Cancel</a>
+            <?php else: ?>
+                <a href="/remediationplan/list" class="cancel">Cancel</a>
+            <?php endif; ?>
         <?php endif; ?>
     </div>
 

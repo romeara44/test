@@ -210,7 +210,6 @@ class Module
                         return new TableGateway('corporate_users', $dbAdapter, null, $resultSetPrototype);
                     },
 
-                    
                 'Client\Model\CompanyRolesTable' =>  function($sm) {
                     $tableGateway = $sm->get('CompanyRolesTableGateway');
                     $table = new \Client\Model\CompanyRolesTable($tableGateway);

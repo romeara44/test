@@ -50,7 +50,22 @@ $form->setAttribute('method', 'post');
 
             <p class="labelBold">
                 <?php $fn = $form->get('a_c_id');
-                $fn->setValue($this->companyId);
+                
+                if(isset($fn)){
+
+                        // Retrieve the select element's options.
+                        $options = $fn->getValueOptions();
+
+                        // If there are at least two options, set the second one as the default value.
+                        if (count($options) > 1) {
+                            $keys = array_keys($options); // Extract option keys.
+                            $fn->setValue($keys[1]); // Set the second option as the default.
+                        }else{
+
+                            $fn->setValue($this->companyId);
+                        }
+                }
+                
                 echo $this->formLabel($fn);
                 echo $this->formSelect($fn->setAttributes(array('class'=>'form-control', 'id' => 'a_c_id')));
                 echo $this->formElementErrors($fn);
@@ -74,10 +89,12 @@ $form->setAttribute('method', 'post');
             </p>
             <ul style="display: none" id="sa1"><li>Value is required and can't be empty</li></ul>
 
-            <p id="inviteClientLinkP">
-                <label>&nbsp;</label>
-                <a id="inviteClientLink" href="/assessment/invitetoassessment/0" onclick="" class="fancybox form-button"><i class="fa fa-envelope"></i> Invite Client to Assessment</a>
-            </p>
+            <?php if ($this->aId){ ?>
+                <p id="inviteClientLinkP">
+                    <label>&nbsp;</label>
+                    <a id="inviteClientLink" href="/assessment/invitetoassessment/0" onclick="" class="fancybox form-button"><i class="fa fa-envelope"></i> Invite Client to Assessment</a>
+                </p>
+            <?php } ?>
 
         <?php endif; ?>
 

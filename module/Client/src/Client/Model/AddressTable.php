@@ -30,12 +30,6 @@ class AddressTable implements ServiceLocatorAwareInterface
         return $this->serviceLocator;
     }
 
-    /*public function fetchAll()
-    {
-        $resultSet = $this->tableGateway->select();
-        return $resultSet;
-    }*/
-
     public function getAddresses($itemId = 0, $itemType = 1)
     {
         $select = $this->tableGateway->getSql()->select();
@@ -43,6 +37,19 @@ class AddressTable implements ServiceLocatorAwareInterface
 
         $select->where('cadr_type = ' . $itemType);
         $select->where('cadr_c_id = ' . $itemId);
+        $select->where('adr_active = 1');
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        return $resultSet;
+    }
+
+    public function getAddressesWithoutType($companyId = 0)
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->join(array('ai' => 'addresses_items'), 'cadr_adr_id = adr_id', array('*'));
+
+        $select->where('cadr_c_id = ' . $companyId);
         $select->where('adr_active = 1');
 
         $resultSet = $this->tableGateway->selectWith($select);
@@ -99,18 +106,19 @@ class AddressTable implements ServiceLocatorAwareInterface
             'adr_state_id' => $address->adr_state_id,
             'adr_zip' => $address->adr_zip,
 
-            'adr_name' => $address->adr_name,
+            'department' => $address->department,
             'adr_phone' => $address->adr_phone,
             'adr_phone_inner' => $address->adr_phone_inner,
             'adr_other_phone' => $address->adr_other_phone,
             'adr_other_phone_inner' => $address->adr_other_phone_inner,
             'adr_fax' => $address->adr_fax,
-            'adr_email' => $address->adr_email,
+            'adr_email' => $address->adr_email
         );
 
         $id = (int) $address->adr_id;
         
         if ($id == 0) {
+            $data['adr_update_date'] = new \Zend\Db\Sql\Expression('NOW()');
             $this->tableGateway->insert($data);
             $id = $this->tableGateway->lastInsertValue;
         } else {

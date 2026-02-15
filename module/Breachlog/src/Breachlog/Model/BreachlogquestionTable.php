@@ -94,7 +94,8 @@ class BreachlogquestionTable implements ServiceLocatorAwareInterface
             $bl = $blDb->getBreachlog($blId);
 
             $bl->bl_reportable = 1;
-
+            $bl->breach_locked = 1;
+            
             $blDb->saveBreachlog($bl);
 
             $authService = new \Zend\Authentication\AuthenticationService();
@@ -112,8 +113,8 @@ class BreachlogquestionTable implements ServiceLocatorAwareInterface
             $dataBrp['brp_initials']          = $bl->bl_initials;
             $dataBrp['brp_performed_u_id']    = $identity['u_id'];
             $dataBrp['brp_remediation_date']  = date('Y-m-d H:i:s');
-            $dataBrp['brp_incident_date']     = date('Y-m-d H:i:s');
-
+            $dataBrp['brp_incident_date']     = $bl->bl_date_of_occurrence;
+            
             $brpDb = $this->getServiceLocator()->get('Breachlog\Model\BreachremediationplanTable');
 
             $brp = new Breachremediationplan();

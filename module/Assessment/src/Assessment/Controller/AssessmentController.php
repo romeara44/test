@@ -269,34 +269,115 @@ class AssessmentController extends AbstractActionController
                 $header .= ' in process as of ' . date('F d Y');
             }
 
-            $rows[] = array('Report generation date:' . date('F d Y'), $header, '', '', '');
-            $rows[] = array('', '', '', '', '');
-            $rows[] = array('', 'Safeguard / Question', 'specification / Likelyhood', 'Citation / Impact', 'Answer');
+            $rows[] = array($header, '', '', '', '', '', '', '', '', '');
+            $rows[] = array('Report Generation Date: ' . date('F d Y'), '','', '', '', '', '', '', '', '');
+            $rows[] = array('', '', '', '', '', '', '', '', '', '');
+            $rows[] = array('', 'Safeguard', 'Specification', 'Citation', 'Policy', 'Question', 'Answer', 'Likelihood', 'Impact', 'Risk Score');
+
             $roles = $this->getServiceLocator()->get('Assessment\Model\AssessmentRoleTable')->getAssessmentsRoles($aObj->a_type, true);
             $risk_scores = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionOptionTable')->getOptionsRiskScores();
-
+            
             foreach ($roles as $role) {
-                $rows[] = array($role->ar_name, '', '', '', '');
+                $rows[] = array($role->ar_name, '', '', '', '', '');
                 $questions = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionTable')->getQuestions($aObj->a_type, $role->ar_id, $aObj->a_id, $location, $aObj);
+                
                 $answers = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionAnswerTable')->getAqas($id, $location, $role->ar_id);
-
+                
                 foreach ($questions as $question) {
-                    $rows[] = array('', $question['cat']['aqc_description'], $question['cat']['aqc_specification'], str_replace('Â', '', $question['cat']['aqc_citation']), '');
-                    $rows[] = array('', '', '', '', '');
+                    $total = 0;
+                    $risk_score_string = '';
+                    
+                    foreach ($question['elements'] as $questionEl){
+                        
+                        $local_impact_value = 0;
+                        $local_likelihood = 0.00;
+
+                        if (isset($answers[$questionEl['aq_id']])) {
+                            $option_id = $answers[$questionEl['aq_id']]['answerId'];
+                            if (isset($option_id)){
+                                $risk_scores1 = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionOptionTable')->getCalculatedRiskScoreByQuestion($option_id);
+                                $total = $total + $risk_scores1;
+                                
+                            }
+                            
+                        }
+
+                        //Put child code 
+                        //if ($isYes && isset($questionEl['children'])) {
+                        if (isset($questionEl['children'])) {
+                            foreach ($questionEl['children'] as $questionElChild) {
+                                $option_id = 0;
+                                                                
+                                if (isset($answers[$questionElChild['aq_id']])) {
+                                    $option_id = $answers[$questionElChild['aq_id']]['answerId'];
+                                    
+                                    if (isset($option_id)){
+                                        $risk_scores1 = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionOptionTable')->getCalculatedRiskScoreByQuestion($option_id);
+                                        $total = $total + $risk_scores1;
+
+                                    }
+                                }
+                            }
+                        }
+                        ///////////////////////
+                    }
+                                        
+                    if ($total >= 10) {
+                        $risk_score_string = 'High';
+                    } elseif ($total > 6 && $total < 10) {
+                        $risk_score_string = 'Medium';
+                    } else {
+                        $risk_score_string = 'Low';
+                    }
+
+                    $rows[] = array('', $question['cat']['aqc_description'], $question['cat']['aqc_specification'], str_replace('Â', '', $question['cat']['aqc_citation']), $question['cat']['aqc_policy'], '', '', '', '', '');
+                    $rows[] = array('', '', '', '', '', '', '', '', '', '');                
+
                     foreach ($question['elements'] as $questionEl) {
                         $aqTitle = str_replace('Â', '', $questionEl['aq_title']);
+                        //$rpa->rpa_threat = str_replace('Â', '', $rpa->rpa_threat);
+                        //$rpa->rpa_threat = str_replace('§', utf8_decode('§'), $rpa->rpa_threat);
+                        
                         $answer = '';
                         $isYes = false;
                         $answerScore = 0;
                         $option_id = 0;
+                        $local_calculate_risk_score = 0;
+                        $local_impact_value = 0;
+                        $local_likelihood = 0.00;
+                        $local_likelihood_numeric = 0.00;
+
                         if (isset($answers[$questionEl['aq_id']])) {
+                            
                             $option_id = $answers[$questionEl['aq_id']]['answerId'];
-                            $answerScore = (int)$risk_scores[$option_id];
+                            $answerScore = $risk_scores[$option_id];
+
+                            $local_impact_value = 0;
+                            $local_likelihood = 0.00;
+                            $risk_scores1 = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionOptionTable')->getOptionsRiskScoresByQuestion($option_id);
+                            
+                            $local_impact_value = $risk_scores1['impact_value'];
+                            $local_likelihood = $risk_scores1['likelihood_value'];
+                            $local_calculate_risk_score = $risk_scores1['calculate_risk_score'];
+                            
+                            if ($local_calculate_risk_score == '1') {
+                                $total = $total + ($local_impact_value * $local_likelihood);
+                            }
+                            else {
+                                $twentyFivePercentOfLikelihood = (float)$local_likelihood * 0.25;
+                                $total = $total + ($local_impact_value * $twentyFivePercentOfLikelihood);
+                            }
+
+                            
+                            
                             $_options = $questionEl['_options'];
                             $_optionsT = explode(',', $_options);
+                        
                             foreach ($_optionsT as $_option) {
-                                $_optionT = explode('::', $_option);
+                                //$_optionT has ID and the option value which could be Yes, No or N/A
+                                $_optionT = explode('::', $_option);                          
                                 if ($option_id == $_optionT[0]) {
+                                    //$answer is the actual answer of Yes, No or N/A
                                     $answer = $_optionT[1];
                                     if ($questionEl['aq_id'] == 14) {
                                         $isYes = ($_optionT[1] == 'No') ? true : false;
@@ -307,33 +388,51 @@ class AssessmentController extends AbstractActionController
                                 }
                             }
                         }
-
-                        $riskLevel = 0;
-                        if (($answerScore >= 6) && ($answerScore < 10)) {
-                            $riskLevel = 1;
-                        } elseif ($answerScore >= 10) {
-                            $riskLevel = 2;
-                        }
-
-                        if ($option_id == 3) {
-                            $riskLevel = 3;
-                        }
-
-                        $rows[] = array('', $aqTitle, $answerScore, $riskLevel, $answer);
-
+                        
+                        //$rows[] = array('', '', '', '', '', $aqTitle, $answer, $local_likelihood, $local_impact_value, $risk_score_string);
+                        $rows[] = array('', '', '', '', '', $aqTitle, $answer, '', '', $risk_score_string);
+                        
                         if ($isYes && isset($questionEl['children'])) {
                             foreach ($questionEl['children'] as $questionElChild) {
                                 $aqTitle = str_replace('Â', '', $questionElChild['aq_title']);
                                 $answerScore = 0;
                                 $option_id = 0;
                                 $answer = '';
+                                
+                                $test = 0;
+                                
                                 if (isset($answers[$questionElChild['aq_id']])) {
                                     $option_id = $answers[$questionElChild['aq_id']]['answerId'];
-                                    $answerScore = (int)$risk_scores[$option_id];
+                                    $test = $option_id;
+                                    $answerScore = $risk_scores[$option_id];
+                                    
+                                    $local_impact_value = 0;
+                                    $local_likelihood = 0.00;
+                                    
+                                    $risk_scores2 = $this->getServiceLocator()->get('Assessment\Model\AssessmentQuestionOptionTable')->getOptionsRiskScoresByQuestion($option_id);
+                                    
+                                    $local_impact_value = $risk_scores2['impact_value'];
+                                    $local_likelihood = $risk_scores2['likelihood_value'];
+                                    $local_calculate_risk_score = $risk_scores2['calculate_risk_score'];
+                                    
+                                    
+                                    if ($local_calculate_risk_score == '1') {
+                                        $local_likelihood_numeric = $local_likelihood;
+                                        $total = $total + ((float)$local_impact_value * (float)$local_likelihood);
+                                    }
+                                    else {
+                                        $local_likelihood_numeric = (float)$local_likelihood * 0.25;
+                                        $total = $total + ($local_impact_value * $twentyFivePercentOfLikelihood);
+                                        
+                                    }
+
+                                                                  
                                     $_options = $questionElChild['_options'];
                                     $_optionsT = explode(',', $_options);
+                                    
                                     foreach ($_optionsT as $_option) {
                                         $_optionT = explode('::', $_option);
+                                        
                                         if ($option_id == $_optionT[0]) {
                                             $answer = $_optionT[1];
                                             break;
@@ -341,22 +440,12 @@ class AssessmentController extends AbstractActionController
                                     }
                                 }
 
-                                $riskLevel = 0;
-                                if (($answerScore >= 6) && ($answerScore < 10)) {
-                                    $riskLevel = 1;
-                                } elseif ($answerScore >= 10) {
-                                    $riskLevel = 2;
-                                }
-
-                                if ($option_id == 3) {
-                                    $riskLevel = 3;
-                                }
-
-                                $rows[] = array('', $aqTitle, $answerScore, $riskLevel, $answer);
+                                $rows[] = array('', '', '', '', $test, $aqTitle, $answer, $local_likelihood_numeric, $local_impact_value, '');
                             }
                         }
                     }
-                    $rows[] = array('', '', '', '', '');
+                    $rows[] = array('', '', '', '', '','', '', '', '', '');
+                
                 }
             }
         }
@@ -437,7 +526,7 @@ class AssessmentController extends AbstractActionController
                 $isNew = (int) $id ? false : true;
 
                 if(!$checkFillCompanyRoles = $this->getCompanyRolesTable()->checkFillCompanyRoles($post['a_c_id'])) {
-                    $companyRolesMsg = 'Please, fill all roles for this company';
+                    $companyRolesMsg = 'All roles for the organization must be assigned before you can begin an assessment.  Click <a href="/company/edit/' . $post['a_c_id'] . '?is_redirected=true&tab=3"> here </a> to complete your roles.';
                 } elseif (!empty($post['a_c_id'])) {
                     $c_addrs = $this->getAddressTable()->getAddresses($post['a_c_id'], \Client\Model\AddressItem::COMPANY_TYPE);
                     if (!$c_addrs->count()) {

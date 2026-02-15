@@ -1,0 +1,871 @@
+<?php
+use Assessment\Model\Assessment;
+?>
+
+<div class="page-title">
+    <h1 class="fleft"><?php echo $this->rpObj->rp_type == Assessment::TYPE_SECURITY_RISK ? 'Security' : 'Privacy'; ?> Remediation Plan for <?php echo (!$this->isPdf) ? '<br/>' : '' ?><?php echo $this->rpObj->_client_name ?>
+    <?php foreach ($this->actions as $rpa): ?>
+    <?php
+        if($rpa->rpa_adr_id === null){
+            echo 'Additional Tasks';
+        } else {
+            echo $rpa->_location_name;
+        }        
+        break;
+    ?>
+    <?php endforeach; ?>
+    <?php echo !$this->rpObj->rp_a_id ? ' <span class="remediationplan_imported_edit">(imported)</span>' : ''?>
+    </h1>
+    <?php if (!$this->isPdf): ?>
+        <a href="/remediationplan/edit/<?php echo $rpObj->rp_id ?>/type/pdf" class="button" title="Download as PDF"><i class="fa fa-download"></i> PDF</a>
+        <a href="/remediationplan/edit/<?php echo $rpObj->rp_id ?>/type/csv" class="button" title="Download as CSV"><i class="fa fa-download"></i> CSV</a>
+        <a href="/remediationplan/editaudit/<?php echo $rpObj->rp_id ?>/policies/<?php echo $policies ?>/ar_id/<?php echo $audit_record_id ?>" class="button" title="Detailed view">Detailed view</a>
+    <?php endif; ?>
+    <div class="cboth"></div>
+</div>
+
+<p></p>
+<div class="cboth"></div>
+
+<div class="col6" style="float: left;">
+    <p><strong>STATUS:</strong><br /><span class="label selected"><?php echo \Assessment\Model\Remediationplan::$statusesNames[$rpObj->rp_status]  ?></span></p>
+</div>
+<div class="col5"  style="float: left;">
+    <p>
+        <strong>PERFORMED BY:</strong><br />
+        <?php if ($this->isPdf): ?>
+            <?php echo $this->rpObj->_performed_name ?>
+        <?php else: ?>
+            <?php if ($this->writable): ?>
+                <span id="toggle-edit-show-1">
+                    <?php echo $this->rpObj->_performed_name ?> &nbsp;<a href="" title="Edit"><i class="fa fa-pencil"></i></a>
+                </span>
+                <span id="toggle-edit-1">
+                    <select id="rp_performed_u_id" id="" class="w175">
+                        <option value="">Please Select</option>
+                        <option value="">---</option>
+                        <?php foreach ($this->contacts as $uId => $contact): ?>
+                            <option <?php echo ($uId == $this->rpObj->rp_performed_u_id) ? ' SELECTED ' : '' ?> value="<?php echo $uId ?>"><?php echo $contact ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </span>
+            <?php else: ?>
+                <?php echo $this->rpObj->_performed_name ?>
+            <?php endif; ?>
+        <?php endif; ?>
+    </p>
+</div>
+<div class="col5"  style="float: left;">
+    <p>
+        <?php if ($this->writable): ?>
+            <?php if ($this->rpObj->rp_parent_rp_id): ?>
+                <strong>Work Plan in Process</strong>
+            <?php else: ?>
+                <strong>Awaiting Approval</strong>
+            <?php endif; ?>
+        <?php else: ?>
+            <strong>APPROVED BY:</strong><br />
+            <?php echo $this->rpObj->_approver_name ?>
+        <?php endif; ?>
+    </p>
+</div>
+<div class="col5"  style="float: left;">
+    <p><strong>ASSESSMENT DATE:</strong><br />
+        <?php if ($this->writable): ?>
+            <span id="toggle-edit-show-2">
+                <?php echo $this->rpObj->rp_incident_date ? $this->rpObj->_rp_incident_date_formatted : ''; ?> &nbsp;<a href="" title="Edit"><i class="fa fa-pencil"></i></a>
+            </span>
+            <span id="toggle-edit-2">
+                <input type="text" id="rp_incident_date" name="rp_incident_date" readonly="readonly" class="w175" value="<?php echo $this->rpObj->rp_incident_date ? $this->rpObj->_rp_incident_date_formatted : '' ?>" />
+            </span>
+        <?php else: ?>
+            <?php echo $this->rpObj->rp_incident_date ? $this->rpObj->_rp_incident_date_formatted : '' ?>
+        <?php endif; ?>
+    </p>
+</div>
+<div class="col4 last" style="float: left;">
+    <p><strong>REMEDIATION PLAN DATE:</strong><br />
+        <?php if ($this->writable): ?>
+            <span id="toggle-edit-show-3">
+            <?php echo ($this->rpObj->rp_remediation_date != '0000-00-00') ? $this->rpObj->_rp_remediation_date_formatted : '' ?> &nbsp;<a href="" title="Edit"><i class="fa fa-pencil"></i></a>
+        </span>
+            <span id="toggle-edit-3">
+            <input type="text" id="rp_remediation_date" name="rp_remediation_date" readonly="readonly" class="w175" value="<?php echo ($this->rpObj->rp_remediation_date != '0000-00-00') ? $this->rpObj->_rp_remediation_date_formatted : '' ?>" />
+        </span>
+        <?php else: ?>
+            <?php echo ($this->rpObj->rp_remediation_date != '0000-00-00') ? $this->rpObj->_rp_remediation_date_formatted : '' ?>
+        <?php endif; ?>
+</div>
+<div class="cboth"></div>
+
+<p></p>
+
+<table cellpadding="0" cellspacing="0">
+    <thead>
+        <tr>
+            <?php $classSort = ($order_by == 'date') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'summary', 'id' => $this->id, 'order_by' => 'date', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Target Date <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+            <?php $classSort = ($order_by == 'risk_score') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'summary', 'id' => $this->id, 'order_by' => 'risk_score', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">Risk score <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+            <?php $classSort = ($order_by == 'policy_number') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'summary', 'id' => $this->id, 'order_by' => 'policy_number', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">Policy number <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+            <?php $classSort = ($order_by == 'status') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'summary', 'id' => $this->id, 'order_by' => 'status', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Status <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'assignee') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'summary', 'id' => $this->id, 'order_by' => 'assignee', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Assignee <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+            
+            <?php $classSort = ($order_by == 'approver') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'summary', 'id' => $this->id, 'order_by' => 'approver', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Approver <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+
+            <?php $classSort = ($order_by == 'status_change_date') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>
+                <a href="<?php echo $this->url('remediationplan', array('action' => 'summary', 'id' => $this->id, 'order_by' => 'status_change_date', 'order' => $urlOrder, 'roleFilter' => $roleFilter)); ?>">
+                    Status change date <i class="fa <?php echo $classSort ?>"></i>
+                </a>
+            </th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+    <tr id="edit-row" style="display:none;">
+    <td>
+        <?php
+            $fn = $formTask->get('rpa_target_date');
+            echo $this->formText($fn->setAttributes(array('readonly' => 'readonly', 'class' => 'datepicker')));
+        ?>
+    </td>
+    <td>
+        <?php
+            $fn = $formTask->get('rpa_risk_level');
+            echo $this->formSelect($fn);
+        ?>
+    </td>
+    <td>
+        <?php
+            $fn = $formTask->get('rpa_policy');
+            echo $this->formInput($fn);
+        ?>
+    </td>
+    <td>
+    <select name="rpa_status">
+    <option value="0"><?= \Assessment\Model\Remediationplanaction::$statusesNames[\Assessment\Model\Remediationplanaction::STATUS_TODO] ?></option>
+    <option value="10"><?= \Assessment\Model\Remediationplanaction::$statusesNames[\Assessment\Model\Remediationplanaction::STATUS_PENDING_APPROVAL] ?></option>
+    <option value="30"><?= \Assessment\Model\Remediationplanaction::$statusesNames[\Assessment\Model\Remediationplanaction::STATUS_PENDING_IMPLEMENTATION] ?></option>
+    <option value="20"><?= \Assessment\Model\Remediationplanaction::$statusesNames[\Assessment\Model\Remediationplanaction::STATUS_COMPLETED] ?></option>
+    <option value="40"><?= \Assessment\Model\Remediationplanaction::$statusesNames[\Assessment\Model\Remediationplanaction::STATUS_AUDITED] ?></option>
+    </select>
+    </td>
+    <td>
+        <?php
+            $fn = $formTask->get('rpa_contact_u_id');
+            echo $this->formSelect($fn);
+        ?>
+    </td>
+    <td>
+        <?php
+            $fn = $formTask->get('rpa_approver_u_id');
+            echo $this->formSelect($fn);
+        ?>
+    </td>
+    <td>
+        <input name="rpa_latest_action_date" type="text" readonly="readonly" class="datepicker" value="">
+    </td>
+    </tr>
+    <?php $adrId = 0; $adrChange = false; ?>
+    <?php foreach ($this->actions as $rpa): ?>
+        <?php if ($adrId != $rpa->rpa_adr_id):
+            $adrChange = true;
+            if($rpa->rpa_adr_id === null){
+                $adrId = 0;
+                $rpa->_location_name = 'Additional Tasks';
+            } else {
+                $adrId = $rpa->rpa_adr_id;
+            }
+        else:
+            $adrChange = false;
+        endif; ?>
+
+        <?php if ($adrChange): ?>
+            <tr>
+                <td colspan="20">
+                    <h2><?php if ($this->isPdf): ?><span style="font-size: 13px; font-weight: normal">Location:<?php endif; ?></span><br/><?php echo $rpa->_location_name ?></h2>
+                </td>
+            </tr>
+        <?php endif; ?>
+        
+
+        <?php $notesTaskAtt = $this->noteTable->getNotes($rpa->rpa_id, \Note\Model\Note::NOTE_RPA, 0, 'file'); ?>
+        <?php $notesTaskAssessments = $this->noteTable->getNotesForRemedTask($rpa->rpa_id, $adrId, 'file'); ?>
+        <?php $notesTaskAttText = $this->noteTable->getNotes($rpa->rpa_id, \Note\Model\Note::NOTE_RPA, 0, 'text'); ?>
+        <?php $notesTaskAssessmentsText = $this->noteTable->getNotesForRemedTask($rpa->rpa_id, $adrId, 'text'); ?>
+
+        <tr <?php if ($this->writable): ?> class="editable" data-id="<?= $rpa->rpa_id ?>" <?php endif; ?>>
+            <td><?php echo $rpa->_rpa_target_date_formatted ?></td>
+            <td class="tdSmall"><?php echo \Assessment\Model\Remediationplanaction::$levelsNames[$rpa->rpa_risk_level] ?></td>
+            <td class="tdSmall"><?php echo $rpa->rpa_policy ?></td>
+            <td class="acenter"><?php echo \Assessment\Model\Remediationplanaction::$statusesNames[$rpa->rpa_status] ?></td>
+            <td><?php echo $rpa->_contact_name ?></td>
+            <td><?php echo $rpa->_approver_name ?></td>
+            <td><?php echo $rpa->rpa_latest_action_date ? $rpa->_rpa_latest_action_date_formatted : ''; ?></td>
+            <td class="aright nowrap">
+                <a href="/remediationplan/edittask/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>" id="edittask<?php echo $rpa->rpa_id ?>" class="fancybox" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+                <?php /* <a href="/remediationplan/planemail/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>" class="fancybox" title="Email Assignee"><i class="fa fa-envelope"></i></a> &nbsp; */ ?>
+                <?php if ($this->writable): ?>
+                    <?php $deleteUrl = '/remediationplan/deletetask/' . $rpa->rpa_id . '/rpId/' . $rpObj->rp_id; ?>
+                    <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete" title="Delete"><i class="fa fa-trash-o"></i></a>
+                <?php endif; ?>
+                <?php if ($notesTaskAtt->count() || ($notesTaskAssessments && $notesTaskAssessments->count())): ?>
+                    <a style="margin-left: 10px;" href="" class="attachments" rel="<?php echo $rpa->rpa_id ?>" title="View Attachments"><i class="fa fa-paperclip"></i></a>
+                <?php endif; ?>
+                <?php if ($notesTaskAttText->count() || ($notesTaskAssessments && $notesTaskAssessmentsText->count())): ?>
+                    <a style="margin-left: 10px;" href="" class="notes" rel="<?php echo $rpa->rpa_id ?>" title="View Notes"><i class="fa fa-file-text-o fa-1"></i></a>
+                <?php endif; ?>
+            </td>
+         </tr>
+
+        <?php //if (!$this->writable): ?>
+
+            <tr class="expandable" id="notes<?php echo $rpa->rpa_id ?>">
+                <td colspan="4">
+                    <form action="/remediationplan/savetasknote/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>" method="POST">
+                    <p style="border: 0;">
+                        <strong style="line-height: 30px;">Approver Notes</strong><br>
+                        <textarea name="note_text" style="width: 570px;"></textarea>
+                    </p>
+                    <p>
+                        <input type="submit" value="Save" class="form-button" />
+                    </p>
+                    </form>
+                </td>
+                    <?php $colspan = 2; ?>
+                    <?php foreach (array('Task notes' => $notesTaskAttText, 'Questions notes' => $notesTaskAssessmentsText) as $keyAtt => $notesTask): ?>
+                        <td colspan="<?php echo $colspan ?>">                            
+                            <?php if (is_object($notesTask) && ($notesTask->count())): ?>
+                                <div>
+                                    <div><strong><?php echo $keyAtt ?>:</strong></div>
+                                    <div>
+                                        <?php $notesTask->buffer() ?>
+                                        <?php foreach ($notesTask as $note): ?>
+                                            <?php if ($note->note_text != ''): ?>
+                                                <div>
+                                                    <?php if ($note->note_active) : ?>
+                                                        <a title="Delete" href="#del-att-box-modal" class="confirmation-modal i-delete" onclick="$('#delAttYes').attr('href', '/files/archive/note/<?php echo $note->note_id ?>');"><i class="fa fa-trash-o"></i></a><br />
+                                                    <?php elseif ($this->isAdmin) : ?>
+                                                        <a href="/files/unarchive/note/<?php echo $note->note_id ?>" class="ajax-link">Unarchive</a><br />
+                                                    <?php endif; ?>
+                                                    <?php echo $note->note_text ?>
+                                                </div>
+                                            <?php endif; ?>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        </td>
+                        <?php $colspan = 2; ?>
+                    <?php endforeach; ?>
+            </tr>
+            <tr class="expandable" id="fileupload<?php echo $rpa->rpa_id ?>">
+                <td colspan="8">
+                    <input class="fileupload" type="file" name="files[]" multiple data-url="/remediationplan/savefiles/<?php echo $rpa->rpa_id ?>/rpId/<?php echo $rpObj->rp_id ?>" style="width:99%">
+                    <br>
+                    <br>
+                    <div class="progress hidden">
+                        <div class="progress-bar"></div>
+                    </div>
+                </td>
+            </tr>
+            <tr class="expandable" id="attachments<?php echo $rpa->rpa_id ?>">                
+                <?php echo $this->partial('remediationplan/taskAttachments', array(
+                    'notesTaskAtt' => $notesTaskAtt,
+                    'notesTaskAssessments' => $notesTaskAssessments,
+                    'isPdf' => $this->isPdf,
+                    'isAdmin' => $this->isAdmin,
+                )); ?>                    
+            </tr>
+        <?php //endif; ?>
+    <?php endforeach; ?>
+    </tbody>
+</table>
+
+<?php if ($this->writable && !$this->isPdf): ?>
+    <p><a href="/remediationplan/edittask/0/rpId/<?php echo $rpObj->rp_id ?>/type/summary" class="fancybox button fright"><i class="fa fa-plus-circle"></i> Add</a></p>
+
+    <div id="confirmation-sign-off-modal">
+        <h3>Do you want a new plan created?</h3>
+        <div class="form-buttons">
+            <a id="sign-off-btn-yes" href="javascript:void(0);" class="form-button">Yes</a>
+            <a id="sign-off-btn-no" href="javascript:void(0);" class="form-button">No</a>
+        </div>
+    </div>
+<?php endif; ?>
+
+<form action="/remediationplan/summaryaudit/<?php echo $this->id ?>" name="" style="width: 600px;" id="formNote" method="POST" enctype="multipart/form-data" class="col2" >
+    <input id="rp_performed_u_id_hidden" name="rp_performed_u_id" type="hidden" value="<?php echo $this->rpObj->rp_performed_u_id ?>" />
+    <input id="rp_incident_date_hidden" name="rp_incident_date" type="hidden" value="<?php echo ($this->rpObj->rp_incident_date != '0000-00-00') ? $this->rpObj->_rp_incident_date_formatted : '' ?>" />
+    <input id="rp_remediation_date_hidden" name="rp_remediation_date" type="hidden" value="<?php echo ($this->rpObj->rp_remediation_date != '0000-00-00') ? $this->rpObj->_rp_remediation_date_formatted : '' ?>" />
+    <input id="audit_id" type="hidden" name="audit_id" value="<?php echo $audit_id ?>" />
+
+    <?php if ($this->writable && !$this->isPdf): ?>
+        <input id="signedoff" type="hidden" name="signedoff" value="0" />
+        <input id="signedoff_clone" type="hidden" name="signedoff_clone" value="0" />
+        <input id="requestreview" type="hidden" name="requestreview" value="0" />
+        <input type="hidden" name="noteform" value="1" />
+        <input id="rp_id" type="hidden" name="rp_id" value="<?php echo $rp_id ?>" />
+        
+
+
+
+
+        <?php
+        $fn = $formNote->get('note_id');
+        echo $this->formHidden($fn);
+        ?>
+        <?php
+        $fn = $formNote->get('note_item_type');
+        $fn->setValue(\Note\Model\Note::NOTE_RP);
+        echo $this->formHidden($fn);
+        ?>
+        <?php
+        $fn = $formNote->get('note_item_id');
+        $fn->setValue($this->id);
+        echo $this->formHidden($fn);
+        ?>
+
+        <p style="border: 0;">
+            <strong style="line-height: 30px;">Notes</strong><br />
+            <?php
+            $fn = $formNote->get('note_text');
+            echo $this->formTextarea($fn->setAttributes(array('style' => 'width: 570px;')));
+            echo $this->formElementErrors($fn);
+            ?>
+
+        </p>
+        <?php if (!$this->isPdf): ?>
+            <p style="border: 0;">
+                <strong style="line-height: 30px;">Additional Attachments</strong><br />
+                <a id="browseFile" href="javascript:" class="button"><i class="fa fa-plus-circle"></i> Browse Files...</a>
+                <br /><br /><br />
+            </p>
+        <?php endif; ?>
+
+        <div class="cboth"></div>
+        <div id="filesToUploadBox">
+
+        </div>
+    <?php endif; ?>
+
+    <?php if ($this->id && is_object($notes) && ($notes->count())): ?>
+        <?php foreach ($notes as $note): ?>
+            <div class="note">
+                <strong><?php echo $note->_username ?></strong> <small> on <?php echo $note->_note_create_date_format ?></small>
+                <?php if ($note->note_active) : ?>
+                    <a title="Delete" href="#del-att-box-modal" class="confirmation-modal i-delete" onclick="$('#delAttYes').attr('href', '/files/archive/note/<?php echo $note->note_id ?>');"><i class="fa fa-trash-o"></i></a>
+                <?php elseif ($this->isAdmin) : ?>
+                    <a href="/files/unarchive/note/<?php echo $note->note_id ?>" class="ajax-link">Unarchive</a>
+                <?php endif; ?>
+                <br />
+                <p>
+                    <?php echo $note->note_text ?><br />
+                    <?php if ($note->_files != ''): ?>
+                        <?php
+                        $_files = explode(',', $note->_files);
+                        $att_title = false;
+                        ?>                        
+                        <?php foreach ($_files as $i => $_file): ?>
+                            <?php
+                            $_file = explode('::', $_file);
+                            $_fileName = $_file[0];
+                            $_fileId = $_file[1];
+                            $_active = $_file[2];
+                            ?>
+                            <?php if ($_active || $this->isAdmin) : ?>
+                                <?php if (!$att_title) : $att_title = true; ?>
+                                    <strong>Attachments:</strong><br />
+                                <?php endif; ?>
+                            <span style="float: left; margin-right: 5px;" class="<?php echo !$this->isPdf ? $this->renderPictoIcon($_fileName) : ''; ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a>
+                            <?php if ($_active) : ?>
+                            <span>&nbsp;</span><a title="Delete" href="#del-att-box-modal" class="confirmation-modal i-delete" onclick="$('#delAttYes').attr('href', '/files/archive/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>');"><i class="fa fa-trash-o"></i></a>
+                            <?php elseif ($this->isAdmin) : ?>
+                            <span>&nbsp;</span><a href="/files/unarchive/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="ajax-link">Unarchive</a>
+                            <?php endif; ?>   
+                            <br/>
+                            <?php endif; ?>                            
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </p>
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+
+    <div class="cboth"></div>
+
+    <?php if ($this->writable && !$this->isPdf): ?>
+        <p style="border: 0;"><label style="width:195px"><strong>Reviewed and approved by </strong></label>
+            <select name="rp_approver_u_id" id="rp_approver_u_id" id="" class="w175 valid_input form-control required">
+                <option value="">Please Select</option>
+                <option value="">---</option>
+                <?php foreach ($this->approverAccepter as $contact): ?>
+                    <option <?php echo ($contact->_u_id == $this->rpObj->rp_approver_u_id || (!$this->rpObj->rp_approver_u_id && in_array(9, $contact->_ar_id))) ? ' SELECTED ' : '' ?> value="<?php echo $contact->_u_id ?>"><?php echo $contact->_u_name ?></option>
+                <?php endforeach; ?>
+            </select>
+        </p>
+        <p style="border: 0;">
+            <label>Initials</label>
+            <input type="text" name="rp_initials_approver" class="valid_input form-control required" id="rp_initials_approver" value="<?php echo $this->rpObj->rp_initials_approver ?>" />
+        </p>
+        <p style="border: 0;">
+            <label>Date: </label>
+            <input type="text" name="rp_approved_date" readonly="readonly" class="valid_input form-control required" id="rp_approved_date" value="<?php echo $this->rpObj->rp_approved_date ? $this->rpObj->_rp_approved_date_formatted : date('m/d/Y')?>">
+        </p>
+    <?php else: ?>
+        <p style="border: 0;"><strong>Reviewed and approved by <?php echo $this->rpObj->_approver_name?></strong></p>
+        <p style="border: 0;">
+            <label>Initials: <?php echo $this->rpObj->rp_initials_approver ?></label>
+        </p>
+        <p style="border: 0;">
+            <label>Date: <?php echo $this->rpObj->rp_approved_date ? $this->rpObj->_rp_approved_date_formatted : ''?></label>
+        </p>
+    <?php endif; ?>
+
+    <div class="cboth"></div>
+
+    <?php if ($this->writable && !$this->isPdf): ?>
+        <p style="border: 0;"><label style="width:195px"><strong>Agreed to and accepted by</strong></label>
+            <select name="rp_accepter_u_id" id="rp_accepter_u_id" id="" class="w175 valid_input form-control required">
+                <option value="">Please Select</option>
+                <option value="">---</option>
+                <?php foreach ($this->approverAccepter as $contact): ?>
+                    <option <?php echo ($contact->_u_id == $this->rpObj->rp_accepter_u_id || (!$this->rpObj->rp_accepter_u_id && in_array(10, $contact->_ar_id))) ? ' SELECTED ' : '' ?> value="<?php echo $contact->_u_id ?>"><?php echo $contact->_u_name ?></option>
+                <?php endforeach; ?>
+            </select>
+        </p>
+        <p style="border: 0;">
+            <label>Initials</label>
+            <input type="text" name="rp_initials" id="" class="valid_input form-control required" value="<?php echo $this->rpObj->rp_initials ?>" />
+        </p>
+        <p style="border: 0;">
+            <label>Date: </label>
+            <input type="text" name="rp_accepted_date" readonly="readonly" class="valid_input form-control required" id="rp_accepted_date" value="<?php echo $this->rpObj->rp_accepted_date ? $this->rpObj->_rp_accepted_date_formatted : date('m/d/Y')?>">
+        </p>
+    <?php else: ?>
+        <p style="border: 0;"><strong>Agreed to and accepted by <?php echo $this->rpObj->_accepter_name?></strong></p>
+        <p style="border: 0;">
+            <label>Initials: <?php echo $this->rpObj->rp_initials ?></label>
+        </p>
+        <p style="border: 0;">
+            <label>Date: <?php echo $this->rpObj->rp_accepted_date ? $this->rpObj->_rp_accepted_date_formatted : '' ?></label>
+        </p>
+
+    <?php endif; ?>
+
+    <div class="cboth"></div>
+
+    <div class="form-buttons">
+        <?php if ($this->writable && !$this->isPdf): ?>
+            <input type="submit" name="save_button" id="save_button" value="Save" class="form-button" />
+            <a href="/audit/edit/<?php echo $audit_record_id ?>" class="cancel">Cancel</a>
+        <?php else: ?>
+            <?php if (!$this->isPdf): ?>
+                <div class="cboth"></div>
+                <?php if (!$this->isAdmin): ?>
+                    <a href="/audit/edit/<?php echo $audit_record_id ?>" class="form-button">Back</a>
+                <?php endif; ?>
+            <?php endif; ?>
+        <?php endif; ?>
+
+        <?php if ($this->isAdmin && $rpObj->rp_status != \Assessment\Model\Remediationplan::STATUS_OPEN): ?>
+            <?php $deleteUrl = '/remediationplan/reopen/' . $rpObj->rp_id; ?>
+            <a href="#confirmation-box-modal" onclick="$('#confirmation-box-modal h3').html('Are you sure you want to re-open this plan ?'); $('#deleteYes').attr('href', '<?php echo $deleteUrl ?>')" class="form-button confirmation-modal">Re-Open Plan</a>
+            <div class="fleft">or</div>
+            <a href="/audit/edit/<?php echo $audit_record_id ?>" class="cancel">Cancel</a>
+        <?php endif; ?>
+    </div>
+
+</form>
+
+
+<div class="cboth"><br /></div>
+
+<script type="text/javascript">
+
+    var browseFilesCounter = 0;
+    jQuery(document).ready(function() {
+        $('#browseFile').click(function() {
+            $('#filesToUploadBox').append('<input type="file" name="notesFiles[]" id="file' + browseFilesCounter + '" /><br />');
+
+            $('#file' + browseFilesCounter).click();
+            browseFilesCounter++;
+        });
+        
+        openEditTask();
+    });
+    
+    function openEditTask()
+    {
+        var get = parseGET();
+        if(get['edittask'] != undefined)
+        {
+            $('#edittask' + get['edittask']).click();
+        }
+    }
+    
+    function parseGET() 
+    {
+      var tmp = new Array();
+      var tmp2 = new Array();
+      var get = new Array();
+      var url = location.search;
+
+      if(url != '') {
+
+        tmp = (url.substr(1)).split('&');
+
+        for(var i=0; i < tmp.length; i++) {
+          tmp2 = tmp[i].split('=');
+          get[tmp2[0]] = tmp2[1];
+        }
+      }
+        return get;
+    }
+
+
+</script>
+
+<script type="text/javascript">
+
+    jQuery(document).ready(function() {
+        $('#rp_performed_u_id').change(function() {
+            $('#rp_performed_u_id_hidden').val($(this).val());
+        });
+
+        $('#rp_incident_date').change(function() {
+            $('#rp_incident_date_hidden').val($(this).val());
+        });
+
+        $('#rp_remediation_date').change(function() {
+            $('#rp_remediation_date_hidden').val($(this).val());
+        });
+        //form disclaimer slide out
+        jQuery('.expandable').hide();
+        jQuery('.attachments, .notes').click(function(e) {
+            e.preventDefault();
+            var $this = $(this);
+            var idA = $this.attr('rel');
+            if($this.hasClass('notes')) {
+                if(jQuery('#notes' + idA).is(':visible')) {
+                    jQuery('#notes' + idA).slideUp();
+                } else {
+                    jQuery('#attachments' + idA + ', #fileupload' + idA).slideUp(function(){
+                        jQuery('#notes' + idA).delay(600).slideDown();
+                    });
+                }
+            } else {
+                if(jQuery('#attachments' + idA).is(':visible')) {                    
+                    jQuery('#attachments' + idA + ', #fileupload' + idA).slideUp(function(){
+                    });
+                } else {
+                    jQuery('#notes' + idA).slideUp(function(){
+                        jQuery('#attachments' + idA + ', #fileupload' + idA).delay(600).slideDown();
+                    });
+                }
+            }
+            
+        });
+        
+        $('#save_button, #save_and_copy_button').click(function() {
+            $('#signedoff, #requestreview').val('');
+            $('.valid_input').removeClass('required');
+            $('#formNote').submit();
+        });
+        
+        $('#requestreview_button').click(function() {
+            $('#signedoff').val('');
+            $('#requestreview').val(1);
+            $('.valid_input').removeClass('required');
+            $('#formNote').submit();
+        });
+        
+        $('#sign-off-btn-yes').click(function() {
+            jQuery.fancybox.close();
+            $('#requestreview').val('');
+            $('#signedoff').val(1);
+            $('#signedoff_clone').val(1);
+            $('.valid_input').addClass('required');
+            $('#formNote').submit();
+        });
+
+        $('#sign-off-btn-no').click(function() {
+            jQuery.fancybox.close();
+            $('#requestreview').val('');
+            $('#signedoff_clone').val('');
+            $('#signedoff').val(1);
+            $('.valid_input').addClass('required');
+            $('#formNote').submit();
+        });
+        
+        $('#formNote').submit(function() {
+            
+            var isValid = $('#formNote').valid();
+
+            if (isValid) {
+                return true;
+            }
+            return false;
+        });
+
+        jQuery('#signedoff_button').fancybox({
+            'href' : '#confirmation-sign-off-modal',
+            'width': '500',
+            'autoDimensions': false,
+            'hideOnContentClick': false,
+            'closeBtn': false,
+            'helpers' : {
+                'overlay' : {
+                    'closeClick': false,
+                    'locked': false
+                }
+            },
+            'keys' : {
+                close  : null
+            },
+            'beforeShow': function () {
+                jQuery.fancybox.wrap.bind("contextmenu", function (e) {
+                    return false;
+                });
+            }
+        });
+
+        $('body').on('click', '.ajax-link', function(e) {
+            e.preventDefault();
+            $.ajax({
+                type:"POST",
+                url:$(this).prop('href'),
+                success: function(data){
+                    if (data == '1') {
+                        location.reload();
+                    } else {
+                        alert(data);
+                    }
+                }
+            });
+        });
+
+        $('a.draggable').each(function( index, value ) {
+          value.addEventListener('dragstart',function(evt){
+            evt.dataTransfer.setData('DownloadURL',$(value).data('downloadurl'));
+          },false);
+        });
+
+        jQuery('.fancybox').each(function() {
+    
+            var width = jQuery(this).attr("width");
+            if (!width) width = 700;
+        
+            jQuery(this).fancybox({
+                'width': width,
+                'autoDimensions': false,
+                'type': 'iframe',
+                afterClose:function(){
+                    window.location.reload();
+                }
+            });
+            
+        });
+
+        $('tr.editable td').click(function() {
+            var td = $(this), edit_row = $('#edit-row');
+            if (td.hasClass('edit-mode') || td.index() >= edit_row.children().length) {
+                return;
+            }
+            $('tr.editable .edit-cancel').trigger('click');
+            td.addClass('edit-mode');
+            var old_val = td.html();
+            td.html('<span class="old-val">' + old_val + '</span>' + edit_row.children().eq(td.index()).children().clone().wrap('<div></div>').wrap('<form></form>').parent().parent().html() + '<a href="#" class="edit-save">Save</a> <a href="#" class="edit-cancel">Cancel</a>');
+            var elem = td.find('form').children();
+            if (elem.is('input')) {
+                elem.val(old_val);
+            }
+            if (elem.is('select')) {
+                elem.find('option').filter(function() {
+                    return $(this).text() == old_val; 
+                }).prop('selected', true);
+            }
+            if (elem.hasClass('datepicker')) {
+                elem.datepicker({dateFormat: 'mm/dd/yy'});
+            }
+        });
+
+        $('tr.editable').on('click', '.edit-cancel', function(e) {
+            e.preventDefault();
+            var td = $(this).closest('td');
+            td.html(td.children('span.old-val').html()).removeClass('edit-mode');
+        });
+
+        $('tr.editable').on('click', '.edit-save', function(e) {
+            e.preventDefault();
+            var td = $(this).closest('td');
+            var url = '/remediationplan/savetaskfield/' + td.closest('tr').data('id');
+            $.ajax({
+                type:"POST",
+                url:url,
+                data:td.find('form').serialize(),
+                success: function(data){
+                    if (data == '1') {
+                        var elem = td.find('form').children();
+                        if (elem.is('input')) {
+                            td.html(elem.val()).removeClass('edit-mode');
+                        }
+                        if (elem.is('select')) {
+                            td.html(elem.find('option:selected').text()).removeClass('edit-mode');
+                        }
+                    } else {
+                        alert('Error');
+                    }
+                }
+            });
+        });
+
+        jQuery('.fileupload').each(function() {
+            $(this).fileupload({
+                dropZone: $(this),
+                dataType: 'json',
+                done: function (e, data) {
+                    var tr = $(this).closest('tr').next('tr');
+                    tr.html(data.result.html);    
+                    tr.find('a.draggable').each(function( index, value ) {
+                      value.addEventListener('dragstart',function(evt){
+                        evt.dataTransfer.setData('DownloadURL',$(value).data('downloadurl'));
+                      },false);
+                    });  
+                    tr.find('.confirmation-modal').each(function() {
+                        $(this).fancybox({
+                            'width': '500',
+                            'autoDimensions': false,
+                            'hideOnContentClick': false,
+                            'closeBtn': false,
+                            'helpers' : {
+                                'overlay' : {
+                                    'closeClick': false
+                                }
+                            },
+                            'keys' : {
+                                close  : null
+                            },
+                            'beforeShow': function () {
+                                $.fancybox.wrap.bind("contextmenu", function (e) {
+                                    return false;
+                                });
+                            }
+                        });
+                    });       
+                },
+                progressall: function (e, data) {
+                    var progress = parseInt(data.loaded / data.total * 100, 10);
+                    var bar1 = $(this).closest('td').find('.progress');
+                    var bar2 = bar1.find('.progress-bar');
+
+                    bar1.removeClass('hidden');
+                    bar2.css({
+                        width : progress + '%'
+                    });
+
+                    if(progress === 100) {
+                        bar2.css({
+                         width : 0
+                        });
+                        bar1.addClass('hidden');
+                    }
+                }
+            });
+        });
+    });
+
+</script>
+
+<script type="text/javascript">
+    jQuery(function(){
+        $( "#rp_incident_date, #rp_remediation_date, #rp_approved_date, #rp_accepted_date" ).datepicker({dateFormat: 'mm/dd/yy'});
+        
+        jQuery("#toggle-edit-1").hide();
+        jQuery("#toggle-edit-show-1").toggle(function() {
+            jQuery("#toggle-edit-1").show();
+            jQuery("#toggle-edit-show-1").hide();
+        }, function() {
+            jQuery("#toggle-edit-show-1").show();
+            jQuery("#toggle-edit-1").hide();
+        });
+
+        jQuery("#toggle-edit-4").hide();
+        jQuery("#toggle-edit-show-4").toggle(function() {
+            jQuery("#toggle-edit-4").show();
+            jQuery("#toggle-edit-show-4").hide();
+        }, function() {
+            jQuery("#toggle-edit-show-4").show();
+            jQuery("#toggle-edit-4").hide();
+        });
+
+        jQuery("#toggle-edit-2").hide();
+        jQuery("#toggle-edit-show-2").toggle(function() {
+            jQuery("#toggle-edit-2").show();
+            jQuery("#toggle-edit-show-2").hide();
+        }, function() {
+            jQuery("#toggle-edit-show-2").show();
+            jQuery("#toggle-edit-2").hide();
+        });
+        jQuery("#toggle-edit-3").hide();
+        jQuery("#toggle-edit-show-3").toggle(function() {
+            jQuery("#toggle-edit-3").show();
+            jQuery("#toggle-edit-show-3").hide();
+        }, function() {
+            jQuery("#toggle-edit-show-3").show();
+            jQuery("#toggle-edit-3").hide();
+        });
+    });
+</script>
+
+<style type="text/css">
+    tr.editable td span.old-val {
+        display:none;
+    }
+
+    .progress {
+        height: 40px;
+        background-color: #f5f5f5;
+    }
+
+    .progress-bar {
+        margin-top: -5px;
+        float: left;
+        width: 0;
+        height: 100%;
+        text-align: center;
+        background-color: #428bca;
+    }
+
+    .progress.hidden {
+        display: none;
+    }
+</style>

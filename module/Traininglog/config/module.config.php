@@ -1,10 +1,19 @@
 <?php
+// Module/Traininglog/config/module.config.php
 
 return array(
     'controllers' => array(
-        'invokables' => array(
-            'Traininglog\Controller\Traininglog' => 'Traininglog\Controller\TraininglogController'
+        // 'invokables' => array(
+        //     'Traininglog\Controller\Traininglog' => 'Traininglog\Controller\TraininglogController'
+        // ),
+        'factories' => array(
+            'Traininglog\Controller\Traininglog' => 'Traininglog\Factory\TraininglogControllerFactory'
         ),
+    ),
+    'service_manager' => array(
+        'invokables' => array(
+            'Traininglog\Service\TovutiServiceInterface' => 'Traininglog\Service\TovutiService'
+        )
     ),
 
     // The following section is new and should be added to your file

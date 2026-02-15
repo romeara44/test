@@ -11,17 +11,17 @@ $identity = $authService->getIdentity();
 <div class="page-title">
     <h1 class="fleft">Clients</h1>
     <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 0, 'activeFilter' => $activeFilter)); ?>" class="label <?php echo $roleFilter == 0 ? ' selected ' : '' ?>">All</a>
-    <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 1, 'activeFilter' => $activeFilter)); ?>" class="label <?php echo $roleFilter == 1 ? ' selected ' : '' ?>">Companies</a>
+    <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 1, 'activeFilter' => $activeFilter)); ?>" class="label <?php echo $roleFilter == 1 ? ' selected ' : '' ?>">Organizations</a>
     <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 2, 'activeFilter' => $activeFilter)); ?>" class="label <?php echo $roleFilter == 2 ? ' selected ' : '' ?>">Contacts</a>
     <?php if (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_SENIOR_CONSULTANT))
         || $identity['u_company_id_admin']) : ?>
     <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => $roleFilter, 'activeFilter' => 1)); ?>" class="label <?php echo $activeFilter == 1 ? ' selected ' : '' ?>">Active</a>
     <a href="<?php echo $this->url('client', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => $roleFilter, 'activeFilter' => 2)); ?>" class="label <?php echo $activeFilter == 2 ? ' selected ' : '' ?>">Inactive</a>
     <?php endif;?>
-    <?php if ($identity['u_role_id'] != \Admin\Model\User::ROLE_TRAIL) : ?>
+    <?php if ($identity['u_role_id'] != \Admin\Model\User::ROLE_TRIAL) : ?>
     <a href="/client/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Contact</a>
-    <?php if($checkClientLimitCompany): ?>
-        <a href="/company/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Company</a>
+    <?php if(in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_PARTIAL))): ?>
+        <a href="/company/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Organization</a>
     <?php endif;?>
     <?php endif;?>
     <div class="cboth"></div>
@@ -40,7 +40,7 @@ $identity = $authService->getIdentity();
             <th>Name</th>
 
             <?php $classSort = ($order_by == 'company') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
-            <th>Company</th>
+            <th>Organization</th>
             <th>Phone</th>
             <th>Created</th>
             <th>Renewal Date</th>
@@ -75,7 +75,7 @@ $identity = $authService->getIdentity();
                 <td><?php echo ($isUser) ? '' : ($company->c_renewal_date != '0000-00-00 00:00:00') ? $this->formatDateA($company->c_renewal_date) : '' ?></td>                
                 <td class="aright">
                     <a href="/<?php echo ($isUser) ? 'client' : 'company' ?>/edit/<?php echo ($isUser) ? $company->u_id : $company->c_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
-                    <?php if ($identity['u_role_id'] != \Admin\Model\User::ROLE_TRAIL) : ?>
+                    <?php if ($identity['u_role_id'] != \Admin\Model\User::ROLE_TRIAL) : ?>
                         <?php if ($company->_c_active): ?>
                             <?php $deleteUrl = '/' . (($isUser) ? 'client' : 'company') . '/delete/' . (($isUser) ? $company->u_id : $company->c_id); ?>
                             <a href="#deactivation-box-modal" onclick="$('#deactivateYes').attr('href', '<?php echo $deleteUrl ?>')" class="confirmation-modal i-delete" title="Deactivate"><i class="fa fa-trash-o"></i></a>

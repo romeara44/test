@@ -1,0 +1,90 @@
+<?php
+    $urlOrder = $order == 'ASC' ? 'DESC' : 'ASC';
+    $authService = new \Zend\Authentication\AuthenticationService();
+    $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+    $identity = $authService->getIdentity();
+    $isClientRole = $identity['u_role_id'] == 5 ? 1 : 0;
+
+?>
+
+<div class="page-title">
+    <h1 class="fleft">Audits</h1>
+    <?php if (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_TRAIL)) || ($identity['u_role_id'] == \Admin\Model\User::ROLE_CLIENT && $identity['u_company_id_admin'])): ?>
+        <a href="/audit/newaudit" class="button"><i class="fa fa-clipboard"></i> Start New Audit</a>
+    <?php endif; ?>
+    <div class="cboth"></div>
+</div>
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+
+<p></p>
+<style>
+    tr.group,
+    tr.group:hover {
+        background-color: #eee !important;
+        font-weight: bold
+    }
+</style>
+<table id="audit-record-list-table" cellpadding="0" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Audit ID</th>
+            <th>Remediation Plan Being Audited</th>
+            <th>Lead Auditor</th>
+            <th>Date Audited</th>
+            <th>Audit Status</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <?php $postFix = ''; $isVersion = false; $counterVersion = 0; $paddingVersion = 0; $rowIdParent = ''; $isParentActive = false; $lastVersionIndex = 0;
+        foreach ($this->res as $rps):
+            if (count($rps) > 1):
+                $multiple = true;
+            else:
+                $multiple = false;
+            endif;
+
+            foreach ($rps as $key => $rp): ?>
+                <tr>
+                    <td><?php echo $rp->audit_record_id ?></td>
+                    <td><?php echo $rp->_remediationPlanIndex ?></td>
+                    <td><?php echo $rp->_user_first_name . ' ' . $rp->_user_last_name ?></td>
+
+                    <td><?php echo ($rp->date_audited  != '0000-00-00 00:00:00') ? $this->formatDateA($rp->date_audited) : '' ?></td>
+                    <td><?php echo $rp->_audit_status_name ?></td>
+                    <td><a class="bold" href="/audit/edit/<?php echo $rp->audit_record_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+                </tr>
+
+            <?php endforeach; ?>
+        
+        <?php endforeach; ?>
+
+    </tbody>
+</table>
+
+<div class="cboth"><br /></div>
+
+<script type="text/javascript">
+
+    $(document).ready( function () {
+        $('#audit-record-list-table').DataTable({
+            pageLength: 10,
+            paging: true,
+            searching: true,
+            order: [[0, "desc"]],
+            columnDefs: [{ orderable: true, targets: [5] }] // 6 was the highest index, not 7
+        });
+
+        $('.dataTables_filter input[type="search"]').
+            css({'width':'95%','display':'inline-block'});
+    } );
+
+    $(document).ready(function() {
+        $('.multiple-locs').click(function() {
+            $(this).closest('tr').siblings('tr.assess-' + $(this).data('ass_id')).toggle();
+        });
+    });
+</script>

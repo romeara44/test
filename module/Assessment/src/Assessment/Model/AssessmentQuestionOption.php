@@ -14,6 +14,9 @@ class AssessmentQuestionOption
     public $aqo_order;
     public $aqo_risk_score;
     public $aqo_active;
+    public $calculate_risk_score;
+    public $impact_value;
+    public $likelihood_value;
     public $aqo_create_date;
     public $aqo_update_date;
 
@@ -27,6 +30,9 @@ class AssessmentQuestionOption
         $this->aqo_order     = (isset($data['aqo_order'])) ? $data['aqo_order'] : null;
         $this->aqo_risk_score     = (isset($data['aqo_risk_score'])) ? $data['aqo_risk_score'] : null;
         $this->aqo_active     = (isset($data['aqo_active'])) ? $data['aqo_active'] : null;
+        $this->calculate_risk_score = (isset($data['calculate_risk_score'])) ? $data['calculate_risk_score'] : null;
+        $this->impact_value   = (isset($data['impact_value'])) ? $data['impact_value'] : null;
+        $this->likelihood_value = (isset($data['likelihood_value'])) ? $data['likelihood_value'] : null;
         $this->aqo_create_date     = (isset($data['aqo_create_date'])) ? $data['aqo_create_date'] : null;
         $this->aqo_update_date     = (isset($data['aqo_update_date'])) ? $data['aqo_update_date'] : null;
     }

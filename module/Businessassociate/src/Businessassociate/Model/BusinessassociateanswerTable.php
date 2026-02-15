@@ -82,6 +82,9 @@ class BusinessassociateanswerTable implements ServiceLocatorAwareInterface
 
     public function checkIfAnswersExists($baId = 0)
     {
+        if (is_null($baId)){
+            $baId = 0;
+        }
         $select = $this->tableGateway->getSql()->select();
         $select->where('baa_ba_id = ' . $baId);
         $select->where('baa_active = 1');

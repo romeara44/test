@@ -254,6 +254,9 @@ class AssessmentQuestionAnswerTable implements ServiceLocatorAwareInterface
                     $dataAnswer['aqa_create_date'] = new \Zend\Db\Sql\Expression('NOW()');
                     $dataAnswer['aqa_create_u_id'] = $identity['u_id'];
 
+                    $dataAnswer['aqa_update_date'] = new \Zend\Db\Sql\Expression('NOW()');
+                    $dataAnswer['aqa_update_u_id'] = $identity['u_id'];
+                    
                     $aqaId = $this->tableGateway->insert($dataAnswer);
                     $aqaId = $this->tableGateway->lastInsertValue;
                 }

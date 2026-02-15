@@ -3,7 +3,7 @@
     <div class="cboth"></div>
 </div>
 <div>
-    <label class="auditbreach_search_label" for="list_search">Regulation Number or Regulation Descriptoin</label>
+    <label class="auditbreach_search_label" for="list_search">Regulation Number or Regulation Description</label>
     <form id="reporting_search_form" method="GET" onsubmit="encodeInput(this)" action="<?php echo $this->url('reporting', array('action' => 'auditbreach', 'roleFilter' => 1)); ?>">
         <a href="javascript:" onclick="$('#reporting_search_form').submit()" id="list_search-button"><i class="fa fa-search"></i></a>
         <input type="text" name="search" id="list_search" placeholder="Search" value="<?php echo $search?>">

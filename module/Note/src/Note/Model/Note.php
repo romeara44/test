@@ -11,24 +11,25 @@ class Note
     const NOTE_COMPANY = 1;
     const NOTE_BUSINESSASSOCIATE = 2;
     const NOTE_BUSINESSASSOCIATE_ANSWER = 3;
-    const NOTE_BRP = 4;
-    const NOTE_BRPA = 5;
+    const NOTE_BRP = 4;  //Breach Remediation Plan
+    const NOTE_BRPA = 5; //Breach Remediation Plan Action
     const NOTE_AILI = 6;
-    const NOTE_ABAL = 7;
-    const NOTE_ASSESSMENT_ANSWER = 8;
-    const NOTE_CONTACT = 9;
-    const NOTE_RP = 10;
-    const NOTE_RPA = 11;
-    const NOTE_BL = 12;
-    const NOTE_TLT = 13;
-    const NOTE_TLC = 14;
-    const NOTE_SRM = 15;
-    const NOTE_SRC = 16;
-    const NOTE_IAIR = 17;
-    const NOTE_IAIN = 18;
-    const NOTE_PSC = 19;
-    const NOTE_DR = 20;
-    const NOTE_AR = 21;
+    const NOTE_ABAL = 7;  //Asset Business Associate List Item
+    const NOTE_ASSESSMENT_ANSWER = 8;  //Assessment Item Question Answer Note
+    const NOTE_CONTACT = 9;  //Client Note
+    const NOTE_RP = 10;  //Remediation Plan
+    const NOTE_RPA = 11;  //Remediation Plan Action
+    const NOTE_BL = 12;  //Breach Log
+    const NOTE_TLT = 13;  // Note TrainingLog Table
+    const NOTE_TLC = 14;  //TrainingLog Ccomment
+    const NOTE_SRM = 15;  //Security Reminder
+    const NOTE_SRC = 16; //Security Reminder Controller
+    const NOTE_IAIR = 17;  //IT Asset Inventory R?
+    const NOTE_IAIN = 18;  //IT Asset Inventory N?
+    const NOTE_PSC = 19;  //Physical Security Change
+    const NOTE_DR = 20;  //Disclosure Record
+    const NOTE_AR = 21; //Accounting Request
+    const NOTE_AUDIT_ITEM = 22;  //Audit Item
 
     public $note_id;
     public $note_text;
@@ -47,18 +48,34 @@ class Note
 
     public function exchangeArray($data)
     {
-        $this->note_id     = (isset($data['note_id'])) ? $data['note_id'] : null;
-        $this->note_text     = (isset($data['note_text'])) ? $data['note_text'] : null;
-        $this->note_u_id     = (isset($data['note_u_id'])) ? $data['note_u_id'] : null;
-        $this->note_item_type     = (isset($data['note_item_type'])) ? $data['note_item_type'] : null;
-        $this->note_item_id     = (isset($data['note_item_id'])) ? $data['note_item_id'] : null;
-        $this->note_subitem_id     = (isset($data['note_subitem_id'])) ? $data['note_subitem_id'] : null;
-        $this->note_active     = (isset($data['note_active'])) ? $data['note_active'] : null;
-        $this->note_create_date     = (isset($data['note_create_date'])) ? $data['note_create_date'] : null;
-        $this->note_encrypted     = (isset($data['note_encrypted'])) ? $data['note_encrypted'] : null;
-        $this->_username     = (isset($data['_username'])) ? $data['_username'] : null;
-        $this->_files     = (isset($data['_files'])) ? $data['_files'] : null;
-        $this->_note_create_date_format    = (isset($data['_note_create_date_format'])) ? $data['_note_create_date_format'] : null;
+        $this->note_id                  = (isset($data['note_id'])) ? $data['note_id'] : null;
+        $this->note_text                = (isset($data['note_text'])) ? $data['note_text'] : null;
+        $this->note_u_id                = (isset($data['note_u_id'])) ? $data['note_u_id'] : null;
+        $this->note_item_type           = (isset($data['note_item_type'])) ? $data['note_item_type'] : null;
+        $this->note_item_id             = (isset($data['note_item_id'])) ? $data['note_item_id'] : null;
+        $this->note_subitem_id          = (isset($data['note_subitem_id'])) ? $data['note_subitem_id'] : null;
+        $this->note_active              = (isset($data['note_active'])) ? $data['note_active'] : null;
+        $this->note_create_date         = (isset($data['note_create_date'])) ? $data['note_create_date'] : null;
+        $this->note_encrypted           = (isset($data['note_encrypted'])) ? $data['note_encrypted'] : null;
+        $this->_username                = (isset($data['_username'])) ? $data['_username'] : null;
+        $this->_files                   = (isset($data['_files'])) ? $data['_files'] : null;
+        $this->_note_create_date_format = (isset($data['_note_create_date_format'])) ? $data['_note_create_date_format'] : null;
+    }
+
+    public function exchangeObject($data)
+    {
+        $this->note_id                  = (isset($data->note_id)) ? $data->note_id : null;
+        $this->note_text                = (isset($data->note_text)) ? $data->note_text : null;
+        $this->note_u_id                = (isset($data->note_u_id)) ? $data->note_u_id : null;
+        $this->note_item_type           = (isset($data->note_item_type)) ? $data->note_item_type : null;
+        $this->note_item_id             = (isset($data->note_item_id)) ? $data->note_item_id : null;
+        $this->note_subitem_id          = (isset($data->note_subitem_id)) ? $data->note_subitem_id : null;
+        $this->note_active              = (isset($data->note_active)) ? $data->note_active : null;
+        $this->note_create_date         = (isset($data->note_create_date)) ? $data->note_create_date : null;
+        $this->note_encrypted           = (isset($data->note_encrypted)) ? $data->note_encrypted : null;
+        $this->_username                = (isset($data->_username)) ? $data->_username : null;
+        $this->_files                   = (isset($data->_files)) ? $data->_files : null;
+        $this->_note_create_date_format = (isset($data->_note_create_date_format)) ? $data->_note_create_date_format : null;
     }
 
     public function getArrayCopy()

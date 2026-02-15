@@ -1,0 +1,669 @@
+<?php
+
+$request = new \Zend\Http\PhpEnvironment\Request();
+$http_referer = $request->getServer('HTTP_REFERER');
+$parsed = parse_url($http_referer, PHP_URL_PATH); //dashboard/client
+
+// within a view script
+$form = $this->form;
+$form->prepare();
+
+// Assuming the "contact/process" route exists...
+$form->setAttribute('action', '/contact/edit');
+
+// Set the method attribute for the form
+$form->setAttribute('method', 'post');
+
+// Render the opening tag
+?>
+
+<style>
+      
+      article {
+        padding: 10px;
+        /*margin: 10px;*/
+      }
+
+      section {
+        display: flex;
+        
+    }
+
+    fieldset {
+      overflow: hidden;
+      width: 700px;
+    }
+    
+    .some-class {
+      float: left;
+      clear: none;
+    }
+    
+    label {
+      float: left;
+      clear: none;
+      display: block;
+      padding: 0px 1em 0px 8px;
+    }
+    
+    input[type=radio],
+    input.radio {
+      float: left;
+      clear: none;
+      margin: 2px 0 0 2px;
+    }
+      /* Add your flexbox CSS below here */
+ 
+</style>
+
+
+<div class="page-title">
+    <h1 class="fleft"><?php if (!$uId): ?>Add New Contact<?php else: ?>Contact Details<?php endif; ?></h1>
+    
+    <?php if ($this->uId): ?>
+        <ul id="tabs-nav">
+            <li><a href="#tab1">Details</a></li>
+            <li><a href="#tab2">Notes</a></li>
+            <?php if($administrationAccess): ?>
+                <li><a href="#tab3">Administration</a></li>
+            <?php endif; ?>
+        </ul>
+        <div class="cboth"></div>
+    <?php endif; ?>
+
+    <div class="cboth"></div>
+
+
+</div>
+
+<p></p>
+
+<div class="col-left">
+    <div id="tab1">
+        <form action="/contact/edit/<?php echo $this->uId ?>/company/<?php echo $this->cId ?>" method="post" name="user" id="user">
+            <?php
+                $fn = $form->get('u_id');
+                echo $this->formHidden($fn);
+            ?>
+
+            <p>
+                <?php
+                $fn = $form->get('u_firstname');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_lastname');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_title');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+
+            <p>
+                <?php $fn = $form->get('u_company_id');
+                echo $this->formLabel($fn);
+                echo $this->formSelect($fn->setAttributes(array('class'=>'form-control required', 'id' => 'u_company_id')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+
+            <?php if(!(is_object($userObj) && $userObj->u_role_id == \Admin\Model\User::ROLE_TRIAL)) : ?>
+                <?php if($identity['u_role_id'] != \Admin\Model\User::ROLE_PARTIAL) :?>
+                    <p style="padding: 2px 0 12px 0; line-height: 14px; border-top: 0;">
+                        <label>&nbsp;</label>
+
+                        <?php if(!$uId || in_array($identity['u_role_id'], array(1, 2, 3)) || $isCompanyAdmin) :?>
+                            <input type="checkbox" name="is_primary_contact" <?php if(is_object($clientObj) && $clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $userObj->u_id) :?>checked="checked"<?php endif; ?> id="primaryContact" class="checkbox" value="1" eanbled />
+                        <?php else: ?>
+                            <input type="checkbox" name="is_primary_contact" <?php if(is_object($clientObj) && $clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $userObj->u_id) :?>checked="checked"<?php endif; ?> id="primaryContact" class="checkbox" value="1" disabled />
+                        <?php endif; ?>
+                        <label for="primaryContact" class="checkbox">Primary Contact</label>
+
+
+                        <?php if (!$uId || in_array($identity['u_role_id'], array(1, 2, 3)) || $isCompanyAdmin): ?>
+                            <span id="companyIdAdminWrap" <?php if(!(in_array($identity['u_role_id'], array(1, 2, 3, 5)) || (is_object($clientObj) && $clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $identity['u_id']))) :?>style="display:none"<?php endif; ?>>
+                                <input type="checkbox" name="u_company_id_admin" <?php if($isCompanyAdmin):?>checked <?php endif; ?> id="companyIdAdmin" class="checkbox" value="<?php echo $userObj ? $userObj->u_company_id_admin : '' ?>"
+                                <?php if(!(in_array($identity['u_role_id'], array(1, 2, 3)) || (is_object($clientObj) && $clientObj->c_primary_contact_u_id && $clientObj->c_primary_contact_u_id == $identity['u_id']))) :?> disabled="true"<?php endif; ?> />
+                                <label for="companyIdAdmin" class="checkbox">Organization Admin</label>
+                            </span>
+                        <?php endif; ?>
+
+
+
+
+                    </p>
+                    <p style="padding: 2px 0 12px 0; line-height: 14px; border-top: 0;">
+                        <label>&nbsp;</label>
+                        <?php if (!$uId || in_array($identity['u_role_id'], array(1, 2, 3)) || $isCompanyAdmin): ?>
+                            <input type="checkbox" name="u_grant_to_disclosures" <?php if(is_object($userObj) && $userObj->u_grant_to_disclosures):?>checked <?php endif; ?> id="grantToDisclosures"  class="checkbox" value="1" enabled/>
+                        <?php else: ?>
+                            <input type="checkbox" name="u_grant_to_disclosures" <?php if(is_object($userObj) && $userObj->u_grant_to_disclosures):?>checked <?php endif; ?> id="grantToDisclosures"  class="checkbox" value="1" disabled/>
+                        <?php endif; ?>
+                        <label for="grantToDisclosures" class="checkbox">Grant To Disclosures</label>
+                        
+                        <span class="tooltip" style="border-bottom: none">
+                            <i class="fas fa-info-circle"></i><span class="tooltiptext">The Training Manager is the person in charge of tracking of all training modules and also the system manager component of the training module</span>
+                            <input type="checkbox" name="is_training_manager" <?php if(is_object($userObj) && in_array($userObj->u_id, $training_managers)):?>checked <?php endif; ?> id="trainingManager" class="checkbox" value="1" />
+                            <label for="trainingManager" class="checkbox">Training Manager</label>
+                        </span>
+
+                    </p>
+                    
+                    <p style="padding: 2px 0 12px 0; line-height: 14px; border-top: 0;">
+                        <label>&nbsp;</label>
+                        <?php if ((!$uId || in_array($identity['u_role_id'], array(1, 2, 3)) || $isCompanyAdmin)): ?>
+                            <input type="checkbox" name="u_grant_to_breach" <?php if(is_object($userObj) && $userObj->u_grant_to_breach):?>checked <?php endif; ?> id="grantToBreach" class="checkbox" value="1"/>
+                            <label for="grantToBreach" class="checkbox">Grant To Breach</label>
+
+                            <input type="checkbox" name="audit_signoff_approve" <?php if(is_object($userObj) && $userObj->audit_signoff_approve):?>checked <?php endif; ?> id="grantToAuditSignoff" class="checkbox" value="1" />
+                            <label for="grantToAuditSignoff" class="checkbox">Audit Signoff and Approve</label>
+                        <?php endif; ?>
+                    </p>
+                <?php endif; ?>
+            <?php endif; ?>
+
+            <input type="hidden" name="identity_u_role_id" id="identity_u_role_id" value="<?php echo $identity['u_role_id'] ?>" disabled="true" />
+            <input type="hidden" name="u_role_id" id="u_role_id" value="<?php echo $userObj ? $userObj->u_role_id :''?>" />
+            <input type="hidden" name="identity_u_id" id="identity_u_id" value="<?php echo $identity['u_id']?>" disabled="true" />
+            <input type="hidden" name="def_u_company_id" id="def_u_company_id" value="<?php echo $userObj ? $userObj->u_company_id :'' ?>" disabled="true" />
+            <input type="hidden" name="def_u_company_id_admin" id="def_u_company_id_admin" value="<?php echo $userObj ? $userObj->u_company_id_admin :'' ?>" disabled="true" />
+
+            <p style="padding: 0;border-top: 0;">
+                <?php if($setTrainingManagerMsg) :?>
+                    <label style="padding:0" for="trainingManager" generated="true" class="error"><?php echo $setTrainingManagerMsg ?></label>
+                <?php endif; ?>
+            </p>
+            <p style="padding: 0;border-top: 0;">
+                <?php if($clientLimitMsg) :?>
+                    <label style="padding:0" for="u_company_id" generated="true"class="error"><?php echo $clientLimitMsg ?></label>
+                <?php endif; ?>
+            </p>
+
+            <p style="border: 0;">
+                <div>
+                    <input type="checkbox" name="licensed_user" <?php if(is_object($userObj) && $userObj->licensed_user == 1):?>checked <?php endif; ?> id="licensedUser" class="checkbox" value="1" <?php if (($purchasedLicense - $this->usedLicense) == 0 ) { ?> disabled <?php } ?> <?php if(is_object($userObj) && $userObj->licensed_user):?>checked <?php endif; ?> />
+                    <label for="licensedUser" class="checkbox">Licensed User</label>&nbsp;&nbsp;
+                    <div class="tooltip">
+                        <i class="fas fa-info-circle"></i><span class="tooltiptext">A licensed user is a user that has access to work within HIPAA Suite®.  A licensed user will be credited against the total licenses purchased.  A non-licensed user is someone that can have tasks within HIPAA Suite® assigned to them but will not complete work within HIPAA Suite®.</span>
+                    </div>
+                </div>
+
+                <section class="col-left">
+                    <article>
+                        <label>Purchased</label>
+                        <input type="text" name="licensed_user" disabled="disabled" class="valid_input form-control" id="purchasedLicenses" value=<?php echo $purchasedLicense ?> />
+                    </article>
+
+                    <article>
+                        <label>Used</label>
+                        <input type="text" name="license_used" disabled="disabled" class="valid_input form-control" id="usedLicenses" value=<?php echo $usedLicense ?> />
+                    </article>
+
+                    <article>
+                        <label>Available</label>
+                        <input type="text" name="license_available" disabled="disabled" class="valid_input form-control" id="availableLicenses" value=<?php echo $purchasedLicense - $this->usedLicense ?> />
+                        <input type="hidden" name"masterAvailableLicenses" id="masterAvailableLicenses" value=<?php echo $purchasedLicense - $this->usedLicense ?> />
+                    </article>
+                    
+                </section>
+            </p>
+            
+            <p>
+                <fieldset>
+                    <p>User Type:</p>
+                    <div class="some-class">
+                        <input type="radio" class="radio" name="x" value="y" id="y" />
+                        <label for="y">Training Express</label>
+                        <input type="radio" class="radio" name="x" value="z" id="z" />
+                        <label for="z">OSHA Express</label>
+                        <input type="radio" class="radio" name="x" value="z" id="z" />
+                        <label for="z">OIG Express</label>
+                    </div>
+                </fieldset>
+                <br>
+                <br>
+            </p>
+            
+            <p>
+                <?php
+                $fn = $form->get('u_office_phone');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                echo $this->formElementErrors($fn);
+                ?>
+
+                <?php
+                $fn = $form->get('u_office_phone_inner');
+                echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                echo $this->formElementErrors($fn);
+                ?>
+
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_direct_phone');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                echo $this->formElementErrors($fn);
+                ?>
+                <?php
+                $fn = $form->get('u_direct_phone_inner');
+                echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                echo $this->formElementErrors($fn);
+                ?>
+
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_cell_phone');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_other_phone');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'phone')));
+                echo $this->formElementErrors($fn);
+                ?>
+                <?php
+                $fn = $form->get('u_other_phone_inner');
+                echo $this->formInput($fn->setAttributes(array('class'=>'ext')));
+                echo $this->formElementErrors($fn);
+                ?>
+
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_fax');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_email');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p id="phoneRequired" style="display: none">
+                <label for="" generated="true" class="error">At least 1 phone number is required</label>
+            </p>
+
+            <h2>Address</h2>
+
+            <p style="padding: 12px 0 12px 0; line-height: 14px;">
+                <label>&nbsp;</label>
+                <input type="checkbox" name="companyAddress" id="companyAddress" class="checkbox" value="" /> <label for="companyAddress" class="checkbox">Same as Organization Address</label>
+            </p>
+
+            <p>
+                <?php
+                $fn = $form->get('u_address1');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id' => 'u_address1')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_address2');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id' => 'u_address2')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_city');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id' => 'u_city')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php $fn = $form->get('u_state_id');
+                echo $this->formLabel($fn);
+                echo $this->formSelect($fn->setAttributes(array('class'=>'form-control', 'id' => 'u_state_id')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+            <p>
+                <?php
+                $fn = $form->get('u_zip');
+                echo $this->formLabel($fn);
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id' => 'u_zip')));
+                echo $this->formElementErrors($fn);
+                ?>
+            </p>
+
+            <div class="cboth"></div>
+            <div class="form-buttons">
+                <?php if ($identity['u_role_id'] != \Admin\Model\User::ROLE_TRIAL): ?>
+                    <input type="submit"  name="save" value="Save" class="form-button" />
+                    <?php if ($this->uId): ?>
+                        <a href="/client/sendinvite/<?php echo $this->uId ?>" class="form-button">Send Invite Email</a>
+                    <?php else: ?>
+                        <input type="submit" name="save_send_email" value="Save & Send Invite Email" class="form-button" />
+                    <?php endif; ?>
+                    <div class="fleft">or</div>
+                <?php endif; ?>
+                <?php if($parsed == '/dashboard/client'): ?>
+                    <a href="/dashboard/client" class="cancel">Cancel</a>
+                <?php else: ?>
+                    <a href="/contact/list" class="cancel">Cancel</a>
+                <?php endif; ?>
+
+            </div>
+
+        <?php echo $this->form()->closeTag() ?>
+    </div>
+
+    <?php if ($this->uId): ?>
+        <div id="tab2">
+            <div class="tooltip">
+                <i class="fas fa-info-circle"></i><span class="tooltiptext">This is a free text field where you can add any notes that you would like about the contact.  Note fields are available throughout the whole system so segregate your notes for specific purposes.  These notes should be about the contact.</span>
+            </div>
+            <h3>Add a note about this Contact</h3>
+            
+            <form action="/client/edit/<?php echo $this->uId ?>" name="" id="" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="noteform" value="1" />
+
+                <?php
+                $fn = $formNote->get('note_id');
+                echo $this->formHidden($fn);
+                ?>
+
+                <?php
+                $fn = $formNote->get('note_item_type');
+                $fn->setValue(9);
+                echo $this->formHidden($fn);
+                ?>
+
+                <?php
+                $fn = $formNote->get('note_item_id');
+                $fn->setValue($this->uId);
+                echo $this->formHidden($fn);
+                ?>
+
+                <p>
+                    <?php
+                    $fn = $formNote->get('note_text');
+                    echo $this->formTextarea($fn->setAttributes(array('class' => 'double')));
+                    echo $this->formElementErrors($fn);
+                    ?>
+                </p>
+
+                <div class="tooltip">
+                    <p style="border: 0;">
+                    <i class="fas fa-info-circle"></i><span class="tooltiptext">Attachment fields are available throughout the whole system so segregate your attachments for specific purposes.  These attachments should be about the contact.</span>
+                        <strong style="line-height: 30px;">Attachments</strong><br />
+                        <a id="browseFile" href="javascript:" class="button"><i class="fa fa-plus-circle"></i> Browse Files...</a>
+                    </p>
+                </div>
+
+                <div class="cboth"></div>
+                <div id="filesToUploadBox">
+
+                </div>
+
+                <div class="cboth"></div>
+                <div class="form-buttons">
+                    <?php if($identity['u_role_id'] != \Admin\Model\User::ROLE_TRIAL): ?>
+                        <input type="submit" value="Save" class="form-button" />
+                        <div class="fleft">or</div>
+                    <?php endif; ?>
+
+                    <?php if($parsed == '/dashboard/client'): ?>
+                        <a href="/dashboard/client" class="cancel">Cancel</a>
+                    <?php else: ?>
+                        <a href="/contact/list" class="cancel">Cancel</a>
+                    <?php endif; ?>
+
+                </div>
+                <div class="cboth"><br /></div>
+
+            </form>
+
+            <?php if ($this->uId && is_object($notes) && ($notes->count())): ?>
+                <?php foreach ($notes as $note): ?>
+                    <div class="note">
+                        <strong><?php echo $note->_username ?></strong> <small> on <?php echo $note->_note_create_date_format ?></small><br />
+                        <p>
+                            <?php echo $note->note_text ?><br />
+                            <?php if ($note->_files != ''): ?>
+                                <?php
+                                $_files = explode(',', $note->_files);
+                                ?>
+                                <strong>Attachments:</strong><br />
+                                <?php foreach ($_files as $_file): ?>
+                                    <?php
+                                    $_file = explode('::', $_file);
+                                    $_fileName = $_file[0];
+                                    $_fileId = $_file[1];
+                                    ?>
+                                    <span style="float: left; margin-right: 5px;" class="<?php echo $this->renderPictoIcon($_fileName); ?>"></span><a href="/files/get/note/<?php echo $note->note_id ?>/<?php echo $_fileId ?>" class="" target="_blank"><?php echo $_fileName ?></a><br/>
+
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </p>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($administrationAccess): ?>
+        <div id="tab3">
+            <h3>Administration</h3>
+
+            <form action="/client/resetpassword/<?php echo $this->uId ?>" name="" id="" method="POST">
+
+                <p style="border-bottom:0">
+                    <input type="submit"  name="reset" value="Reset Password" class="form-button" />
+                </p>
+
+            </form>
+
+        </div>
+    <?php endif; ?>
+</div>
+
+<?php if (is_object($clientObj)): ?>
+    <div class="col-right">
+
+        <h3 style="padding-top: 0;">Organization Details</h3>
+        <h5><?php echo $clientObj->c_name ?></h5>
+        <?php if (is_object($primaryAddressObj)): ?>
+            <p><?php echo $primaryAddressObj->adr_address1 ?><br /><?php echo $primaryAddressObj->adr_address2 ?><br /><?php echo $primaryAddressObj->adr_city ?>, <?php echo $primaryAddressObj->_state_code ?> <?php echo $primaryAddressObj->adr_zip ?></p>
+        <?php endif; ?>
+        <p><small>Office Phone:</small> <?php echo $clientObj->c_phone ?><br /><small>Fax:</small> <?php echo $clientObj->c_fax ?></p>
+        <p><small>Email:</small> <a href="mailto:<?php echo $clientObj->c_email ?>"><?php echo $clientObj->c_email ?></a><br /><small>URL:</small> <a href="<?php echo $clientObj->c_website ?>" target="_blank"><?php echo $clientObj->c_website ?></a></p>
+
+        <p><a href="/company/edit/<?php echo $clientObj->c_id ?>" class="button"><i class="fa fa-pencil"></i> Organization Details</a></p>
+
+    </div>
+<?php endif; ?>
+
+<div class="cboth"><br /></div>
+
+<script>
+
+    var primaryAddress1 = '';
+    var primaryAddress2 = '';
+    var primaryCity = '';
+    var primaryState = '';
+    var primaryZip = '';
+
+    <?php if (is_object($primaryAddressObj)): ?>
+        primaryAddress1 = '<?php echo $primaryAddressObj->adr_address1 ?>';
+        primaryAddress2 = '<?php echo $primaryAddressObj->adr_address2 ?>';
+        primaryCity = '<?php echo $primaryAddressObj->adr_city ?>';
+        primaryState = '<?php echo $primaryAddressObj->adr_state_id ?>';
+        primaryZip = '<?php echo $primaryAddressObj->adr_zip ?>';
+    <?php endif; ?>
+
+    var browseFilesCounter = 0;
+
+    $(document).ready(function() {
+        $('#browseFile').click(function() {
+            
+            $('#filesToUploadBox').append('<input type="file" name="notesFiles[]" id="file' + browseFilesCounter + '" />');
+
+            $('#file' + browseFilesCounter).click();
+            browseFilesCounter++;
+        });
+
+		$('#companyAddress').change(function() {
+            if ($(this).prop('checked') && $('#u_company_id').val()) {
+                $('#u_address1').val(primaryAddress1);
+                $('#u_address2').val(primaryAddress2);
+                $('#u_city').val(primaryCity);
+                $('#u_state_id option[value=' + primaryState + ']').attr('selected','selected');
+                $('#u_zip').val(primaryZip);
+            }
+        });
+
+        $('#u_company_id').change(function() {
+
+            var companyVal = $('#u_company_id').val();
+
+            $.ajax({
+                type:"POST",
+                url: '/client/saveItemStatus',
+                data: {value: companyVal},
+                success: function(response)
+                {
+                    var jsonData = JSON.parse(response);
+                }
+            });
+            
+            if($('#def_u_company_id').val() == companyVal) {
+                $('#trainingManager').attr('checked', true);
+            } else {
+                $('#trainingManager').attr('checked', false);
+            }
+
+            if($('#def_u_company_id_admin').val() == companyVal) {
+                 $('#companyIdAdmin').attr({'value': companyVal, 'checked': true});
+            } else {
+                $('#companyIdAdmin').attr({'value': 0, 'checked': false});
+            }
+
+            $.getJSON("/company/getprimaryaddress/" + companyVal, {  }, function(data) {
+                if (companyVal) {
+                    if (data.address.adr_id) {
+                        primaryAddress1 = data.address.adr_address1;
+                        primaryAddress2 = data.address.adr_address2;
+                        primaryCity = data.address.adr_city;
+                        primaryState = data.address.adr_state_id;
+                        primaryZip = data.address.adr_zip;
+                        var identityRoleId = parseInt($('#identity_u_role_id').val());
+                        var identityUId = parseInt($('#identity_u_id').val());
+                        if(identityRoleId == 1 || identityRoleId == 2 || (identityRoleId == 5 && identityUId == data.company.c_primary_contact_u_id)) {
+                            $('#companyIdAdminWrap').css('display', 'block');
+                            $('#companyIdAdmin').attr('disabled', false);
+                        } else {
+                            $('#companyIdAdminWrap').css('display', 'none');
+                            $('#companyIdAdmin').attr('disabled', true);
+                        }
+                        if ($('#companyAddress').prop('checked')) {
+                            $('#u_address1').val(primaryAddress1);
+                            $('#u_address2').val(primaryAddress2);
+                            $('#u_city').val(primaryCity);
+                            $('#u_state_id').val(primaryState);
+                            $('#u_zip').val(primaryZip);
+                        }                        
+                    }
+                }
+            });
+
+        });
+    });
+
+</script>
+
+<script type="text/javascript">
+    
+    var companyId = <?php echo (int) $this->cId ?>;
+    jQuery(function() {
+        if (companyId) {
+            $('#u_company_id').val(companyId);
+        }
+        $('#user').validate();
+        $("input[name=u_cell_phone], input[name=u_office_phone], input[name=u_direct_phone], input[name=u_other_phone], input[name=u_fax]").mask("(999) 999-9999");
+        $('input[name="u_zip"]').mask("99999");
+
+        $('#user').submit(function() {
+            var isPhoneValid = false;
+            $("input[name=u_cell_phone], input[name=u_office_phone], input[name=u_direct_phone], input[name=u_other_phone]").each(function() {
+                if ($(this).val() != '') {
+                    isPhoneValid = true;
+                    return;
+                }
+            });
+            var isValid = $('#user').valid();
+            if (isPhoneValid) {
+                $('#phoneRequired, #phoneRequired label').hide();
+            } else {
+                $('#phoneRequired, #phoneRequired label').show();
+            }
+
+            if (isPhoneValid && isValid) {
+                return true;
+            }
+            return false;
+        });
+        $('#companyIdAdmin').change(function(){
+            if($(this).is(':checked')) {
+                $(this).val($('#u_company_id option:selected').val());
+            }
+        })
+
+        <?php if ($identity['u_role_id'] == \Admin\Model\User::ROLE_TRIAL) : ?>
+            $('input[type=submit]').prop('disabled', true);
+        <?php endif; ?>
+
+        <?php if (!is_object($clientObj)): ?>
+            $('#companyAddress').click();
+        <?php endif; ?>
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        if (parseInt(document.getElementById('availableLicenses').value) < 1)
+        {
+            document.getElementById("licensedUser").disabled = true;
+        }
+        
+        checkbox.addEventListener('change', function(event)
+        {
+            if (event.target.checked) {
+                document.getElementById('availableLicenses').value = parseInt(document.getElementById('availableLicenses').value) - 1;
+            }
+            else {
+                document.getElementById('availableLicenses').value = parseInt(document.getElementById('availableLicenses').value) + 1;
+            }
+
+        });
+        
+    }, false);
+
+</script>

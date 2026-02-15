@@ -16,7 +16,7 @@ use Zend\Db\Sql\Expression;
 
 class CompanyTable implements ServiceLocatorAwareInterface
 {
-    const DEFAULT_USERS_LIMUT = 3;
+    const DEFAULT_USERS_LIMIT = 3;
 
     protected $tableGateway;
     protected $serviceLocator;
@@ -40,6 +40,36 @@ class CompanyTable implements ServiceLocatorAwareInterface
         $resultSet = $this->tableGateway->select();
         return $resultSet;
     }*/
+
+    public function getCompaniesv2($typeItems = 'all', $identity = null, $orderBy = null, $order = null, $activeFilter = 1)
+    {
+        
+        $select = $this->tableGateway->getSql()->select();
+        $select->join(array('ai' => 'addresses_items'), 'c_id = ai.cadr_c_id', array(), 'inner');
+        $select->join(array('addr' => 'addresses'), 'addr.adr_id = ai.cadr_adr_id', array('_location_name' => 'adr_name'), 'inner');
+        
+        if ($typeItems == 'companies') {
+            //$select->columns(array('*', '_name' => 'c_name', '_id' => 'c_id', '_c_active' => new \Zend\Db\Sql\Expression('c.c_active')));
+            if ($activeFilter == 1) {
+                $select->where('c_active = 1');
+            } elseif ($activeFilter == 2) {
+                $select->where('c_active = 0');
+            }
+        }
+
+        if ($identity['u_role_id'] > 3)
+        {
+            $select->where('c_id = ' . $identity['u_company_id']);
+        }        
+        
+        if ($orderBy) {
+            $order = $order ? $order : 'ASC';
+            $select->order($orderBy . ' ' . $order);
+        }
+        
+        $resultSet = $this->tableGateway->selectWith($select);
+        return $resultSet;
+    }
 
     public function getCompanies($paginated = false, $orderBy = null, $order = null, $typeItems = 'all', $identity = null, $activeFilter = 1)
     {
@@ -303,6 +333,24 @@ class CompanyTable implements ServiceLocatorAwareInterface
         return $result;
     }
 
+    public function getClientCompaniesMain()
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('c_active = 1');
+        //$select->where('c_owner_u_id = ' . $cId);
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        $result = array();
+
+        foreach ($resultSet as $rs) {
+            $result[] = $rs->c_id;
+        }
+
+        return $result;
+    }
+
+
     public function getCompany($id)
     {
         $authService = new \Zend\Authentication\AuthenticationService();
@@ -349,6 +397,43 @@ class CompanyTable implements ServiceLocatorAwareInterface
         return $row;
     }
 
+    public function getCompanyLayout($id)
+    {
+        
+        $id  = (int) $id;
+        $select = $this->tableGateway->getSql()->select();
+
+        
+        $select->where('c_id = ' . $id);
+
+        $row = $this->tableGateway->selectWith($select)->current();
+
+        if (!$row) {
+            return false;
+        }
+
+        // $select = $this->tableGateway->getSql()->select();
+        // $select->join(array('cc' => 'company_consultants'), new \Zend\Db\Sql\Expression('cc.cc_company_id = c_id'), array('_c_consultant_id' => new \Zend\Db\Sql\Expression('cc.cc_consultant_id')), 'inner');
+        // $select->where("c_id =" . $id);
+
+        // $consultants = $this->tableGateway->selectWith($select);
+
+        // foreach ($consultants as $consultant) {
+        //     $row->_c_cur_consultants[$consultant->_c_consultant_id] = $consultant->_c_consultant_id;
+        // }
+        // $companyConsultantsTable = $this->getServiceLocator()->get('Client\Model\CompanyConsultantsTable');
+
+        // if ($row->c_rel_type == \Client\Model\Company::RELATION_TYPE_PARENT) {
+        //     $row->c_parent_type = $row->c_type;
+        //     $row->_c_child_c_ids = $this->getChildCompaniesIds($id);
+        // } elseif ($row->c_rel_type == \Client\Model\Company::RELATION_TYPE_CHILD) {
+        //     $row->c_child_type = $row->c_type;
+        // }        
+
+        return $row;
+    }
+
+
     public function saveCompany(Company $company)
     {
         $authService = new \Zend\Authentication\AuthenticationService();
@@ -356,19 +441,23 @@ class CompanyTable implements ServiceLocatorAwareInterface
         $identity = $authService->getIdentity();
 
         $data = array(
-            'c_name' => $company->c_name,
-            'c_email' => $company->c_email,
-            'c_phone' => $company->c_phone,
-            'c_other_phone' => $company->c_other_phone,
-            'c_other_phone_inner' => $company->c_other_phone_inner,
-            'c_fax' => $company->c_fax,
-            'c_website' => $company->c_website,
-            'c_primary_adr_id' => $company->c_primary_adr_id,
-            'c_update_u_id' => $company->c_update_u_id,
-            'c_rel_type'    => 0,
-            'c_type'    => 0,
-            'c_parent_c_id'    => 0,
-            'company_type_id'    => $company->company_type_id,
+            'c_name'                    => $company->c_name,
+            'c_email'                   => $company->c_email,
+            'c_phone'                   => $company->c_phone,
+            'c_other_phone'             => $company->c_other_phone,
+            'c_other_phone_inner'       => $company->c_other_phone_inner,
+            'c_fax'                     => $company->c_fax,
+            'c_website'                 => $company->c_website,
+            'c_primary_adr_id'          => $company->c_primary_adr_id,
+            'c_update_u_id'             => $company->c_update_u_id,
+            'c_rel_type'                => 0,
+            'c_type'                    => 0,
+            'c_parent_c_id'             => 0,
+            'company_type_id'           => $company->company_type_id,
+            'hipaa_suite_type_id'       => $company->hipaa_suite_type_id,
+            'is_training_sub_type'      => $company->is_training_sub_type,
+            'is_oig_express_sub_type'   => $company->is_oig_express_sub_type,
+            'is_osha_express_sub_type'  => $company->is_osha_express_sub_type
         );
 
         if (in_array($identity['u_role_id'], array(User::ROLE_SALES_REP, User::ROLE_SENIOR_CONSULTANT, User::ROLE_ADMIN))) {
@@ -389,7 +478,7 @@ class CompanyTable implements ServiceLocatorAwareInterface
             $data['c_owner_u_id'] = $company->c_owner_u_id;
             $ownerContact         = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUser($company->c_owner_u_id);
             if($ownerContact && in_array($ownerContact->u_role_id, array(User::ROLE_CLIENT, User::ROLE_PARTIAL))) {
-                $data['c_users_limit'] = self::DEFAULT_USERS_LIMUT;
+                $data['c_users_limit'] = self::DEFAULT_USERS_LIMIT;
             } else {
                 $data['c_users_limit'] = 0;
             }
@@ -400,6 +489,7 @@ class CompanyTable implements ServiceLocatorAwareInterface
         }
 
         if ($id == 0) {
+            $data['c_update_date'] = new \Zend\Db\Sql\Expression('NOW()');
             $this->tableGateway->insert($data);
             $id = $this->tableGateway->lastInsertValue;
 
@@ -501,7 +591,8 @@ class CompanyTable implements ServiceLocatorAwareInterface
             'c_owner_u_id' => $company->c_owner_u_id,
             'c_primary_contact_u_id' => $company->c_primary_contact_u_id,
             'c_primary_contact_u_id' => $company->c_primary_contact_u_id,
-            'c_users_limit' => self::DEFAULT_USERS_LIMUT,
+            'c_users_limit' => self::DEFAULT_USERS_LIMIT,
+            'c_update_date' => new \Zend\Db\Sql\Expression('NOW()'), //Just added this rto
             'c_active' => 1
         );
 
@@ -578,12 +669,15 @@ class CompanyTable implements ServiceLocatorAwareInterface
             foreach ($post['adr_address1'] as $keyAdr => $adr) {
                 if (trim($post['adr_address1'][$keyAdr]) == '') continue;
 
+                $addressData['department'] = $post['department'][$keyAdr];
                 $addressData['adr_name'] = $post['adr_name'][$keyAdr];
                 $addressData['adr_address1'] = $post['adr_address1'][$keyAdr];
                 $addressData['adr_address2'] = $post['adr_address2'][$keyAdr];
                 $addressData['adr_city'] = $post['adr_city'][$keyAdr];
                 $addressData['adr_state_id'] = $post['adr_state_id'][$keyAdr];
                 $addressData['adr_zip'] = $post['adr_zip'][$keyAdr];
+
+                
 
                 // save to address table
                 $sm = $this->getServiceLocator();
@@ -626,6 +720,7 @@ class CompanyTable implements ServiceLocatorAwareInterface
                     $this->setPrimaryAddressId($companyId, $keyAdr);
                 }
 
+                $addressData['department'] = $post['exists_department'][$keyAdr];
                 $addressData['adr_name'] = $post['exists_adr_name'][$keyAdr];
                 $addressData['adr_address1'] = $post['exists_adr_address1'][$keyAdr];
                 $addressData['adr_address2'] = $post['exists_adr_address2'][$keyAdr];
@@ -821,10 +916,30 @@ class CompanyTable implements ServiceLocatorAwareInterface
 
     public function getCompaniesByUserEmail($email)
     {
+        
         $select = $this->tableGateway->getSql()->select();
         $select->join(array('u' => 'users'), 'u.u_company_id = c_id', array(), 'right');
         $select->where('u_email = "' . $email . '"');
         return $this->tableGateway->selectWith($select);
+    }
+
+    public function getCompaninesAssociatedUserEmail($email){
+        $user = $this->getServiceLocator()->get('Admin\Model\UserTable')->getUserByEmail($email);
+        
+        $select = $this->tableGateway->getSql()->select();
+		$select->columns(array(new \Zend\Db\Sql\Expression('DISTINCT(companies.c_name) as c_name, companies.c_id')));       
+        $select->join(array('cc' => 'company_consultants'), 'cc.cc_company_id = companies.c_id', array(), 'inner');
+        $select->join(array('u' => 'users'), 'u_company_id = c_id', array(), 'inner');
+        
+        $select->where('u_active = 1');
+        $select->where('u_id != ' . $user->u_id);
+		$select->where('c_active = 1');
+		$select->where('companies.c_owner_u_id = ' . $user->u_id . ' OR cc.cc_consultant_id = ' . $user->u_id . ' OR u.u_senior_consultant_u_id = ' . $user->u_id);
+        
+        $select->order('companies.c_name ASC');
+
+        return $this->tableGateway->selectWith($select);
+        
     }
 
     public function getClientCompany($id)
@@ -833,6 +948,19 @@ class CompanyTable implements ServiceLocatorAwareInterface
         $select = $this->tableGateway->getSql()->select();
         $select->where('c_id = ' . $id);
         $select->where('c_active = 1');
+        $row = $this->tableGateway->selectWith($select)->current();
+
+        if (!$row) {
+            return false;
+        }
+        return $row;
+    }
+
+    public function getCompanyInformation($id)
+    {
+        $id  = (int) $id;
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('c_id = ' . $id);
         $row = $this->tableGateway->selectWith($select)->current();
 
         if (!$row) {
@@ -883,4 +1011,39 @@ class CompanyTable implements ServiceLocatorAwareInterface
     {
         $this->tableGateway->update(array('c_renewal_date' => date('Y-m-d', strtotime('+1 year'))), 'DATE(c_renewal_date) = "' . date('Y-m-d') . '"');
     }
+    
+    public function getCompanyInformationById($id)
+    {
+        $id  = (int) $id;
+        $select = $this->tableGateway->getSql()->select();
+        $select->columns(array('c_id', 'suppress_secondary_auth'));
+        $select->where('c_id = ' . $id);
+        
+        $row = $this->tableGateway->selectWith($select)->current();
+
+        if (!$row) {
+            return false;
+        }
+        return $row;
+
+        
+    }
+
+
+    public function checkPurchasedLicensesByCompany($id)
+    {
+        $id  = (int) $id;
+        $select = $this->tableGateway->getSql()->select();
+        $select->columns(array('c_id', 'c_users_limit'));
+        $select->where('c_id = ' . $id);
+        
+        $row = $this->tableGateway->selectWith($select)->current();
+
+        if (!$row) {
+            return false;
+        }
+        return $row;
+    }
+
+    
 }

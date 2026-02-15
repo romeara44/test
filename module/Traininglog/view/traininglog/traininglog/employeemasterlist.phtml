@@ -1,105 +1,85 @@
 <?php
-
-// within a view script
-$form = $this->form;
-$form->prepare();
-
-// Assuming the "contact/process" route exists...
-$form->setAttribute('action', '/traininglog/employeemasterlist');
-
-// Set the method attribute for the form
-$form->setAttribute('method', 'post');
-
-// Render the opening tag
+    //$urlOrder = $order == 'ASC' ? 'DESC' : 'ASC';
+    //$authService = new \Zend\Authentication\AuthenticationService();
+    //$authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+    //$identity = $authService->getIdentity();
 ?>
 
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/rowgroup/1.1.4/css/rowGroup.dataTables.min.css">
 
-    <div class="page-title">
-        <h1 class="fleft">Edit Employee Master List</h1>
-        <div class="cboth"></div>
-    </div>
 
-    <p></p>
-
-<div class="col-left">
-    <form action="/traininglog/employeemasterlist" method="post" enctype="multipart/form-data" name="traininglog" id="traininglog">
-        
-        <?php if ($this->lists && $this->lists->count()) : ?>
-        <?php foreach ($lists as $list) : ?>
-        <p>
-            <?php $fn = $form->get('eml_company_id[]');
-            $fn->setValue($list->eml_company_id);
-            echo $this->formLabel($fn);
-            echo $this->formSelect($fn->setAttributes(array('class'=>'form-control required')));
-            echo $this->formElementErrors($fn);
-            ?>
-        </p>
-        
-        <p>
-            <?php $fn = $form->get('eml_list[]');
-            $fn->setValue($list->eml_list);
-            echo $this->formLabel($fn);
-            echo $this->formTextarea($fn->setAttributes(array('class'=>'required', 'style' => 'width: 450px; height: 185px;')));
-            echo $this->formElementErrors($fn);
-            ?>
-        </p>
-        <?php endforeach; ?>
-        <?php else : ?>
-        <p>
-            <?php $fn = $form->get('eml_company_id[]');
-            echo $this->formLabel($fn);
-            echo $this->formSelect($fn->setAttributes(array('class'=>'form-control required')));
-            echo $this->formElementErrors($fn);
-            ?>
-        </p>
-        
-        <p>
-            <?php $fn = $form->get('eml_list[]');
-            echo $this->formLabel($fn);
-            echo $this->formTextarea($fn->setAttributes(array('class'=>'required', 'style' => 'width: 450px; height: 185px;')));
-            echo $this->formElementErrors($fn);
-            ?>
-        </p>
-        <?php endif; ?>
-        
-        <div class="cboth"></div>
-        <p style="border-top: 0">
-                        <a id="addLocationButton" href="javascript:void(0)"class="button"><i class="fa fa-plus-circle"></i> + Add list for other Company</a>
-                    </p>
-        <div class="cboth"></div>
-        <div class="form-buttons">
-            <input type="submit" value="Save" class="form-button" />
-        </div>
-
-    <?php echo $this->form()->closeTag() ?>
+<div class="page-title">
+    <h1 class="fleft">Trainee List</h1>
+    
+    <?php //if ($identity['u_role_id'] != \Admin\Model\User::ROLE_TRIAL) : ?>
+        <?php //if(in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_PARTIAL))): ?>
+            <a href="/traininglog/add" class="button"><i class="fa fa-plus-circle"></i> Add Trainee</a>
+        <?php //endif;?>
+    <?php// endif;?>
+    <div class="cboth"></div>
 </div>
+
+<p></p>
+
+
+<table id="training-list" cellpadding="0" cellspacing="0" style="width:100%">
+    <thead>
+        <tr>
+            <?php //$classSort = ($order_by == 'c_id') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            
+            <?php //$classSort = ($order_by == 'organization') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>Department</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Job Title</th>
+            <th>User Name</th>
+            <th>Registered Date</th>
+            <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php //if ($this->litmosUser != null): ?>
+            <?php foreach ($this->traineeUsers as $traineeUser): ?>            
+                <tr>
+                    <td><?php echo $traineeUser['Department'] ?></td>
+                    <td><?php echo $traineeUser['FirstName'] ?></td>
+                    <td><?php echo $traineeUser['LastName'] ?></td>
+                    <td><?php echo $traineeUser['Email'] ?></td>
+                    <td><?php echo $traineeUser['JobTitle'] ?></td>
+                    <td><?php echo $traineeUser['UserName'] ?></td>
+                    <td><?php echo $traineeUser['RegisteredDate'] ?></td>
+                    <td class="aright">
+                        <a href="/traininglog/edit?tovuti_id= <?php echo trim($traineeUser['Id']) ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+                        <a href="#confirmation-box-modal" onclick="$('#deleteYes').attr('href', '/traininglog/inactivatetovutiuser?tovuti_id= <?php echo $traineeUser['Id'] ?>')" class="confirmation-modal i-delete"><i class="fa fa-trash-o"></i></a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        <?php //endif; ?>
+    </tbody>
+</table>
+
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/rowgroup/1.1.4/js/dataTables.rowGroup.min.js"></script>
+<script>
+	$(document).ready( function () {
+		$('#training-list').DataTable({
+			"order": [[ 1, "asc" ], [ 2, "asc" ]],
+			"columnDefs": [
+				{"type": "num", "targets": 0},
+				{"type": "date", "targets": 4},
+				{"type": "date", "targets": 5},
+				{ "orderable": false, "targets": 6 }
+			]
+		});
+		$('.dataTables_filter input[type="search"]').
+			css({'width':'95%','display':'inline-block'});
+	});
+
+    $(document).ready( function () {
+    $('#myTable').DataTable();
+} );
+</script>
 
 <div class="cboth"><br /></div>
-<div id="step" style="display:none">
-<p>
-    <?php $fn = $form->get('eml_company_id[]');
-    $fn->setValue(0);
-    echo $this->formLabel($fn);
-    echo $this->formSelect($fn->setAttributes(array('class'=>'form-control required')));
-    echo $this->formElementErrors($fn);
-    ?>
-</p>
-
-<p>
-    <?php $fn = $form->get('eml_list[]');
-    $fn->setValue('');
-    echo $this->formLabel($fn);
-    echo $this->formTextarea($fn->setAttributes(array('class'=>'required', 'style' => 'width: 450px; height: 185px;')));
-    echo $this->formElementErrors($fn);
-    ?>
-</p>
-</div>
-<script type="text/javascript">
-$(document).ready(function() {
-    $('#traininglog').validate();
-    var step = $('#step').html();
-    $('#addLocationButton').click(function() {
-        $(this).parent().before(step);
-    })
-});
-</script>

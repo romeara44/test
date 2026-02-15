@@ -56,7 +56,7 @@ class BreachlogTable implements ServiceLocatorAwareInterface
                                    'bl_date_of_occurrence'   => DbCrypt::decryptField('bl_date_of_occurrence'),
                                    'bl_size'                 => DbCrypt::decryptField('bl_size'),
                                    'bl_description'          => DbCrypt::decryptField('bl_description'),
-                                   'bl_reportable'           => DbCrypt::decryptField('bl_reportable'),
+                                   'bl_reportable'           => 'bl_reportable',
                                    'bl_create_date'          => DbCrypt::decryptField('bl_create_date'),
                                    'bl_update_date'          => DbCrypt::decryptField('bl_update_date'),
                                    'bl_invest_led_by'        => DbCrypt::decryptField('bl_invest_led_by'),
@@ -66,7 +66,8 @@ class BreachlogTable implements ServiceLocatorAwareInterface
                                    'bl_initials'             => DbCrypt::decryptField('bl_initials'),
                                    'bl_approver_u_id'        => 'bl_approver_u_id',
                                    'bl_accepter_u_id'        => 'bl_accepter_u_id',
-                                   'bl_active'               => 'bl_active'
+                                   'bl_active'               => 'bl_active',
+                                   'breach_locked'           => 'breach_locked'
                                   )
                                 );
 
@@ -136,7 +137,7 @@ class BreachlogTable implements ServiceLocatorAwareInterface
                                'bl_date_of_occurrence'   => DbCrypt::decryptField('bl_date_of_occurrence'),
                                'bl_size'                 => DbCrypt::decryptField('bl_size'),
                                'bl_description'          => DbCrypt::decryptField('bl_description'),
-                               'bl_reportable'           => DbCrypt::decryptField('bl_reportable'),
+                               'bl_reportable'           => 'bl_reportable',
                                'bl_create_date'          => DbCrypt::decryptField('bl_create_date'),
                                'bl_update_date'          => DbCrypt::decryptField('bl_update_date'),
                                'bl_invest_led_by'        => DbCrypt::decryptField('bl_invest_led_by'),
@@ -146,7 +147,8 @@ class BreachlogTable implements ServiceLocatorAwareInterface
                                'bl_initials'             => DbCrypt::decryptField('bl_initials'),
                                'bl_approver_u_id'        => 'bl_approver_u_id',
                                'bl_accepter_u_id'        => 'bl_accepter_u_id',
-                               'bl_active'               => 'bl_active'
+                               'bl_active'               => 'bl_active',
+                               'breach_locked'           => 'breach_locked'
                               )
                             );
 
@@ -306,7 +308,7 @@ class BreachlogTable implements ServiceLocatorAwareInterface
                                'bl_date_of_occurrence'   => DbCrypt::decryptField('bl_date_of_occurrence'),
                                'bl_size'                 => DbCrypt::decryptField('bl_size'),
                                'bl_description'          => DbCrypt::decryptField('bl_description'),
-                               'bl_reportable'           => DbCrypt::decryptField('bl_reportable'),
+                               'bl_reportable'           => 'bl_reportable',
                                'bl_create_date'          => DbCrypt::decryptField('bl_create_date'),
                                'bl_update_date'          => DbCrypt::decryptField('bl_update_date'),
                                'bl_invest_led_by'        => DbCrypt::decryptField('bl_invest_led_by'),
@@ -316,7 +318,8 @@ class BreachlogTable implements ServiceLocatorAwareInterface
                                'bl_initials'             => DbCrypt::decryptField('bl_initials'),
                                'bl_approver_u_id'        => 'bl_approver_u_id',
                                'bl_accepter_u_id'        => 'bl_accepter_u_id',
-                               'bl_active'               => 'bl_active'
+                               'bl_active'               => 'bl_active',
+                               'breach_locked'           => 'breach_locked'
                               )
                             );
 
@@ -361,11 +364,12 @@ class BreachlogTable implements ServiceLocatorAwareInterface
             'bl_description'          => DbCrypt::encryptValue($bl->bl_description),
             'bl_initials_approver'    => DbCrypt::encryptValue($bl->bl_initials_approver),
             'bl_initials'             => DbCrypt::encryptValue($bl->bl_initials),
-            'bl_reportable'           => 0,//DbCrypt::encryptValue($bl->bl_reportable),
+            'bl_reportable'           => $bl->bl_reportable,
             'bl_approver_u_id'        => $bl->bl_approver_u_id,
-            'bl_accepter_u_id'        => $bl->bl_accepter_u_id
+            'bl_accepter_u_id'        => $bl->bl_accepter_u_id,
+            'breach_locked'           => isset($bl->breach_locked) ? $bl->breach_locked : 0
         );
-
+        
         $id = (int) $bl->bl_id;
 
         if (!$id) {
@@ -379,6 +383,16 @@ class BreachlogTable implements ServiceLocatorAwareInterface
 
             $data['bl_create_u_id'] = $identity['u_id'];
             $data['bl_create_date'] = DbCrypt::encryptValue(date('Y-m-d H:i:s'));
+
+            $data['bl_update_u_id'] = $identity['u_id'];
+            $data['bl_update_date'] = DbCrypt::encryptValue(date('Y-m-d H:i:s'));
+        }
+
+        if ($data['bl_approver_u_id'] == "") {
+            $data['bl_approver_u_id'] = 0;
+        }
+        if ($data['bl_accepter_u_id'] == "") {
+            $data['bl_accepter_u_id'] = 0;
         }
 
         if ($id == 0) {

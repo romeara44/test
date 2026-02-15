@@ -73,6 +73,7 @@ class TaskForm extends Form
                     10 => \Assessment\Model\Remediationplanaction::$statusesNames[\Assessment\Model\Remediationplanaction::STATUS_PENDING_APPROVAL],
                     30 => \Assessment\Model\Remediationplanaction::$statusesNames[\Assessment\Model\Remediationplanaction::STATUS_PENDING_IMPLEMENTATION],
                     20 => \Assessment\Model\Remediationplanaction::$statusesNames[\Assessment\Model\Remediationplanaction::STATUS_COMPLETED],
+                    40 => \Assessment\Model\Remediationplanaction::$statusesNames[\Assessment\Model\Remediationplanaction::STATUS_AUDITED]
                 ),
             )
         ));

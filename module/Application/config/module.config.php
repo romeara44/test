@@ -122,15 +122,16 @@ return array(
     ),
     'view_helpers' => array(
         'invokables' => array(
-            'menuTop' => 'Application\View\Helper\MenuTop',
-            'menuLeft' => 'Application\View\Helper\MenuLeft',
-            'userName' => 'Application\View\Helper\UserName',
-            'roleView' => 'Application\View\Helper\RoleView',
-            'renderPictoIcon' => 'Application\View\Helper\RenderPictoIcon',
-            'getConsultant' => 'Application\View\Helper\GetConsultant',
-            'bodyClass' => 'Application\View\Helper\BodyClass',
-            'formatDateA' => 'Application\View\Helper\FormatDateA',
-            'asessmentProgressBar' => 'Application\View\Helper\AsessmentProgressBar',
+            'menuTop'               => 'Application\View\Helper\MenuTop',
+            'menuLeft'              => 'Application\View\Helper\MenuLeft',
+            'userName'              => 'Application\View\Helper\UserName',
+            'roleView'              => 'Application\View\Helper\RoleView',
+            'renderPictoIcon'       => 'Application\View\Helper\RenderPictoIcon',
+            'getConsultant'         => 'Application\View\Helper\GetConsultant',
+            'bodyClass'             => 'Application\View\Helper\BodyClass',
+            'formatDateA'           => 'Application\View\Helper\FormatDateA',
+            'asessmentProgressBar'  => 'Application\View\Helper\AsessmentProgressBar',
+            'getHipaaTypes'         => 'Application\View\Helper\GetHipaaTypes'
         )
     )
 );

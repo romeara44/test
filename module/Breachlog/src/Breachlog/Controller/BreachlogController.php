@@ -193,7 +193,7 @@ class BreachlogController extends AbstractActionController
         $request = $this->getRequest();
 
         $id = (int) $this->params('id');
-				$etype = (strpos($request, 'type=view') === false) ? '' : 'view';
+		$etype = (strpos($request, 'type=view') === false) ? '' : 'view';
         $noteform = $request->isPost() && (int) $request->getPost('noteform');
 
         if (!$this->hasIdentity()) {
@@ -220,9 +220,12 @@ class BreachlogController extends AbstractActionController
                     $companyUsers['options'][$companyUserObj->u_id] = $companyUserObj->u_firstname . ' ' . $companyUserObj->u_lastname; 
                 }
             }
+            
             $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_BL);
+
         } else if($identity['u_role_id'] == \Admin\Model\User::ROLE_CLIENT) {
             $companyUsersObj = $this->getUserTable()->getUsersByCompany($identity['u_company_id']);
+
             if($companyUsersObj) {
                 foreach($companyUsersObj as $companyUserObj) {
                     $companyUsers['options'][$companyUserObj->u_id] = $companyUserObj->u_firstname . ' ' . $companyUserObj->u_lastname; 
@@ -242,9 +245,7 @@ class BreachlogController extends AbstractActionController
             $bl = new Breachlog();
             $post = $request->getPost();
 
-            if(!$blObj || $blObj->bl_reportable == 1) {
-                $ymds['bl_date_of_occurrence'] = \DateTime::createFromFormat('m/d/Y', $post['bl_date_of_occurrence']);
-            }
+            $ymds['bl_date_of_occurrence'] = \DateTime::createFromFormat('m/d/Y', $post['bl_date_of_occurrence']);
             $ymds['bl_date_invest_start'] = \DateTime::createFromFormat('m/d/Y', $post['bl_date_invest_start']);
             $ymds['bl_date_invest_complete'] = \DateTime::createFromFormat('m/d/Y', $post['bl_date_invest_complete']);
             
@@ -256,10 +257,20 @@ class BreachlogController extends AbstractActionController
                 }
             }
             
-            $form->setInputFilter($bl->getInputFilter($this->getServiceLocator(), $id));
+            if($this->signAndLockBreach($post)){
+                $form->setInputFilter($bl->getInputFilter($this->getServiceLocator(), $id));
+            } else {
+                $form->setInputFilter($bl->getPreInputFilter($this->getServiceLocator(), $id));
+            }
+                
             $form->setData($post);
 
-            if (!(int) $id) { // check if all questions answered - only for new breach log
+            $breach_locked_local = 0;
+            if(isset($blObj->breach_locked)){
+                $breach_locked_local = $blObj->breach_locked;
+            }
+
+            if ($this->signAndLockBreach($post) && $breach_locked_local != 1) { // check if all questions answered - only when signing and locking the record
                 if (isset($post['questions'])) {
                     foreach ($post['questions'] as $questionId => $question) {
                         $questionsFormAnswers[$questionId] = $question;
@@ -272,14 +283,18 @@ class BreachlogController extends AbstractActionController
                 }
             }
 
-            if(!$checkFillCompanyRoles = $this->getCompanyRolesTable()->checkFillCompanyRoles($post['bl_c_id'])) {
+            if ($identity['u_role_id'] != \Admin\Model\User::ROLE_CLIENT && $post['bl_c_id'] == "") {
+                $checkFillCompanyRoles = false;
+                $companyRolesMsg = 'Please, fill all roles for this company';
+            } else if(!$checkFillCompanyRoles = $this->getCompanyRolesTable()->checkFillCompanyRoles($post['bl_c_id'])) {
                 $companyRolesMsg = 'Please, fill all roles for this company';
             }
-
-
-            if ($form->isValid() && $checkFillCompanyRoles && !$questionsErrors) {
+            
+            if (($form->isValid() && $checkFillCompanyRoles && !$questionsErrors && $breach_locked_local != 1) || $form->isValid() && $checkFillCompanyRoles && !$questionsErrors && $identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN) {
                 $post['bl_consultant_u_id'] = $identity['u_id'];
-                if(isset($post['questions'][11]) && $post['questions'][11] == 2) $post['bl_date_of_occurrence'] = '';
+                //Was the PHI encrypted?
+                //if(isset($post['questions'][11]) && $post['questions'][11] == 2) $post['bl_date_of_occurrence'] = '';
+                
                 $bl->exchangeArray($post);
                 $this->getBreachlogTable()->setServiceLocator($this->getServiceLocator());
 
@@ -288,34 +303,92 @@ class BreachlogController extends AbstractActionController
                 }
 
                 $blId = $this->getBreachlogTable()->saveBreachlog($bl);
-
-                // save answers
+                if ((int)$blId > 0){
+                    $bl->bl_id = $blId;
+                }
+                
+                // save answers to breach questions
                 if (isset($post['questions'])) {
+                    
                     foreach ($post['questions'] as $questionId => $question) {
                         $bla = new Breachloganswer();
+                        
+                        $this->getBreachloganswerTable()->setServiceLocator($this->getServiceLocator());
+                        $breachlogAnswerRecord = $this->getBreachloganswerTable()->getBreachlogAnswerId($blId, $questionId);
+
+                        $answer['bla_id'] = isset($breachlogAnswerRecord->bla_id) ? $breachlogAnswerRecord->bla_id : NULL;
                         $answer['bla_blq_id'] = $questionId;
                         $answer['bla_value'] = $question;
                         $answer['bla_bl_id'] = $blId;
 
                         $bla->exchangeArray($answer);
                         $this->getBreachloganswerTable()->setServiceLocator($this->getServiceLocator());
+                        
                         $blaId = $this->getBreachloganswerTable()->saveBreachloganswers($bla);
                     }
-                    $this->getBreachlogquestionTable()->setServiceLocator($this->getServiceLocator());
 
-                    // This is where we determine if the security incident is a reportable breach
-                    $brpId = $this->getBreachlogquestionTable()->setReportable($blId);
+                    //Clean up data due to switching from Yes to No answers.
+                    //If Question 2 equals a 2 then Question 3 should be empty or should not exist in the database.
+                    if(isset($post['questions'][2]) && $post['questions'][2] == 2) {
+                        $breachlogAnswerRecordToDelete = $this->getBreachloganswerTable()->getBreachlogAnswerId($blId, 3);
+                        if ($breachlogAnswerRecordToDelete) {
+                            $this->getBreachloganswerTable()->deleteBreachlogAnswerById($breachlogAnswerRecordToDelete->bla_id);
+                            if (isset($post['questions'][3]) && $post['questions'][3] == 1) {
+                                unset($post['questions'][3]);
+                            }
+                        }
+                    }
 
-                    if ($brpId) {
-                        // As per lhecker in BT-6, any reportable breach requires a remediation plan
-                        $this->flashMessenger()->addSuccessMessage('This security incident constitutes a reportable breach. Please create a remediation plan.');
-                        return $this->redirect()->toRoute('breachremediationplan', array('controller' => 'breachremediationplan', 'action' => 'edit', 'id' => $brpId));
-                    } else {
-                        // As per lhecker in BT-6, a remediation plan should not be created if incident is not a breach
-                        $this->flashMessenger()->addSuccessMessage('This security incident does not constitute a reportable breach. No additional reporting is necessary.');
-                        $bl->bl_id = $blId;
-                        $bl->bl_date_of_occurrence = '';
-                        $this->getBreachlogTable()->saveBreachlog($bl);
+                    // Determine if either
+                    // a.) Incident includes identifiable data
+                    // b.) Incident does not include identifiable data, but de-identified data
+                    //     can be re-identified
+                    
+                    $isDataIdentifiable =
+                            (isset($post['questions'][2]) && $post['questions'][2] == 2 && empty($post['questions'][3]))
+                        || (isset($post['questions'][2]) && $post['questions'][2] == 1 && isset($post['questions'][3]) && $post['questions'][3] == 2);
+
+                    // Determines if security incident is a breach (i.e., reportable)
+                    $isIncidentReportable =
+                            isset($post['questions'][1])
+                        && ($post['questions'][1] == 2)
+                        && ($isDataIdentifiable)
+                        && (isset($post['questions'][4]))
+                        && ($post['questions'][4] == 2)
+                        && (isset($post['questions'][5]))
+                        && ($post['questions'][5] == 1)
+                        && (isset($post['questions'][6]))
+                        && ($post['questions'][6] == 1)
+                        && (isset($post['questions'][7]))
+                        && ($post['questions'][7] == 2)
+                        && (isset($post['questions'][8]))
+                        && ($post['questions'][8] == 1)
+                        && (isset($post['questions'][11]))
+                        && ($post['questions'][11] == 1);
+
+                    
+                    $bl->bl_reportable = $isIncidentReportable ? 1 : 0;
+                    $blId = $this->getBreachlogTable()->saveBreachlog($bl);
+
+                    if($this->signAndLockBreach($post)){
+                        $this->getBreachlogquestionTable()->setServiceLocator($this->getServiceLocator());
+
+                        // This is where we determine if the security incident is a reportable breach
+                        $brpId = $this->getBreachlogquestionTable()->setReportable($blId);
+                        
+                        if ($brpId) {
+                            // As per lhecker in BT-6, any reportable breach requires a remediation plan
+                            $this->flashMessenger()->addSuccessMessage('This security incident constitutes a reportable breach. Please create a remediation plan.');
+                            return $this->redirect()->toRoute('breachremediationplan', array('controller' => 'breachremediationplan', 'action' => 'edit', 'id' => $brpId));
+                        } else {
+                            // As per lhecker in BT-6, a remediation plan should not be created if incident is not a breach
+                            $this->flashMessenger()->addSuccessMessage('This security incident does not constitute a reportable breach. No additional reporting is necessary.');
+                            $bl->bl_id = $blId;
+                            //$bl->bl_date_of_occurrence = '';
+                            $bl->bl_reportable = 0;
+                            $bl->breach_locked = 1;
+                            $this->getBreachlogTable()->saveBreachlog($bl);
+                        }
                     }
                 }
 
@@ -406,6 +479,89 @@ class BreachlogController extends AbstractActionController
         );
     }
 
+    public function cloneAction(){
+              
+        $id = (int) $this->params('id');
+		$request = $this->getRequest();
+
+        $etype = '';
+        $noteform = $request->isPost() && (int) $request->getPost('noteform');
+
+        if (!(int) $id) {
+            return;
+        }
+
+        if (!$this->hasIdentity()) {
+            $this->flashMessenger()->addErrorMessage('You must log in');
+            return $this->redirect()->toRoute('application', array('controller' => 'index', 'action' => 'index'));
+        }
+
+        $identity = $this->getIdentity();
+
+        $form = new BreachlogForm($this->getServiceLocator());
+        $formNote = new NoteForm($this->getServiceLocator());
+        
+        $notes = null;
+        $blObj = null;
+        $userObj = null;
+        $companyUsers['options'][''] = 'Please Select';
+        $companyRolesMsg = '';
+                
+        if ((int) $id) {
+            $blObj = $this->getBreachlogTable()->getBreachlog($id);
+
+            $companyUsersObj = $this->getUserTable()->getUsersByCompany($blObj->bl_c_id);
+            if($companyUsersObj) {
+                foreach($companyUsersObj as $companyUserObj) {
+                    $companyUsers['options'][$companyUserObj->u_id] = $companyUserObj->u_firstname . ' ' . $companyUserObj->u_lastname; 
+                }
+            }
+            
+            $notes = $this->getNoteTable()->getNotes($id, \Note\Model\Note::NOTE_BL);
+        } else if($identity['u_role_id'] == \Admin\Model\User::ROLE_CLIENT) {
+            $companyUsersObj = $this->getUserTable()->getUsersByCompany($identity['u_company_id']);
+            if($companyUsersObj) {
+                foreach($companyUsersObj as $companyUserObj) {
+                    $companyUsers['options'][$companyUserObj->u_id] = $companyUserObj->u_firstname . ' ' . $companyUserObj->u_lastname; 
+                }
+            }
+        }
+
+        $questionsErrors = false;
+        $answers = array();
+        $questionsFormAnswers = array();
+        
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Cloned breachlog "' . $id . '" page');
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveLog(\Application\Model\LogsTable::TYPE_OPEN, \Application\Model\LogsTable::ITEM_TYPE_BREACHLOG, $id);
+
+        if ((int) $id) {
+            $blObj->bl_date_of_occurrence = ($blObj->bl_date_of_occurrence != '0000-00-00 00:00:00') ? substr($blObj->bl_date_of_occurrence, 0, 10) : '';
+            $blObj->bl_date_invest_start = ($blObj->bl_date_invest_start != '0000-00-00 00:00:00') ? substr($blObj->bl_date_invest_start, 0, 10) : '';
+            $blObj->bl_date_invest_complete = ($blObj->bl_date_invest_complete != '0000-00-00 00:00:00') ? substr($blObj->bl_date_invest_complete, 0, 10) : '';
+            $blObj->bl_id = 0;
+            $blObj->bl_approver_u_id = NULL;
+            $blObj->bl_accepter_u_id = NULL;
+            $form->bind($blObj);
+        }
+        
+        $questions = $this->getBreachlogquestionTable()->getBreachlogquestionsWithAnswers($id);
+
+        return array(
+            'form' => $form,
+            'notes' => $notes,
+            'formNote' => $formNote,
+            'blId' => 0,
+            'etype' => $etype,
+            'blObj' => $blObj,
+            'companyUsers' => $companyUsers,
+            'questions' => $questions,
+            'questionsFormAnswers' => $questionsFormAnswers,
+            'questionsErrors' => $questionsErrors,
+            'companyRolesMsg' => $companyRolesMsg,
+            'regulations' => $this->getRegulationTable()->getRegulations(),
+        );
+    }
+
     // TODO is this restrictive enough?
     public function deleteAction()
     {
@@ -447,4 +603,18 @@ class BreachlogController extends AbstractActionController
         return new JsonModel($users);
 
     }
+
+    public function signAndLockBreach($post){
+        $result = false;
+
+        if(isset($post['bl_approver_u_id']) && $post['bl_approver_u_id'] != "" &&
+            isset($post['bl_initials_approver']) && $post['bl_initials_approver'] != "" &&
+            isset($post['bl_accepter_u_id']) && $post['bl_accepter_u_id'] != "" &&
+            isset($post['bl_initials']) && $post['bl_initials'] != ""){
+                $result = true;
+        }
+    
+        return $result;
+    }
+    
 }

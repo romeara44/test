@@ -42,6 +42,28 @@ class BreachloganswerTable implements ServiceLocatorAwareInterface
         return $resultSet;
     }
 
+    public function getBreachlogAnswerId($breachlogId, $breachlogQuestionAsnwerId){
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('bla_bl_id = ' . $breachlogId);
+        $select->where('bla_blq_id = ' . $breachlogQuestionAsnwerId);
+
+        $resultSet = $this->tableGateway->selectWith($select);
+        $row = $resultSet->current();
+
+        return $row;
+
+    } 
+
+    public function getBreachlogAnswer($id)
+    {
+        $select = $this->tableGateway->getSql()->select();
+        $select->where('bla_id = ' . $id);
+
+        $resultSet = $this->tableGateway->selectWith($select);
+
+        return $resultSet;
+    }
+
     public function saveBreachloganswers(Breachloganswer $bla)
     {
         $authService = new \Zend\Authentication\AuthenticationService();
@@ -60,11 +82,21 @@ class BreachloganswerTable implements ServiceLocatorAwareInterface
         if ($id == 0) {
             $this->tableGateway->insert($data);
             $id = $this->tableGateway->lastInsertValue;
+        } else {
+            if ($this->getBreachlogAnswer($id)) {
+                $this->tableGateway->update($data, array('bla_id' => $id));
+            } else {
+                throw new \Exception('Question id does not exist');
+            }
         }
 
         return $id;
     }
 
-
+    public function deleteBreachlogAnswerById($blaId)
+    {
+        $this->tableGateway->delete("bla_id = $blaId");
+    }
+    
 
 }

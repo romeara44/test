@@ -25,7 +25,7 @@ return array(
                     ),
                     'defaults' => array(
                         'controller' => 'Breachlog\Controller\Breachlog',
-                        'action'     => 'index',
+                        'action'     => 'list',
                     ),
                 ),
             ),

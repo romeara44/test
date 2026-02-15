@@ -9,6 +9,8 @@ $form->setAttribute('action', '/breachlog/edit');
 
 // Set the method attribute for the form
 $form->setAttribute('method', 'post');
+$breach_locked_local = isset($this->blObj->breach_locked) ? $this->blObj->breach_locked : 0;
+$breach_disable_fields = $breach_locked_local;
 
 // Render the opening tag
 ?>
@@ -33,12 +35,23 @@ $form->setAttribute('method', 'post');
             $authService = new \Zend\Authentication\AuthenticationService();
             $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
             $identity = $authService->getIdentity();
+
+            if ($identity['u_role_id'] == \Admin\Model\User::ROLE_ADMIN){
+                $breach_disable_fields = false;
+            }
         ?>
         <?php if (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_CONSULTANT, \Admin\Model\User::ROLE_SENIOR_CONSULTANT))): ?>
             <p>
                 <?php $fn = $form->get('bl_c_id');
                 echo $this->formLabel($fn);
-                echo $this->formSelect($fn->setAttributes(array('id'=>'company', 'class'=>'form-control required')));
+
+                if ($breach_disable_fields) {
+                    echo $this->formSelect($fn->setAttributes(array('id'=>'company', 'class'=>'form-control required', 'disabled' => 'disabled')));
+                }
+                else {
+                    echo $this->formSelect($fn->setAttributes(array('id'=>'company', 'class'=>'form-control required')));
+                }
+                
                 echo $this->formElementErrors($fn);
                 ?>
             </p>
@@ -62,7 +75,14 @@ $form->setAttribute('method', 'post');
             <?php
             $fn = $form->get('bl_name');
             echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            
+            if ($breach_disable_fields) {
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'disabled' => 'disabled')));
+            }
+            else {
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            }
+
             echo $this->formElementErrors($fn);
             ?>
         </p>
@@ -71,7 +91,14 @@ $form->setAttribute('method', 'post');
             <?php
             $fn = $form->get('bl_invest_led_by');
             echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+
+            if ($breach_disable_fields) {
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'disabled' => 'disabled')));
+            }
+            else {
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            }
+
             echo $this->formElementErrors($fn);
             ?>
         </p>
@@ -80,22 +107,44 @@ $form->setAttribute('method', 'post');
             <?php
             $fn = $form->get('bl_date_of_occurrence');
             if ($this->blObj):
-                $fn->setValue($this->formatDateA($this->blObj->bl_date_of_occurrence, false, true));
+                if ($this->blObj->bl_date_of_occurrence === false) {
+                    $fn->setValue(null);
+                } else {
+                    $fn->setValue($this->formatDateA($this->blObj->bl_date_of_occurrence, false, true));
+                }
             endif;
             echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'bl_date_of_occurrence', 'readonly' => 'readonly')));
+
+            if ($breach_disable_fields) {
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'bl_date_of_occurrence', 'disabled' => 'disabled')));
+            }
+            else {
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'bl_date_of_occurrence', 'readonly' => 'readonly')));
+            }
+            
             echo $this->formElementErrors($fn);
             ?>
-        </p>
+        </p> 
         
         <p>
             <?php
             $fn = $form->get('bl_date_invest_start');
             if ($this->blObj):
-                $fn->setValue($this->formatDateA($this->blObj->bl_date_invest_start, false, true));
+                if ($this->blObj->bl_date_invest_start === false) {
+                    $fn->setValue(null);
+                } else {
+                    $fn->setValue($this->formatDateA($this->blObj->bl_date_invest_start, false, true));
+                }
             endif;
             echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'bl_date_invest_start', 'readonly' => 'readonly')));
+
+            if ($breach_disable_fields) {
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'bl_date_invest_start', 'disabled' => 'disabled')));
+            }
+            else {
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'bl_date_invest_start', 'readonly' => 'readonly')));
+            }
+            
             echo $this->formElementErrors($fn);
             ?>
         </p>
@@ -104,10 +153,21 @@ $form->setAttribute('method', 'post');
             <?php
             $fn = $form->get('bl_date_invest_complete');
             if ($this->blObj):
-                $fn->setValue($this->formatDateA($this->blObj->bl_date_invest_complete, false, true));
+                if ($this->blObj->bl_date_invest_complete === false) {
+                    $fn->setValue(null);
+                } else {
+                    $fn->setValue($this->formatDateA($this->blObj->bl_date_invest_complete, false, true));
+                }
             endif;
             echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id' => 'bl_date_invest_complete', 'readonly' => 'readonly')));
+
+            if ($breach_disable_fields) {
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id' => 'bl_date_invest_complete', 'disabled' => 'disabled')));
+            }
+            else {
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id' => 'bl_date_invest_complete', 'readonly' => 'readonly')));
+            }
+            
             echo $this->formElementErrors($fn);
             ?>
         </p>
@@ -116,7 +176,12 @@ $form->setAttribute('method', 'post');
             <?php
             $fn = $form->get('bl_size');
             echo $this->formLabel($fn);
-            echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id'=>'bl_size')));
+            if ($breach_disable_fields) {
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id'=>'bl_size', 'disabled' => 'disabled')));
+            }
+            else {
+                echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'id'=>'bl_size')));
+            }
             echo $this->formElementErrors($fn);
             ?>
         </p>
@@ -125,19 +190,29 @@ $form->setAttribute('method', 'post');
             <label style="width: 300px;">Description of the Breach Event</label><br />
             <?php
             $fn = $form->get('bl_description');
-            echo $this->formTextarea($fn->setAttributes(array('class'=>'', 'style' => 'width: 450px; height: 85px;')));
+            if ($breach_disable_fields) {
+                echo $this->formTextarea($fn->setAttributes(array('class'=>'', 'style' => 'width: 450px; height: 85px;', 'disabled' => 'disabled')));
+            }
+            else{
+                echo $this->formTextarea($fn->setAttributes(array('class'=>'', 'style' => 'width: 450px; height: 85px;')));
+            }
+            
             echo $this->formElementErrors($fn);
             ?>
         </p>
 
         <p>
             <label for="_search_regulation">Regulation Number or Regulation Description</label>
-            <input type="text" name="_search_regulation" id="_search_regulation" class="form-control">
+            <?php if($breach_disable_fields): ?>
+                <input type="text" name="_search_regulation" id="_search_regulation" class="form-control" readonly>
+            <?php else: ?>
+                <input type="text" name="_search_regulation" id="_search_regulation" class="form-control">
+            <?php endif; ?>
         </p>
 
         <p>
         <div style="width: 750px; height: 300px; overflow-y: scroll;">
-            <table id="_regulations_table">
+            <table id="_regulations_table" disabled>
                 <thead>
                     <tr>
                         <th>Policy&Procedure Name</th>
@@ -223,9 +298,21 @@ $form->setAttribute('method', 'post');
                 ?>
                 <?php
                     $qLabel = $question->blq_order == 10 ? 'In 60 days' : 'Yes';
-                    $disabled = $this->blId ? ' DISABLED ' : '';
+                    if  ($question->blq_order == 10):
+                        $disabled = ' DISABLED ';
+                    else:
+                        $disabled = $this->blId ? ' DISABLED ' : '';
+                    endif;
+                    
                 ?>
-                <input <?php echo $checked ?> <?php echo $disabled ?> type="radio" name="questions[<?php echo $question->blq_id ?>]" id="q<?php echo $question->blq_id ?>2" value="2" class="radio" style="margin-top: 10px; margin-bottom: 20px;" /> <label for="q<?php echo $question->blq_id ?>2" class="checkbox fleft" style="margin-top: 10px; margin-bottom: 20px;"><?php echo $qLabel ?> &nbsp; &nbsp; &nbsp; </label>
+                <?php 
+                    //$breach_locked_local = isset($this->blObj->breach_locked) ? $this->blObj->breach_locked : 0;
+                    if($breach_locked_local || $question->blq_order == 10):?>
+                        <input <?php echo $checked ?> <?php echo $disabled ?> type="radio" name="questions[<?php echo $question->blq_id ?>]" id="q<?php echo $question->blq_id ?>2" value="2" class="radio" style="margin-top: 10px; margin-bottom: 20px;" /> <label for="q<?php echo $question->blq_id ?>2" class="checkbox fleft" style="margin-top: 10px; margin-bottom: 20px;"><?php echo $qLabel ?> &nbsp; &nbsp; &nbsp; </label>
+                   <?php  else: ?>
+                        <input <?php echo $checked ?> type="radio" name="questions[<?php echo $question->blq_id ?>]" id="q<?php echo $question->blq_id ?>2" value="2" class="radio" style="margin-top: 10px; margin-bottom: 20px;" /> <label for="q<?php echo $question->blq_id ?>2" class="checkbox fleft" style="margin-top: 10px; margin-bottom: 20px;"><?php echo $qLabel ?> &nbsp; &nbsp; &nbsp; </label>
+                    <?php endif; ?>
+                
 
                 <?php
                 if (isset($questionsFormAnswers[$question->blq_id])):
@@ -238,7 +325,15 @@ $form->setAttribute('method', 'post');
                 <?php
                     $qLabel = $question->blq_order == 10 ? '60 days after end of year' : 'No';
                 ?>
-                <input <?php echo $checked ?> <?php echo $disabled ?> type="radio" name="questions[<?php echo $question->blq_id ?>]" id="q<?php echo $question->blq_id ?>1" value="1" class="radio" style="margin-top: 10px; margin-bottom: 20px;" /> <label for="q<?php echo $question->blq_id ?>1" class="checkbox fleft" style="margin-top: 10px; margin-bottom: 20px;"><?php echo $qLabel ?> &nbsp; &nbsp; &nbsp; </label>
+                <?php 
+                    //$breach_locked_local = isset($this->blObj->breach_locked) ? $this->blObj->breach_locked : 0;
+                    if($breach_locked_local || $question->blq_order == 10):?>
+                        <input <?php echo $checked ?> <?php echo $disabled ?> type="radio" name="questions[<?php echo $question->blq_id ?>]" id="q<?php echo $question->blq_id ?>1" value="1" class="radio" style="margin-top: 10px; margin-bottom: 20px;" /> <label for="q<?php echo $question->blq_id ?>1" class="checkbox fleft" style="margin-top: 10px; margin-bottom: 20px;"><?php echo $qLabel ?> &nbsp; &nbsp; &nbsp; </label>
+                   <?php  else: ?>
+                    <input <?php echo $checked ?> type="radio" name="questions[<?php echo $question->blq_id ?>]" id="q<?php echo $question->blq_id ?>1" value="1" class="radio" style="margin-top: 10px; margin-bottom: 20px;" /> <label for="q<?php echo $question->blq_id ?>1" class="checkbox fleft" style="margin-top: 10px; margin-bottom: 20px;"><?php echo $qLabel ?> &nbsp; &nbsp; &nbsp; </label>
+                    <?php endif; ?>
+
+                
             </p>
         <?php endforeach; ?>
         
@@ -247,15 +342,28 @@ $form->setAttribute('method', 'post');
         <p style="border: 0;">
            <?php $fn = $form->get('bl_approver_u_id')->setOptions($companyUsers);
             echo '<strong>' . $this->formLabel($fn->setLabelAttributes(array('style'=>'width:190px'))) . '</strong>';
-            echo $this->formSelect($fn->setAttributes(array('class'=>'form-control', 'id'=>'bl_approver_u_id')));
+            if ($breach_disable_fields) {
+                echo $this->formSelect($fn->setAttributes(array('class'=>'form-control', 'id'=>'bl_approver_u_id', 'disabled' => 'disabled')));
+            }
+            else {
+                echo $this->formSelect($fn->setAttributes(array('class'=>'form-control', 'id'=>'bl_approver_u_id')));
+            }
+
             echo $this->formElementErrors($fn);
             ?>
+
         </p>
         <p style="border: 0;">
             <?php
                 $fn = $form->get('bl_initials_approver');
                 echo $this->formLabel($fn->setLabelAttributes(array('style'=>'width:190px')));
-                echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id'=>'bl_initials_approver')));
+                if ($breach_disable_fields) {
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id'=>'bl_initials_approver', 'disabled' => 'disabled')));
+                }
+                else {
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id'=>'bl_initials_approver')));
+                }
+                
                 echo $this->formElementErrors($fn);
             ?>
         </p>
@@ -265,7 +373,13 @@ $form->setAttribute('method', 'post');
         <p style="border: 0;">
            <?php $fn = $form->get('bl_accepter_u_id')->setOptions($companyUsers);
             echo '<strong>' . $this->formLabel($fn->setLabelAttributes(array('style'=>'width:190px'))) . '</strong>';
-            echo $this->formSelect($fn->setAttributes(array('class'=>'form-control', 'id'=>'bl_accepter_u_id')));
+            if ($breach_disable_fields) {
+                echo $this->formSelect($fn->setAttributes(array('class'=>'form-control', 'id'=>'bl_accepter_u_id', 'disabled' => 'disabled')));
+            }
+            else {
+                echo $this->formSelect($fn->setAttributes(array('class'=>'form-control', 'id'=>'bl_accepter_u_id')));
+            }
+            
             echo $this->formElementErrors($fn);
             ?>
         </p>
@@ -273,7 +387,13 @@ $form->setAttribute('method', 'post');
             <?php
                 $fn = $form->get('bl_initials');
                 echo $this->formLabel($fn->setLabelAttributes(array('style'=>'width:190px')));
-                echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id'=>'bl_initials')));
+                if ($breach_disable_fields) {
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id'=>'bl_initials', 'disabled' => 'disabled')));
+                }
+                else {
+                    echo $this->formInput($fn->setAttributes(array('class'=>'form-control required', 'id'=>'bl_initials')));
+                }
+                
                 echo $this->formElementErrors($fn);
             ?>
         </p>
@@ -281,7 +401,13 @@ $form->setAttribute('method', 'post');
             <strong style="line-height: 30px;">Notes</strong><br />
             <?php
             $fn = $formNote->get('note_text');
-            echo $this->formTextarea($fn->setAttributes(array('style' => 'width: 570px;')));
+            if ($breach_disable_fields) {
+                echo $this->formTextarea($fn->setAttributes(array('style' => 'width: 570px;', 'disabled' => 'disabled')));
+            }
+            else {
+                echo $this->formTextarea($fn->setAttributes(array('style' => 'width: 570px;')));
+            }
+            
             echo $this->formElementErrors($fn);
             ?>
 
@@ -347,7 +473,7 @@ $form->setAttribute('method', 'post');
 
 <script type="text/javascript">
     jQuery(function() {
-        $('#breachlog').validate();
+        //$('#breachlog').validate();
         $('input[name="u_zip"]').mask("99999");
         //$('input[name="bl_size"]').mask("99999");
 
@@ -362,7 +488,6 @@ $form->setAttribute('method', 'post');
 
         $('#q22, #q21').change();
         $('#bl_size').change(function(){
-            if($('#q102').is(':disabled')) return;
             if(parseFloat($('#bl_size').val()) >= 500) {
                 $('#q102').attr('checked', 'checked');
             } else {
@@ -412,6 +537,19 @@ $form->setAttribute('method', 'post');
             });
             
             $( "#bl_date_of_occurrence, #bl_date_invest_start, #bl_date_invest_complete" ).datepicker({dateFormat: 'mm/dd/yy'});
+
+            if(parseFloat($('#bl_size').val()) >= 500) {
+                $('#q102').attr('checked', 'checked');
+            } else {
+                $('#q101').attr('checked', 'checked');
+            }
+            
+           var locked = <?php echo json_encode($breach_locked_local); ?>;
+           
+           if (locked == true){
+            $("#_regulations_table").find("input,button,textarea,select").attr("disabled", "disabled");
+           }
+
         });
 
         function searchRegulations()
@@ -438,7 +576,12 @@ $form->setAttribute('method', 'post');
         searchRegulations();
 
         $('#_regulations_table tbody tr').click(function() {
-            $(this).toggleClass('tr-selected');
+            
+            if (!$("input[name='bl_name").prop("disabled"))
+            {
+                $(this).toggleClass('tr-selected');
+            }
+                        
             regulationHandle();
         });
 
@@ -463,6 +606,18 @@ $form->setAttribute('method', 'post');
         }
 
         $('#breachlog').submit(function(e) {
+            
+            var is102Checked = $('#q102').attr('checked');
+            if (is102Checked == 'checked') {
+                $("#q102").prop("disabled", false);
+                $("#q101").prop("disabled", true);
+            }
+            var is101Checked = $('#q101').attr('checked');
+            if (is101Checked == 'checked') {
+                $("#q101").prop("disabled", false);
+                $("#q102").prop("disabled", true);
+            }
+
             var value = '';
             $('#_regulations_table tbody tr.tr-selected').each(function(i, v) {
                 value += $(v).prop('id') + ',';
@@ -471,6 +626,7 @@ $form->setAttribute('method', 'post');
                 value = value.slice(0, -1);
             }
             $('#_bl_cur_regulations_hidden').val(value);
+
         });
     });
 </script>

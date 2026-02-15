@@ -1,0 +1,84 @@
+<?php
+    $urlOrder = $order == 'ASC' ? 'DESC' : 'ASC';
+    $authService = new \Zend\Authentication\AuthenticationService();
+    $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+    $identity = $authService->getIdentity();
+?>
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/rowgroup/1.1.4/css/rowGroup.dataTables.min.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/rowgroup/1.1.4/js/dataTables.rowGroup.min.js"></script>
+
+<div class="page-title">
+    <h1 class="fleft">Organization(s)</h1>
+    <a href="<?php echo $this->url('organization', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => 0, 'activeFilter' => $activeFilter)); ?>" class="label <?php echo $roleFilter == 0 ? ' selected ' : '' ?>">All</a>
+    <?php if (in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_SENIOR_CONSULTANT))
+        || $identity['u_company_id_admin']) : ?>
+        <a href="<?php echo $this->url('organization', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => $roleFilter, 'activeFilter' => 1)); ?>" class="label <?php echo $activeFilter == 1 ? ' selected ' : '' ?>">Active</a>
+        <a href="<?php echo $this->url('organization', array('action' => 'list', 'page' => $page, 'order_by' => $order_by, 'order' => $order, 'roleFilter' => $roleFilter, 'activeFilter' => 2)); ?>" class="label <?php echo $activeFilter == 2 ? ' selected ' : '' ?>">Inactive</a>
+    <?php endif;?>
+
+    <?php if ($identity['u_role_id'] != \Admin\Model\User::ROLE_TRIAL) : ?>
+        <?php if(in_array($identity['u_role_id'], array(\Admin\Model\User::ROLE_ADMIN, \Admin\Model\User::ROLE_SENIOR_CONSULTANT, \Admin\Model\User::ROLE_PARTIAL))): ?>
+            <a href="/organization/edit" class="button"><i class="fa fa-plus-circle"></i> Add New Organization</a>
+        <?php endif;?>
+    <?php endif;?>
+    <div class="cboth"></div>
+</div>
+
+<p></p>
+
+<table id="organization-list" cellpadding="0" cellspacing="0">
+    <thead>
+        <tr>
+            <?php $classSort = ($order_by == 'c_id') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>ID</th>
+            
+            <?php $classSort = ($order_by == 'organization') ? ($order == 'DESC') ? ' fa-sort-asc' : 'fa-sort-desc' : 'fa-unsorted'; ?>
+            <th>Organization</th>
+            <th>Location</th>
+            <th>Phone</th>
+            <th>Created</th>
+            <th>Renewal Date</th>
+            <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->paginator as $company): ?>
+                        
+            <tr>
+                <td><?php echo $company->c_id ?></td>
+                
+                <td>
+                    <a href="/organization/edit/<?php echo $company->c_id ?>"><?php echo $company->c_name ?></a>
+                </td>
+                <td><?php echo $company->_location_name ?></td>
+                <td><?php echo $company->c_phone ?></td>
+                <td><?php echo ($company->c_create_date != '0000-00-00 00:00:00') ? $this->formatDateA($company->c_create_date) : '' ?></td>
+                <td><?php echo ($company->c_renewal_date != '0000-00-00 00:00:00') ? $this->formatDateA($company->c_renewal_date) : '' ?></td>                
+                <td class="aright">
+                    <a href="/<?php echo 'organization' ?>/edit/<?php echo $company->c_id ?>" title="Edit"><i class="fa fa-pencil"></i></a> &nbsp;
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+<script>
+	$(document).ready( function () {
+		$('#organization-list').DataTable({
+			"order": [[ 2, "asc" ]],
+			"columnDefs": [
+				{"type": "num", "targets": 0},
+				{"type": "date", "targets": 4},
+				{"type": "date", "targets": 5},
+				{ "orderable": false, "targets": 6 }
+			]
+		});
+		$('.dataTables_filter input[type="search"]').
+			css({'width':'95%','display':'inline-block'});
+	});
+</script>
+
+<div class="cboth"><br /></div>

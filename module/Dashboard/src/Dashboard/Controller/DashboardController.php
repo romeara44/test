@@ -23,6 +23,8 @@ use Businessassociate\Model\Businessassociateuser;
 use Note\Model\Note;
 use Mail\Model\Mailtemplate;
 use Zend\Session\Container;
+use Client\Model\CompanyTable;
+use Assessment\Model\RemediationTable;
 
 class DashboardController extends AbstractActionController
 {
@@ -31,6 +33,7 @@ class DashboardController extends AbstractActionController
     protected $userTable;
     protected $noteTable;
     protected $mailtemplateTable;
+    protected $companyTable;
 
     public function onDispatch(\Zend\Mvc\MvcEvent $e)
     {
@@ -114,6 +117,16 @@ class DashboardController extends AbstractActionController
         return $identity;
     }
 
+    public function getCompanyTable()
+    {
+        if (!$this->companyTable) {
+            $sm = $this->getServiceLocator();
+            $this->companyTable = $sm->get('Client\Model\CompanyTable');
+        }
+        return $this->companyTable;
+    }
+
+
     public function clientAction()
     {
         $container = new Container('activity');
@@ -128,8 +141,28 @@ class DashboardController extends AbstractActionController
 
         $container = new Container('files');
 
+        //$company = $this->getCompanyTable()->getCompany($identity['u_company_id']);
+        $company = $this->getCompanyTable()->getCompanyInformation($identity['u_company_id']);
+
+        $rpSecurityReportInProgress = $this->getServiceLocator()->get('Assessment\Model\RemediationplanTable')->getOldestOpenSecurityRemediationplan($identity['u_company_id']);
+        $rpPrivacyReportInProgress = $this->getServiceLocator()->get('Assessment\Model\RemediationplanTable')->getOldestOpenPrivacyRemediationplan($identity['u_company_id']);
+        $trainingReport = $this->getServiceLocator()->get('Traininglog\Model\TrainingReportTable')->getTrainingReportUrlByCompany($identity['u_company_id']);
+
+        if($identity['u_company_id_admin']) {
+            $is_company_admin = 1;
+        } else {
+            $is_company_admin = 0;
+        }
+
         $viewModel = new ViewModel(array(
-            'usRoleId' => $identity['u_role_id']
+            'usRoleId' => $identity['u_role_id'],
+            'u_company_id' => $identity['u_company_id'],
+            'c_name' => $company ? $company->c_name : '',
+            'rp_security_id' => $rpSecurityReportInProgress ? $rpSecurityReportInProgress->rp_id : 0,
+            'rp_privacy_id' => $rpPrivacyReportInProgress ? $rpPrivacyReportInProgress->rp_id : 0,
+            'training_report_id' => $trainingReport ? $trainingReport->training_url : null,
+            'audit_signoff_approve' => (int)$identity['audit_signoff_approve'],
+            'is_company_admin' => $is_company_admin
         ));
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open client dashboard page');
@@ -137,6 +170,7 @@ class DashboardController extends AbstractActionController
         return $viewModel;
     }
 
+    //This should be removed when all references are fixed as this is a spelling error.  It should be trialAction
     public function trailAction()
     {
         $container = new Container('activity');
@@ -156,6 +190,29 @@ class DashboardController extends AbstractActionController
         ));
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open trail user dashboard page');
+
+        return $viewModel;
+    }
+
+    public function trialAction()
+    {
+        $container = new Container('activity');
+        $container->activity = time();
+        $container = new Container('files');
+        $identity  = $this->getIdentity();
+        
+        if ($container->item != '') {
+            $container->item = '';
+            $this->redirect()->toUrl($container->item);
+        }
+
+        $container = new Container('files');
+
+        $viewModel = new ViewModel(array(
+            'usRoleId' => $identity['u_role_id']
+        ));
+
+        $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open trial user dashboard page');
 
         return $viewModel;
     }
@@ -186,6 +243,7 @@ class DashboardController extends AbstractActionController
             'logsOpen' => $logsOpen,
             'logsActivities' => $logsActivities,
             'logsUpcoming' => $logsUpcoming,
+            'roleId' => $identity['u_role_id']
         ));
 
         $this->getServiceLocator()->get('Application\Model\LogsTable')->saveUserFileLog('Open consultant dashboard page');

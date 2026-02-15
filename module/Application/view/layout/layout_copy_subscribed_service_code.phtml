@@ -1,0 +1,461 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <?php $sl = $this->getHelperPluginManager()->getServiceLocator(); ?>
+    <head profile="http://gmpg.org/xfn/11">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <title>HIPAA Suite by The Carosh Group</title>
+        <script src="https://kit.fontawesome.com/e1b4bd3382.js" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="//use.typekit.net/zii4xgd.js"></script>
+        <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+        <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+        <link rel="apple-touch-icon" sizes="114x114" href="/images/apple-touch-icon-iphone-retina.png" />
+        <link rel="apple-touch-icon" sizes="72x72" href="/images/apple-touch-icon-ipad.png" />
+        <link rel="apple-touch-icon" sizes="57x57" href="/images/apple-touch-icon-iphone.png" />
+        <!-- Le styles -->
+        <?php echo $this->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon'))
+            ->prependStylesheet($this->basePath() . '/css/style.css?v=1.1')
+            ->prependStylesheet($this->basePath() . '/css/font-awesome.css')
+            ->prependStylesheet($this->basePath() . '/css/jquery.fancybox.css')
+            ->prependStylesheet($this->basePath() . '/css/jquery-ui.min.css')
+            ->prependStylesheet($this->basePath() . '/css/jquery-ui.structure.min.css')
+            ->prependStylesheet($this->basePath() . '/css/jquery-ui.theme.min.css')
+        ?>
+
+        <meta name="author" content="click5interactive.com" />
+        <meta name="robots" content="noindex, nofollow" />
+
+        <script type="text/javascript" src="/js/jquery.min.js"></script>
+        <script type="text/javascript" src="/js/scripts.js"></script>
+        <script type="text/javascript" src="/js/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="/js/jquery.validate.min.js"></script>
+        <script type="text/javascript" src="/js/jquery.fancybox.pack.js"></script>
+        <script type="text/javascript" src="/js/jquery.maskedinput.min.js"></script>
+        <script type="text/javascript" src="/js/Chart.min.js"></script>
+        <script src='https://www.google.com/recaptcha/api.js'></script>
+        <script src="/js/jquery.ui.widget.js"></script>
+        <script src="/js/jquery.iframe-transport.js"></script>
+        <script src="/js/jquery.fileupload.js"></script>
+    </head>
+
+    <body class="<?php echo ($this->bodyClass != '') ?  $this->bodyClass : $this->bodyClass() ?>">
+        <div class="wrapper_all">
+
+            <?php if (isset($flashMessagesSuccess) && count($flashMessagesSuccess)) : ?>
+                <div class="confirmation-box">
+                    <?php foreach ($flashMessagesSuccess as $msg) : ?>
+                        <p><?php echo $msg; ?></p>
+                    <?php endforeach; ?>
+                </div>
+                <script type="text/javascript">
+                    jQuery('.confirmation-box').stop().show().animate({opacity: 1.0}, 3000).fadeOut(1000);
+                </script>
+            <?php endif; ?>
+            <?php if (isset($flashMessagesErrors) && count($flashMessagesErrors)) : ?>
+                <div class="confirmation-box-error">
+                    <?php foreach ($flashMessagesErrors as $msg) : ?>
+                        <p><?php echo $msg; ?></p>
+                    <?php endforeach; ?>
+                </div>
+                <script type="text/javascript">
+                    jQuery('.confirmation-box-error').stop().show().animate({opacity: 1.0}, 3000).fadeOut(1000);
+                </script>
+            <?php endif; ?>
+
+            <?php
+                $authService = new \Zend\Authentication\AuthenticationService();
+                $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+                $identity = $authService->getIdentity();
+                $uRoleId = $identity['u_role_id'];
+            ?>
+
+            <?php
+                // $authService = new \Zend\Authentication\AuthenticationService();
+                // $authService->setStorage(new \SanAuth\Model\MyAuthStorage('hipaa'));
+                // $identity = $authService->getIdentity();
+                // $uRoleId = $identity['u_role_id'];
+
+                // $stuff = new \Client\Model\CompanyTable
+                //$companyObj = $this->getServiceLocator()->get('\Client\Model\CompanyTable')->getCompanyLayout($this->identity['']);
+                
+            ?>
+
+            <div id="header-wrap" <?php if ($uRoleId == 6): ?>style="height: 110px;"<?php endif ?>>
+                <div id="header" <?php if ($uRoleId == 6): ?>style="height: 110px;"<?php endif ?>>
+                    <div id="logo"><img src="/images/logo-main.png" alt="HIPAA Suite" title="HIPAA Suite"/></a></div>
+                <?php if ($uRoleId): ?>
+                    <div id="top-links">
+
+                        Welcome, <?php echo $this->userName(); ?><br />
+                        <?php if ($uRoleId == \Admin\Model\User::ROLE_ADMIN): ?>
+                            <a href="/sitesetting">Site Settings</a><br />
+                        <?php endif ?>
+                        <a href="/user/account">My Profile</a><br />
+												<a href="#role-report-issue-modal" class="confirmation-modal" onclick="$('.report-issue-msg').hide();">Report Issue</a><br />												
+                        <a href="/auth/logout">Logout</a>
+                    </div>
+                        <?php if (!in_array($uRoleId, array(5, 6, 7))): ?>
+                            <div id="top-search">
+                                <form id="formLogin" method="POST" action="/search/search">
+                                    <input type="hidden" name="roleFilter" value="<?php echo empty($this->searchRoleFilter) ? '' : $this->searchRoleFilter; ?>">
+                                    <a href="javascript:" onclick="$('#formLogin').submit()" id="search-button"></a>
+                                    <input type="text" name="search" id="search" value="<?php echo (isset($this->query) && $this->query != '') ? $query : 'Search' ?>" onfocus="if (this.value=='Search') this.value='';" onblur="if (this.value=='') this.value='Search';" />
+                                </form>
+                            </div>
+                        <?php elseif($uRoleId != \Admin\Model\User::ROLE_PARTIAL): ?>
+                            <div id="top-contact">
+                                <?php $uConsultant = $this->getConsultant($sl); ?>
+                                <strong>Your Consultant</strong> &mdash; <?php echo is_object($uConsultant) ? $uConsultant->u_firstname : '' ?> <?php echo is_object($uConsultant) ? $uConsultant->u_lastname : ''?><br />
+                                <span><?php echo is_object($uConsultant) ? $uConsultant->u_office_phone : '' ?> &nbsp; | &nbsp; <a href="mailto:<?php echo is_object($uConsultant) ? $uConsultant->u_email : ''?>"><?php echo is_object($uConsultant) ? $uConsultant->u_email : '' ?></a></span>
+                            </div>
+                        <?php endif; ?>
+                        
+                        <div id="hipaa-type" style="color:red; font-size: 10px;">
+                            <?php $companyObj = $this->getHipaaTypes($sl); ?><div>
+                            <p>Subscribed Services: <?php echo $companyObj->is_training_sub_type ?> Training <?php echo $companyObj->is_oig_express_sub_type ?> OIG Express <?php echo $companyObj->is_osha_express_sub_type ?> OSHA Express 1 HIPAA Express 0 HIPAA Basic 0 HIPAA Select 0 HIPAA Expert</p>
+                            
+                        </div>
+
+                        <?php if ($uRoleId != 6): ?>
+                            <div id="nav">
+                                <?php echo $this->menuTop($sl); ?>
+                            </div>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+
+            <div id="wrap">
+                <div id="canvas">
+                    <?php echo $this->content; ?>
+                </div>
+                <div class="cboth"></div>
+            </div>
+            <div class="clear"></div>
+        </div>
+
+
+        <div id="footer-wrap">
+            <div id="footer">
+
+                <div class="fleft">
+                    <h5>&nbsp;</h5>
+                    <p>Copyright &copy; <?php echo date('Y'); ?> <a href="http://www.carosh.com/" target="_blank">The Carosh Group</a>. All rights reserved.<br />
+                        <a href="/Privacy_Policy.pdf" class="copy">Privacy Statement</a> &nbsp; | &nbsp; <a href="/Terms_of_Use.pdf" class="copy">Terms and Conditions</a></p>
+                </div>
+
+                <div class="fright">
+                    <h5>Questions? Need help?</h5>
+                    <p>Read our <strong><a href="#">FAQs</a></strong> for quick answers or contact our support<br />
+                        team by calling <strong>219-230-9000</strong> or <strong><a href="mailto:support@carosh.com">support@carosh.com</a></strong>.</p>
+                </div>
+
+                <div class="cboth"></div>
+
+            </div>
+        </div>
+
+        <div id="confirmation-box-modal">
+            <h3>Are you sure you want to delete this record?</h3>
+            <div class="form-buttons">
+                <a id="deleteYes" href="/" class="form-button">Yes</a>
+                <a href="javascript:void(0);" onclick="jQuery.fancybox.close();" class="form-button">No</a>
+            </div>
+        </div>
+
+        <div id="role-rename-modal" style="display: none;">
+            <h3>Update Role Name (Optional)</h3>
+            <div class="form-buttons">
+
+                <form id="alias-form" method="post" action="" class="inline">
+					<input type="text" name="alias" id="alias" maxlength="30" title="Enter alias role name.">
+                </form>
+
+                <a id="rename-role" class="form-button" onclick="var o=new roleObj(); o.renameRole();" title="Enter a new role name above and save">Save</a>
+                <a href="javascript:void(0);" onclick="var o=new roleObj(); o.revertRole();" class="form-button" title="Rever to original role name">Revert</a>
+                <a href="javascript:void(0);" onclick="jQuery.fancybox.close();" class="form-button">Cancel</a>
+
+                <script>
+                    var owner = null;
+                    class roleObj{
+                        constructor() {
+                            var t = this;
+                            owner = t;
+                            t.document = document;
+                            t.ar_id = t.document.getElementById("alias-form-role-id").innerText;
+                            t.company_id = t.document.getElementById("alias-form-company-id").innerText;
+                            t.url = "/alias/edit/" + t.ar_id + "/" + t.company_id;
+                            t.revert = null;
+                        }
+
+                        ajaxCall(callback){
+                            var t = this;
+                            $.ajax({
+                                url:t.url,
+                                type:'post',
+                                data:$(t.document.getElementById('alias-form')).serialize(),
+                                success:function(response){
+                                        var data = JSON.parse(response);
+                                        var targetDiv = "rolename " + t.ar_id;
+                                        // Reset rolename on current page (since there's no redirect)
+                                        owner.document.getElementById(targetDiv).innerText = data.alias;
+                                        callback();
+                                }
+                            });
+                        }
+
+                        renameRole(){
+                            var t = this;
+                            t.ajaxCall(t.finish);
+                        }
+
+                        revertRole(){
+                            var t = this;
+
+                            t.revert = t.document.createElement('input');
+                            t.revert.type = 'hidden';
+                            t.revert.name = 'delete'; // 'the key/name of the attribute/field that is sent to the server
+                            t.revert.value = 'true';
+                            t.document.getElementById('alias-form').appendChild(t.revert);
+                            t.ajaxCall(function(){
+                                var t = owner;
+                                t.document.getElementById('alias-form').removeChild(t.revert);
+                                t.finish();
+                            });
+                        }
+
+                        finish(){
+                            var t = owner;
+                            // Reset alias-form to defaults and close modal
+                            var field_alias = t.document.getElementById("alias-form").elements.namedItem("alias");
+                            field_alias.value = field_alias.defaultValue;
+                            jQuery.fancybox.close();
+                        }
+                    }
+
+                </script>
+            </div>
+        </div>
+
+        <div id="role-report-issue-modal" style="display: none;">
+					<h3>Report Issue</h3>
+					<div>
+						<div>
+							<p id="report-issue-txt" class="report-issue-msg"></p>
+						</div>
+						<script>
+              $('.report-issue-msg').hide();
+						</script>
+						<form method="post" action="" class="inline">
+							<textarea id="report-issue-text" rows="12" cols="100" title="Enter and report an individual issue here."></textarea>
+						 </form>
+
+						<a id="report-issue" class="form-button" onclick="var o=new reportObj(); o.reportIssue();" title="Enter an issue above to report.">Report</a>
+						<a href="javascript:void(0);" onclick="jQuery.fancybox.close();" class="form-button">Cancel</a>
+
+						<script>
+								var owner = null;
+								class reportObj{
+									constructor() {
+										var t = this;
+										owner = t;
+										t.document = document;
+										$('.report-issue-msg').hide();
+										t.url = "/user/issue/";
+									}
+
+									ajaxCall(callback){
+										var t = this;
+										var is = t.document.getElementById('report-issue-text').value;
+										var dat = {"issue": is};
+										if(is == ""){
+                      t.document.getElementById('report-issue-txt').innerHTML = '<font size="4" color="red" type="bold">Please enter an issue.</font>';
+                      $('.report-issue-msg').show().animate({opacity: 1.0}, 3000).fadeOut(1000);
+											return;
+										}
+										
+										$.ajax({
+											url:t.url,
+											type:'post',
+											data:dat,
+											success:function(response){
+												callback();
+											}
+										});
+									}
+
+									reportIssue(){
+										var t = this;
+										t.ajaxCall(t.finish);
+									}
+
+
+									finish(){
+										var t = owner;
+										t.document.getElementById('report-issue-text').value = '';
+										t.document.getElementById('report-issue-txt').innerHTML = '<font size="4" color="green" type="bold">Issue successfully reported.</font>';
+										$('.report-issue-msg').show().animate({opacity: 1.0}, 3000).fadeOut(1000);
+										setTimeout(function(){ jQuery.fancybox.close(); }, 2500);
+									}
+								}
+
+						</script>
+					</div>
+        </div>
+
+        <div class="modules-access-box">
+            <h3>For access to this module you need enter code</h3>
+            <div>
+                <p style="overflow: hidden">
+                    <input type="text" name="code" id="moduleAccessCode" value="" />
+                    <label for="moduleAccessCode" class="error">Wrong or old code</label>
+                    <input type="hidden" name="url" id="moduleAccessUrl" value="" />
+                </p>
+                <div class="form-buttons">
+                    <p class="send-code-msg-ok">Code sent to your email</p>
+                    <a id="moduleAccessSubmit" href="javascript:;" class="form-button">Submit</a>
+                    <a id="moduleAccessSend" href="javascript:;" class="form-button">Send code to email</a>
+                    <a id="moduleAccessCancel" href="javascript:;" class="form-button">Cancel</a>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="activity-box">
+            <p>You will be log out after <span id="secLeft">60</span> sec. Click <a id="resetActivity" href="javascript:">OK</a> to continue</p>
+        </div>
+        <div class="need-activation-box">
+            <?php $application_vars = new Zend\Session\Container('application_vars');?>
+            <p>This module is not activated, contact <a href="mailto:<?php  echo $application_vars->storage['register_email']?>"><?php  echo $application_vars->storage['register_email']?></a> to find out about activation</p>
+        </div>
+
+        <div id="deactivation-box-modal">
+            <h3>Are you sure you want to deactivate this client?</h3>
+            <div class="form-buttons">
+                <a id="deactivateYes" href="/" class="form-button">Yes</a>
+                <a href="javascript:void(0);" onclick="jQuery.fancybox.close();" class="form-button">No</a>
+            </div>
+        </div>
+
+        <div id="del-att-box-modal">
+            <h3>Are you sure you want to delete this attachment?</h3>
+            <div class="form-buttons">
+                <a id="delAttYes" href="/" class="form-button ajax-link">Yes</a>
+                <a href="javascript:void(0);" onclick="jQuery.fancybox.close();" class="form-button">No</a>
+            </div>
+        </div>
+    </body>
+
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            $.datepicker.setDefaults({
+              changeMonth: true,
+            changeYear: true,
+            yearRange: "-80:+05"
+            });
+            jQuery('.confirmation-box').hover(
+                function() {
+                    jQuery('.confirmation-box').stop(true, true).show();
+                }, function() {
+                    jQuery('.confirmation-box').stop().animate({opacity: 1.0}, 3000).fadeOut(1000);
+                }
+            );
+
+            jQuery('.confirmation-box-error').hover(
+                function() {
+                    jQuery('.confirmation-box-error').stop(true, true).show();
+                }, function() {
+                    jQuery('.confirmation-box-error').stop().animate({opacity: 1.0}, 3000).fadeOut(1000);
+                }
+            );
+
+            setCheckActivity();
+            $('#resetActivity').click(function() {
+                $.getJSON("/dashboard/resetactivity", {  }, function(data) {
+                    jQuery('.activity-box').stop().hide().animate({opacity: 1.0}, 3000);
+                    $('#secLeft').html(60);
+                    clearInterval(secLeftInterval);
+                    setCheckActivity();
+                });
+            });
+            $('a.with-access').click(function(e) {
+                e.preventDefault();
+                $('#moduleAccessUrl').val($(this).attr('href'));
+                $.get("/auth/checkaccessformodules", { }, function(data) {
+                    if(data.result === 1) {
+                        document.location.href = $('#moduleAccessUrl').val();
+                    } else if(data.result === 0) {
+                        $('#moduleAccessCode').removeClass('error').val('');
+                        $('label.error, .send-code-msg-ok').hide();
+                        $('.modules-access-box').show().animate({opacity: 1.0}, 3000);
+                    }
+                    
+                });
+            });
+            $('#moduleAccessSend').click(function(e) {
+                $this = $(this);
+                $.post("/auth/getaccessformodules", { 'action': 'send_code' }, function(data) {
+                    if(data.result === 1) {
+                       $('.send-code-msg-ok').show().animate({opacity: 1.0}, 3000).fadeOut(1000);
+                    }
+                    
+                });
+            });
+            $('#moduleAccessSubmit').click(function(e) {
+                $.post("/auth/getaccessformodules", { 'action': 'get_access', 'code': $('#moduleAccessCode').val() }, function(data) {
+                    debugger;
+                    if(data.result === 1) {
+                        document.location.href = $('#moduleAccessUrl').val();
+                    } else {
+                       $('#moduleAccessCode').addClass('error');
+                       $('label.error').fadeIn(300);
+                    }
+                });
+            });
+            $('#moduleAccessCancel').click(function(e) {
+                $('.modules-access-box').stop().fadeOut(500);
+            });
+        });
+
+        var secLeftInterval  = null;
+
+        var funcOnLogout  = null;
+        var needLogout  = true;
+
+        function setCheckActivity()
+        {
+            var check = setInterval(function() {
+                $.getJSON("/dashboard/checkactivity", {  }, function(data) {
+                    if (parseInt(data) == 1) {
+                        clearInterval(check);
+                        jQuery('.activity-box').stop().show().animate({opacity: 1.0}, 3000);
+                        var secLeft = 60;
+
+                        secLeftInterval = setInterval(function() {
+                            $('#secLeft').html(--secLeft);
+                            if (secLeft == 0) {
+                                console.log(typeof funcOnLogout)
+                                if (typeof funcOnLogout == 'function') {
+                                    funcOnLogout();
+                                }
+                                if (needLogout) {
+                                    document.location.href = '/auth/logout';
+                                }                                
+                            }
+                        }, 1000);
+                    }
+                })
+            }, 10000);
+        }
+        $('li.disabled a').click(function() {
+            $('.need-activation-box').show().animate({opacity: 1.0}, 3000).fadeOut(1000);
+        })
+
+        $('a.disabled').click(function(e) {
+            e.preventDefault();
+        })
+    </script>
+</html>
+
