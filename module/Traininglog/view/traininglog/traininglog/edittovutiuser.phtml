@@ -1,0 +1,219 @@
+<script src="https://kit.fontawesome.com/e1b4bd3382.js" crossorigin="anonymous"></script>
+<?php 
+$request = new \Zend\Http\PhpEnvironment\Request();
+$http_referer = $request->getServer('HTTP_REFERER');
+$parsed = parse_url($http_referer, PHP_URL_PATH); //dashboard/client
+
+// within a view script
+$form = $this->form;
+$form->prepare();
+
+// Assuming the "contact/process" route exists...
+$form->setAttribute('action', 'edittovutisuser');
+
+// Set the method attribute for the form
+$form->setAttribute('method', 'post');
+
+// Render the opening tag
+?>
+
+<div class="page-title">
+    <h1 class="fleft">Edit Trainee5</h1>
+    <div class="cboth"></div>
+
+</div>
+
+<p></p>
+
+
+<div class="col-left">
+    <div id="tab1">
+        <form action="edittovutiuser<?php echo $this->id ?>" method="post" name="edittovutiuser" id="edittovutiuser">
+          <?php
+              $fn = $form->get('tovutiuserid');
+              echo $this->formHidden($fn);
+          ?>
+
+          <?php
+            $fn = $form->get('companyname');
+            echo $this->formHidden($fn);
+          ?>
+
+          <?php
+              $fn = $form->get('tovutiid');
+              echo $this->formHidden($fn);
+          ?>
+
+          <p>
+          
+            <?php
+              $fn = $form->get('firstname');
+              echo $this->formLabel($fn);
+              echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+              echo $this->formElementErrors($fn);
+            ?>
+          </p>
+
+          <p>
+            <?php
+              $fn = $form->get('lastname');
+              echo $this->formLabel($fn);
+              echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+              echo $this->formElementErrors($fn);
+            ?>
+          
+          </p>
+
+          <p>
+            <div class="tooltip">
+              <i class="fas fa-info-circle"></i><span class="tooltiptext">Employees email address at which they will receive all training notification emails.</span>
+              <label for="email" style="width: auto">Email</label>
+            </div>
+          
+            <?php
+              $fn = $form->get('email');
+              //echo $this->formLabel($fn);
+              echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+              echo $this->formElementErrors($fn);
+            ?>
+          </p>
+
+          <p>
+            <div class="tooltip">
+              <i class="fas fa-info-circle"></i><span class="tooltiptext">The department of the organization that the employee works within.</span>
+              <label for="jobtitle" style="width: auto">Department</label>
+            </div>
+            <?php
+              $fn = $form->get('department');
+              //echo $this->formLabel($fn);
+              echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+              echo $this->formElementErrors($fn);
+            ?>
+          </p>
+
+          <p>
+            <div class="tooltip">
+              <i class="fas fa-info-circle"></i><span class="tooltiptext">The employees current job title within the organization.</span>
+              <label for="jobtitle" style="width: auto">Job Title</label>
+            </div>
+            <?php
+              $fn = $form->get('jobtitle');
+              //echo $this->formLabel($fn);
+              echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+              echo $this->formElementErrors($fn);
+            ?>
+          </p>
+
+          <p>
+            <div class="tooltip">
+              <i class="fas fa-info-circle"></i><span class="tooltiptext">User name that employee will use to log in to the training system.  This is normally the employee’s email address.</span>
+              <label for="username" style="width: auto">User Name</label>
+            </div>
+            <?php
+              $fn = $form->get('username');
+              //echo $this->formLabel($fn);
+              echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+              echo $this->formElementErrors($fn);
+            ?>
+          </p>
+          
+          <p>
+              <div style="padding-top: 0">
+                <div class="tooltip">
+                  <i class="fas fa-info-circle"></i><span class="tooltiptext">An Essential User is a user who has access to ePHI on a frequent or regular basis. An Occasional User is a user that does not have access to ePHI on a frequent or regular basis but rather may come across ePHI on an infrequent or occasional basis.</span>
+                  <label for="traineetype" style="width: auto">Trainee Type</label>
+                </div>
+              </div>
+              <select name="departments" id="departments" class="w175">
+                  
+                  <?php foreach ($departments as $ar): ?>
+                      <option <?php echo $ar->id == $selectedDepartment->id ? ' SELECTED' : ''  ?> value=<?php echo $ar->id ?>><?php echo $ar->group_name ?></option>
+                  <?php endforeach; ?>
+                  
+              </select>
+          </p>
+
+          <p>
+            <?php
+              $fn = $form->get('registerdate');
+              echo $this->formLabel($fn);
+              echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'disabled' => 'disabled')));
+              echo $this->formElementErrors($fn);
+            ?>
+          
+          </p>
+
+          <p>
+            <?php
+              $fn = $form->get('lastvisitdate');
+              echo $this->formLabel($fn);
+              echo $this->formInput($fn->setAttributes(array('class'=>'form-control', 'disabled' => 'disabled')));
+              echo $this->formElementErrors($fn);
+            ?>
+          
+          </p>
+
+          <p>
+            <?php
+              $fn = $form->get('requirereset');
+              echo $this->formLabel($fn);
+              echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+              echo $this->formElementErrors($fn);
+            ?>
+              
+              
+            
+              <?php
+              // <label for="requirereset">Require Reset:</label>
+
+              // <select name="requirereset" id="requirereset">
+              //   <option <?php echo $tovutiDatabaseObject->require_reset == 1 ? ' SELECTED' : "" ?> value="1">True</option>
+              //   <option <?php echo $tovutiDatabaseObject->require_reset == 0 ? ' SELECTED' : "" ?> value="0">False</option>
+              // </select>
+              ?>
+          </p>
+
+          <p>              
+            <?php
+              // <label for="status">Status:</label>
+
+              // <select name="status" id="status">
+              //   <option value="active">Active</option>
+              //   <option value="disabled">Disabled</option>
+              // </select>
+            ?>
+
+              <?php
+                $fn = $form->get('status');
+                echo $this->formLabel($fn);
+                echo $this->formSelect($fn->setAttributes(array('class'=>'form-control')));
+                echo $this->formElementErrors($fn);
+              ?>
+          </p>
+         
+    
+<div class="cboth"></div>
+
+<div class="form-buttons">
+    <input id="save" type="submit" name="save" value="Save" class="form-button" />
+    <a href="/traininglog/employeemasterlist" class="cancel">Cancel</a>
+</div>
+
+<?php echo $this->form()->closeTag(); ?>
+
+<?php
+  if(isset($_POST['submit']))
+  {
+    $getcar=$_POST['litmosTeam'];
+  }
+?>
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+
+        $('#save').click(function() {
+            //document.getElementById('addlitmosuser').submit();
+        });
+
+    });
+
+</script>

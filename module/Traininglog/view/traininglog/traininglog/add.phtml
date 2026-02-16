@@ -1,0 +1,97 @@
+<?php
+    // Filename: /module/Traininglog/view/traininglog/traininglog/add.phtml:
+    
+    $title = 'Add Trainee';
+    $this->headTitle($title);
+?>
+
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<?php
+    $form->setAttribute('action', $this->url('traininglog', array('action' => 'add')));
+    $form->prepare();
+
+    echo $this->form()->openTag($form);
+    echo $this->formHidden($form->get('tovutiuserid'));
+    echo $this->formHidden($form->get('companyname'));
+    echo $this->formHidden($form->get('tovutiid'));
+    echo $this->formRow($form->get('firstname'));
+    echo $this->formRow($form->get('lastname'));
+?>
+
+<p>
+<div class="tooltip">
+ <i class="fas fa-info-circle"></i><span class="tooltiptext">Employees email address at which they will receive all training notification emails.</span>
+ <label for="email" style="">Email</label>
+</div>
+
+<?php
+ $fn = $form->get('email');
+ //echo $this->formLabel($fn);
+ echo $this->formRow($fn->setAttributes(array('class'=>'form-control required')));
+ echo $this->formElementErrors($fn);
+?>
+</p>
+
+<p>
+    <div class="tooltip">
+        <i class="fas fa-info-circle"></i><span class="tooltiptext">The department of the organization that the employee works within.</span>
+        <label for="department" style="">Department</label>
+    </div>
+    <div>
+        <?php
+        $fn = $form->get('department');
+        //echo $this->formLabel($fn);
+        echo $this->formSelect($fn->setAttributes(array('class'=>'form-control required')));
+        echo $this->formElementErrors($fn);
+        ?>
+    </div>
+</p>
+    <div class="tooltip">
+        <i class="fas fa-info-circle"></i><span class="tooltiptext">The employees current job title within the organization.</span>
+        <label for="jobtitle" style="">Job Title</label>
+    </div>
+    <div>
+        <?php
+            $fn = $form->get('jobtitle');
+            //echo $this->formLabel($fn);
+            echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+            echo $this->formElementErrors($fn);
+        ?>
+    </div>
+</p>
+
+<div class="tooltip">
+ <i class="fas fa-info-circle"></i><span class="tooltiptext">User name that employee will use to log in to the training system.  This is normally the employee’s email address.</span>
+ <label for="username" style="">User Name</label>
+</div>
+<?php
+ $fn = $form->get('username');
+ //echo $this->formLabel($fn);
+ echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+ echo $this->formElementErrors($fn);
+?>
+</p>
+
+<p>
+ <div style="padding-top: 0">
+   <div class="tooltip">
+     <i class="fas fa-info-circle"></i><span class="tooltiptext">An Essential User is a user who has access to ePHI on a frequent or regular basis. An Occasional User is a user that does not have access to ePHI on a frequent or regular basis but rather may come across ePHI on an infrequent or occasional basis.</span>
+     <label for="traineetype" style="width: auto">Trainee Type</label>
+   </div>
+ </div>
+ <select name="departments" id="departments" class="w175">
+     
+     <?php foreach ($departments as $ar): ?>
+         <option <?php echo $ar->id == $selectedDepartment->id ? ' SELECTED' : ''  ?> value=<?php echo $ar->id ?>><?php echo $ar->group_name ?></option>
+     <?php endforeach; ?>
+     
+ </select>
+</p>
+
+<?php
+    echo $this->formRow($form->get('requirereset'));
+    echo $this->formRow($form->get('status'));
+    echo $this->formSubmit($form->get('submit'));
+    echo $this->formSubmit($form->get('cancel'));
+    echo $this->form()->closeTag();
+?>

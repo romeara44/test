@@ -1,0 +1,169 @@
+<?php 
+$request = new \Zend\Http\PhpEnvironment\Request();
+$http_referer = $request->getServer('HTTP_REFERER');
+$parsed = parse_url($http_referer, PHP_URL_PATH); //dashboard/client
+
+// within a view script
+$form = $this->form;
+$form->prepare();
+
+// Assuming the "contact/process" route exists...
+$form->setAttribute('action', 'addlitmosuser');
+
+// Set the method attribute for the form
+$form->setAttribute('method', 'post');
+
+
+
+// Render the opening tag
+?>
+
+<div class="page-title">
+    <h1 class="fleft">Add Trainee</h1>
+    <div class="cboth"></div>
+
+</div>
+
+<p></p>
+
+
+<div class="col-left">
+    <div id="tab1">
+        <form action="addlitmosuser<?php echo $this->id ?>" method="post" name="addlitmosuser" id="addlitmosuser">
+          <?php
+            $fn = $form->get('id');
+            echo $this->formHidden($fn);
+          ?>
+
+          <?php
+            $fn = $form->get('companyname');
+            echo $this->formHidden($fn);
+          ?>
+
+          <?php
+              $fn = $form->get('litmosuserid');
+              echo $this->formHidden($fn);
+          ?>
+
+          <p>
+            <?php
+              $fn = $form->get('department');
+              echo $this->formHidden($fn);
+            ?>
+          </p>
+
+          <p>
+            <p>
+              <p style="padding-top: 0">Department</p>
+              <div class="tooltip">
+                <i class="fas fa-info-circle"></i><span class="tooltiptext">The department of the organization that the employee works within.</span>
+              </div>
+            </p>
+
+            <select name="departments" id="departments" class="w175">
+                
+                <?php foreach ($departments as $ar): ?>
+                    <option <?php echo $ar == $selectedDepartment ? ' SELECTED' : ''  ?> value=<?php echo $ar ?>><?php echo $ar ?></option>
+                <?php endforeach; ?>
+                
+            </select>
+          </p>
+
+          <p>
+            <?php
+              $fn = $form->get('firstname');
+              echo $this->formLabel($fn);
+              echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+              echo $this->formElementErrors($fn);
+            ?>
+          </p>
+
+          <p>
+            <?php
+              $fn = $form->get('lastname');
+              echo $this->formLabel($fn);
+              echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+              echo $this->formElementErrors($fn);
+            ?>
+          </p>
+
+           <p>
+          <div class="tooltip">
+            <i class="fas fa-info-circle"></i><span class="tooltiptext">Employees email address at which they will receive all training notification emails.</span>
+            <label for="lastname" style="width: auto">Email</label>
+          </div>
+          
+            <?php
+              $fn = $form->get('email');
+              //echo $this->formLabel($fn);
+              echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+              echo $this->formElementErrors($fn);
+            ?>
+          </p>
+
+          <p>
+            <div class="tooltip">
+              <i class="fas fa-info-circle"></i><span class="tooltiptext">The employees current job title within the organization.</span>
+              <label for="lastname" style="width: auto">Job Title</label>
+            </div>
+            <?php
+              $fn = $form->get('jobtitle');
+              //echo $this->formLabel($fn);
+              echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+              echo $this->formElementErrors($fn);
+            ?>
+          </p>
+
+          <p>
+            <div class="tooltip">
+              <i class="fas fa-info-circle"></i><span class="tooltiptext">User name that employee will use to log in to the training system.  This is normally the employee’s email address.</span>
+              <label for="lastname" style="width: auto">User Name</label>
+            </div>
+            <?php
+              $fn = $form->get('username');
+              //echo $this->formLabel($fn);
+              echo $this->formInput($fn->setAttributes(array('class'=>'form-control required')));
+              echo $this->formElementErrors($fn);
+            ?>
+          </p>
+          
+          <p>
+          <div class="tooltip">
+            <i class="fas fa-info-circle"></i><span class="tooltiptext">An Essential User is a user who has access to ePHI on a frequent or regular basis. An Occasional User is a user that does not have access to ePHI on a frequent or regular basis but rather may come across ePHI on an infrequent or occasional basis.</span>
+          </div>
+          <p style="padding-top: 0">Trainee Type</p>
+          <select name="litmosTeam" id="litmosTeam" class="w175">
+              
+              <?php foreach ($teams as $ar): ?>
+                  <option <?php echo $ar['id'] == $secondaryTeamId ? ' SELECTED' : ''  ?> value=<?php echo $ar['id'] ?>><?php echo $ar['name'] ?></option>
+              <?php endforeach; ?>
+              
+          </select>
+        </p>
+
+    
+<div class="cboth"></div>
+
+<div class="form-buttons">
+    <input id="save" type="submit" name="save" value="Save" class="form-button" />
+    <a href="/traininglog/employeemasterlist" class="cancel">Cancel</a>
+</div>
+
+<?php echo $this->form()->closeTag(); ?>
+
+<?php
+  if(isset($_POST['submit']))
+  {
+    $getcar=$_POST['litmosTeam'];
+  }
+?>
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+
+        $('#save').click(function() {
+            //document.getElementById('addlitmosuser').submit();
+        });
+
+    });
+
+</script>

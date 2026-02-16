@@ -1,0 +1,106 @@
+* {
+  box-sizing: border-box;
+}
+
+input[type='checkbox'] {
+    width: 10%;
+
+}
+
+.status input[type='radio'] {
+    float: left;
+    width: 25%;
+
+}
+
+.status label {
+    font-size: 16px;
+    line-height: 14px;
+}
+
+.performance_group{
+    display:grid;
+    grid-template-columns: 2fr 4fr 1fr;
+    grid-gap:1em;
+    background-color: #145374;
+    border: 2px solid;
+    padding: 1em;
+    justify-content: space-around
+}
+
+.question_type_group{
+    display:grid;
+    grid-template-columns: 100%;
+    grid-gap:1em;
+    padding: 1em;
+    justify-content: space-around
+}
+
+.signoff_group1{
+    display:grid;
+    grid-template-columns: 100%;
+    padding: 10em;
+    justify-content: space-around;
+}
+
+.audit_group > div{
+    display:grid;
+    grid-template-columns: 4fr 1fr 1fr;
+    grid-gap:1em;
+    grid-auto-rows:minmax(50px, auto);
+    justify-items: center;
+    align-items: center;
+    background-color: #d5e9f3;
+    padding: 1em;
+    border: #333 1px solid;
+}
+
+.audit_group > div:nth-child(odd){
+    background:#e1ebf0;
+}
+
+.audit_inquiry {
+    justify-self: left;
+    grid-column: 1/2;
+}
+
+.performance_title {
+    grid-column: 1/4;
+    font-size: 25px;
+    color:#b6c1cb;
+}
+
+.performance_description {
+    grid-column: 1/4;
+    color:#b6c1cb;
+}
+
+.policy_group {
+    grid-column: 1/4;
+    justify-self: left;
+    background-color: #145374;
+    color:#b6c1cb;
+}
+
+.policy_group > label {
+    color:#b6c1cb;
+}
+
+.audit_details_group {
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-gap:1em;
+    padding: 1em;
+    justify-content: space-around
+}
+
+.comment_group > input {
+    height: 50px;
+    width: 1fr;
+}
+
+.status {
+    display: block;
+    width: 100%;
+    border: none;
+}
