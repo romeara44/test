@@ -1,1 +1,1 @@
-{"require": {"php": ">=8.4","laravel/framework": "^12.0"}}
+{\n    "require": {\n        "php": "^8.4",\n        "laravel/framework": "^12.0"\n    },\n    "autoload": {\n        "psr-4": {\n            "App\\": "app/"\n        }\n    },\n    "autoload-dev": {\n        "psr-4": {\n            "Tests\\": "tests/"\n        }\n    }\n}
